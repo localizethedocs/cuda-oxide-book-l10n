@@ -94,9 +94,9 @@ msgid ""
 "features, and API breakage** as we work to improve it. We hope you'll try it "
 "and help shape its direction by sharing feedback on your experience."
 msgstr ""
-"v0.1.0 發行版屬於早期內測階段：在我們持續改進期間，\\ **請預期會遇到臭蟲、不"
-"完整的功能，以及 API 破壞**\\ 。我們希望你能嘗試使用並透過分享使用經驗來協助"
-"塑造專案的方向。"
+"v0.1.0 發行版屬於早期內測階段：在我們持續改進期間，**請預期會遇到臭蟲、不完整"
+"的功能，以及 API 破壞**。我們希望你能嘗試使用並透過分享使用經驗來協助塑造專案"
+"的方向。"
 
 #: ../../../index.md:26
 msgid "🚀 Quick start"
