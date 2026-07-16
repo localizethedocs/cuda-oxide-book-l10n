@@ -1,0 +1,1231 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025-2026, NVIDIA Corporation
+# This file is distributed under the same license as the cuda-oxide package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: cuda-oxide \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-16 12:33+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../../compiler/mlir-dialects.md:1
+msgid "Pliron Dialects"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:3
+msgid ""
+"cuda-oxide does not lower Rust to PTX in a single, heroic transformation. It "
+"works across three pliron dialects, each modeling a different level of "
+"abstraction: two defined locally (`dialect-mir`, `dialect-nvvm`) and the "
+"LLVM dialect provided by the upstream `pliron-llvm` crate. This chapter "
+"walks through all three -- their types, their operations, and how they fit "
+"together to form the compilation pipeline."
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:10
+msgid ""
+"If you have not read the [Pliron -- Pliron IR (MLIR-like)](pliron.md) "
+"chapter yet, now is a good time. The concepts there (operations, types, "
+"attributes, regions, `Ptr<T>`, def-use chains) are the building blocks of "
+"everything on this page."
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:16
+msgid "The Three Dialects at a Glance"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Dialect"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Purpose"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Level"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "**dialect-mir**"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Models Rust MIR semantics"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Highest -- Rust types, tuples, enums, slices, checked arithmetic"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "**LLVM dialect**"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Models LLVM IR"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Middle -- flat types, GEP, PHI-ready control flow"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "**dialect-nvvm**"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Models NVIDIA GPU intrinsics"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Orthogonal -- thread indexing, warps, TMA, WGMMA, tcgen05"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:24
+msgid ""
+"The LLVM dialect is not a cuda-oxide crate: its modeling (ops, types, "
+"attributes, op-interfaces) lives upstream in the `pliron-llvm` crate, which "
+"cuda-oxide consumes as a dependency."
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:28
+msgid ""
+"`dialect-nvvm` is \"orthogonal\" rather than a layer in the stack because "
+"its operations appear *alongside* LLVM dialect operations, not below them. A "
+"warp shuffle and an integer add coexist in the same function body."
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:32
+msgid "Data flows through the pipeline like this:"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:34
+msgid ""
+"dialect-mir ──(mem2reg)──▶ dialect-mir (SSA) ──(annotated unroll)──▶ dialect-"
+"mir\n"
+"  ──(DialectConversion)──▶ LLVM dialect + dialect-nvvm ops ──(export)──▶ "
+"LLVM IR ──(llc)──▶ PTX\n"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:39
+msgid ""
+"Each arrow is a well-defined transformation over pliron or LLVM IR. The last "
+"one is LLVM's NVPTX backend doing what it does best."
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:44
+msgid "dialect-mir -- The Rust Layer"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:46
+msgid ""
+"`dialect-mir` preserves Rust's type system and control flow semantics as "
+"pliron operations. This is deliberate: we want to reason about Rust concepts "
+"(tuples, enums, checked arithmetic, address spaces) *before* flattening them "
+"to LLVM's type system."
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:51 ../../../compiler/mlir-dialects.md:161
+msgid "Types"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:53
+msgid ""
+"The dialect defines seven custom types that mirror Rust's compound types:"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Type"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Example"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Description"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`mir.tuple`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`mir.tuple<i32, f32, i64>`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Heterogeneous tuples"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`mir.ptr`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`mir.ptr<f32, mutable, addrspace: 1>`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Pointers with GPU address space"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`mir.array`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`mir.array<f32, 256>`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Fixed-size arrays"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`mir.struct`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`mir.struct<\"Point\", [f32, f32]>`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Named structs with layout info"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`mir.slice`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`mir.slice<f32, addrspace: 1>`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Fat pointers (ptr + length)"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`mir.disjoint_slice`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`mir.disjoint_slice<f32>`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Bounds-checked slice carrying a typed index space"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`mir.enum`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`mir.enum<\"Option_i32\", [(\"None\", []), (\"Some\", [i32])]>`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Rust enums with discriminant and variant payloads"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:65
+msgid ""
+"The address spaces on `mir.ptr` and `mir.slice` track where data lives in "
+"the GPU memory hierarchy:"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Address Space"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Meaning"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "0"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Generic (resolved at runtime)"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "1"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Global (device DRAM)"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "3"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Shared (per-block SRAM)"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "4"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Constant (read-only cache)"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "5"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Local (per-thread stack, spills to DRAM)"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "6"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Tensor memory (Blackwell TMEM)"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:77 ../../../compiler/mlir-dialects.md:180
+msgid "Operations"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:79
+msgid "`dialect-mir` defines 54 operations across 11 categories:"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Category"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Examples"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Count"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Function"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`mir.func`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Control flow"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid ""
+"`mir.goto`, `mir.cond_br`, `mir.return`, `mir.assert`, `mir.unreachable`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Constants"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`mir.constant`, `mir.float_constant`, `mir.undef`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Memory"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid ""
+"`mir.alloca`, `mir.load`, `mir.store`, `mir.assign`, `mir.ref`, `mir."
+"ptr_offset`, `mir.shared_alloc`, `mir.global_alloc`, `mir.extern_shared`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "9"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Arithmetic"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid ""
+"`mir.add`, `mir.sub`, `mir.mul`, `mir.div`, `mir.rem`, `mir.checked_add`, "
+"`mir.checked_sub`, `mir.checked_mul`, `mir.neg`, `mir.not`, `mir.shr`, `mir."
+"shl`, `mir.bitand`, `mir.bitor`, `mir.bitxor`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "15"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Comparison"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`mir.eq`, `mir.ne`, `mir.lt`, `mir.le`, `mir.gt`, `mir.ge`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Aggregate"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid ""
+"`mir.extract_field`, `mir.insert_field`, `mir.construct_struct`, `mir."
+"construct_tuple`, `mir.construct_array`, `mir.extract_array_element`, `mir."
+"field_addr`, `mir.array_element_addr`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "8"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Enum"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`mir.get_discriminant`, `mir.construct_enum`, `mir.enum_payload`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Cast"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`mir.cast`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Storage"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`mir.storage_live`, `mir.storage_dead`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "2"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Call"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`mir.call`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:95
+msgid ""
+"That is a lot of operations, but they fall into natural groups. If you know "
+"Rust MIR (or have read the [rustc_public chapter](rustc-public.md)), each "
+"operation maps directly to a MIR concept."
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:99
+msgid "What the IR Looks Like"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:101
+msgid ""
+"Here are a few examples of `dialect-mir` operations in practice. These are "
+"simplified for readability -- the actual printed form includes more metadata."
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:104
+msgid "**Checked addition** (Rust: `let sum = a + b` where `a, b: i32`):"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:106
+msgid ""
+"// mir.checked_add returns a tuple (result, overflow_flag)\n"
+"%checked = mir.checked_add %a, %b : i32\n"
+"%sum     = mir.extract_field %checked, 0 : mir.tuple<i32, i1>\n"
+"%overflowed = mir.extract_field %checked, 1 : mir.tuple<i32, i1>\n"
+"mir.assert %overflowed == false, \"attempt to add with overflow\" -> bb1\n"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:114
+msgid "**Struct construction and field access** (Rust: `point.x`):"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:116
+msgid ""
+"%point = mir.construct_struct %x, %y : mir.struct<\"Point\", [f32, f32]>\n"
+"%x_val = mir.extract_field %point, 0 : mir.struct<\"Point\", [f32, f32]>\n"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:121
+msgid "**Shared memory allocation** (the GPU-specific part):"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:123
+msgid ""
+"%shmem = mir.shared_alloc : mir.ptr<f32, mutable, addrspace: 3>\n"
+"mir.store %value, %shmem : f32\n"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:128
+msgid "Verification"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:130
+msgid ""
+"Every MIR operation verifies type consistency when constructed. This catches "
+"import bugs early -- before they have a chance to propagate through the "
+"lowering pipeline and surface as cryptic LLVM errors three passes later."
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:134
+msgid "Examples of what gets checked:"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:136
+msgid "`mir.add` verifies that both operands have the same type."
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:137
+msgid "`mir.cond_br` verifies that the condition is `i1` (a boolean)."
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:138
+msgid ""
+"`mir.extract_field` verifies that the field index is in bounds and the "
+"result type matches the field's type."
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:140
+msgid ""
+"`mir.store` verifies that the value type matches the pointee type of the "
+"pointer."
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:143
+msgid ""
+"`DisjointSlice` accepts only a matching `ThreadIndex`, so the type system "
+"checks the device-side index space. Host launch geometry completes the "
+"uniqueness proof through `PreparedLaunch<K>` or an unsafe raw-launch "
+"obligation. There is no separate disjoint-access compiler pass; the safety "
+"comes from these APIs."
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:150
+msgid "The LLVM Dialect -- The LLVM Layer"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:152
+msgid ""
+"The LLVM dialect models LLVM IR as pliron operations. It provides a near-1:1 "
+"mapping to textual `.ll` files -- every LLVM instruction has a corresponding "
+"pliron operation, and the types map directly to LLVM's type system. The "
+"dialect itself (ops, types, attributes, op-interfaces) is defined upstream "
+"in the `pliron-llvm` crate; cuda-oxide consumes it and re-exports it through "
+"the thin `llvm-export` crate, which also carries the textual `.ll` exporter "
+"and a few GPU-specific extensions (named address spaces, a syncscope enum, "
+"fp16 bit helpers) that pliron-llvm does not ship."
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Integers"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`i1`, `i8`, `i16`, `i32`, `i64`, `i128`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Pliron built-in, used directly"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Floats"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`half`, `float`, `double`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Pliron built-in (`FP16Type`, `FP32Type`, `FP64Type`)"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`llvm.ptr`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`ptr addrspace(1)`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Opaque pointers with optional address space"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`llvm.struct`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`{ i32, float }` or `%MyStruct`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Named or anonymous, may be opaque"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`llvm.array`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`[256 x float]`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`llvm.vector`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`<4 x float>`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "SIMD vectors"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`llvm.func`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`(i32, ptr) -> void`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Function signatures"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`llvm.void`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`void`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "The unit type"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:174
+msgid ""
+"Note the absence of Rust-specific types. By the time code reaches the LLVM "
+"dialect, tuples have become structs, enums have become discriminant-indexed "
+"structs, and slices have become pointer-length pairs. The lowering pass "
+"(covered in [The Lowering Pipeline](lowering-pipeline.md)) handles all of "
+"that flattening."
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:182
+msgid "The dialect defines 62 operations:"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid ""
+"`add`, `sub`, `mul`, `fadd`, `fsub`, `fmul`, `fdiv`, `frem`, `fneg`, ..."
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "19"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid ""
+"`zext`, `sext`, `trunc`, `fpext`, `fptrunc`, `sitofp`, `uitofp`, `fptosi`, "
+"`fptoui`, `ptrtoint`, `inttoptr`, `addrspacecast`, `bitcast`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "13"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`br`, `cond_br`, `switch`, `return`, `unreachable`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`load`, `store`, `alloca`, `gep`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Atomic"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`atomic_load`, `atomic_store`, `atomicrmw`, `cmpxchg`, `fence`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`icmp`, `fcmp`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`extract_value`, `insert_value`, `extractelement`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`call`, `call_intrinsic`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Inline asm"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`inline_asm`, `inline_asm_multi`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`constant`, `zero`, `undef`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Symbol"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`func`, `global`, `addressof`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Select"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`select`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:199
+msgid ""
+"If you have read LLVM IR before, nothing here will surprise you. The "
+"operation names are intentionally the same as their LLVM counterparts, "
+"prefixed with `llvm.` in the IR."
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:203
+msgid "The Export Engine"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:205
+msgid ""
+"The crown jewel of `llvm-export` is its export module (`crates/llvm-export/"
+"src/export/`) -- the code that converts a pliron IR module into valid "
+"textual LLVM IR. This is the part cuda-oxide keeps local: pliron-llvm only "
+"emits real `.ll` via an `llvm-sys` bridge, which cuda-oxide avoids. This is "
+"not just \"print each operation\"; several non-trivial transformations "
+"happen during export:"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:212
+msgid ""
+"**Block arguments become PHI nodes.** Pliron IR (MLIR-like) models merge "
+"points as block arguments -- a function-style calling convention between "
+"basic blocks. LLVM IR uses PHI nodes instead. The exporter builds a "
+"predecessor map from branch operands and emits `phi` instructions at the top "
+"of each non-entry block."
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:218
+msgid ""
+"**Value naming.** A pre-pass assigns sequential SSA names (`%v0`, "
+"`%v1`, ...) to every value. Constants are special-cased: `llvm.constant` "
+"results are mapped to their literal value (not a `%vN` name), so PHIs can "
+"reference constants from blocks that appear later in the output."
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:223
+msgid ""
+"**NVVM intrinsic name conversion.** Pliron identifiers use underscores; LLVM "
+"intrinsics use dots. The exporter converts all names starting with `llvm_` "
+"by replacing underscores with dots: `llvm_nvvm_read_ptx_sreg_tid_x` becomes "
+"`llvm.nvvm.read.ptx.sreg.tid.x`. This is a mechanical transformation, not a "
+"lookup table."
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:229
+msgid ""
+"**Convergent attribute marking.** Barrier, shuffle, and vote intrinsics must "
+"be marked `convergent` to prevent LLVM from hoisting them out of control "
+"flow. The exporter recognizes these by prefix pattern matching on the (dot-"
+"form) name and appends `#0` to their call sites, emitting `attributes #0 = "
+"{ convergent }` at module level."
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:235
+msgid ""
+"**Kernel metadata.** Functions marked as kernels get `ptx_kernel` calling "
+"convention and an `!nvvm.annotations` metadata entry."
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:238
+msgid ""
+"Here is what the exported LLVM IR looks like for a simple vector-add kernel:"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:240
+msgid ""
+"target datalayout = \"e-i64:64-i128:128-v16:16-v32:32-n16:32:64\"\n"
+"target triple = \"nvptx64-nvidia-cuda\"\n"
+"\n"
+"declare i32 @llvm.nvvm.read.ptx.sreg.tid.x()\n"
+"declare i32 @llvm.nvvm.read.ptx.sreg.ntid.x()\n"
+"declare i32 @llvm.nvvm.read.ptx.sreg.ctaid.x()\n"
+"\n"
+"define ptx_kernel void @vecadd(ptr addrspace(1) %v0, i64 %v1,\n"
+"                                ptr addrspace(1) %v2, i64 %v3,\n"
+"                                ptr addrspace(1) %v4, i64 %v5) {\n"
+"entry:\n"
+"    %v6 = call i32 @llvm.nvvm.read.ptx.sreg.tid.x() #0\n"
+"    %v7 = call i32 @llvm.nvvm.read.ptx.sreg.ntid.x() #0\n"
+"    %v8 = call i32 @llvm.nvvm.read.ptx.sreg.ctaid.x() #0\n"
+"    %v9 = mul i32 %v8, %v7\n"
+"    %v10 = add i32 %v9, %v6\n"
+"    ; ... bounds check, load, add, store ...\n"
+"    ret void\n"
+"}\n"
+"\n"
+"!nvvm.annotations = !{!0}\n"
+"!0 = !{ptr @vecadd, !\"kernel\", i32 1}\n"
+"attributes #0 = { convergent }\n"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:266
+msgid ""
+"Notice the slices have been scalarized: each Rust `&[f32]` becomes a `ptr "
+"addrspace(1)` and an `i64` length. That happened in the lowering pass; by "
+"the time the LLVM dialect sees them, they are flat arguments."
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:272
+msgid "dialect-nvvm -- The GPU Layer"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:274
+msgid ""
+"`dialect-nvvm` wraps NVIDIA's GPU intrinsics as typed pliron operations. "
+"These operations do not form a \"level\" in the lowering chain -- they are "
+"inserted during the `dialect-mir` → LLVM dialect lowering pass and coexist "
+"with LLVM dialect operations in the same function body. At export time, they "
+"become `call` instructions to `@llvm.nvvm.*` intrinsics."
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:280
+msgid "Architecture Coverage"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:282
+msgid ""
+"The dialect is organized into modules, each targeting a GPU feature set:"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Module"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Ops"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Minimum SM"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "GPU Family"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`thread`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Thread/block indexing, `barrier0`, threadfences"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "18"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "All"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "All GPUs"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`warp`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Lane id, shuffle, vote, match"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`grid`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Cooperative `grid_sync`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "sm_70"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Volta+"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`debug`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Clock, trap, breakpoint, `vprintf`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`atomic`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Atomic load/store/RMW/cmpxchg"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`cluster`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Thread Block Clusters + DSMEM"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "11"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "sm_90"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Hopper+"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`mbarrier`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Async barriers + fence proxy + nanosleep"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "10"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`tma`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Tensor Memory Accelerator (bulk G2S/S2G)"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`wgmma`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Warpgroup Matrix Multiply-Accumulate"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`stmatrix`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Shared memory matrix store + bf16 convert"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`tcgen05`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Tensor Core Gen 5 + TMEM"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "24"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "sm_100"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Blackwell+"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`clc`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Cluster Launch Control"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:299
+msgid ""
+"That is 123 operations total. Most users will only encounter the first three "
+"modules (thread indexing, warp shuffles, barriers). The rest are for "
+"advanced GPU programming -- TMA, matrix accelerators, and Blackwell's tensor "
+"memory -- covered in the [Advanced GPU Features](../advanced/tensor-memory-"
+"accelerator.md) chapters."
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:305
+msgid "From Rust to PTX: An Intrinsic's Journey"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:307
+msgid "Each NVVM operation maps through three levels of naming:"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "Pliron operation"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "LLVM intrinsic"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "PTX instruction"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`ReadPtxSregTidXOp`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`llvm.nvvm.read.ptx.sreg.tid.x`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`mov.u32 %r1, %tid.x`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`Barrier0Op`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`llvm.nvvm.barrier0`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`bar.sync 0`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`ShflSyncBflyI32Op`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`llvm.nvvm.shfl.sync.bfly.i32`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`shfl.sync.bfly.b32`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`CpAsyncBulkTensorG2sTile2dOp`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`llvm.nvvm.cp.async.bulk.tensor.2d.tile.g2s.im2col.*`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:0
+msgid "`cp.async.bulk.tensor.2d.tile.g2s ...`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:316
+msgid ""
+"The first column is the Rust struct name in `dialect-nvvm`. The second is "
+"what `llvm-export` emits (after the underscore-to-dot transformation). The "
+"third is what `llc` produces. You never have to write any of these by hand "
+"-- they are generated by `mir-lower` when it sees calls to `cuda-device` "
+"intrinsic functions like `thread::index_x()` or `warp::shfl_sync_bfly()`."
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:322
+msgid "Verification Strategy"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:324
+msgid ""
+"NVVM operations use minimal structural verification: each operation checks "
+"its operand count and result count, and a handful verify result types "
+"(thread indexing ops require `i32` results; `tcgen05` loads check exact "
+"result counts for their 32-register and 4-register variants)."
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:329
+msgid ""
+"This is intentional. NVVM operations are machine-generated by `mir-lower` -- "
+"they are never hand-written by users. LLVM's NVPTX backend provides "
+"comprehensive type validation downstream. Adding full type checking to every "
+"NVVM operation would double the dialect's code size for zero practical "
+"benefit."
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:335
+msgid ""
+"The GPU architecture requirements (sm_70, sm_90, sm_100) are documented but "
+"not enforced at the pliron level. Architecture validation happens later, "
+"when `llc` is invoked with a specific `-mcpu=sm_XX` flag. If you use a "
+"Hopper intrinsic and target Volta, `llc` will tell you -- loudly."
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:343
+msgid "How the Dialects Interact"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:345
+msgid ""
+"Here is the lifecycle of a single Rust operation as it passes through all "
+"three abstraction levels:"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:348
+msgid ""
+"Rust source:   let sum = a + b;        // a, b: f32\n"
+"\n"
+"dialect-mir:   %sum = mir.add %a, %b : f32\n"
+"                ↓  (DialectConversion)\n"
+"LLVM dialect:  %v5 = fadd float %v3, %v4\n"
+"                ↓  (llvm-export)\n"
+"LLVM IR:       %v5 = fadd float %v3, %v4\n"
+"                ↓  (llc --mcpu=sm_80)\n"
+"PTX:           add.f32 %f3, %f1, %f2;\n"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:360
+msgid ""
+"The `dialect-mir` → LLVM dialect step is where the interesting work happens: "
+"`mir.add` on `f32` becomes `fadd` (floating-point add), while `mir.add` on "
+"`i32` becomes `add` (integer add). Checked operations like `mir.checked_add` "
+"expand into an `llvm.add`, a constant `i1 false` for the overflow flag, and "
+"an `insertvalue` into a struct -- the GPU path omits overflow detection "
+"(since GPU integer arithmetic wraps). The lowering pass handles all of these "
+"translations."
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:368
+msgid "For GPU-specific operations, `dialect-nvvm` enters the picture:"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:370
+msgid ""
+"Rust source:   let tid = thread::threadIdx_x();\n"
+"\n"
+"dialect-mir:   %tid = mir.call @cuda_oxide_device_<hash>_thread_index_x()\n"
+"                ↓  (DialectConversion, recognizes the intrinsic)\n"
+"dialect-nvvm:  %v2 = nvvm.read_ptx_sreg_tid_x : i32\n"
+"                ↓  (llvm-export)\n"
+"LLVM IR:       %v2 = call i32 @llvm.nvvm.read.ptx.sreg.tid.x() #0\n"
+"                ↓  (llc)\n"
+"PTX:           mov.u32 %r1, %tid.x;\n"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:382
+msgid ""
+"The lowering pass recognizes calls to `cuda_device` intrinsic functions by "
+"their fully qualified names (FQDNs) and replaces them with the corresponding "
+"`dialect-nvvm` operations. No generic \"function call\" machinery is needed "
+"-- the intrinsic becomes a direct hardware instruction."
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:387
+msgid "The Full Picture"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:389
+msgid ""
+"Putting it all together, a compiled kernel body contains a mix of LLVM "
+"dialect and `dialect-nvvm` operations:"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:392
+msgid ""
+"llvm.func @vecadd(...) {\n"
+"  entry:\n"
+"    %tid    = nvvm.read_ptx_sreg_tid_x     // NVVM: thread index\n"
+"    %ntid   = nvvm.read_ptx_sreg_ntid_x    // NVVM: block size\n"
+"    %ctaid  = nvvm.read_ptx_sreg_ctaid_x   // NVVM: block index\n"
+"    %offset = llvm.mul %ctaid, %ntid        // LLVM: integer math\n"
+"    %idx    = llvm.add %offset, %tid        // LLVM: integer math\n"
+"    %cmp    = llvm.icmp slt %idx, %len      // LLVM: bounds check\n"
+"    llvm.cond_br %cmp, bb1, bb2             // LLVM: branch\n"
+"  bb1:\n"
+"    %p_a    = llvm.gep %a, %idx             // LLVM: pointer arithmetic\n"
+"    %val_a  = llvm.load %p_a                // LLVM: memory access\n"
+"    %p_b    = llvm.gep %b, %idx\n"
+"    %val_b  = llvm.load %p_b\n"
+"    %sum    = llvm.fadd %val_a, %val_b      // LLVM: floating-point add\n"
+"    %p_c    = llvm.gep %c, %idx\n"
+"    llvm.store %sum, %p_c\n"
+"    llvm.br bb2\n"
+"  bb2:\n"
+"    llvm.return void\n"
+"}\n"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:416
+msgid ""
+"The `dialect-nvvm` operations at the top compute the global thread index. "
+"Everything else is standard LLVM dialect -- loads, stores, arithmetic, "
+"branches. The export engine serializes all of it into a single `.ll` file, "
+"and `llc` compiles it to PTX."
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:423
+msgid ""
+"For how these dialects are connected by the lowering pass, see [The Lowering "
+"Pipeline](lowering-pipeline.md)."
+msgstr ""
