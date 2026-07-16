@@ -1,0 +1,655 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025-2026, NVIDIA Corporation
+# This file is distributed under the same license as the cuda-oxide package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: cuda-oxide \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-16 12:33+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../../async-programming/concurrent-execution.md:1
+msgid "Concurrent Execution"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:3
+msgid ""
+"You know how to describe GPU work with `DeviceOperation`, compose multi-"
+"stage pipelines with `and_then` and `zip!`, and let the scheduling policy "
+"assign streams. Now comes the payoff: running multiple pipelines **at the "
+"same time**. This chapter walks through the `async_mlp` example end to end, "
+"showing how Tokio tasks, the round-robin scheduler, and Rust's ownership "
+"model come together to process four batches concurrently on one GPU."
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:11
+msgid ""
+"[CUDA Programming Guide -- Multi-Device System](https://docs.nvidia.com/cuda/"
+"cuda-programming-guide/#multi-device-system) for CUDA's rules on multi-GPU "
+"contexts, peer access, and cross-device memory."
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:15
+msgid "The scenario"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:17
+msgid ""
+"You are running a three-layer MLP forward pass: **GEMM** (matrix multiply), "
+"**MatVec** (matrix-vector product), and **ReLU** (activation). You have two "
+"weight matrices loaded on the GPU and four batches of input data to process. "
+"Each batch is independent -- batch 0 does not depend on batch 1 -- but they "
+"all share the same weights."
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:27
+msgid ""
+"Four MLP forward passes running concurrently. Top: shared weights uploaded "
+"once as `Arc<DeviceBox>`, cloned cheaply into each batch. Middle: the GPU "
+"timeline — round-robin distributes batches across four streams, and the "
+"staggered pipelines overlap. Bottom: sequential processing takes ~4× the "
+"time of one batch; concurrent processing takes ~1.3× if the GPU has spare "
+"SMs."
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:34
+msgid "The sequential approach processes one batch at a time:"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:36
+msgid ""
+"Batch 0:  ████ GEMM ████ MatVec ██ ReLU █ D2H █\n"
+"                                                  Batch 1:  ████ GEMM "
+"████ ...\n"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:41
+msgid "The concurrent approach overlaps them across streams:"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:43
+msgid ""
+"Stream 0:  ████ GEMM ████ MatVec ██ ReLU █ D2H █\n"
+"Stream 1:    ████ GEMM ████ MatVec ██ ReLU █ D2H █\n"
+"Stream 2:      ████ GEMM ████ MatVec ██ ReLU █ D2H █\n"
+"Stream 3:        ████ GEMM ████ MatVec ██ ReLU █ D2H █\n"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:50
+msgid ""
+"If the GPU has enough SMs to run multiple kernels simultaneously, the "
+"overlapped version finishes significantly faster. And because each pipeline "
+"is a single `and_then` chain on one stream, stages within a batch are still "
+"strictly ordered -- no cross-stream synchronization needed."
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:55
+msgid "Step 1: Initialize the runtime"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:57
+msgid ""
+"Everything starts with `init_device_contexts`. This creates the CUDA "
+"context, sets up the scheduling policy (round-robin with four streams by "
+"default), and makes the thread-local state available for `.sync()` and `."
+"await`:"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:61
+msgid ""
+"use cuda_async::device_context::init_device_contexts;\n"
+"\n"
+"#[tokio::main]\n"
+"async fn main() -> Result<(), Box<dyn std::error::Error>> {\n"
+"    init_device_contexts(0, 1)?;\n"
+"    let module = kernels::load_async(0)?;\n"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:70
+msgid ""
+"The embedded module is loaded through the thread-local async context. The "
+"typed module handle can be cloned cheaply into each batch pipeline."
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:73
+msgid "Step 2: Upload shared weights"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:75
+msgid ""
+"The model has two weight matrices: W0 (DIM x DIM) and W1 (DIM). Both need to "
+"live on the device for the duration of all four forward passes. This is "
+"where `zip!` and `.arc()` earn their keep:"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:79
+msgid ""
+"    let w0_host: Vec<f32> = (0..DIM * DIM)\n"
+"        .map(|i| ((i % 7) as f32 - 3.0) * 0.01)\n"
+"        .collect();\n"
+"    let w1_host: Vec<f32> = (0..DIM)\n"
+"        .map(|i| ((i % 5) as f32 - 2.0) * 0.01)\n"
+"        .collect();\n"
+"\n"
+"    let (w0, w1): (Arc<DeviceBox<[f32]>>, Arc<DeviceBox<[f32]>>) = zip!(\n"
+"        h2d(w0_host).arc(),\n"
+"        h2d(w1_host).arc()\n"
+"    ).await?;\n"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:93
+msgid ""
+"`zip!` bundles two independent H2D transfers into one operation. `.arc()` "
+"wraps each result in `Arc` so the weights can be shared. `.await` schedules "
+"the combined operation on one of the pool's streams and waits for it to "
+"complete."
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:97
+msgid ""
+"After this line, `w0` and `w1` are `Arc<DeviceBox<[f32]>>` -- cheap to "
+"clone, safe to share, and pinned on the device."
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:100
+msgid "Step 3: Build and spawn batch pipelines"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:102
+msgid ""
+"Now the interesting part. For each batch, you build a lazy pipeline (no GPU "
+"work yet) and hand it to `tokio::spawn`:"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:105
+msgid ""
+"    let num_batches = 4;\n"
+"    let mut handles = vec![];\n"
+"\n"
+"    for batch_idx in 0..num_batches {\n"
+"        let w0 = w0.clone();       // Arc clone: ~1 ns\n"
+"        let w1 = w1.clone();\n"
+"        let module = module.clone();\n"
+"\n"
+"        let batch_data: Vec<f32> = (0..DIM * DIM)\n"
+"            .map(|i| ((i + batch_idx * 37) % 13) as f32 * 0.1)\n"
+"            .collect();\n"
+"\n"
+"        let pipeline = zip!(h2d(batch_data), zeros(DIM * DIM), zeros(DIM))\n"
+"            .and_then(move |(input, hidden, output)| {\n"
+"                // Stage 1: GEMM — hidden = input × W0\n"
+"                // ... build + finalize an owned launch, then chain with "
+"and_then ...\n"
+"            })\n"
+"            .and_then(move |(hidden, output, w1, module)| {\n"
+"                // Stage 2: MatVec — output = hidden × W1\n"
+"                // ...\n"
+"            })\n"
+"            .and_then(move |(output, module)| {\n"
+"                // Stage 3: ReLU — result = max(0, output)\n"
+"                // ...\n"
+"            })\n"
+"            .and_then(d2h);  // Stage 4: copy result to host\n"
+"\n"
+"        handles.push(tokio::spawn(pipeline.into_future()));\n"
+"    }\n"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:137
+msgid "Let's unpack what happens here:"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:139
+msgid ""
+"**`pipeline` is a `DeviceOperation`.** It describes the entire forward pass "
+"but performs no GPU work. Building it is pure host-side computation -- "
+"allocating closures and structs."
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:143
+msgid ""
+"**`.into_future()` converts it to a `DeviceFuture`.** This triggers the "
+"scheduling policy, which picks a stream. Batch 0 gets stream 0, batch 1 gets "
+"stream 1, and so on -- round-robin."
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:147
+msgid ""
+"**`tokio::spawn` hands the future to the Tokio runtime.** The runtime will "
+"poll it when the executor has capacity. On the first poll, the pipeline's "
+"`execute()` runs, submitting all the GPU work to the assigned stream."
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:151
+msgid ""
+"**The runtime is free.** After the first poll, the task is parked. The GPU "
+"is crunching numbers on four streams simultaneously. No host thread sits "
+"waiting."
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:155
+msgid ""
+"**When the GPU finishes** a pipeline's work, the `cuLaunchHostFunc` callback "
+"fires, waking the corresponding Tokio task. The runtime re-polls it, "
+"delivering the `Vec<f32>` result."
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:159
+msgid "Step 4: Collect results"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:161
+msgid ""
+"    for (i, handle) in handles.into_iter().enumerate() {\n"
+"        let result: Vec<f32> = handle.await??;\n"
+"        println!(\"Batch {}: {} elements, first 4 = {:?}\",\n"
+"            i, result.len(), &result[..4]);\n"
+"    }\n"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:169
+msgid ""
+"The double `?` unwraps two layers: the outer `JoinError` (in case the Tokio "
+"task panicked) and the inner `DeviceError` (in case GPU work failed). In a "
+"production system you would handle these separately."
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:173
+msgid "`.await` vs `.sync()` vs `tokio::spawn`"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:175
+msgid "Having seen all three in action, here is when to reach for each:"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:177
+msgid ""
+"**`.sync()`** blocks the calling thread until the GPU finishes. Use it in "
+"scripts, tests, and anywhere you do not have an async runtime. Simple, no "
+"ceremony, but no concurrency either -- the host thread is stuck waiting:"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:181
+msgid "let result = pipeline.sync()?;\n"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:185
+msgid ""
+"**`.await`** yields the current async task while the GPU works. Other tasks "
+"on the same Tokio thread can make progress. This is better than `.sync()` "
+"for throughput but still sequential within the task -- the code after `."
+"await` does not run until the operation completes:"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:190
+msgid "let result = pipeline.await?;\n"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:194
+msgid ""
+"**`tokio::spawn(op.into_future())`** launches the pipeline as a fully "
+"independent task. The spawning code continues immediately, and the result "
+"arrives later via the join handle. This is the way to achieve true "
+"concurrency -- multiple pipelines running on different streams at the same "
+"time:"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:199
+msgid ""
+"let handle = tokio::spawn(pipeline.into_future());\n"
+"// ... spawn more pipelines, do other work ...\n"
+"let result = handle.await??;\n"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:206
+msgid ""
+"For a chain of dependent operations (like the four-stage forward pass), "
+"prefer `and_then` over sequential `.await`s. An `and_then` chain runs "
+"entirely on one stream with zero scheduling overhead between stages. "
+"Sequential `.await`s go through the scheduling policy for each operation, "
+"potentially landing on different streams and requiring cross-stream "
+"synchronization."
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:214
+msgid "Ownership patterns"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:216
+msgid ""
+"Concurrent GPU programming in Rust means Rust's ownership rules are actively "
+"working for you -- and occasionally getting in your way. Here are the "
+"patterns that come up repeatedly."
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:220
+msgid "Moving data through `and_then` closures"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:222
+msgid ""
+"Each `and_then` closure captures data by `move`. The kernel launch produces "
+"`()`, so you need to explicitly carry forward the buffers the next stage "
+"needs:"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:225
+msgid ""
+"launch_gemm(input, hidden, w0)\n"
+"    .and_then(move |()| {\n"
+"        // input is consumed by the kernel. hidden and module survive\n"
+"        // because they were captured but not consumed.\n"
+"        value((hidden, output, w1, module))\n"
+"    })\n"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:234
+msgid ""
+"The closure returns a `Value` containing a tuple of everything the next "
+"stage needs. This tuple is the \"baton\" passed between stages."
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:237
+msgid "Sharing immutable data with `Arc`"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:239
+msgid ""
+"Model weights, lookup tables, and other immutable data shared across "
+"pipelines should be wrapped in `Arc`. The `.arc()` combinator does this "
+"automatically for a `DeviceOperation`'s output. For data you already have, "
+"`Arc::new()` works:"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:243
+msgid ""
+"let weights = h2d(weight_data).arc().await?;  // Arc<DeviceBox<[f32]>>\n"
+"for batch in batches {\n"
+"    let w = weights.clone();  // cheap reference-count bump\n"
+"    tokio::spawn(forward_pass(batch, w).into_future());\n"
+"}\n"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:251
+msgid "Keeping device memory alive"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:253
+msgid ""
+"A `DeviceBox` must stay alive until the GPU is done using it. In `and_then` "
+"chains this is automatic -- the closure owns the `DeviceBox`, and it lives "
+"until the next stage takes it. The danger is `with_context` closures where "
+"you perform an async copy and the `DeviceBox` might be dropped before the "
+"copy completes:"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:258
+msgid ""
+"fn d2h(dev: DeviceBox<[f32]>) -> impl DeviceOperation<Output = Vec<f32>> {\n"
+"    with_context(move |ctx| {\n"
+"        let stream = ctx.get_cuda_stream();\n"
+"        let mut host = vec![0.0f32; dev.len()];\n"
+"        unsafe {\n"
+"            memcpy_dtoh_async(\n"
+"                host.as_mut_ptr(), dev.cu_deviceptr(),\n"
+"                dev.len() * std::mem::size_of::<f32>(),\n"
+"                stream.cu_stream(),\n"
+"            ).unwrap();\n"
+"        }\n"
+"        // dev is captured by the closure and lives until the closure "
+"returns.\n"
+"        // The stream will synchronize before the result is consumed,\n"
+"        // so the async copy completes before dev is dropped.\n"
+"        value(host)\n"
+"    })\n"
+"}\n"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:278
+msgid ""
+"The key: `dev` is captured by the `move` closure and is not dropped until "
+"the closure returns. Since the stream synchronizes before the `DeviceFuture` "
+"delivers the result, the async copy finishes before `dev` is freed."
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:284
+msgid "Error handling"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:286
+msgid ""
+"Errors from GPU work propagate through the `Result` chain just like any Rust "
+"code. When running concurrent batches, you typically want to continue "
+"processing even if one batch fails:"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:290
+msgid ""
+"for (i, handle) in handles.into_iter().enumerate() {\n"
+"    match handle.await {\n"
+"        Ok(Ok(result)) => {\n"
+"            println!(\"Batch {i}: {} elements\", result.len());\n"
+"        }\n"
+"        Ok(Err(device_err)) => {\n"
+"            eprintln!(\"Batch {i}: GPU error: {device_err}\");\n"
+"        }\n"
+"        Err(join_err) => {\n"
+"            eprintln!(\"Batch {i}: task panicked: {join_err}\");\n"
+"        }\n"
+"    }\n"
+"}\n"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:306
+msgid ""
+"The three arms correspond to: success, a CUDA driver or scheduling error (e."
+"g., out-of-memory, invalid launch config), and a Tokio task panic."
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:309
+msgid "Multi-device execution"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:311
+msgid ""
+"For systems with multiple GPUs, pass a higher device count to "
+"`init_device_contexts`:"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:314
+msgid ""
+"init_device_contexts(0, 2)?;  // default device 0, capacity for 2 devices\n"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:318
+msgid ""
+"This sets the default device to GPU 0 and prepares the thread-local map for "
+"two devices. Each device's CUDA context, scheduling policy, and stream pool "
+"are created lazily on first use. All policy-driven operations (`.sync()`, `."
+"await`) use the default device unless you explicitly target a different one. "
+"The `ExecutionContext` carries the device ID, so operations on GPU 0 never "
+"interfere with streams on GPU 1."
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:326
+msgid ""
+"Multi-device programming requires attention to memory placement. A "
+"`DeviceBox` allocated on GPU 0 is not accessible from GPU 1 unless peer "
+"access is enabled. Use `with_context` to check `ctx.get_device_id()` when "
+"building device-specific operations."
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:332
+msgid "Performance tuning"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:334
+msgid "Stream pool sizing"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:336
+msgid ""
+"The default pool of four streams works well for most workloads, but if you "
+"are chasing the last few percent of throughput, the right pool size depends "
+"on your situation:"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:325
+msgid "Workload"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:325
+msgid "Suggested pool size"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:325
+msgid "Why"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:325
+msgid "One large kernel per launch"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:325
+msgid "1--2"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:325
+msgid "The kernel already saturates the GPU"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:325
+msgid "Many small kernels"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:325
+msgid "4--8"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:325
+msgid "Overlap launch overhead between streams"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:325
+msgid "Mixed kernel + memcpy"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:325
+msgid "2--4"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:325
+msgid "Overlap compute with data transfer"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:325
+msgid "Latency-sensitive serving"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:325
+msgid "1 per request"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:325
+msgid "Avoid head-of-line blocking"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:347
+msgid "Profiling"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:349
+msgid "Nsight Systems is the standard tool for visualizing stream occupancy:"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:351
+msgid ""
+"nsys profile --trace=cuda cargo oxide run async_mlp\n"
+"nsys-ui report.nsys-rep\n"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:356
+msgid ""
+"Look for gaps between kernels on the same stream (launch overhead), idle "
+"streams in the pool (unbalanced work distribution), and unexpected "
+"serialization across streams (missing or extra dependencies)."
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:360
+msgid "Common pitfalls"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:325
+msgid "Pitfall"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:325
+msgid "What you see"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:325
+msgid "Fix"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:325
+msgid "`.sync()` inside an async context"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:325
+msgid "Blocks the Tokio thread, stalling all tasks on it"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:325
+msgid "Use `.await` instead"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:325
+msgid "`DeviceBox` dropped before stream sync"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:325
+msgid "Use-after-free crash or corrupted results"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:325
+msgid "Keep ownership in `and_then` closures"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:325
+msgid "Too many streams"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:325
+msgid "Scheduling overhead exceeds overlap benefit"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:325
+msgid "Profile, reduce pool size"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:325
+msgid "Missing `init_device_contexts`"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:325
+msgid "`DeviceError::Context` on first operation"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:325
+msgid "Call once at program start"
+msgstr ""
+
+#: ../../../async-programming/concurrent-execution.md:370
+msgid ""
+"The [Async MLP Pipeline](../projects/async-mlp-pipeline.md) project chapter "
+"has the full `async_mlp` source with build instructions and expected output."
+msgstr ""
