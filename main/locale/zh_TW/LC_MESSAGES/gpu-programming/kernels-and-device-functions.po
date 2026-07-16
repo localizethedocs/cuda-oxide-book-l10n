@@ -39,7 +39,7 @@ msgstr ""
 
 #: ../../../gpu-programming/kernels-and-device-functions.md:14
 msgid "`#[kernel]` -- the GPU entry point"
-msgstr ""
+msgstr "`#[kernel]` -- GPU 進入點"
 
 #: ../../../gpu-programming/kernels-and-device-functions.md:16
 msgid ""

@@ -19,11 +19,11 @@ msgstr ""
 
 #: ../../../index.md:105
 msgid "Getting Started"
-msgstr ""
+msgstr "開始使用"
 
 #: ../../../index.md:114
 msgid "Writing GPU Programs"
-msgstr ""
+msgstr "編寫 GPU 程式"
 
 #: ../../../index.md:127
 msgid "Safety on the GPU"
@@ -31,7 +31,7 @@ msgstr ""
 
 #: ../../../index.md:135
 msgid "Async GPU Programming"
-msgstr ""
+msgstr "異步 GPU 程式設計"
 
 #: ../../../index.md:146
 msgid "Building a Real Application"
@@ -47,11 +47,11 @@ msgstr ""
 
 #: ../../../index.md:183
 msgid "Appendix"
-msgstr ""
+msgstr "附錄"
 
 #: ../../../index.md:1
 msgid "The cuda-oxide Book"
-msgstr ""
+msgstr "cuda-oxide 手冊"
 
 #: ../../../index.md:3
 msgid "cuda-oxide logo"
@@ -63,6 +63,9 @@ msgid ""
 "(SIMT) GPU kernels in safe(ish), idiomatic Rust. It compiles standard Rust "
 "code directly to PTX — no DSLs, no foreign language bindings, just Rust."
 msgstr ""
+"**cuda-oxide** 是一個實驗性的 Rust 轉 CUDA 編譯器，讓你以相對安全且符合慣用寫"
+"法的 Rust 編寫（SIMT）GPU 內核。它將標準 Rust 程式碼直接編譯成 PTX — 無需 "
+"DSL、無需外語綁定，只有純粹的 Rust。"
 
 #: ../../../index.md:13
 msgid ""
@@ -70,6 +73,9 @@ msgid ""
 "ownership, traits, and generics. Later chapters on async GPU programming "
 "also assume working knowledge of `async`/`.await` and runtimes like tokio."
 msgstr ""
+"本書假設讀者熟悉 Rust 程式語言，包括所有權、特質與泛型。後面有關異步 GPU 程式"
+"設計的章節也假設讀者對 `async` / `.await` 以及像 tokio 這類的執行時有實務上的"
+"了解。"
 
 #: ../../../index.md:15
 msgid ""
@@ -80,7 +86,7 @@ msgstr ""
 
 #: ../../../index.md:20
 msgid "Project Status"
-msgstr ""
+msgstr "專案狀態"
 
 #: ../../../index.md:22
 msgid ""
@@ -88,6 +94,9 @@ msgid ""
 "features, and API breakage** as we work to improve it. We hope you'll try it "
 "and help shape its direction by sharing feedback on your experience."
 msgstr ""
+"v0.1.0 發行版屬於早期內測階段：在我們持續改進期間，\\ **請預期會遇到臭蟲、不"
+"完整的功能，以及 API 破壞**\\ 。我們希望你能嘗試使用並透過分享使用經驗來協助"
+"塑造專案的方向。"
 
 #: ../../../index.md:26
 msgid "🚀 Quick start"
@@ -170,7 +179,7 @@ msgstr ""
 
 #: ../../../index.md:94
 msgid "💎  A SIMT Compiler"
-msgstr ""
+msgstr "💎  SIMT 編譯器"
 
 #: ../../../index.md:95
 msgid ""
@@ -179,7 +188,7 @@ msgstr ""
 
 #: ../../../index.md:99
 msgid "⚡  Async Execution"
-msgstr ""
+msgstr "⚡  異步執行"
 
 #: ../../../index.md:100
 msgid ""

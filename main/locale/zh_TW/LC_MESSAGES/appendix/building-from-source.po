@@ -153,7 +153,7 @@ msgstr ""
 
 #: ../../../appendix/building-from-source.md:48
 msgid "Install CUDA"
-msgstr ""
+msgstr "安裝 CUDA"
 
 #: ../../../appendix/building-from-source.md:50
 msgid "Make sure the CUDA toolkit is on your `PATH`:"

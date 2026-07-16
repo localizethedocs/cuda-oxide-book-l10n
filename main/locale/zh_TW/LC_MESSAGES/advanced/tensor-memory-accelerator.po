@@ -19,7 +19,7 @@ msgstr ""
 
 #: ../../../advanced/tensor-memory-accelerator.md:1
 msgid "Tensor Memory Accelerator (TMA)"
-msgstr ""
+msgstr "張量記憶體加速器（TMA）"
 
 #: ../../../advanced/tensor-memory-accelerator.md:3
 msgid ""
@@ -60,7 +60,7 @@ msgstr ""
 
 #: ../../../advanced/tensor-memory-accelerator.md:29
 msgid "TILE_A[ty * TILE + tx] = a[row * k + tile_offset + tx];\n"
-msgstr ""
+msgstr "TILE_A[ty * TILE + tx] = a[row * k + tile_offset + tx];\n"
 
 #: ../../../advanced/tensor-memory-accelerator.md:33
 msgid ""
@@ -88,7 +88,7 @@ msgstr ""
 
 #: ../../../advanced/tensor-memory-accelerator.md:55
 msgid "TmaDescriptor — the tensor map"
-msgstr ""
+msgstr "TmaDescriptor — 張量映射"
 
 #: ../../../advanced/tensor-memory-accelerator.md:57
 msgid ""
