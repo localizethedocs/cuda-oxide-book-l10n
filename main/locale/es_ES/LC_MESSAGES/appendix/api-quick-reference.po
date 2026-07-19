@@ -1,0 +1,1167 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025-2026, NVIDIA Corporation
+# This file is distributed under the same license as the cuda-oxide package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: cuda-oxide \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-16 12:33+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: es_ES\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../../appendix/api-quick-reference.md:1
+msgid "API Quick Reference"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:3
+msgid ""
+"This appendix is a condensed reference for the cuda-oxide device and host "
+"APIs. For full documentation, run `cargo doc --no-deps --open` from the "
+"workspace root."
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:9
+msgid "Attributes and Macros"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:11
+msgid "Kernel and Device Attributes"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:13
+msgid ""
+"use cuda_device::{kernel, device, launch_bounds, cluster_launch, "
+"cooperative_launch};\n"
+"\n"
+"#[kernel]\n"
+"pub fn vecadd(a: &[f32], b: &[f32], mut c: DisjointSlice<f32>) { /* ... "
+"*/ }\n"
+"\n"
+"#[kernel]\n"
+"pub fn unrolled(mut data: DisjointSlice<f32>) {\n"
+"    let mut i = 0;\n"
+"    #[unroll(4)]\n"
+"    while i < 16 { /* ... */ i += 1; }\n"
+"}\n"
+"\n"
+"#[kernel]\n"
+"#[launch_bounds(256, 2)]\n"
+"pub fn tuned_kernel(data: &mut [f32]) { /* ... */ }\n"
+"\n"
+"#[kernel]\n"
+"#[cluster_launch(4, 1, 1)]\n"
+"pub fn cluster_kernel(data: &mut [f32]) { /* ... */ }\n"
+"\n"
+"#[kernel]\n"
+"#[cooperative_launch]\n"
+"pub fn grid_sync_kernel(data: &mut [f32]) { /* ... */ }\n"
+"\n"
+"#[device]\n"
+"fn helper(x: f32) -> f32 { x * x }\n"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Attribute"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Purpose"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`#[kernel]`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Mark a function as a GPU kernel entry point (`.entry` in PTX)"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`#[device]`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Mark a helper function or `extern \"C\"` block for device compilation"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`#[unroll]` / `#[unroll(N)]`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Request full unrolling, or unrolling by a factor `N >= 2`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`#[launch_bounds(max_threads, min_blocks)]`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Occupancy hints for register allocation"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`#[cluster_launch(x, y, z)]`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Set compile-time cluster dimensions (Hopper+)"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`#[cooperative_launch]`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Launch cooperatively via `#[cuda_module]` (enables `grid::sync()`)"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`#[convergent]`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Mark as convergent (barrier semantics)"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`#[pure]`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Mark as side-effect free"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`#[readonly]`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Mark as read-only"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:54
+msgid ""
+"Use these annotations only on an explicit counted `while` loop inside a "
+"`#[kernel]` or `#[device]` function. Range-based `for` loops are not yet "
+"recognized by the unroll pass. Nested loops and multiple `continue` paths "
+"are supported. Full `#[unroll]` preserves `break` paths and multiple exit "
+"targets."
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:59
+msgid ""
+"Partial `#[unroll(N)]` requires a positive step, a `<` or `<=` test, an "
+"unchanging limit, and no exit besides the normal header test. Other requests "
+"warn and are not unrolled."
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:63
+msgid ""
+"One annotation may create at most 1,024 body copies, 8,192 cloned basic "
+"blocks, and 65,536 cloned operations. Larger requests warn and are not "
+"unrolled."
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:66
+msgid "Debug and PTX Macros"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:68
+msgid ""
+"use cuda_device::{gpu_printf, gpu_assert, ptx_asm};\n"
+"\n"
+"gpu_printf!(\"thread %d: val = %f\\n\", idx as i32, val as f64);\n"
+"gpu_assert!(val >= 0.0);\n"
+"\n"
+"let y: u32;\n"
+"unsafe {\n"
+"    ptx_asm!(\"add.u32 %0, %1, %1;\", out(\"=r\") y, in(\"r\") x, "
+"options(register_only));\n"
+"}\n"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Macro"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`gpu_printf!(fmt, args...)`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Device-side formatted output (lowers to `vprintf`)"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`gpu_assert!(condition)`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Runtime assertion; calls `trap()` on failure"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`ptx_asm!(...)`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Unsafe CUDA inline PTX"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:88
+msgid "Thread Identification"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:90
+msgid ""
+"use cuda_device::thread;\n"
+"\n"
+"let idx     = thread::index_1d();                            // "
+"ThreadIndex<'_, Index1D>\n"
+"let idx2d   = thread::index_2d::<128>();                     // "
+"Option<ThreadIndex<'_, Index2D<128>>>\n"
+"let idx2d_r = unsafe { thread::index_2d_runtime(stride) };   // "
+"Option<ThreadIndex<'_, Runtime2DIndex>>\n"
+"\n"
+"let tid_x  = thread::threadIdx_x();    // u32\n"
+"let bid_x  = thread::blockIdx_x();     // u32\n"
+"let bdim_x = thread::blockDim_x();     // u32\n"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Function"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Returns"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Description"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`thread::index_1d()`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`ThreadIndex<'_, Index1D>`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Unique linear index (1D grids)"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`thread::index_2d::<S>()`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`Option<ThreadIndex<'_, Index2D<S>>>`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Const-stride 2D index; mismatched strides are a type error"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`unsafe thread::index_2d_runtime(s)`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`Option<ThreadIndex<'_, Runtime2DIndex>>`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Runtime-stride 2D index; caller asserts `s` is uniform"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`thread::index_2d_row()`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`usize`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "2D row index"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`thread::index_2d_col()`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "2D column index"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`thread::threadIdx_{x,y,z}()`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`u32`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Thread index within block"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`thread::blockIdx_{x,y,z}()`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Block index within grid"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`thread::blockDim_{x,y,z}()`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Block dimensions"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:113
+msgid ""
+"`thread::index_2d::<S>()` and `thread::index_2d_runtime(s)` return `None` "
+"when the computed column exceeds the stride — use it to skip the right-edge "
+"tail in non-aligned 2D kernels."
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:117
+msgid ""
+"`index_2d::<S>` is the safe const-stride form; the const generic encodes the "
+"stride in the witness type so threads cannot use different strides. "
+"Dimensionality remains a host-side obligation: `index_1d` requires inactive "
+"Y/Z dimensions, and 2D indices require inactive Z. A matching "
+"`PreparedLaunch<K>` proves this; a raw launch is unsafe. `index_2d_runtime` "
+"is the escape hatch for launches whose stride is only known at runtime; the "
+"caller takes on the \"every thread used the same stride\" obligation by "
+"writing `unsafe`. Full discussion in [The Safety Model](../gpu-safety/the-"
+"safety-model.md)."
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:128
+msgid "Safe Parallel Writes — DisjointSlice"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:130
+msgid ""
+"use cuda_device::{DisjointSlice, kernel};\n"
+"\n"
+"#[kernel]\n"
+"pub fn vecadd(a: &[f32], b: &[f32], mut c: DisjointSlice<f32>) {\n"
+"    if let Some((c_elem, idx)) = c.get_mut_indexed() {\n"
+"        let i = idx.get();\n"
+"        *c_elem = a[i] + b[i];\n"
+"    }\n"
+"}\n"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Method"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Signature"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`get_mut_indexed`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`() -> Option<(&mut T, ThreadIndex<'_, IS>)>`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "One-call form: mints the witness and resolves it. Index1D / Index2D."
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`get_mut`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`(ThreadIndex<'_, IS>) -> Option<&mut T>`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Bounds-checked mutable access from an explicit witness"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`get_unchecked_mut`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`(usize) -> &mut T`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Unsafe, unchecked access"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`len`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`() -> usize`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Number of elements"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:149
+msgid ""
+"`get_mut_indexed` is gated on `IndexSpace: IndexFormula` (impl'd by "
+"`Index1D` and `Index2D<S>`). For `Runtime2DIndex` slices, use the explicit "
+"`unsafe { thread::index_2d_runtime(s) }` + `get_mut(idx)` pair."
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:155
+msgid "Shared Memory"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:157
+msgid ""
+"use cuda_device::{SharedArray, DynamicSharedArray, thread};\n"
+"\n"
+"#[kernel]\n"
+"pub fn tiled(data: &[f32], mut out: DisjointSlice<f32>) {\n"
+"    static mut TILE: SharedArray<f32, 256> = SharedArray::UNINIT;\n"
+"    let tid = thread::threadIdx_x() as usize;\n"
+"    unsafe { TILE[tid] = data[thread::index_1d().get()]; }\n"
+"    thread::sync_threads();\n"
+"    // ... read from TILE ...\n"
+"}\n"
+"\n"
+"#[kernel]\n"
+"pub fn dynamic(data: &[f32]) {\n"
+"    static mut BUF: DynamicSharedArray<f32> = DynamicSharedArray::UNINIT;\n"
+"    // Size set at launch via LaunchConfig::shared_mem_bytes\n"
+"}\n"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Type"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`SharedArray<T, N>`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Compile-time sized, block-scoped shared memory"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`SharedArray<T, N, 128>`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "With 128-byte alignment (required for TMA destinations)"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`DynamicSharedArray<T>`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Runtime-sized shared memory (set via `LaunchConfig`)"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:182
+msgid "Both are `!Sync` — concurrent access requires explicit barriers."
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:186
+msgid "Synchronization"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:188
+msgid "Block-Level"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:190
+msgid "thread::sync_threads();   // __syncthreads() equivalent\n"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:194
+msgid "Managed Barriers (Hopper+)"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:196
+msgid ""
+"use cuda_device::{ManagedBarrier, TmaBarrierHandle, Uninit, Ready};\n"
+"\n"
+"// Typestate lifecycle: Uninit → Ready → Invalidated\n"
+"let bar: TmaBarrierHandle<Uninit> = TmaBarrierHandle::from_static(ptr);\n"
+"let bar: TmaBarrierHandle<Ready> = unsafe { bar.init(thread_count) };\n"
+"let token = bar.arrive();\n"
+"bar.wait(token);\n"
+"unsafe { bar.inval() };\n"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Operation"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`.init(count)`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Initialize barrier with expected arrival count"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`.arrive()`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Signal arrival, returns `BarrierToken`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`.arrive_expect_tx(bytes)`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Arrive and set expected TX byte count (for TMA)"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`.wait(token)`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Block until all arrivals + TX complete"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`.inval()`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Invalidate barrier (cleanup)"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:217
+msgid "Warp Primitives"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:219
+msgid ""
+"use cuda_device::warp;\n"
+"\n"
+"let lane = warp::lane_id();      // 0–31\n"
+"let wid  = warp::warp_id();\n"
+"\n"
+"// Shuffle\n"
+"let partner = warp::shuffle_xor_f32(val, mask);\n"
+"let from_above = warp::shuffle_down_f32(val, delta);\n"
+"let from_below = warp::shuffle_up_f32(val, delta);\n"
+"let from_lane  = warp::shuffle_f32(val, src_lane);\n"
+"\n"
+"// i32 variants\n"
+"let partner_i = warp::shuffle_xor_i32(val, mask);\n"
+"\n"
+"// Vote\n"
+"let all_true = warp::all(predicate);\n"
+"let any_true = warp::any(predicate);\n"
+"let mask     = warp::ballot(predicate);\n"
+"let count    = warp::popc(mask);\n"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:241
+msgid "Shuffle Operations"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`shuffle_xor_{f32,i32}(val, mask)`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Exchange with lane `id ^ mask`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`shuffle_down_{f32,i32}(val, delta)`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Read from lane `id + delta`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`shuffle_up_{f32,i32}(val, delta)`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Read from lane `id - delta`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`shuffle_{f32,i32}(val, src)`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Read from specific lane"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:250
+msgid "Vote Operations"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`all(pred)`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`bool`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "True if predicate holds for all lanes"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`any(pred)`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "True if predicate holds for any lane"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`ballot(pred)`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Bitmask of lanes where predicate is true"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`popc(mask)`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Population count of set bits"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:261
+msgid "Atomics"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:263
+msgid "Scoped GPU Atomics"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:265
+msgid ""
+"use cuda_device::atomic::{DeviceAtomicU32, AtomicOrdering};\n"
+"\n"
+"static COUNTER: DeviceAtomicU32 = DeviceAtomicU32::new(0);\n"
+"\n"
+"// In kernel:\n"
+"COUNTER.fetch_add(1, AtomicOrdering::Relaxed);\n"
+"let old = COUNTER.load(AtomicOrdering::Acquire);\n"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Scope"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Types"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`DeviceAtomic{U32,I32,U64,I64,F32,F64}`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`.gpu` scope"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`BlockAtomic{U32,I32,U64,I64,F32,F64}`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`.cta` scope"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`SystemAtomic{U32,I32,U64,I64,F32,F64}`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`.sys` scope (CPU-GPU shared)"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:281
+msgid ""
+"`core::sync::atomic` types (`AtomicU32`, `AtomicBool`, etc.) also compile to "
+"GPU code, defaulting to system scope."
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:286
+msgid "TMA — Tensor Memory Accelerator (Hopper+)"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:288
+msgid ""
+"use cuda_device::tma::TmaDescriptor;\n"
+"use cuda_device::tma::{cp_async_bulk_tensor_2d_g2s, "
+"cp_async_bulk_commit_group};\n"
+"\n"
+"// Host: build descriptor (128 bytes, opaque)\n"
+"// Device: issue async bulk copy\n"
+"cp_async_bulk_tensor_2d_g2s(smem_ptr, &desc, coord_x, coord_y, "
+"barrier_ptr);\n"
+"cp_async_bulk_commit_group();\n"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`cp_async_bulk_tensor_{1..5}d_g2s(...)`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Global → shared async bulk copy"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`cp_async_bulk_tensor_{1..5}d_s2g(...)`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Shared → global async bulk copy"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`cp_async_bulk_tensor_2d_g2s_multicast(...)`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Multicast to all CTAs in cluster"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`cp_async_bulk_commit_group()`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Commit outstanding copies"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`cp_async_bulk_wait_group(n)`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Wait until ≤ n groups remain"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:308
+msgid "Cluster Programming (Hopper+)"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:310
+msgid ""
+"use cuda_device::cluster;\n"
+"\n"
+"let rank = cluster::block_rank();        // This block's rank in the "
+"cluster\n"
+"let size = cluster::cluster_size();      // Number of blocks in cluster\n"
+"cluster::cluster_sync();                 // Barrier across all cluster "
+"blocks\n"
+"\n"
+"// Distributed Shared Memory\n"
+"let remote_ptr = cluster::map_shared_rank(local_ptr, target_rank);\n"
+"let val = cluster::dsmem_read_u32(remote_ptr);\n"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:324
+msgid "Tensor Cores — WGMMA (Hopper, SM 90)"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:326
+msgid ""
+"use cuda_device::wgmma;\n"
+"\n"
+"wgmma::wgmma_fence();\n"
+"wgmma::wgmma_commit_group();\n"
+"wgmma::wgmma_wait_group::<0>();\n"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:334
+msgid ""
+"Warpgroup MMA: 4 warps (128 threads) issue matrix multiply-accumulate from "
+"shared memory. Operands described by SMEM descriptors; accumulator in "
+"registers."
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:339
+msgid "Tensor Cores — tcgen05 (Blackwell, SM 100+)"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:341
+msgid ""
+"use cuda_device::tcgen05::{TmemGuard, TmemUninit, TmemReady};\n"
+"use cuda_device::SharedArray;\n"
+"\n"
+"static mut TMEM_SLOT: SharedArray<u32, 1, 4> = SharedArray::UNINIT;\n"
+"\n"
+"let guard = TmemGuard::<TmemUninit, 512>::from_static(&raw mut TMEM_SLOT as "
+"*mut u32);\n"
+"let guard = unsafe { guard.alloc() };   // TmemUninit → TmemReady\n"
+"// ... issue MMA, read results via guard.address() ...\n"
+"let _guard = unsafe { guard.dealloc() }; // TmemReady → TmemDeallocated\n"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:353
+msgid ""
+"Single-thread MMA issue into dedicated Tensor Memory (TMEM). `TmemGuard` "
+"manages TMEM lifetime with typestate: `TmemUninit → TmemReady → "
+"TmemDeallocated`. N_COLS must be a power of 2 in the range [32, 512]."
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:359
+msgid "Host-Side: Kernel Launch"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:361
+msgid "Typed Synchronous"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:363
+msgid ""
+"use cuda_core::{CudaContext, DeviceBuffer, LaunchConfig};\n"
+"\n"
+"let ctx = CudaContext::new(0).unwrap();\n"
+"let stream = ctx.default_stream();\n"
+"let module = kernels::load(&ctx).unwrap();\n"
+"\n"
+"let a = DeviceBuffer::from_host(&stream, &a_host).unwrap();\n"
+"let b = DeviceBuffer::from_host(&stream, &b_host).unwrap();\n"
+"let mut output = DeviceBuffer::<f32>::zeroed(&stream, n).unwrap();\n"
+"\n"
+"// SAFETY: this is a 1D launch and all buffers contain n elements.\n"
+"unsafe {\n"
+"    module.vecadd(&stream, LaunchConfig::for_num_elems(n), &a, &b, &mut "
+"output)\n"
+"}\n"
+".unwrap();\n"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:381
+msgid "Typed Async"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:383
+msgid ""
+"use cuda_async::device_operation::DeviceOperation;\n"
+"\n"
+"let module = kernels::load_async(0)?;\n"
+"// SAFETY: this is 1D, buffers contain n elements, and module/scheduler "
+"share a context.\n"
+"let op = unsafe {\n"
+"    module.vecadd_async(LaunchConfig::for_num_elems(n), &a, &b, &mut "
+"output)\n"
+"}?;\n"
+"\n"
+"op.sync()?;       // blocking\n"
+"// or: op.await?;  // async with tokio\n"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:396
+msgid ""
+"Raw generated calls are unsafe because `LaunchConfig` is not tied to a "
+"kernel. A kernel with `#[launch_contract]` instead uses "
+"`LaunchConfig1D/2D/3D` to create a checked `PreparedLaunch<K>`, then "
+"launches safely. `cuda_launch!` and `cuda_launch_async!` remain unsafe lower-"
+"level APIs for explicit module loading and custom launch code."
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:402
+msgid "LaunchConfig"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`LaunchConfig::for_num_elems(n)`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Auto-configure grid/block for `n` elements"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`LaunchConfig { grid_dim, block_dim, shared_mem_bytes }`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Direct struct construction"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:411
+msgid "Debug Facilities"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:413
+msgid ""
+"use cuda_device::debug;\n"
+"\n"
+"let t = debug::clock64();       // Cycle counter\n"
+"debug::trap();                  // Abort kernel\n"
+"debug::breakpoint();            // cuda-gdb breakpoint\n"
+"cuda_device::barrier::nanosleep(1000); // Sleep ~1μs\n"
+"debug::prof_trigger::<7>();     // Nsight profiler trigger\n"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:425
+msgid "Quick Reference Tables"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:427
+msgid "cuda-device Modules"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Module"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Min SM"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`thread`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Thread/block IDs, `index_1d`, `sync_threads`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "All"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`disjoint`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`DisjointSlice<T>` — typed writes completed by a launch proof"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`shared`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`SharedArray<T, N>`, `DynamicSharedArray<T>`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`warp`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Shuffle, vote, match, lane/warp ID"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`atomic`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Scoped atomics (device/block/system)"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "sm_70+"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`debug`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`clock64`, `trap`, `breakpoint`, `gpu_printf!`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`fence`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`threadfence_block` / `threadfence` / `threadfence_system`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`grid`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Grid-scoped `sync` (cooperative kernel launches)"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`cooperative_groups`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Typed handles, warp/block reductions and scans"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`barrier`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`ManagedBarrier` — async mbarrier for TMA/MMA"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "sm_90+"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`cluster`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Thread block clusters, DSMEM"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`tma`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`TmaDescriptor`, bulk tensor copies (1D–5D)"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`wgmma`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Warpgroup MMA (fence/commit/wait)"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "sm_90"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`tcgen05`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "5th-gen tensor cores, TMEM, `TmemGuard`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "sm_100+"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`cusimd`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`CuSimd<T, N>`, `Float2`/`Float4`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`clc`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Cluster Launch Control"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:448
+msgid "Crate Map"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Crate"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Role"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`cuda-device`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Device intrinsics and types (`#![no_std]`)"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`cuda-macros`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Proc macros (`#[kernel]`, `#[device]`, `gpu_printf!`, `ptx_asm!`)"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`cuda-host`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Typed module loading plus low-level launch helpers"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`cuda-core`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Safe RAII wrappers (`CudaContext`, `CudaStream`, `DeviceBuffer<T>`)"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`cuda-async`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`DeviceOperation`, `DeviceFuture`, `DeviceBox<T>`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`cuda-bindings`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Raw `bindgen` FFI to `cuda.h`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`cargo-oxide`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Cargo subcommand (`cargo oxide run`, `build`, `sanitize`, `debug`)"
+msgstr ""

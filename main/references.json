@@ -11,6 +11,16 @@
         "title" : ""
       }
     },
+    "es_ES" : 
+    {
+      "branch" : "main",
+      "commit" : 
+      {
+        "date" : "2026-07-04 13:09:34 +0530",
+        "hash" : "29396b7f643b1d42eb4d80b7347ad27bb011525a",
+        "title" : "feat: add typed kernel launch contracts (#318)"
+      }
+    },
     "zh_CN" : 
     {
       "branch" : "main",
