@@ -30,6 +30,15 @@
       }
     },
     {
+      "name" : "es_ES",
+      "displayName" : "European Spanish",
+      "description" : "Español Europeo",
+      "inherits" : "default",
+      "cacheVariables" : {
+        "LANGUAGE" : "es_ES"
+      }
+    },
+    {
       "name" : "zh_CN",
       "displayName" : "Simplified Chinese",
       "description" : "简体中文",
