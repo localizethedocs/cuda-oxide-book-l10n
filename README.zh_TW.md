@@ -6,6 +6,7 @@
 <p></p>
 <ul>
   <li><a href="./README.md"><code>en_US</code> : English</a></li>
+  <li><a href="./README.es_ES.md"><code>es_ES</code> : Español Europeo</a></li>
   <li><a href="./README.zh_CN.md"><code>zh_CN</code> : 简体中文</a></li>
   <li><a href="./README.zh_TW.md"><code>zh_TW</code> : 繁體中文</a></li>
 </ul>
@@ -291,6 +292,22 @@ The goal of this project is to translate The CUDA Oxide Book into multiple langu
     </tr>
   </thead>
   <tbody>
+    <!-- es_ES -->
+    <tr>
+      <td rowspan="1" colspan="1" align="center" style="text-align: center;"><div><code>es_ES</code></div></td>
+      <td rowspan="1" colspan="1" align="center" style="text-align: center;">
+        <div>
+          <div>European Spanish</div>
+          <div>Español Europeo</div>
+        </div>
+      </td>
+      <td rowspan="1" colspan="1" align="center" style="text-align: center;">
+        <div>
+          <div><a href="https://localizethedocs.crowdin.com/cuda-oxide-book-l10n/es" title="es translation" target="_blank"><img alt="es translation" src="https://img.shields.io/badge/dynamic/json?color=blue&label=es&style=flat&logo=crowdin&query=%24.progress.0.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200032568-132.json" /></a></div>
+          <div><a href="https://localizethedocs.crowdin.com/cuda-oxide-book-l10n/es" title="es proofreading" target="_blank"><img alt="es proofreading" src="https://img.shields.io/badge/dynamic/json?color=green&label=es&style=flat&logo=crowdin&query=%24.progress.0.data.approvalProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200032568-132.json" /></a></div>
+        </div>
+      </td>
+    </tr>
     <!-- zh_CN -->
     <tr>
       <td rowspan="1" colspan="1" align="center" style="text-align: center;"><div><code>zh_CN</code></div></td>
@@ -302,8 +319,8 @@ The goal of this project is to translate The CUDA Oxide Book into multiple langu
       </td>
       <td rowspan="1" colspan="1" align="center" style="text-align: center;">
         <div>
-          <div><a href="https://localizethedocs.crowdin.com/cuda-oxide-book-l10n/zh-CN" title="zh-CN translation" target="_blank"><img alt="zh-CN translation" src="https://img.shields.io/badge/dynamic/json?color=blue&label=zh-CN&style=flat&logo=crowdin&query=%24.progress.0.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200032568-132.json" /></a></div>
-          <div><a href="https://localizethedocs.crowdin.com/cuda-oxide-book-l10n/zh-CN" title="zh-CN proofreading" target="_blank"><img alt="zh-CN proofreading" src="https://img.shields.io/badge/dynamic/json?color=green&label=zh-CN&style=flat&logo=crowdin&query=%24.progress.0.data.approvalProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200032568-132.json" /></a></div>
+          <div><a href="https://localizethedocs.crowdin.com/cuda-oxide-book-l10n/zh-CN" title="zh-CN translation" target="_blank"><img alt="zh-CN translation" src="https://img.shields.io/badge/dynamic/json?color=blue&label=zh-CN&style=flat&logo=crowdin&query=%24.progress.1.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200032568-132.json" /></a></div>
+          <div><a href="https://localizethedocs.crowdin.com/cuda-oxide-book-l10n/zh-CN" title="zh-CN proofreading" target="_blank"><img alt="zh-CN proofreading" src="https://img.shields.io/badge/dynamic/json?color=green&label=zh-CN&style=flat&logo=crowdin&query=%24.progress.1.data.approvalProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200032568-132.json" /></a></div>
         </div>
       </td>
     </tr>
@@ -318,8 +335,8 @@ The goal of this project is to translate The CUDA Oxide Book into multiple langu
       </td>
       <td rowspan="1" colspan="1" align="center" style="text-align: center;">
         <div>
-          <div><a href="https://localizethedocs.crowdin.com/cuda-oxide-book-l10n/zh-TW" title="zh-TW translation" target="_blank"><img alt="zh-TW translation" src="https://img.shields.io/badge/dynamic/json?color=blue&label=zh-TW&style=flat&logo=crowdin&query=%24.progress.1.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200032568-132.json" /></a></div>
-          <div><a href="https://localizethedocs.crowdin.com/cuda-oxide-book-l10n/zh-TW" title="zh-TW proofreading" target="_blank"><img alt="zh-TW proofreading" src="https://img.shields.io/badge/dynamic/json?color=green&label=zh-TW&style=flat&logo=crowdin&query=%24.progress.1.data.approvalProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200032568-132.json" /></a></div>
+          <div><a href="https://localizethedocs.crowdin.com/cuda-oxide-book-l10n/zh-TW" title="zh-TW translation" target="_blank"><img alt="zh-TW translation" src="https://img.shields.io/badge/dynamic/json?color=blue&label=zh-TW&style=flat&logo=crowdin&query=%24.progress.2.data.translationProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200032568-132.json" /></a></div>
+          <div><a href="https://localizethedocs.crowdin.com/cuda-oxide-book-l10n/zh-TW" title="zh-TW proofreading" target="_blank"><img alt="zh-TW proofreading" src="https://img.shields.io/badge/dynamic/json?color=green&label=zh-TW&style=flat&logo=crowdin&query=%24.progress.2.data.approvalProgress&url=https%3A%2F%2Fbadges.awesome-crowdin.com%2Fstats-200032568-132.json" /></a></div>
         </div>
       </td>
     </tr>
@@ -348,6 +365,13 @@ You can preview translations in <a href="https://projects.localizethedocs.org/cu
       <td rowspan="1" colspan="1" align="center" style="text-align: center;"><div><code>en_US</code></div></td>
       <td rowspan="1" colspan="1" align="left"   style="text-align: left;  ">
         <div><a href="https://projects.localizethedocs.org/cuda-oxide-book-l10n/en-us">https://projects.localizethedocs.org/cuda-oxide-book-l10n/en-us</a></div>
+      </td>
+    </tr>
+    <!-- es_ES -->
+    <tr>
+      <td rowspan="1" colspan="1" align="center" style="text-align: center;"><div><code>es_ES</code></div></td>
+      <td rowspan="1" colspan="1" align="left"   style="text-align: left;  ">
+        <div><a href="https://projects.localizethedocs.org/cuda-oxide-book-l10n/es-es">https://projects.localizethedocs.org/cuda-oxide-book-l10n/es-es</a></div>
       </td>
     </tr>
     <!-- zh_CN -->
