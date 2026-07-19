@@ -18,6 +18,7 @@ languages_mapping: &languages_mapping
   locale:
     zh-CN:  zh_CN
     zh-TW:  zh_TW
+    es:     es_ES
 
 #
 # Files configuration.
