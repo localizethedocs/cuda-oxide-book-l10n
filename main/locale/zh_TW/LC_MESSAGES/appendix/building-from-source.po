@@ -280,7 +280,7 @@ msgstr ""
 
 #: ../../../appendix/building-from-source.md:129
 msgid "Build the workspace"
-msgstr ""
+msgstr "建置工作空間"
 
 #: ../../../appendix/building-from-source.md:131
 msgid ""
@@ -405,7 +405,7 @@ msgstr ""
 
 #: ../../../appendix/building-from-source.md:215
 msgid "Workspace structure"
-msgstr ""
+msgstr "工作空間結構"
 
 #: ../../../appendix/building-from-source.md:217
 msgid ""
