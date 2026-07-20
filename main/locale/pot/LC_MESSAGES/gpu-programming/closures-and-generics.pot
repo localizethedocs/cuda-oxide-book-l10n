@@ -8,10 +8,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-16 12:33+0000\n"
+"POT-Creation-Date: 2026-07-20 10:41+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -172,14 +173,140 @@ msgid ""
 msgstr ""
 
 #: ../../../gpu-programming/closures-and-generics.md:85
-msgid "Const-generic kernels"
+msgid "Compile-time kernel policies"
 msgstr ""
 
 #: ../../../gpu-programming/closures-and-generics.md:87
-msgid "Const parameters work on kernel and device-function entry points:"
+msgid "A policy type groups tuning choices for one generic kernel:"
 msgstr ""
 
 #: ../../../gpu-programming/closures-and-generics.md:89
+msgid ""
+"#![feature(generic_const_exprs)]\n"
+"#![allow(incomplete_features)]\n"
+"\n"
+"use cuda_core::LaunchConfig1D;\n"
+"use cuda_device::{\n"
+"    cuda_module, kernel, launch_bounds, launch_contract, thread, "
+"DisjointSlice,\n"
+"};\n"
+"\n"
+"trait TransformPolicy {\n"
+"    const MAX_THREADS: u32;\n"
+"    const MIN_BLOCKS: u32;\n"
+"    const UNROLL: u32;\n"
+"}\n"
+"\n"
+"enum Small {}\n"
+"impl TransformPolicy for Small {\n"
+"    const MAX_THREADS: u32 = 64;\n"
+"    const MIN_BLOCKS: u32 = 2;\n"
+"    const UNROLL: u32 = 2;\n"
+"}\n"
+"\n"
+"enum Wide {}\n"
+"impl TransformPolicy for Wide {\n"
+"    const MAX_THREADS: u32 = 256;\n"
+"    const MIN_BLOCKS: u32 = 1;\n"
+"    const UNROLL: u32 = 4;\n"
+"}\n"
+"\n"
+"#[cuda_module]\n"
+"mod kernels {\n"
+"    use super::*;\n"
+"\n"
+"    #[kernel]\n"
+"    #[launch_bounds(P::MAX_THREADS, P::MIN_BLOCKS)]\n"
+"    #[launch_contract(domain = 1)]\n"
+"    pub fn transform<P: TransformPolicy>(mut output: DisjointSlice<u32>) {\n"
+"        let index = thread::index_1d();\n"
+"        if let Some(value) = output.get_mut(index) {\n"
+"            let mut step = 0;\n"
+"            #[unroll(P::UNROLL)]\n"
+"            while step < 8 {\n"
+"                *value = value.rotate_left(1);\n"
+"                step += 1;\n"
+"            }\n"
+"        }\n"
+"    }\n"
+"}\n"
+"\n"
+"let launch = module\n"
+"    .prepare_transform::<Small>(LaunchConfig1D::new(1, 64, 0))\n"
+"    .expect(\"valid Small launch\");\n"
+"module\n"
+"    .transform::<Small>(&stream, &launch, &mut output)\n"
+"    .expect(\"launch Small kernel\");\n"
+"\n"
+"let wide_launch = module\n"
+"    .prepare_transform::<Wide>(LaunchConfig1D::new(1, 256, 0))\n"
+"    .expect(\"valid Wide launch\");\n"
+"module\n"
+"    .transform::<Wide>(&stream, &wide_launch, &mut output)\n"
+"    .expect(\"launch Wide kernel\");\n"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:153
+msgid ""
+"`Small` and `Wide` produce separate PTX kernels. The policy is not a kernel "
+"argument, and the GPU does not choose a policy at runtime."
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:156
+msgid "A policy can also carry metadata-only descriptions:"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:158
+msgid ""
+"use cuda_device::config::{\n"
+"    Atom, AtomKind, Block, Global, RowMajor, Shape1, Thread, Tile,\n"
+"};\n"
+"\n"
+"type BlockTile = Tile<Shape1<1024>, RowMajor, Global, Block>;\n"
+"\n"
+"enum Rotate {}\n"
+"impl AtomKind for Rotate {}\n"
+"type ElementOp = Atom<Rotate, Shape1<1>, Thread>;\n"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:170
+msgid ""
+"`BlockTile` describes 1,024 row-major global-memory elements handled by a "
+"block. `ElementOp` names a one-element operation handled by a thread; a "
+"kernel library decides what `Rotate` does. Neither type allocates memory, "
+"calculates an address, or runs an operation."
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:175
+msgid ""
+"`MAX_THREADS` is a maximum, not an exact block size. The prepared launch for "
+"`Small` accepts at most 64 threads per block; `Wide` accepts at most 256. "
+"Use `block = (x, y, z)` in `#[launch_contract]` only when the shape must be "
+"exact. `MIN_BLOCKS` is a compiler occupancy hint, not a requested grid size."
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:180
+msgid ""
+"`UNROLL = 4` groups four loop iterations. It does not stop the loop after "
+"four iterations, and remaining iterations are still handled."
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:183
+msgid ""
+"Generic policy expressions currently need Rust's `generic_const_exprs` "
+"feature. Other named constants used in a contracted `launch_bounds` maximum "
+"must be visible at module scope."
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:187
+msgid "Const-generic kernels"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:189
+msgid "Const parameters work on kernel and device-function entry points:"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:191
 msgid ""
 "#[kernel]\n"
 "pub fn add_value<const VALUE: u32>(mut output: DisjointSlice<u32>) {\n"
@@ -190,17 +317,17 @@ msgid ""
 "}\n"
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:99
+#: ../../../gpu-programming/closures-and-generics.md:201
 msgid ""
 "add_value::<4> -> add_value_TID_<hash A>\n"
 "add_value::<8> -> add_value_TID_<hash B>\n"
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:104
+#: ../../../gpu-programming/closures-and-generics.md:206
 msgid "Use ordinary Rust turbofish syntax on the generated launch method:"
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:106
+#: ../../../gpu-programming/closures-and-generics.md:208
 msgid ""
 "// SAFETY: config matches the kernels' 1D indexing and output bounds.\n"
 "unsafe {\n"
@@ -209,25 +336,25 @@ msgid ""
 "}\n"
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:114
+#: ../../../gpu-programming/closures-and-generics.md:216
 msgid ""
 "The older `#[kernel(f32, i32)]` convenience form only supports one type "
 "parameter. For const or mixed generics, use bare `#[kernel]` and specialize "
 "at the launch site."
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:118
+#: ../../../gpu-programming/closures-and-generics.md:220
 msgid "Host closures as kernel arguments"
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:120
+#: ../../../gpu-programming/closures-and-generics.md:222
 msgid ""
 "cuda-oxide supports passing closures from the host to the GPU. This enables "
 "powerful `map`-style patterns where the kernel's behavior is parameterized "
 "by a function:"
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:124
+#: ../../../gpu-programming/closures-and-generics.md:226
 msgid ""
 "#[kernel]\n"
 "pub fn map<F: Fn(i32) -> i32>(f: F, input: &[i32], mut out: "
@@ -240,11 +367,11 @@ msgid ""
 "}\n"
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:135
+#: ../../../gpu-programming/closures-and-generics.md:237
 msgid "Launch with a closure:"
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:137
+#: ../../../gpu-programming/closures-and-generics.md:239
 msgid ""
 "let factor = 3i32;\n"
 "// SAFETY: config is 1D and both buffers cover every launched index.\n"
@@ -255,11 +382,11 @@ msgid ""
 ".expect(\"Launch failed\");\n"
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:146
+#: ../../../gpu-programming/closures-and-generics.md:248
 msgid "How closure arguments travel"
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:148
+#: ../../../gpu-programming/closures-and-generics.md:250
 msgid ""
 "The closure passes through the launch as one value -- not as a list of "
 "captured fields. The launcher pushes a single driver argument (the whole "
@@ -267,7 +394,7 @@ msgid ""
 "param`:"
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:153
+#: ../../../gpu-programming/closures-and-generics.md:255
 msgid ""
 "host          factor = 3i32; cl = move |x| x * factor\n"
 "              push one driver arg ─► closure struct { factor: i32 }\n"
@@ -280,7 +407,7 @@ msgid ""
 "              )\n"
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:165
+#: ../../../gpu-programming/closures-and-generics.md:267
 msgid ""
 "Slices keep their `(ptr, len)` flattening because that shape is shared by "
 "the host launch helpers and the PTX entry-point layout. Only aggregate- by-"
@@ -288,18 +415,18 @@ msgid ""
 "byval at the kernel boundary."
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:170
+#: ../../../gpu-programming/closures-and-generics.md:272
 msgid ""
 "A closure with no captures is a zero-sized type -- the backend drops the `."
 "param` entirely, and the host launcher knows to skip it so the packet stays "
 "aligned."
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:174
+#: ../../../gpu-programming/closures-and-generics.md:276
 msgid "PTX naming for closures"
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:176
+#: ../../../gpu-programming/closures-and-generics.md:278
 msgid ""
 "A closure-generic kernel gets the same `_TID_<hex32>` suffix as any other "
 "generic kernel. The closure's anonymous type is part of the concrete "
@@ -331,72 +458,72 @@ msgstr ""
 msgid "`map_TID_<hex_b>`"
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:186
+#: ../../../gpu-programming/closures-and-generics.md:288
 msgid "Move vs reference closures"
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:188
+#: ../../../gpu-programming/closures-and-generics.md:290
 msgid "The `move` keyword determines how captures are transferred to the GPU:"
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:190
+#: ../../../gpu-programming/closures-and-generics.md:292
 msgid "Move closures (recommended default)"
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:192
+#: ../../../gpu-programming/closures-and-generics.md:294
 msgid ""
 "let factor = 3i32;\n"
 "move |x| x * factor   // `factor` is copied into the closure struct\n"
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:197
+#: ../../../gpu-programming/closures-and-generics.md:299
 msgid "The closure struct holds the capture by value (`{ factor: i32 }`)."
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:198
+#: ../../../gpu-programming/closures-and-generics.md:300
 msgid "The kernel reads `factor` as a regular field of the byval closure."
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:199
+#: ../../../gpu-programming/closures-and-generics.md:301
 msgid "The host variable can be dropped after launch."
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:200
+#: ../../../gpu-programming/closures-and-generics.md:302
 msgid "Works on all systems -- no special hardware support needed."
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:202
+#: ../../../gpu-programming/closures-and-generics.md:304
 msgid "Reference closures (HMM)"
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:204
+#: ../../../gpu-programming/closures-and-generics.md:306
 msgid ""
 "let factor = 3i32;\n"
 "|x| x * factor   // closure captures &factor\n"
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:209
+#: ../../../gpu-programming/closures-and-generics.md:311
 msgid ""
 "The closure struct contains a **host pointer** to `factor` (`{ factor: &i32 }"
 "`)."
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:211
+#: ../../../gpu-programming/closures-and-generics.md:313
 msgid ""
 "The whole closure still travels as one byval parameter; the kernel deref's "
 "that host pointer through **Hardware-Managed Memory (HMM)**, which migrates "
 "the host page on access."
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:214
+#: ../../../gpu-programming/closures-and-generics.md:316
 msgid "The host variable **must remain alive** until the kernel completes."
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:215
+#: ../../../gpu-programming/closures-and-generics.md:317
 msgid "Requires HMM support (Turing+ GPU, Linux 6.1.24+, CUDA 12.2+)."
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:217
+#: ../../../gpu-programming/closures-and-generics.md:319
 msgid "When to use which"
 msgstr ""
 
@@ -440,25 +567,25 @@ msgstr ""
 msgid "Reference (HMM) -- but beware synchronization"
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:227
+#: ../../../gpu-programming/closures-and-generics.md:329
 msgid ""
 "When in doubt, use `move` closures. They are simpler to reason about, work "
 "everywhere, and avoid the synchronization hazards of shared host/device "
 "memory."
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:231
+#: ../../../gpu-programming/closures-and-generics.md:333
 msgid "In-kernel closures"
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:233
+#: ../../../gpu-programming/closures-and-generics.md:335
 msgid ""
 "Closures defined and called entirely within device code work with normal "
 "Rust semantics -- no host/device ABI is involved because everything is "
 "already on the GPU:"
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:237
+#: ../../../gpu-programming/closures-and-generics.md:339
 msgid ""
 "#[kernel]\n"
 "pub fn apply_transform(input: &[f32], mut out: DisjointSlice<f32>) {\n"
@@ -476,23 +603,23 @@ msgid ""
 "}\n"
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:253
+#: ../../../gpu-programming/closures-and-generics.md:355
 msgid ""
 "In-kernel closures are inlined by the compiler and have zero overhead. They "
 "are useful for factoring logic within a kernel without introducing a "
 "separate device function."
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:257
+#: ../../../gpu-programming/closures-and-generics.md:359
 msgid "Cross-crate kernels"
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:259
+#: ../../../gpu-programming/closures-and-generics.md:361
 msgid ""
 "Kernels can be defined in a library crate and launched from a binary crate:"
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:261
+#: ../../../gpu-programming/closures-and-generics.md:363
 msgid ""
 "// In lib crate `my_kernels`:\n"
 "use cuda_device::{cuda_module, kernel, thread, DisjointSlice};\n"
@@ -512,7 +639,7 @@ msgid ""
 "}\n"
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:280
+#: ../../../gpu-programming/closures-and-generics.md:382
 msgid ""
 "// In binary crate:\n"
 "use my_kernels::kernels;\n"
@@ -523,14 +650,14 @@ msgid ""
 "    .expect(\"Launch failed\");\n"
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:290
+#: ../../../gpu-programming/closures-and-generics.md:392
 msgid ""
 "The compiler handles cross-crate kernel discovery through the marker traits "
 "generated by `#[kernel]`. The typed module resolves the PTX name at compile "
 "time and caches the loaded function handle."
 msgstr ""
 
-#: ../../../gpu-programming/closures-and-generics.md:295
+#: ../../../gpu-programming/closures-and-generics.md:397
 msgid ""
 "For generic cross-crate kernels, the monomorphization happens in the "
 "**calling** crate (where the concrete type is known), so the PTX is "
