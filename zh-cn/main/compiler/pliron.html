@@ -1,0 +1,929 @@
+
+<!DOCTYPE html>
+
+
+<html lang="zh-CN" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Pliron -- Pliron IR (MLIR-like) &#8212; cuda-oxide</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/nvidia-sphinx-theme.css?v=5d97cc0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=196aea71" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/lightbox.css?v=31fdf494" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../_static/documentation_options.js?v=d786bb5c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/translations.js?v=540d3cec"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'compiler/pliron';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../_static/js/lightbox.js?v=8cf6bc2b"></script>
+    <script src="../_static/js/spa-nav.js?v=9a4d0bbe"></script>
+    <link rel="canonical" href="https://projects.localizethedocs.org/cuda-oxide-book-l10n/compiler/pliron.html" />
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="rustc_public -- Stable MIR" href="rustc-public.html" />
+    <link rel="prev" title="Architecture Overview" href="architecture-overview.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="zh-CN"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+<script type="text/javascript" src="../ltd-provenance.js"></script>
+<script type="text/javascript" src="../ltd-current.js"></script>
+<script type="text/javascript" src="../../../ltd-config.js"></script>
+<script type="text/javascript" src="../../../ltd-flyout.js"></script>
+
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">跳转至主要内容</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>回到顶部</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="版本警告"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="网页导航">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">cuda-oxide</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="亮色"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="暗色"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>亮色</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>暗色</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="当前页面">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="亮色"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="暗色"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>亮色</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>暗色</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><div class="sidebar-tree">
+    <p class="sidebar-tree-title">
+        Table of Contents
+    </p>
+    <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/hello-gpu.html">Writing Your First Kernel</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Writing GPU Programs</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/execution-model.html">The CUDA Execution Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/kernels-and-device-functions.html">Kernels and Device Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/memory-and-data-movement.html">Memory and Data Movement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/launching-kernels.html">Launching Kernels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/closures-and-generics.html">Closures and Generics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/error-handling-and-debugging.html">Error Handling and Debugging</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Safety on the GPU</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-safety/the-safety-model.html">The Safety Model</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Async GPU Programming</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/the-device-operation-model.html">The DeviceOperation Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/combinators-and-composition.html">Combinators and Composition</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/scheduling-and-streams.html">Scheduling and Streams</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/concurrent-execution.html">Concurrent Execution</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Building a Real Application</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../projects/async-mlp-pipeline.html">Project: Async MLP Pipeline</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Advanced GPU Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/shared-memory-and-synchronization.html">Shared Memory and Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/warp-level-programming.html">Warp-Level Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/tensor-memory-accelerator.html">Tensor Memory Accelerator (TMA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/matrix-multiply-accelerators.html">Matrix Multiply Accelerators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cluster-programming.html">Cluster Programming</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Inside the Compiler</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="architecture-overview.html">Architecture Overview</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Pliron -- Pliron IR (MLIR-like)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rustc-public.html">rustc_public -- Stable MIR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rustc-codegen-cuda.html">The Code Generator: rustc-codegen-cuda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mir-importer.html">The MIR Importer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compiler-optimizations.html">Compiler Optimizations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mlir-dialects.html">Pliron Dialects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lowering-pipeline.html">The Lowering Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="adding-new-intrinsics.html">Adding New Intrinsics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fuzzing-and-differential-testing.html">Fuzzing and Differential Testing</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Appendix</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/building-from-source.html">Building from Source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/api-quick-reference.html">API Quick Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/supported-features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/cuda-cpp-comparison.html">cuda-oxide vs CUDA C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/ecosystem.html">The Rust + GPU Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/glossary.html">Glossary</a></li>
+</ul>
+
+</div></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="初始页面">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Pliron -- Pliron IR (MLIR-like)</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="pliron-pliron-ir-mlir-like">
+<h1>Pliron -- Pliron IR (MLIR-like)<a class="headerlink" href="#pliron-pliron-ir-mlir-like" title="链接到此标题。">#</a></h1>
+<p>cuda-oxide does not compile Rust directly to PTX in one step. It lowers code
+through a series of intermediate representations, each capturing a different
+level of abstraction. The framework that makes this possible is <strong>pliron</strong> -- an
+extensible compiler IR framework written in pure Rust, inspired by LLVM's MLIR.
+We refer to the IR built on this framework as <strong>Pliron IR</strong>.</p>
+<p>This chapter explains what upstream MLIR is, why pliron exists as an alternative,
+and how its core data structures work. If you have never built a compiler, don't
+worry -- nothing here requires prior compiler experience, just a working
+knowledge of Rust.</p>
+<section id="what-is-mlir-and-why-should-you-care">
+<h2>What is MLIR (and why should you care)?<a class="headerlink" href="#what-is-mlir-and-why-should-you-care" title="链接到此标题。">#</a></h2>
+<p>LLVM IR is a fixed instruction set. It has roughly 70 opcodes (<code class="docutils literal notranslate"><span class="pre">add</span></code>, <code class="docutils literal notranslate"><span class="pre">load</span></code>,
+<code class="docutils literal notranslate"><span class="pre">br</span></code>, <code class="docutils literal notranslate"><span class="pre">getelementptr</span></code>, and so on), and if your domain doesn't map cleanly to
+those opcodes, tough luck -- you flatten your high-level concepts into low-level
+instructions and hope the optimizer can reconstruct what you meant.</p>
+<p><strong>MLIR</strong> (Multi-Level Intermediate Representation) takes a different approach.
+Instead of one fixed instruction set, MLIR gives you a framework for defining
+<em>many</em> instruction sets -- called <strong>dialects</strong> -- each tailored to a specific
+domain. A dialect is a collection of operations, types, and attributes that model
+the concepts you actually care about.</p>
+<p>The key idea is straightforward:</p>
+<ol class="arabic simple">
+<li><p>Define a dialect with operations that match your domain.</p></li>
+<li><p>Write <strong>passes</strong> that transform one dialect into another (lowering).</p></li>
+<li><p>Chain passes together until you reach something a backend can consume.</p></li>
+</ol>
+<p>Consider how Triton (the GPU compiler behind PyTorch) uses MLIR. Python GPU code
+first lowers to <strong>TTIR</strong>, a tensor-level IR where operations like &quot;broadcast this
+scalar across a tensor&quot; are first-class. At that level, Triton can apply
+domain-specific optimizations -- for instance, replacing a <code class="docutils literal notranslate"><span class="pre">splat</span> <span class="pre">+</span> <span class="pre">mul</span></code>
+(broadcast a scalar, then multiply element-wise) with a single native
+vector-scalar multiply. That optimization is trivial to express when you have
+tensor operations in your IR and nearly impossible to recover after flattening
+to LLVM IR.</p>
+<p>cuda-oxide faces a similar challenge. We need to represent three very different
+levels of abstraction:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Level</p></th>
+<th class="head text-left"><p>What it models</p></th>
+<th class="head text-left"><p>Example operations</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><strong><code class="docutils literal notranslate"><span class="pre">dialect-mir</span></code></strong></p></td>
+<td class="text-left"><p>Rust semantics -- tuples, enums, slices, checked arithmetic</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">mir.extract_field</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.get_discriminant</span></code></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><strong>LLVM dialect</strong></p></td>
+<td class="text-left"><p>Machine-near operations -- integer math, memory, control flow</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">llvm.add</span></code>, <code class="docutils literal notranslate"><span class="pre">llvm.load</span></code>, <code class="docutils literal notranslate"><span class="pre">llvm.br</span></code></p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><strong><code class="docutils literal notranslate"><span class="pre">dialect-nvvm</span></code></strong></p></td>
+<td class="text-left"><p>GPU intrinsics -- thread indexing, warp shuffles, TMA, WGMMA</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">nvvm.read_ptx_sreg_tid_x</span></code>, <code class="docutils literal notranslate"><span class="pre">nvvm.shfl_sync</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Without an extensible IR, we would have to either jam Rust enums into LLVM IR
+(losing semantic information) or build separate IR frameworks for each level of
+the pipeline. MLIR lets us define all three as dialects in a single system and
+lower between them with well-typed passes.</p>
+</section>
+<section id="enter-pliron">
+<h2>Enter pliron<a class="headerlink" href="#enter-pliron" title="链接到此标题。">#</a></h2>
+<p>MLIR's dialect-and-lowering model is the right abstraction for cuda-oxide: keep
+high-level semantics in the IR while progressively lowering toward code the GPU
+backend can consume. The question is implementation fit. Upstream MLIR is part
+of the LLVM C++ ecosystem, while cuda-oxide is a Rust compiler project built
+around Rust crates, Rust types, and Cargo workflows.</p>
+<p><a class="reference external" href="https://github.com/vaivaswatha/pliron">Pliron</a> is an MLIR-inspired extensible
+compiler IR framework written in <strong>pure Rust</strong>. It follows the same conceptual
+model -- operations, regions, basic blocks, types, attributes, dialects, passes
+-- while fitting naturally into a Rust-native compiler stack.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Aspect</p></th>
+<th class="head text-left"><p>pliron</p></th>
+<th class="head text-left"><p>Upstream MLIR</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>Language</p></td>
+<td class="text-left"><p>Pure Rust</p></td>
+<td class="text-left"><p>C++ with Python bindings</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Build system</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">build</span></code></p></td>
+<td class="text-left"><p>CMake + full LLVM build</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>DSLs required</p></td>
+<td class="text-left"><p>None -- just Rust macros</p></td>
+<td class="text-left"><p>TableGen, ODS</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Debugging</p></td>
+<td class="text-left"><p>Standard Rust tooling (<code class="docutils literal notranslate"><span class="pre">dbg!</span></code>, rust-gdb)</p></td>
+<td class="text-left"><p>gdb on C++ templates</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Extensibility</p></td>
+<td class="text-left"><p>Add a dialect as a Rust crate</p></td>
+<td class="text-left"><p>C++ extension against LLVM headers</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Dependency weight</p></td>
+<td class="text-left"><p>One crate (git dependency)</p></td>
+<td class="text-left"><p>Gigabytes of LLVM build artifacts</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>For cuda-oxide, this means the entire compiler -- from MIR import to LLVM IR
+export -- stays within the same Rust build and debugging environment as the rest
+of the project. Pliron gives us the extensible IR structure we need without
+moving the compiler out of the Rust ecosystem.</p>
+</section>
+<section id="core-data-structures">
+<h2>Core data structures<a class="headerlink" href="#core-data-structures" title="链接到此标题。">#</a></h2>
+<p>Pliron's IR is built from a handful of core types. Understanding these is the
+key to reading (and writing) dialect code.</p>
+<section id="context">
+<h3>Context<a class="headerlink" href="#context" title="链接到此标题。">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">Context</span></code> is the central data structure that owns <em>all</em> IR data --
+operations, basic blocks, regions, types, attributes, and dialect registrations.
+Think of it as the arena allocator for your entire compilation unit.</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="c1">// Simplified -- the real Context has more fields</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">Context</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">operations</span><span class="p">:</span><span class="w"> </span><span class="nc">SlotMap</span><span class="o">&lt;</span><span class="n">Ptr</span><span class="o">&lt;</span><span class="n">Operation</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">Operation</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">basic_blocks</span><span class="p">:</span><span class="w"> </span><span class="nc">SlotMap</span><span class="o">&lt;</span><span class="n">Ptr</span><span class="o">&lt;</span><span class="n">BasicBlock</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">BasicBlock</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">regions</span><span class="p">:</span><span class="w"> </span><span class="nc">SlotMap</span><span class="o">&lt;</span><span class="n">Ptr</span><span class="o">&lt;</span><span class="n">Region</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">Region</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">dialects</span><span class="p">:</span><span class="w"> </span><span class="nc">HashMap</span><span class="o">&lt;</span><span class="n">DialectName</span><span class="p">,</span><span class="w"> </span><span class="n">Dialect</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">type_store</span><span class="p">:</span><span class="w"> </span><span class="nc">TypeStore</span><span class="p">,</span><span class="w">     </span><span class="c1">// uniqued (deduplicated) types</span>
+<span class="w">    </span><span class="c1">// Attributes are not stored centrally -- see &quot;Types and attributes&quot; below.</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Pliron uses <strong>generational arenas</strong> (from the <code class="docutils literal notranslate"><span class="pre">slotmap</span></code> crate) instead of
+<code class="docutils literal notranslate"><span class="pre">Box</span></code>-allocated heap nodes. This gives you:</p>
+<ul class="simple">
+<li><p><strong>O(1) insert and remove</strong> -- no tree rebalancing, no linked-list traversal.</p></li>
+<li><p><strong>Stable indices</strong> -- inserting or removing an element does not invalidate
+other indices.</p></li>
+<li><p><strong>Generational versioning</strong> -- each slot carries a generation counter. If you
+delete an operation and the slot gets reused, any old reference will have a
+stale generation and fail at runtime instead of silently reading garbage.</p></li>
+</ul>
+<p>Every piece of IR is stored inside the Context. You never hold a direct <code class="docutils literal notranslate"><span class="pre">&amp;mut</span> <span class="pre">Operation</span></code> across function boundaries -- you hold a <code class="docutils literal notranslate"><span class="pre">Ptr&lt;Operation&gt;</span></code> and deref
+it through the Context when needed.</p>
+</section>
+<section id="operations">
+<h3>Operations<a class="headerlink" href="#operations" title="链接到此标题。">#</a></h3>
+<p>An <strong>operation</strong> is a single node in the IR graph. It has operands (inputs),
+results (outputs), attributes (compile-time metadata), and optionally regions
+(nested structure for things like function bodies and loop nests).</p>
+<p>Every operation belongs to a dialect. The naming convention is
+<code class="docutils literal notranslate"><span class="pre">dialect_name.op_name</span></code>:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="cp">#[pliron_op(name = </span><span class="s">&quot;mir.func&quot;</span><span class="cp">, dialect = </span><span class="s">&quot;mir&quot;</span><span class="cp">)]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">MirFuncOp</span><span class="p">;</span>
+
+<span class="cp">#[pliron_op(name = </span><span class="s">&quot;nvvm.read_ptx_sreg_tid_x&quot;</span><span class="cp">, dialect = </span><span class="s">&quot;nvvm&quot;</span><span class="cp">)]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">ReadPtxSregTidXOp</span><span class="p">;</span>
+
+<span class="cp">#[pliron_op(name = </span><span class="s">&quot;llvm.add&quot;</span><span class="cp">, dialect = </span><span class="s">&quot;llvm&quot;</span><span class="cp">)]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">AddOp</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">#[pliron_op(...)]</span></code> proc macro (from <code class="docutils literal notranslate"><span class="pre">pliron-derive</span></code>) generates the
+boilerplate for registering the operation with its dialect, assigning it an
+opcode, and wiring up the <code class="docutils literal notranslate"><span class="pre">Op</span></code> trait. You define the operation's semantics by
+implementing <code class="docutils literal notranslate"><span class="pre">Verify</span></code>, <code class="docutils literal notranslate"><span class="pre">Printable</span></code>, and <code class="docutils literal notranslate"><span class="pre">Parsable</span></code>.</p>
+</section>
+<section id="types-and-attributes">
+<h3>Types and attributes<a class="headerlink" href="#types-and-attributes" title="链接到此标题。">#</a></h3>
+<p><strong>Types</strong> represent data types in the IR. Pliron's built-in dialect provides
+integers (<code class="docutils literal notranslate"><span class="pre">i1</span></code>, <code class="docutils literal notranslate"><span class="pre">i32</span></code>, <code class="docutils literal notranslate"><span class="pre">i64</span></code>) and floats (<code class="docutils literal notranslate"><span class="pre">f32</span></code>, <code class="docutils literal notranslate"><span class="pre">f64</span></code>). cuda-oxide's MIR
+dialect extends these with Rust-specific types:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="cp">#[pliron_type(name = </span><span class="s">&quot;mir.tuple&quot;</span><span class="cp">, dialect = </span><span class="s">&quot;mir&quot;</span><span class="cp">)]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">MirTupleType</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">types</span><span class="p">:</span><span class="w"> </span><span class="nb">Vec</span><span class="o">&lt;</span><span class="n">Ptr</span><span class="o">&lt;</span><span class="n">TypeObj</span><span class="o">&gt;&gt;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="cp">#[pliron_type(name = </span><span class="s">&quot;mir.slice&quot;</span><span class="cp">, dialect = </span><span class="s">&quot;mir&quot;</span><span class="cp">)]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">MirSliceType</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">element_ty</span><span class="p">:</span><span class="w"> </span><span class="nc">Ptr</span><span class="o">&lt;</span><span class="n">TypeObj</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="cp">#[pliron_type(name = </span><span class="s">&quot;mir.enum&quot;</span><span class="cp">, dialect = </span><span class="s">&quot;mir&quot;</span><span class="cp">)]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">MirEnumType</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">name</span><span class="p">:</span><span class="w"> </span><span class="nb">String</span><span class="p">,</span>
+<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">discriminant_ty</span><span class="p">:</span><span class="w"> </span><span class="nc">Ptr</span><span class="o">&lt;</span><span class="n">TypeObj</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="w">    </span><span class="k">pub</span><span class="w"> </span><span class="n">variant_names</span><span class="p">:</span><span class="w"> </span><span class="nb">Vec</span><span class="o">&lt;</span><span class="nb">String</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="w">    </span><span class="c1">// ...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>Attributes</strong> attach compile-time metadata to operations -- constant values,
+flags, predicate kinds, cast kinds, and so on.</p>
+<p>Types and attributes are stored differently:</p>
+<ul class="simple">
+<li><p><strong>Types are uniqued</strong> (deduplicated). If you create two
+<code class="docutils literal notranslate"><span class="pre">MirTupleType</span> <span class="pre">{</span> <span class="pre">types:</span> <span class="pre">vec![i32,</span> <span class="pre">f32]</span> <span class="pre">}</span></code> instances, pliron stores only
+one copy and hands back the same pointer. Type equality becomes a
+pointer comparison instead of a deep structural compare.</p></li>
+<li><p><strong>Attributes are not uniqued by default.</strong> Each operation carries its
+own attribute values inline. This matches how MLIR's &quot;properties&quot; work
+-- MLIR originally uniqued attributes too, found that mutation and
+per-op state were awkward, and introduced properties as the unstored,
+per-op alternative. Pliron skipped that detour and started with the
+property-shaped design.</p></li>
+</ul>
+<p>If you do want to dedup an attribute (for example, a 4 KB constant lookup
+table that many ops reference), opt into uniquing per-attribute via the
+<code class="docutils literal notranslate"><span class="pre">uniqued_any</span></code> utility. The pattern is to wrap the heavy payload in a
+<code class="docutils literal notranslate"><span class="pre">UniquedKey&lt;T&gt;</span></code> and store the key inside the attribute:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="nc">SomeData</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="cm">/* large or expensive-to-compare payload */</span><span class="w"> </span><span class="p">}</span>
+
+<span class="cp">#[pliron_attr(name = </span><span class="s">&quot;...&quot;</span><span class="cp">, dialect = </span><span class="s">&quot;...&quot;</span><span class="cp">)]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">SomeDataAttr</span><span class="p">(</span><span class="k">pub</span><span class="w"> </span><span class="n">UniquedKey</span><span class="o">&lt;</span><span class="n">SomeData</span><span class="o">&gt;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Now <code class="docutils literal notranslate"><span class="pre">SomeDataAttr</span></code> is a small handle that compares by key; the underlying
+<code class="docutils literal notranslate"><span class="pre">SomeData</span></code> lives once in the uniquing table.</p>
+</section>
+<section id="ptr-t-safe-arena-references">
+<h3>Ptr&lt;T&gt; -- safe arena references<a class="headerlink" href="#ptr-t-safe-arena-references" title="链接到此标题。">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">Ptr&lt;T&gt;</span></code> is pliron's equivalent of a pointer into the arena. Under the hood, it
+is composed of two fields:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">pub</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">Ptr</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">index</span><span class="p">:</span><span class="w"> </span><span class="kt">u32</span><span class="p">,</span><span class="w">           </span><span class="c1">// slot index in the arena</span>
+<span class="w">    </span><span class="n">version</span><span class="p">:</span><span class="w"> </span><span class="nc">NonZeroU32</span><span class="p">,</span><span class="w">  </span><span class="c1">// generational version</span>
+<span class="w">    </span><span class="n">_phantom</span><span class="p">:</span><span class="w"> </span><span class="nc">PhantomData</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <strong>version</strong> field is what makes this safe. When you delete an operation,
+pliron bumps the generation counter on that slot. If someone later tries to
+dereference an old <code class="docutils literal notranslate"><span class="pre">Ptr&lt;Operation&gt;</span></code> whose version no longer matches the slot's
+current generation, the access fails instead of reading the new (unrelated)
+occupant.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">PhantomData&lt;T&gt;</span></code> ensures type safety at compile time -- you cannot
+accidentally use a <code class="docutils literal notranslate"><span class="pre">Ptr&lt;Operation&gt;</span></code> to index into the <code class="docutils literal notranslate"><span class="pre">BasicBlock</span></code> arena. The
+compiler won't let you.</p>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>You interact with arena contents through the Context:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ptr.deref(ctx)</span></code> returns a shared reference (<code class="docutils literal notranslate"><span class="pre">&amp;T</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ptr.deref_mut(ctx)</span></code> returns an exclusive reference (<code class="docutils literal notranslate"><span class="pre">&amp;mut</span> <span class="pre">T</span></code>).</p></li>
+</ul>
+<p>This follows Rust's borrow model -- the Context is the owner, and you borrow
+through it.</p>
+</div>
+</section>
+</section>
+<section id="def-use-chains-memory-safe">
+<h2>Def-use chains (memory-safe)<a class="headerlink" href="#def-use-chains-memory-safe" title="链接到此标题。">#</a></h2>
+<p>In any compiler IR, you need to answer two questions constantly:</p>
+<ul class="simple">
+<li><p><strong>Use-def</strong>: &quot;Where is this value defined?&quot; (Given a use, find the definition.)</p></li>
+<li><p><strong>Def-use</strong>: &quot;Where is this value used?&quot; (Given a definition, find all uses.)</p></li>
+</ul>
+<p>Traditional compilers implement these chains with raw pointers and manual
+bookkeeping. Forget to update a use-list when you delete an operation? Dangling
+pointer. Replace a value but miss one use? Stale reference. Welcome to your
+afternoon of debugging a segfault in <code class="docutils literal notranslate"><span class="pre">opt</span> <span class="pre">-O2</span></code>.</p>
+<p>Pliron implements def-use chains using Rust's type system. A <code class="docutils literal notranslate"><span class="pre">Value</span></code> in pliron
+is an enum:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">pub</span><span class="w"> </span><span class="k">enum</span><span class="w"> </span><span class="nc">Value</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">OpResult</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">op</span><span class="p">:</span><span class="w"> </span><span class="nc">Ptr</span><span class="o">&lt;</span><span class="n">Operation</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">index</span><span class="p">:</span><span class="w"> </span><span class="kt">usize</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="n">BlockArgument</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">block</span><span class="p">:</span><span class="w"> </span><span class="nc">Ptr</span><span class="o">&lt;</span><span class="n">BasicBlock</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">index</span><span class="p">:</span><span class="w"> </span><span class="kt">usize</span><span class="w"> </span><span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Every value is either the result of an operation or an argument to a basic block.
+Each definition tracks the set of all its uses, and each use stores a pointer
+back to its definition. When you call <code class="docutils literal notranslate"><span class="pre">replace_all_uses_with</span></code>, both sides update
+automatically.</p>
+<p>This means:</p>
+<ul class="simple">
+<li><p><strong>No dangling references</strong> -- removing an operation updates all use-lists.</p></li>
+<li><p><strong>No stale uses</strong> -- replacing a value propagates to every consumer.</p></li>
+<li><p><strong>No segfaults during IR transforms</strong> -- the borrow checker and generational
+arenas prevent the entire class of bugs that plague C++ compiler frameworks.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>If you are familiar with LLVM's <code class="docutils literal notranslate"><span class="pre">Value</span></code> / <code class="docutils literal notranslate"><span class="pre">Use</span></code> / <code class="docutils literal notranslate"><span class="pre">User</span></code> system, pliron's
+design serves the same purpose. The difference is that LLVM implements it with
+intrusive linked lists and raw <code class="docutils literal notranslate"><span class="pre">Value*</span></code> pointers, while pliron implements it
+with arena indices and <code class="docutils literal notranslate"><span class="pre">HashSet&lt;UseNode&gt;</span></code>. The semantics are similar, but the
+ownership model fits Rust IR transforms directly.</p>
+</div>
+</section>
+<section id="op-interfaces">
+<h2>Op interfaces<a class="headerlink" href="#op-interfaces" title="链接到此标题。">#</a></h2>
+<p>Most things you want to do across an entire IR -- verify it, print it,
+lower it to another dialect -- naturally express as &quot;every op that
+implements interface <code class="docutils literal notranslate"><span class="pre">X</span></code> knows how to do <code class="docutils literal notranslate"><span class="pre">X</span></code>&quot;. Pliron makes that pattern
+first-class through <strong>op interfaces</strong>: small Rust traits, marked with
+<code class="docutils literal notranslate"><span class="pre">#[op_interface]</span></code>, that any op (or type, or attribute) can implement.</p>
+<p>You define an interface like a normal Rust trait, with the <code class="docutils literal notranslate"><span class="pre">#[op_interface]</span></code>
+attribute on top:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">pliron</span><span class="p">::</span><span class="n">derive</span><span class="p">::</span><span class="n">op_interface</span><span class="p">;</span>
+
+<span class="cp">#[op_interface]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">trait</span><span class="w"> </span><span class="n">MirToLlvmConversion</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">fn</span><span class="w"> </span><span class="nf">convert</span><span class="p">(</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="bp">self</span><span class="p">,</span>
+<span class="w">        </span><span class="n">ctx</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="nc">mut</span><span class="w"> </span><span class="n">Context</span><span class="p">,</span>
+<span class="w">        </span><span class="n">rewriter</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="nc">mut</span><span class="w"> </span><span class="n">DialectConversionRewriter</span><span class="p">,</span>
+<span class="w">        </span><span class="n">operands_info</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="nc">OperandsInfo</span><span class="p">,</span>
+<span class="w">    </span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nb">Result</span><span class="o">&lt;</span><span class="p">()</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Each op implements the interface with <code class="docutils literal notranslate"><span class="pre">#[op_interface_impl]</span></code>:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">pliron</span><span class="p">::</span><span class="n">derive</span><span class="p">::</span><span class="n">op_interface_impl</span><span class="p">;</span>
+
+<span class="cp">#[op_interface_impl]</span>
+<span class="k">impl</span><span class="w"> </span><span class="n">MirToLlvmConversion</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">MirAddOp</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">fn</span><span class="w"> </span><span class="nf">convert</span><span class="p">(</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="bp">self</span><span class="p">,</span>
+<span class="w">        </span><span class="n">ctx</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="nc">mut</span><span class="w"> </span><span class="n">Context</span><span class="p">,</span>
+<span class="w">        </span><span class="n">rewriter</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="nc">mut</span><span class="w"> </span><span class="n">DialectConversionRewriter</span><span class="p">,</span>
+<span class="w">        </span><span class="n">operands_info</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="nc">OperandsInfo</span><span class="p">,</span>
+<span class="w">    </span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nb">Result</span><span class="o">&lt;</span><span class="p">()</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// ...lower MirAddOp into one or more LLVM dialect ops...</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The framework then dispatches against the interface, not against a
+specific concrete op type. A pass that lowers MIR to LLVM looks
+roughly like:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="c1">// Inside DialectConversion::rewrite, for each op encountered:</span>
+<span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nb">Some</span><span class="p">(</span><span class="n">converter</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">op_cast</span><span class="p">::</span><span class="o">&lt;</span><span class="k">dyn</span><span class="w"> </span><span class="n">MirToLlvmConversion</span><span class="o">&gt;</span><span class="p">(</span><span class="n">op</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">converter</span><span class="p">.</span><span class="n">convert</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span><span class="w"> </span><span class="n">rewriter</span><span class="p">,</span><span class="w"> </span><span class="n">operands_info</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>If you add a new MIR op tomorrow and write its <code class="docutils literal notranslate"><span class="pre">#[op_interface_impl]</span></code>,
+the lowering pass picks it up automatically -- no central match
+statement to update, no enum to grow. The same pattern is used for
+verification (<code class="docutils literal notranslate"><span class="pre">#[op_interface]</span> <span class="pre">trait</span> <span class="pre">Verify</span></code>), printing, and any other
+cross-cutting behavior.</p>
+<p>The same <code class="docutils literal notranslate"><span class="pre">#[op_interface]</span></code> / <code class="docutils literal notranslate"><span class="pre">#[op_interface_impl]</span></code> mechanism applies to
+types and attributes too: a type can implement <code class="docutils literal notranslate"><span class="pre">dyn</span> <span class="pre">MemorySemantics</span></code>, a
+constant attribute can implement <code class="docutils literal notranslate"><span class="pre">dyn</span> <span class="pre">TypedAttr</span></code>, and so on.</p>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p>Under the hood, <code class="docutils literal notranslate"><span class="pre">op_cast</span></code> is a small runtime lookup (one hash table
+probe) that maps the op's concrete type to the interface implementation
+the macros registered. It only fires during pass dispatch, not in the
+hot path of IR construction. The benefit is that adding a dialect is
+adding a crate -- never modifying a central enum or generics-tangled
+function signature.</p>
+</div>
+</section>
+<section id="how-cuda-oxide-uses-pliron">
+<h2>How cuda-oxide uses pliron<a class="headerlink" href="#how-cuda-oxide-uses-pliron" title="链接到此标题。">#</a></h2>
+<p>cuda-oxide works with three dialects: it defines <code class="docutils literal notranslate"><span class="pre">dialect-mir</span></code> and
+<code class="docutils literal notranslate"><span class="pre">dialect-nvvm</span></code> locally (each as its own crate) and consumes the LLVM dialect
+from the upstream <code class="docutils literal notranslate"><span class="pre">pliron-llvm</span></code> crate. Registration is automatic: every
+dialect, op, type, and attribute linked into the binary registers itself when
+a <code class="docutils literal notranslate"><span class="pre">Context</span></code> is created (<code class="docutils literal notranslate"><span class="pre">Context::default</span></code> runs all link-time registrations),
+so kernel authors and pass authors never have to think about dialect setup --
+depending on the crate is the only thing you do.</p>
+<section id="dialect-mir-rust-semantics">
+<h3>dialect-mir -- Rust semantics<a class="headerlink" href="#dialect-mir-rust-semantics" title="链接到此标题。">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">dialect-mir</span></code> captures Rust's mid-level IR as pliron operations, preserving
+semantic information that would be lost if we lowered directly to LLVM.</p>
+<ul class="simple">
+<li><p><strong>Function definition</strong>: <code class="docutils literal notranslate"><span class="pre">MirFuncOp</span></code> -- entry point for each device function,
+with typed block arguments matching the Rust function signature.</p></li>
+<li><p><strong>Arithmetic and comparison</strong>: checked and unchecked binary ops (<code class="docutils literal notranslate"><span class="pre">mir.add</span></code>,
+<code class="docutils literal notranslate"><span class="pre">mir.sub</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.eq</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.lt</span></code>, ...) that preserve Rust's overflow semantics.</p></li>
+<li><p><strong>Aggregate types</strong>: <code class="docutils literal notranslate"><span class="pre">MirTupleType</span></code>, <code class="docutils literal notranslate"><span class="pre">MirStructType</span></code>, <code class="docutils literal notranslate"><span class="pre">MirEnumType</span></code>,
+<code class="docutils literal notranslate"><span class="pre">MirSliceType</span></code>, <code class="docutils literal notranslate"><span class="pre">MirArrayType</span></code> -- first-class Rust compound types with
+operations like <code class="docutils literal notranslate"><span class="pre">mir.extract_field</span></code> and <code class="docutils literal notranslate"><span class="pre">mir.get_discriminant</span></code>.</p></li>
+<li><p><strong>Memory and control flow</strong>: <code class="docutils literal notranslate"><span class="pre">mir.load</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.store</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.ref</span></code>,
+<code class="docutils literal notranslate"><span class="pre">mir.goto</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.cond_br</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.return</span></code> -- with GPU address-space
+tracking (<code class="docutils literal notranslate"><span class="pre">global</span></code>, <code class="docutils literal notranslate"><span class="pre">shared</span></code>, <code class="docutils literal notranslate"><span class="pre">local</span></code>, <code class="docutils literal notranslate"><span class="pre">tmem</span></code>).</p></li>
+</ul>
+</section>
+<section id="llvm-dialect-machine-near-ir">
+<h3>LLVM dialect -- machine-near IR<a class="headerlink" href="#llvm-dialect-machine-near-ir" title="链接到此标题。">#</a></h3>
+<p>The LLVM dialect models LLVM IR as pliron operations, providing a 1:1 mapping
+to textual <code class="docutils literal notranslate"><span class="pre">.ll</span></code> files. Its modeling lives upstream in the <code class="docutils literal notranslate"><span class="pre">pliron-llvm</span></code>
+crate; cuda-oxide re-exports it (and adds the textual exporter) through the
+<code class="docutils literal notranslate"><span class="pre">llvm-export</span></code> crate.</p>
+<ul class="simple">
+<li><p><strong>Arithmetic and casts</strong>: all 19 LLVM binary ops (<code class="docutils literal notranslate"><span class="pre">llvm.add</span></code> through
+<code class="docutils literal notranslate"><span class="pre">llvm.frem</span></code>), plus 13 cast ops (<code class="docutils literal notranslate"><span class="pre">llvm.sext</span></code>, <code class="docutils literal notranslate"><span class="pre">llvm.trunc</span></code>, <code class="docutils literal notranslate"><span class="pre">llvm.bitcast</span></code>, ...).</p></li>
+<li><p><strong>Control flow</strong>: <code class="docutils literal notranslate"><span class="pre">llvm.br</span></code>, <code class="docutils literal notranslate"><span class="pre">llvm.cond_br</span></code>, <code class="docutils literal notranslate"><span class="pre">llvm.switch</span></code>, <code class="docutils literal notranslate"><span class="pre">llvm.return</span></code>,
+<code class="docutils literal notranslate"><span class="pre">llvm.unreachable</span></code> -- with block arguments translated to PHI nodes on export.</p></li>
+<li><p><strong>Textual export</strong>: the <code class="docutils literal notranslate"><span class="pre">llvm_export::export</span></code> module emits valid LLVM IR text,
+including <code class="docutils literal notranslate"><span class="pre">&#64;llvm.used</span></code> arrays and <code class="docutils literal notranslate"><span class="pre">!nvvm.annotations</span></code> metadata for GPU kernels.</p></li>
+</ul>
+</section>
+<section id="dialect-nvvm-gpu-intrinsics">
+<h3>dialect-nvvm -- GPU intrinsics<a class="headerlink" href="#dialect-nvvm-gpu-intrinsics" title="链接到此标题。">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">dialect-nvvm</span></code> wraps LLVM's NVPTX backend intrinsics as typed pliron
+operations.</p>
+<ul class="simple">
+<li><p><strong>Thread indexing</strong>: <code class="docutils literal notranslate"><span class="pre">nvvm.read_ptx_sreg_tid_x</span></code>, <code class="docutils literal notranslate"><span class="pre">nvvm.read_ptx_sreg_ctaid_x</span></code>,
+<code class="docutils literal notranslate"><span class="pre">nvvm.barrier0</span></code> -- the building blocks of <code class="docutils literal notranslate"><span class="pre">thread::index_1d()</span></code>.</p></li>
+<li><p><strong>Warp-level primitives</strong>: shuffle (<code class="docutils literal notranslate"><span class="pre">nvvm.shfl_sync</span></code>), vote, and reduce
+operations for warp-cooperative algorithms.</p></li>
+<li><p><strong>Accelerator ops</strong>: TMA bulk copies, WGMMA matrix multiply-accumulate
+(Hopper), and tcgen05 tensor core operations (Blackwell) -- the hardware
+instructions behind the <a class="reference internal" href="../advanced/tensor-memory-accelerator.html"><span class="std std-doc">Advanced GPU Features</span></a>
+chapters.</p></li>
+</ul>
+<p>Each dialect is covered in detail in <a class="reference internal" href="mlir-dialects.html"><span class="std std-doc">Pliron Dialects</span></a>.</p>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="architecture-overview.html"
+       title="上一页">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">上一页</p>
+        <p class="prev-next-title">Architecture Overview</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="rustc-public.html"
+       title="下一页">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">下一页</p>
+        <p class="prev-next-title">rustc_public -- Stable MIR</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> 当前页面
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-mlir-and-why-should-you-care">What is MLIR (and why should you care)?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#enter-pliron">Enter pliron</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#core-data-structures">Core data structures</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#context">Context</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#operations">Operations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#types-and-attributes">Types and attributes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ptr-t-safe-arena-references">Ptr&lt;T&gt; -- safe arena references</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#def-use-chains-memory-safe">Def-use chains (memory-safe)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#op-interfaces">Op interfaces</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-cuda-oxide-uses-pliron">How cuda-oxide uses pliron</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dialect-mir-rust-semantics">dialect-mir -- Rust semantics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#llvm-dialect-machine-near-ir">LLVM dialect -- machine-near IR</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dialect-nvvm-gpu-intrinsics">dialect-nvvm -- GPU intrinsics</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+    <div class="footer-items__center">
+      
+        <div class="footer-item"><footer class="bd-footer-content">
+  <div class="footer-container" style="padding: 1rem 0 2rem 0; border-top: 1px solid var(--pst-color-border); text-align: left;">
+    
+    <!-- NVIDIA Logo -->
+    <div style="margin-bottom: 1rem;">
+      <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem; filter: brightness(0);"
+           class="only-light">
+      <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem;"
+           class="only-dark pst-js-only">
+    </div>
+    
+    <!-- Footer Links - single line, left aligned -->
+    <div style="font-size: 0.8125rem; margin-bottom: 0.5rem; color: var(--pst-color-text-muted);">
+      <a href="https://www.nvidia.com/en-us/about-nvidia/privacy-policy/" target="_blank" style="color: inherit; text-decoration: none;">Privacy Policy</a> | 
+      <a href="https://www.nvidia.com/en-us/preferences/email-preferences/" target="_blank" style="color: inherit; text-decoration: none;">Your Privacy Choices</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/terms-of-service/" target="_blank" style="color: inherit; text-decoration: none;">Terms of Service</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/accessibility/" target="_blank" style="color: inherit; text-decoration: none;">Accessibility</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/company-policies/" target="_blank" style="color: inherit; text-decoration: none;">Corporate Policies</a> | 
+      <a href="https://www.nvidia.com/en-us/product-security/" target="_blank" style="color: inherit; text-decoration: none;">Product Security</a> | 
+      <a href="https://www.nvidia.com/en-us/contact/" target="_blank" style="color: inherit; text-decoration: none;">Contact</a>
+    </div>
+    
+    <!-- Copyright -->
+    <div style="font-size: 0.8125rem; color: var(--pst-color-text-muted);">
+      Copyright &copy; 2025-2026, NVIDIA.
+    </div>
+    
+  </div>
+</footer></div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

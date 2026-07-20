@@ -1,0 +1,825 @@
+
+<!DOCTYPE html>
+
+
+<html lang="zh-CN" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Warp-Level Programming &#8212; cuda-oxide</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/nvidia-sphinx-theme.css?v=5d97cc0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=196aea71" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/lightbox.css?v=31fdf494" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../_static/documentation_options.js?v=d786bb5c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/translations.js?v=540d3cec"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'advanced/warp-level-programming';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../_static/js/lightbox.js?v=8cf6bc2b"></script>
+    <script src="../_static/js/spa-nav.js?v=9a4d0bbe"></script>
+    <link rel="canonical" href="https://projects.localizethedocs.org/cuda-oxide-book-l10n/advanced/warp-level-programming.html" />
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="Tensor Memory Accelerator (TMA)" href="tensor-memory-accelerator.html" />
+    <link rel="prev" title="Shared Memory and Synchronization" href="shared-memory-and-synchronization.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="zh-CN"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+<script type="text/javascript" src="../ltd-provenance.js"></script>
+<script type="text/javascript" src="../ltd-current.js"></script>
+<script type="text/javascript" src="../../../ltd-config.js"></script>
+<script type="text/javascript" src="../../../ltd-flyout.js"></script>
+
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">跳转至主要内容</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>回到顶部</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="版本警告"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="网页导航">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">cuda-oxide</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="亮色"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="暗色"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>亮色</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>暗色</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="当前页面">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="亮色"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="暗色"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>亮色</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>暗色</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><div class="sidebar-tree">
+    <p class="sidebar-tree-title">
+        Table of Contents
+    </p>
+    <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/hello-gpu.html">Writing Your First Kernel</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Writing GPU Programs</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/execution-model.html">The CUDA Execution Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/kernels-and-device-functions.html">Kernels and Device Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/memory-and-data-movement.html">Memory and Data Movement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/launching-kernels.html">Launching Kernels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/closures-and-generics.html">Closures and Generics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/error-handling-and-debugging.html">Error Handling and Debugging</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Safety on the GPU</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-safety/the-safety-model.html">The Safety Model</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Async GPU Programming</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/the-device-operation-model.html">The DeviceOperation Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/combinators-and-composition.html">Combinators and Composition</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/scheduling-and-streams.html">Scheduling and Streams</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/concurrent-execution.html">Concurrent Execution</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Building a Real Application</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../projects/async-mlp-pipeline.html">Project: Async MLP Pipeline</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Advanced GPU Features</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="shared-memory-and-synchronization.html">Shared Memory and Synchronization</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Warp-Level Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tensor-memory-accelerator.html">Tensor Memory Accelerator (TMA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="matrix-multiply-accelerators.html">Matrix Multiply Accelerators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cluster-programming.html">Cluster Programming</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Inside the Compiler</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/architecture-overview.html">Architecture Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/pliron.html">Pliron -- Pliron IR (MLIR-like)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/rustc-public.html">rustc_public -- Stable MIR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/rustc-codegen-cuda.html">The Code Generator: rustc-codegen-cuda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/mir-importer.html">The MIR Importer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/compiler-optimizations.html">Compiler Optimizations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/mlir-dialects.html">Pliron Dialects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/lowering-pipeline.html">The Lowering Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/adding-new-intrinsics.html">Adding New Intrinsics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/fuzzing-and-differential-testing.html">Fuzzing and Differential Testing</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Appendix</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/building-from-source.html">Building from Source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/api-quick-reference.html">API Quick Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/supported-features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/cuda-cpp-comparison.html">cuda-oxide vs CUDA C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/ecosystem.html">The Rust + GPU Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/glossary.html">Glossary</a></li>
+</ul>
+
+</div></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="初始页面">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Warp-Level Programming</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="warp-level-programming">
+<h1>Warp-Level Programming<a class="headerlink" href="#warp-level-programming" title="链接到此标题。">#</a></h1>
+<p>A <strong>warp</strong> is CUDA's fundamental scheduling unit: 32 threads that execute in
+lockstep on the same SM. Because all 32 threads share an instruction
+pointer, they can exchange data directly through <strong>warp shuffle</strong>
+instructions — register-to-register transfers that cost roughly one cycle
+and require no shared memory, no barriers, and no synchronization.</p>
+<p>cuda-oxide exposes the full warp intrinsic set through <code class="docutils literal notranslate"><span class="pre">cuda_device::warp</span></code>.
+This chapter covers shuffle, vote, and the patterns they unlock: warp
+reductions, broadcasts, scans, and ballot-based filtering.</p>
+<div class="admonition seealso">
+<p class="admonition-title">参见</p>
+<p><a class="reference external" href="https://docs.nvidia.com/cuda/cuda-programming-guide/#warp-shuffle-functions">CUDA Programming Guide — Warp Shuffle Functions</a>
+for PTX encoding details and the full set of width variants.</p>
+</div>
+<hr class="docutils" />
+<section id="lane-and-warp-identity">
+<h2>Lane and warp identity<a class="headerlink" href="#lane-and-warp-identity" title="链接到此标题。">#</a></h2>
+<p>Every thread in a block has a <strong>lane ID</strong> (0–31) within its warp:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::</span><span class="n">warp</span><span class="p">;</span>
+
+<span class="kd">let</span><span class="w"> </span><span class="n">lane</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">lane_id</span><span class="p">();</span><span class="w">     </span><span class="c1">// 0..31, hardware register %laneid</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">warp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">warp_id</span><span class="p">();</span><span class="w">     </span><span class="c1">// threadIdx.x / 32</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">warp_id()</span></code> is derived from <code class="docutils literal notranslate"><span class="pre">threadIdx.x</span> <span class="pre">/</span> <span class="pre">32</span></code>. For multi-dimensional
+blocks, this only accounts for the x dimension — which is usually fine,
+since most kernels that care about lane identity use 1D blocks.</p>
+</section>
+<hr class="docutils" />
+<section id="shuffle-register-to-register-data-exchange">
+<h2>Shuffle: register-to-register data exchange<a class="headerlink" href="#shuffle-register-to-register-data-exchange" title="链接到此标题。">#</a></h2>
+<p>The four shuffle variants let a thread read another thread's register
+without going through memory:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Function</p></th>
+<th class="head text-left"><p>What it does</p></th>
+<th class="head text-left"><p>Source lane</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">shuffle(val,</span> <span class="pre">src)</span></code></p></td>
+<td class="text-left"><p>Read from a specific lane</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">src</span></code></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">shuffle_xor(val,</span> <span class="pre">mask)</span></code></p></td>
+<td class="text-left"><p>Read from <code class="docutils literal notranslate"><span class="pre">lane_id</span> <span class="pre">^</span> <span class="pre">mask</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">lane_id</span> <span class="pre">^</span> <span class="pre">mask</span></code></p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">shuffle_down(val,</span> <span class="pre">delta)</span></code></p></td>
+<td class="text-left"><p>Read from <code class="docutils literal notranslate"><span class="pre">lane_id</span> <span class="pre">+</span> <span class="pre">delta</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">lane_id</span> <span class="pre">+</span> <span class="pre">delta</span></code></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">shuffle_up(val,</span> <span class="pre">delta)</span></code></p></td>
+<td class="text-left"><p>Read from <code class="docutils literal notranslate"><span class="pre">lane_id</span> <span class="pre">-</span> <span class="pre">delta</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">lane_id</span> <span class="pre">-</span> <span class="pre">delta</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Each variant exists for both <code class="docutils literal notranslate"><span class="pre">u32</span></code> and <code class="docutils literal notranslate"><span class="pre">f32</span></code>:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="n">partner_val</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">shuffle_xor_f32</span><span class="p">(</span><span class="n">my_val</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">broadcast</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">shuffle_f32</span><span class="p">(</span><span class="n">my_val</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w">     </span><span class="c1">// lane 0&#39;s value to all</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">neighbor</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">shuffle_down_f32</span><span class="p">(</span><span class="n">my_val</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w"> </span><span class="c1">// next lane&#39;s value</span>
+</pre></div>
+</div>
+<p>All shuffles are <strong>warp-synchronous</strong> — they implicitly synchronize the
+warp. No <code class="docutils literal notranslate"><span class="pre">sync_threads()</span></code> is needed, and in fact calling <code class="docutils literal notranslate"><span class="pre">sync_threads()</span></code>
+inside a shuffle pattern would be both unnecessary and wasteful.</p>
+</section>
+<hr class="docutils" />
+<section id="warp-reduction">
+<h2>Warp reduction<a class="headerlink" href="#warp-reduction" title="链接到此标题。">#</a></h2>
+<p>The most common shuffle pattern is a <strong>butterfly reduction</strong>: in
+⌈log₂(32)⌉ = 5 steps, every lane accumulates the sum (or min, max, etc.)
+of all 32 values. No shared memory, no barriers, five instructions.</p>
+<figure class="align-center" id="id1">
+<a class="reference internal image-reference" href="../_images/warp-shuffle-reduction.svg"><img alt="../_images/warp-shuffle-reduction.svg" src="../_images/warp-shuffle-reduction.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">Butterfly reduction using <code class="docutils literal notranslate"><span class="pre">shuffle_xor</span></code>. At each step, lanes exchange
+values with their XOR partner and add. After 5 steps (masks 16, 8, 4, 2,
+1), lane 0 holds the sum of all 32 values.</span><a class="headerlink" href="#id1" title="链接到此图片">#</a></p>
+</figcaption>
+</figure>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::</span><span class="n">warp</span><span class="p">;</span>
+
+<span class="k">fn</span><span class="w"> </span><span class="nf">warp_reduce_sum</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">val</span><span class="p">:</span><span class="w"> </span><span class="kt">f32</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="kt">f32</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">val</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">shuffle_xor_f32</span><span class="p">(</span><span class="n">val</span><span class="p">,</span><span class="w"> </span><span class="mi">16</span><span class="p">);</span>
+<span class="w">    </span><span class="n">val</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">shuffle_xor_f32</span><span class="p">(</span><span class="n">val</span><span class="p">,</span><span class="w"> </span><span class="mi">8</span><span class="p">);</span>
+<span class="w">    </span><span class="n">val</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">shuffle_xor_f32</span><span class="p">(</span><span class="n">val</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span>
+<span class="w">    </span><span class="n">val</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">shuffle_xor_f32</span><span class="p">(</span><span class="n">val</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
+<span class="w">    </span><span class="n">val</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">shuffle_xor_f32</span><span class="p">(</span><span class="n">val</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<span class="w">    </span><span class="n">val</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>After the reduction, <strong>all 32 lanes</strong> hold the sum (because XOR is
+symmetric — both partners accumulate). If you only need the result in
+lane 0, you can use <code class="docutils literal notranslate"><span class="pre">shuffle_down</span></code> instead:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="nf">warp_reduce_sum_lane0</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">val</span><span class="p">:</span><span class="w"> </span><span class="kt">f32</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="kt">f32</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">val</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">shuffle_down_f32</span><span class="p">(</span><span class="n">val</span><span class="p">,</span><span class="w"> </span><span class="mi">16</span><span class="p">);</span>
+<span class="w">    </span><span class="n">val</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">shuffle_down_f32</span><span class="p">(</span><span class="n">val</span><span class="p">,</span><span class="w"> </span><span class="mi">8</span><span class="p">);</span>
+<span class="w">    </span><span class="n">val</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">shuffle_down_f32</span><span class="p">(</span><span class="n">val</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span>
+<span class="w">    </span><span class="n">val</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">shuffle_down_f32</span><span class="p">(</span><span class="n">val</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
+<span class="w">    </span><span class="n">val</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">shuffle_down_f32</span><span class="p">(</span><span class="n">val</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<span class="w">    </span><span class="n">val</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>With <code class="docutils literal notranslate"><span class="pre">shuffle_down</span></code>, only lane 0 holds the correct result — the others
+hold partial sums. This is fine when only lane 0 writes the output.</p>
+<div class="admonition tip">
+<p class="admonition-title">小技巧</p>
+<p>Need a block-wide reduction? Reduce within each warp using shuffles, write
+the 32 per-warp results to shared memory, <code class="docutils literal notranslate"><span class="pre">sync_threads()</span></code>, then reduce
+the warp-level results with one final warp. This hybrid approach is faster
+than a pure shared memory tree because it eliminates 5 levels of barriers.</p>
+</div>
+</section>
+<hr class="docutils" />
+<section id="broadcast">
+<h2>Broadcast<a class="headerlink" href="#broadcast" title="链接到此标题。">#</a></h2>
+<p>Broadcasting lane 0's value to all lanes is a single shuffle:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="n">leader_val</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">shuffle_f32</span><span class="p">(</span><span class="n">my_val</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Any lane can be the source. This replaces the shared-memory pattern of
+&quot;lane 0 writes to shared, sync, all lanes read&quot; — one instruction instead
+of three operations.</p>
+</section>
+<hr class="docutils" />
+<section id="inclusive-prefix-sum-scan">
+<h2>Inclusive prefix sum (scan)<a class="headerlink" href="#inclusive-prefix-sum-scan" title="链接到此标题。">#</a></h2>
+<p>An <strong>inclusive scan</strong> computes a running total: lane <code class="docutils literal notranslate"><span class="pre">i</span></code> holds the sum of
+values from lanes 0 through <code class="docutils literal notranslate"><span class="pre">i</span></code>. The pattern uses <code class="docutils literal notranslate"><span class="pre">shuffle_up</span></code>:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="nf">warp_inclusive_scan</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">val</span><span class="p">:</span><span class="w"> </span><span class="kt">f32</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="kt">f32</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">offset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="k">u32</span><span class="p">;</span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="n">offset</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">32</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">shuffle_up_f32</span><span class="p">(</span><span class="n">val</span><span class="p">,</span><span class="w"> </span><span class="n">offset</span><span class="p">);</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">lane_id</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">offset</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">val</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">n</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="n">offset</span><span class="w"> </span><span class="o">*=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="n">val</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>After 5 steps, each lane holds the prefix sum up to and including its own
+value. This is the building block for stream compaction, histogram building,
+and parallel scan algorithms.</p>
+</section>
+<hr class="docutils" />
+<section id="vote-warp-wide-predicates">
+<h2>Vote: warp-wide predicates<a class="headerlink" href="#vote-warp-wide-predicates" title="链接到此标题。">#</a></h2>
+<p>Vote operations let the warp collectively evaluate a boolean condition:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Function</p></th>
+<th class="head text-left"><p>Returns</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">warp::all(pred)</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if <em>every</em> active lane's <code class="docutils literal notranslate"><span class="pre">pred</span></code> is <code class="docutils literal notranslate"><span class="pre">true</span></code></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">warp::any(pred)</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">true</span></code> if <em>any</em> active lane's <code class="docutils literal notranslate"><span class="pre">pred</span></code> is <code class="docutils literal notranslate"><span class="pre">true</span></code></p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">warp::ballot(pred)</span></code></p></td>
+<td class="text-left"><p>A <code class="docutils literal notranslate"><span class="pre">u32</span></code> bitmask — bit <code class="docutils literal notranslate"><span class="pre">i</span></code> is set if lane <code class="docutils literal notranslate"><span class="pre">i</span></code>'s <code class="docutils literal notranslate"><span class="pre">pred</span></code> is <code class="docutils literal notranslate"><span class="pre">true</span></code></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">warp::popc(pred)</span></code></p></td>
+<td class="text-left"><p>Population count: how many active lanes have <code class="docutils literal notranslate"><span class="pre">pred</span> <span class="pre">==</span> <span class="pre">true</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<section id="filtering-with-ballot">
+<h3>Filtering with ballot<a class="headerlink" href="#filtering-with-ballot" title="链接到此标题。">#</a></h3>
+<p>A common pattern is to compact an array, keeping only elements that pass
+a predicate. <code class="docutils literal notranslate"><span class="pre">ballot</span></code> + <code class="docutils literal notranslate"><span class="pre">popc</span></code> gives you the count and the per-lane write
+offset:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::{</span><span class="n">kernel</span><span class="p">,</span><span class="w"> </span><span class="n">thread</span><span class="p">,</span><span class="w"> </span><span class="n">warp</span><span class="p">,</span><span class="w"> </span><span class="n">DisjointSlice</span><span class="p">};</span>
+
+<span class="cp">#[kernel]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">compact_positive</span><span class="p">(</span>
+<span class="w">    </span><span class="n">input</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span>
+<span class="w">    </span><span class="k">mut</span><span class="w"> </span><span class="n">output</span><span class="p">:</span><span class="w"> </span><span class="nc">DisjointSlice</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="w">    </span><span class="k">mut</span><span class="w"> </span><span class="n">count</span><span class="p">:</span><span class="w"> </span><span class="nc">DisjointSlice</span><span class="o">&lt;</span><span class="kt">u32</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">thread</span><span class="p">::</span><span class="n">index_1d</span><span class="p">();</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">val</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">input</span><span class="p">[</span><span class="n">idx</span><span class="p">.</span><span class="n">get</span><span class="p">()];</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">is_positive</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">val</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">0.0</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">mask</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">ballot</span><span class="p">(</span><span class="n">is_positive</span><span class="p">);</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">lane</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">lane_id</span><span class="p">();</span>
+
+<span class="w">    </span><span class="c1">// Count bits below this lane to get the write position</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">offset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">mask</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="p">((</span><span class="mi">1</span><span class="k">u32</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="n">lane</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)).</span><span class="n">count_ones</span><span class="p">();</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">is_positive</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="o">*</span><span class="n">output</span><span class="p">.</span><span class="n">get_unchecked_mut</span><span class="p">(</span><span class="n">offset</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">usize</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">val</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// Lane 0 records total count for this warp</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">lane</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="o">*</span><span class="n">count</span><span class="p">.</span><span class="n">get_unchecked_mut</span><span class="p">(</span><span class="n">warp</span><span class="p">::</span><span class="n">warp_id</span><span class="p">()</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">usize</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mask</span><span class="p">.</span><span class="n">count_ones</span><span class="p">();</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">ballot</span></code> mask encodes the entire warp's predicate result in one
+register. No communication, no shared memory — the hardware computes it in
+a single cycle.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="when-to-use-warp-primitives-vs-shared-memory">
+<h2>When to use warp primitives vs. shared memory<a class="headerlink" href="#when-to-use-warp-primitives-vs-shared-memory" title="链接到此标题。">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Task</p></th>
+<th class="head text-left"><p>Warp shuffle</p></th>
+<th class="head text-left"><p>Shared memory</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>Reduce 32 values</p></td>
+<td class="text-left"><p>5 shuffles, ~5 cycles</p></td>
+<td class="text-left"><p>5 loads + 5 syncs, ~50 cycles</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Reduce 256 values</p></td>
+<td class="text-left"><p>Shuffle + 1 sync + shuffle</p></td>
+<td class="text-left"><p>Tree reduction, ~10 syncs</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Stencil (neighbor access)</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">shuffle_up</span></code>/<code class="docutils literal notranslate"><span class="pre">shuffle_down</span></code></p></td>
+<td class="text-left"><p>Good for 2D stencils</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Data visible to other warps</p></td>
+<td class="text-left"><p>Not possible</p></td>
+<td class="text-left"><p>Required</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Random access patterns</p></td>
+<td class="text-left"><p>Not supported</p></td>
+<td class="text-left"><p>Index freely</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Persists across warp</p></td>
+<td class="text-left"><p>Not applicable</p></td>
+<td class="text-left"><p>Persists for block lifetime</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The rule of thumb: if the data fits in a single warp (32 elements) and
+the access pattern is regular, shuffle is faster. If you need cross-warp
+communication, larger data sets, or random access, shared memory is the
+tool.</p>
+</section>
+<hr class="docutils" />
+<section id="a-complete-example-warp-level-dot-product">
+<h2>A complete example: warp-level dot product<a class="headerlink" href="#a-complete-example-warp-level-dot-product" title="链接到此标题。">#</a></h2>
+<p>Putting shuffles and votes together, here is a kernel that computes the
+dot product of two vectors using warp reduction:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::{</span><span class="n">kernel</span><span class="p">,</span><span class="w"> </span><span class="n">thread</span><span class="p">,</span><span class="w"> </span><span class="n">warp</span><span class="p">,</span><span class="w"> </span><span class="n">DisjointSlice</span><span class="p">};</span>
+
+<span class="cp">#[kernel]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">warp_dot_product</span><span class="p">(</span>
+<span class="w">    </span><span class="n">a</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span>
+<span class="w">    </span><span class="n">b</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span>
+<span class="w">    </span><span class="n">n</span><span class="p">:</span><span class="w"> </span><span class="kt">u32</span><span class="p">,</span>
+<span class="w">    </span><span class="k">mut</span><span class="w"> </span><span class="n">result</span><span class="p">:</span><span class="w"> </span><span class="nc">DisjointSlice</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">thread</span><span class="p">::</span><span class="n">index_1d</span><span class="p">();</span>
+
+<span class="w">    </span><span class="c1">// Each thread computes one element of the pointwise product</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">product</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">idx</span><span class="p">.</span><span class="n">get</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">usize</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">a</span><span class="p">[</span><span class="n">idx</span><span class="p">.</span><span class="n">get</span><span class="p">()]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">b</span><span class="p">[</span><span class="n">idx</span><span class="p">.</span><span class="n">get</span><span class="p">()]</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="mf">0.0</span><span class="k">f32</span>
+<span class="w">    </span><span class="p">};</span>
+
+<span class="w">    </span><span class="c1">// Warp-level reduction</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">product</span><span class="p">;</span>
+<span class="w">    </span><span class="n">sum</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">shuffle_xor_f32</span><span class="p">(</span><span class="n">sum</span><span class="p">,</span><span class="w"> </span><span class="mi">16</span><span class="p">);</span>
+<span class="w">    </span><span class="n">sum</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">shuffle_xor_f32</span><span class="p">(</span><span class="n">sum</span><span class="p">,</span><span class="w"> </span><span class="mi">8</span><span class="p">);</span>
+<span class="w">    </span><span class="n">sum</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">shuffle_xor_f32</span><span class="p">(</span><span class="n">sum</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span>
+<span class="w">    </span><span class="n">sum</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">shuffle_xor_f32</span><span class="p">(</span><span class="n">sum</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span>
+<span class="w">    </span><span class="n">sum</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">shuffle_xor_f32</span><span class="p">(</span><span class="n">sum</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// Lane 0 of each warp writes its partial sum</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">lane_id</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="o">*</span><span class="n">result</span><span class="p">.</span><span class="n">get_unchecked_mut</span><span class="p">(</span><span class="n">warp</span><span class="p">::</span><span class="n">warp_id</span><span class="p">()</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">usize</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sum</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>For a full dot product, launch a second pass that reduces the per-warp
+results — either with another warp kernel or with atomics. The first
+pass eliminates the vast majority of the work using only register shuffles.</p>
+<div class="admonition seealso">
+<p class="admonition-title">参见</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="shared-memory-and-synchronization.html"><span class="std std-doc">Shared Memory and Synchronization</span></a> —
+the block-wide counterpart for larger-than-warp operations</p></li>
+<li><p><a class="reference internal" href="tensor-memory-accelerator.html"><span class="std std-doc">Tensor Memory Accelerator</span></a> — hardware that
+accelerates the global→shared data movement that feeds these patterns</p></li>
+</ul>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="shared-memory-and-synchronization.html"
+       title="上一页">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">上一页</p>
+        <p class="prev-next-title">Shared Memory and Synchronization</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="tensor-memory-accelerator.html"
+       title="下一页">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">下一页</p>
+        <p class="prev-next-title">Tensor Memory Accelerator (TMA)</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> 当前页面
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lane-and-warp-identity">Lane and warp identity</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#shuffle-register-to-register-data-exchange">Shuffle: register-to-register data exchange</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#warp-reduction">Warp reduction</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#broadcast">Broadcast</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#inclusive-prefix-sum-scan">Inclusive prefix sum (scan)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vote-warp-wide-predicates">Vote: warp-wide predicates</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#filtering-with-ballot">Filtering with ballot</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#when-to-use-warp-primitives-vs-shared-memory">When to use warp primitives vs. shared memory</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-complete-example-warp-level-dot-product">A complete example: warp-level dot product</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+    <div class="footer-items__center">
+      
+        <div class="footer-item"><footer class="bd-footer-content">
+  <div class="footer-container" style="padding: 1rem 0 2rem 0; border-top: 1px solid var(--pst-color-border); text-align: left;">
+    
+    <!-- NVIDIA Logo -->
+    <div style="margin-bottom: 1rem;">
+      <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem; filter: brightness(0);"
+           class="only-light">
+      <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem;"
+           class="only-dark pst-js-only">
+    </div>
+    
+    <!-- Footer Links - single line, left aligned -->
+    <div style="font-size: 0.8125rem; margin-bottom: 0.5rem; color: var(--pst-color-text-muted);">
+      <a href="https://www.nvidia.com/en-us/about-nvidia/privacy-policy/" target="_blank" style="color: inherit; text-decoration: none;">Privacy Policy</a> | 
+      <a href="https://www.nvidia.com/en-us/preferences/email-preferences/" target="_blank" style="color: inherit; text-decoration: none;">Your Privacy Choices</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/terms-of-service/" target="_blank" style="color: inherit; text-decoration: none;">Terms of Service</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/accessibility/" target="_blank" style="color: inherit; text-decoration: none;">Accessibility</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/company-policies/" target="_blank" style="color: inherit; text-decoration: none;">Corporate Policies</a> | 
+      <a href="https://www.nvidia.com/en-us/product-security/" target="_blank" style="color: inherit; text-decoration: none;">Product Security</a> | 
+      <a href="https://www.nvidia.com/en-us/contact/" target="_blank" style="color: inherit; text-decoration: none;">Contact</a>
+    </div>
+    
+    <!-- Copyright -->
+    <div style="font-size: 0.8125rem; color: var(--pst-color-text-muted);">
+      Copyright &copy; 2025-2026, NVIDIA.
+    </div>
+    
+  </div>
+</footer></div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

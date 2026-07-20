@@ -1,0 +1,871 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en-US" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>The DeviceOperation Model &#8212; cuda-oxide</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/nvidia-sphinx-theme.css?v=5d97cc0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=196aea71" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/lightbox.css?v=31fdf494" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../_static/documentation_options.js?v=66d1f95f"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'async-programming/the-device-operation-model';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../_static/js/lightbox.js?v=8cf6bc2b"></script>
+    <script src="../_static/js/spa-nav.js?v=9a4d0bbe"></script>
+    <link rel="canonical" href="https://projects.localizethedocs.org/cuda-oxide-book-l10n/async-programming/the-device-operation-model.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Combinators and Composition" href="combinators-and-composition.html" />
+    <link rel="prev" title="The Safety Model" href="../gpu-safety/the-safety-model.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en-US"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+<script type="text/javascript" src="../ltd-provenance.js"></script>
+<script type="text/javascript" src="../ltd-current.js"></script>
+<script type="text/javascript" src="../../../ltd-config.js"></script>
+<script type="text/javascript" src="../../../ltd-flyout.js"></script>
+
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">cuda-oxide</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><div class="sidebar-tree">
+    <p class="sidebar-tree-title">
+        Table of Contents
+    </p>
+    <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/hello-gpu.html">Writing Your First Kernel</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Writing GPU Programs</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/execution-model.html">The CUDA Execution Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/kernels-and-device-functions.html">Kernels and Device Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/memory-and-data-movement.html">Memory and Data Movement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/launching-kernels.html">Launching Kernels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/closures-and-generics.html">Closures and Generics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/error-handling-and-debugging.html">Error Handling and Debugging</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Safety on the GPU</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-safety/the-safety-model.html">The Safety Model</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Async GPU Programming</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">The DeviceOperation Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="combinators-and-composition.html">Combinators and Composition</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scheduling-and-streams.html">Scheduling and Streams</a></li>
+<li class="toctree-l1"><a class="reference internal" href="concurrent-execution.html">Concurrent Execution</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Building a Real Application</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../projects/async-mlp-pipeline.html">Project: Async MLP Pipeline</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Advanced GPU Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/shared-memory-and-synchronization.html">Shared Memory and Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/warp-level-programming.html">Warp-Level Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/tensor-memory-accelerator.html">Tensor Memory Accelerator (TMA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/matrix-multiply-accelerators.html">Matrix Multiply Accelerators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cluster-programming.html">Cluster Programming</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Inside the Compiler</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/architecture-overview.html">Architecture Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/pliron.html">Pliron – Pliron IR (MLIR-like)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/rustc-public.html">rustc_public – Stable MIR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/rustc-codegen-cuda.html">The Code Generator: rustc-codegen-cuda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/mir-importer.html">The MIR Importer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/compiler-optimizations.html">Compiler Optimizations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/mlir-dialects.html">Pliron Dialects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/lowering-pipeline.html">The Lowering Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/adding-new-intrinsics.html">Adding New Intrinsics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/fuzzing-and-differential-testing.html">Fuzzing and Differential Testing</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Appendix</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/building-from-source.html">Building from Source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/api-quick-reference.html">API Quick Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/supported-features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/cuda-cpp-comparison.html">cuda-oxide vs CUDA C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/ecosystem.html">The Rust + GPU Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/glossary.html">Glossary</a></li>
+</ul>
+
+</div></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">The DeviceOperation Model</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="the-deviceoperation-model">
+<h1>The DeviceOperation Model<a class="headerlink" href="#the-deviceoperation-model" title="Link to this heading">#</a></h1>
+<p>In the <a class="reference internal" href="../gpu-programming/launching-kernels.html"><span class="std std-doc">Writing GPU Programs</span></a> chapter, you
+saw that typed sync launches enqueue work on an explicit stream, while typed
+async launches return a lazy handle that defers stream selection. This chapter
+digs into the abstraction behind that lazy handle – the <strong><code class="docutils literal notranslate"><span class="pre">DeviceOperation</span></code></strong>
+trait – and explains why decoupling <em>what</em> the GPU
+should do from <em>which stream</em> it runs on is the foundation of composable async
+GPU programming in cuda-oxide.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference external" href="https://docs.nvidia.com/cuda/cuda-programming-guide/#asynchronous-concurrent-execution">CUDA Programming Guide – Asynchronous Concurrent Execution</a>
+for the underlying CUDA stream and event model that <code class="docutils literal notranslate"><span class="pre">DeviceOperation</span></code> builds on.</p>
+</div>
+<section id="why-lazy-operations">
+<h2>Why lazy operations?<a class="headerlink" href="#why-lazy-operations" title="Link to this heading">#</a></h2>
+<p>In CUDA C++, you build concurrency by creating multiple <code class="docutils literal notranslate"><span class="pre">cudaStream_t</span></code> handles
+and placing kernel launches and memory copies onto them explicitly. The
+programmer decides at every call site which stream to use. This couples the
+<em>definition</em> of GPU work to the <em>scheduling decision</em>, making it hard to
+compose and rearrange work after the fact.</p>
+<p>cuda-oxide takes a different approach. A <code class="docutils literal notranslate"><span class="pre">DeviceOperation</span></code> describes GPU work
+without binding to any stream. You can compose operations with combinators
+(<code class="docutils literal notranslate"><span class="pre">and_then</span></code>, <code class="docutils literal notranslate"><span class="pre">zip!</span></code>), pass them across function boundaries, store them in
+collections, and only decide how to schedule them at the last moment. This is
+the same idea behind Rust’s <code class="docutils literal notranslate"><span class="pre">Iterator</span></code> – build the pipeline lazily, execute it
+eagerly at the call site.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Approach</p></th>
+<th class="head text-left"><p>Stream chosen by</p></th>
+<th class="head text-left"><p>Composable?</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>Typed sync launch</p></td>
+<td class="text-left"><p>Caller</p></td>
+<td class="text-left"><p>No, enqueued immediately</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Typed async launch</p></td>
+<td class="text-left"><p>Scheduling policy</p></td>
+<td class="text-left"><p>Yes, returns <code class="docutils literal notranslate"><span class="pre">DeviceOperation</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<figure class="align-center" id="id1">
+<a class="reference internal image-reference" href="../_images/device-operation-lifecycle.svg"><img alt="../_images/device-operation-lifecycle.svg" src="../_images/device-operation-lifecycle.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">The DeviceOperation lifecycle. Phase 1: a typed async method builds a lazy recipe
+(no GPU work). Phase 2: the scheduling policy picks a stream from its
+pool. Phase 3: <code class="docutils literal notranslate"><span class="pre">execute()</span></code> submits GPU work and a <code class="docutils literal notranslate"><span class="pre">cuLaunchHostFunc</span></code> callback.
+Phase 4: the callback fires, wakes the async runtime, and delivers the result.
+Bottom: the four execution methods from simplest (<code class="docutils literal notranslate"><span class="pre">.sync()</span></code>) to most manual
+(<code class="docutils literal notranslate"><span class="pre">async_on</span></code>).</span><a class="headerlink" href="#id1" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="recipes-and-kitchens">
+<h2>Recipes and kitchens<a class="headerlink" href="#recipes-and-kitchens" title="Link to this heading">#</a></h2>
+<p>Think of a <code class="docutils literal notranslate"><span class="pre">DeviceOperation</span></code> as a <strong>recipe card</strong>. The card describes every step
+of the dish – what ingredients to combine, at what temperature, for how long –
+but it does not say <em>which kitchen</em> will cook it. You can hand the card to any
+kitchen, photocopy it, staple two cards together into a multi-course meal, or
+file it away for later. The dish only starts cooking when someone walks into a
+kitchen and begins following the instructions.</p>
+<p>In cuda-oxide’s model:</p>
+<ul class="simple">
+<li><p>A <strong>recipe</strong> is a <code class="docutils literal notranslate"><span class="pre">DeviceOperation</span></code> – a lazy description of GPU work.</p></li>
+<li><p>A <strong>kitchen</strong> is a CUDA stream – the in-order queue where work actually runs.</p></li>
+<li><p>The <strong>head chef</strong> is a <code class="docutils literal notranslate"><span class="pre">SchedulingPolicy</span></code> – the logic that decides which
+kitchen handles each recipe.</p></li>
+<li><p>The <strong>meal</strong> is the <code class="docutils literal notranslate"><span class="pre">Output</span></code> – the result you get when everything is done.</p></li>
+</ul>
+<p>This separation is what makes the system composable. You can write a function
+that returns a recipe for “upload data, run GEMM, apply ReLU” without caring
+which stream will execute it. The caller can chain more steps onto the recipe,
+run it on a specific stream, or hand it to the scheduling policy and walk away.</p>
+</section>
+<section id="your-first-async-launch">
+<h2>Your first async launch<a class="headerlink" href="#your-first-async-launch" title="Link to this heading">#</a></h2>
+<p>The simplest way to create a <code class="docutils literal notranslate"><span class="pre">DeviceOperation</span></code> is a generated <code class="docutils literal notranslate"><span class="pre">{kernel}_async</span></code>
+method. It looks like the sync method, but without the stream argument, and it
+returns a recipe instead of cooking immediately:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_async</span><span class="p">::</span><span class="n">device_context</span><span class="p">::</span><span class="n">init_device_contexts</span><span class="p">;</span>
+<span class="k">use</span><span class="w"> </span><span class="n">cuda_core</span><span class="p">::</span><span class="n">LaunchConfig</span><span class="p">;</span>
+
+<span class="c1">// One-time setup: create a stream pool for scheduling</span>
+<span class="n">init_device_contexts</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+
+<span class="c1">// Build the recipe (no GPU work yet)</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">module</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">kernels</span><span class="p">::</span><span class="n">load_async</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+<span class="c1">// SAFETY: this is 1D, buffers contain 1024 elements, and module/scheduler</span>
+<span class="c1">// both use device 0&#39;s context.</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">op</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">module</span><span class="p">.</span><span class="n">vecadd_async</span><span class="p">(</span>
+<span class="w">        </span><span class="n">LaunchConfig</span><span class="p">::</span><span class="n">for_num_elems</span><span class="p">(</span><span class="mi">1024</span><span class="p">),</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="n">a_dev</span><span class="p">,</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="n">b_dev</span><span class="p">,</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">c_dev</span><span class="p">,</span>
+<span class="w">    </span><span class="p">)</span>
+<span class="p">}</span><span class="o">?</span><span class="p">;</span>
+
+<span class="c1">// Now cook it: pick a stream, launch, wait for the result</span>
+<span class="n">op</span><span class="p">.</span><span class="n">sync</span><span class="p">()</span><span class="o">?</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>At the point where <code class="docutils literal notranslate"><span class="pre">op</span></code> is created, nothing has happened on the GPU. The method
+builds an <code class="docutils literal notranslate"><span class="pre">AsyncKernelLaunch</span></code> value that remembers which function to call, what
+arguments to pass, and how to configure the grid – but it does not touch any
+stream. It is a recipe card sitting on the counter.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">unsafe</span></code> is about accepting an unproved raw <code class="docutils literal notranslate"><span class="pre">LaunchConfig</span></code>, not about
+building lazily. A contracted kernel uses a checked <code class="docutils literal notranslate"><span class="pre">PreparedLaunch&lt;K&gt;</span></code> and a
+safe generated async method:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>raw config -&gt; unsafe async recipe
+prepared K -&gt; safe async recipe for K
+</pre></div>
+</div>
+<p>When you call <code class="docutils literal notranslate"><span class="pre">.sync()</span></code>, the scheduling policy picks a stream from its pool,
+submits the kernel, and blocks until the stream is idle. That single line is
+where the recipe becomes a cooked meal.</p>
+</section>
+<section id="what-makes-a-deviceoperation">
+<h2>What makes a <code class="docutils literal notranslate"><span class="pre">DeviceOperation</span></code><a class="headerlink" href="#what-makes-a-deviceoperation" title="Link to this heading">#</a></h2>
+<p>Behind the scenes, <code class="docutils literal notranslate"><span class="pre">DeviceOperation</span></code> is a trait. Any type that describes GPU
+work can implement it. The trait has one required method and one associated type:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">pub</span><span class="w"> </span><span class="k">trait</span><span class="w"> </span><span class="n">DeviceOperation</span><span class="p">:</span><span class="w"> </span><span class="nb">Send</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">Sized</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">IntoFuture</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">type</span><span class="w"> </span><span class="nc">Output</span><span class="p">:</span><span class="w"> </span><span class="nb">Send</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">unsafe</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span>
+<span class="w">        </span><span class="bp">self</span><span class="p">,</span>
+<span class="w">        </span><span class="n">context</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="nc">ExecutionContext</span><span class="p">,</span>
+<span class="w">    </span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nb">Result</span><span class="o">&lt;</span><span class="bp">Self</span><span class="p">::</span><span class="n">Output</span><span class="p">,</span><span class="w"> </span><span class="n">DeviceError</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong><code class="docutils literal notranslate"><span class="pre">Output</span></code></strong> is the Rust value the operation produces when it finishes. For a
+kernel launch this is <code class="docutils literal notranslate"><span class="pre">()</span></code> – the kernel runs for its side effects on device
+memory. For a device-to-host copy it might be <code class="docutils literal notranslate"><span class="pre">Vec&lt;f32&gt;</span></code>. For a memory
+allocation it could be a <code class="docutils literal notranslate"><span class="pre">DeviceBox&lt;[f32]&gt;</span></code> that owns the pointer.</p>
+<p><strong><code class="docutils literal notranslate"><span class="pre">execute</span></code></strong> is where the actual GPU work happens. It receives an
+<code class="docutils literal notranslate"><span class="pre">ExecutionContext</span></code> – the assigned kitchen – and submits work to the stream
+inside it. The method is <code class="docutils literal notranslate"><span class="pre">unsafe</span></code> because GPU work may still be in flight when
+it returns; the caller is responsible for synchronizing before reading results.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">Send</span></code> bound means operations can move across threads (essential for
+<code class="docutils literal notranslate"><span class="pre">tokio::spawn</span></code>). The <code class="docutils literal notranslate"><span class="pre">IntoFuture</span></code> bound is what makes <code class="docutils literal notranslate"><span class="pre">.await</span></code> work – more
+on that shortly.</p>
+<p>You rarely implement <code class="docutils literal notranslate"><span class="pre">DeviceOperation</span></code> yourself. The crate provides a set of
+types that implement it, and you compose them using combinators:</p>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">AsyncKernelLaunch</span></code></strong> – produced by typed async launch methods. Launches a kernel.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">Value&lt;T&gt;</span></code></strong> – wraps a host-side value. No GPU work. Returns <code class="docutils literal notranslate"><span class="pre">T</span></code> immediately.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">AndThen</span></code></strong> – chains two operations: run A, feed the result to B.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">Zip</span></code></strong> – runs two operations and returns both results as a tuple.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">StreamOperation</span></code></strong> – defers construction until the stream is known.</p></li>
+</ul>
+<p>These are the building blocks of every async pipeline. The
+<a class="reference internal" href="combinators-and-composition.html"><span class="std std-doc">Combinators and Composition</span></a> chapter covers
+each one in detail.</p>
+</section>
+<section id="the-executioncontext-where-the-stream-lives">
+<h2>The <code class="docutils literal notranslate"><span class="pre">ExecutionContext</span></code> – where the stream lives<a class="headerlink" href="#the-executioncontext-where-the-stream-lives" title="Link to this heading">#</a></h2>
+<p>When a recipe is executed, it needs to know which kitchen it is in. The
+<code class="docutils literal notranslate"><span class="pre">ExecutionContext</span></code> carries that information:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">pub</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">ExecutionContext</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">device</span><span class="p">:</span><span class="w"> </span><span class="kt">usize</span><span class="p">,</span><span class="w">              </span><span class="c1">// which GPU</span>
+<span class="w">    </span><span class="n">cuda_stream</span><span class="p">:</span><span class="w"> </span><span class="nc">Arc</span><span class="o">&lt;</span><span class="n">CudaStream</span><span class="o">&gt;</span><span class="p">,</span><span class="w">   </span><span class="c1">// which stream</span>
+<span class="w">    </span><span class="n">cuda_context</span><span class="p">:</span><span class="w"> </span><span class="nc">Arc</span><span class="o">&lt;</span><span class="n">CudaContext</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="c1">// which CUDA context</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Operations never create streams themselves. The scheduling policy (covered in
+<a class="reference internal" href="scheduling-and-streams.html"><span class="std std-doc">Scheduling and Streams</span></a>) creates the
+<code class="docutils literal notranslate"><span class="pre">ExecutionContext</span></code> and passes it into <code class="docutils literal notranslate"><span class="pre">execute</span></code>. This is the core of the
+separation: operations describe <em>what</em>, the context provides <em>where</em>.</p>
+<p>Inside an <code class="docutils literal notranslate"><span class="pre">execute</span></code> implementation, you access the stream with
+<code class="docutils literal notranslate"><span class="pre">ctx.get_cuda_stream()</span></code> and the CUDA context with <code class="docutils literal notranslate"><span class="pre">ctx.get_cuda_context()</span></code>.
+For most operations this is all you need – enqueue a kernel or a memory copy
+on the stream, and you are done.</p>
+</section>
+<section id="running-the-recipe-four-ways-to-execute">
+<h2>Running the recipe: four ways to execute<a class="headerlink" href="#running-the-recipe-four-ways-to-execute" title="Link to this heading">#</a></h2>
+<p>Once you have a <code class="docutils literal notranslate"><span class="pre">DeviceOperation</span></code>, you need to trigger it. cuda-oxide gives
+you four paths, ranging from “do everything for me” to “I’ll handle it myself.”</p>
+<section id="sync-block-and-wait">
+<h3><code class="docutils literal notranslate"><span class="pre">.sync()</span></code> – block and wait<a class="headerlink" href="#sync-block-and-wait" title="Link to this heading">#</a></h3>
+<p>The simplest option. The scheduling policy picks a stream, runs the operation,
+and blocks the calling thread until the stream is idle:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="n">result</span><span class="p">:</span><span class="w"> </span><span class="nb">Vec</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d2h_operation</span><span class="p">.</span><span class="n">sync</span><span class="p">()</span><span class="o">?</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>This is perfect for scripts, tests, and any place where you just want the
+answer now. No Tokio runtime needed.</p>
+</section>
+<section id="await-yield-and-resume">
+<h3><code class="docutils literal notranslate"><span class="pre">.await</span></code> – yield and resume<a class="headerlink" href="#await-yield-and-resume" title="Link to this heading">#</a></h3>
+<p>Inside an async runtime, <code class="docutils literal notranslate"><span class="pre">.await</span></code> does the same thing but without blocking the
+thread. It converts the operation into a <code class="docutils literal notranslate"><span class="pre">DeviceFuture</span></code>, submits the GPU work,
+and yields the current task. When the GPU finishes, it wakes the task and
+delivers the result:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="cp">#[tokio::main]</span>
+<span class="k">async</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nb">Result</span><span class="o">&lt;</span><span class="p">(),</span><span class="w"> </span><span class="nb">Box</span><span class="o">&lt;</span><span class="k">dyn</span><span class="w"> </span><span class="n">std</span><span class="p">::</span><span class="n">error</span><span class="p">::</span><span class="n">Error</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">init_device_contexts</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">module</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">kernels</span><span class="p">::</span><span class="n">load_async</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+<span class="w">    </span><span class="c1">// SAFETY: this is 1D, buffers contain 1024 elements, and module/scheduler</span>
+<span class="w">    </span><span class="c1">// both use device 0&#39;s context.</span>
+<span class="w">    </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">module</span><span class="p">.</span><span class="n">vecadd_async</span><span class="p">(</span>
+<span class="w">            </span><span class="n">LaunchConfig</span><span class="p">::</span><span class="n">for_num_elems</span><span class="p">(</span><span class="mi">1024</span><span class="p">),</span>
+<span class="w">            </span><span class="o">&amp;</span><span class="n">a_dev</span><span class="p">,</span>
+<span class="w">            </span><span class="o">&amp;</span><span class="n">b_dev</span><span class="p">,</span>
+<span class="w">            </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">c_dev</span><span class="p">,</span>
+<span class="w">        </span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span><span class="o">?</span>
+<span class="w">    </span><span class="p">.</span><span class="k">await</span><span class="o">?</span><span class="p">;</span>
+
+<span class="w">    </span><span class="nb">Ok</span><span class="p">(())</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>While the GPU is working, the Tokio runtime is free to poll other tasks – no
+thread sits idle waiting for hardware. This is the key to running multiple
+GPU pipelines concurrently, which we explore in
+<a class="reference internal" href="concurrent-execution.html"><span class="std std-doc">Concurrent Execution</span></a>.</p>
+</section>
+<section id="sync-on-stream-you-choose-the-stream">
+<h3><code class="docutils literal notranslate"><span class="pre">.sync_on(&amp;stream)</span></code> – you choose the stream<a class="headerlink" href="#sync-on-stream-you-choose-the-stream" title="Link to this heading">#</a></h3>
+<p>When you need a specific stream – for interop with an existing CUDA library,
+or to guarantee ordering with other work on that stream – <code class="docutils literal notranslate"><span class="pre">sync_on</span></code> lets you
+supply it directly and blocks until it completes:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="n">stream</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ctx</span><span class="p">.</span><span class="n">new_stream</span><span class="p">()</span><span class="o">?</span><span class="p">;</span>
+<span class="n">operation</span><span class="p">.</span><span class="n">sync_on</span><span class="p">(</span><span class="o">&amp;</span><span class="n">stream</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+</pre></div>
+</div>
+</section>
+<section id="unsafe-async-on-stream-fire-and-forget">
+<h3><code class="docutils literal notranslate"><span class="pre">unsafe</span> <span class="pre">async_on(&amp;stream)</span></code> – fire and forget<a class="headerlink" href="#unsafe-async-on-stream-fire-and-forget" title="Link to this heading">#</a></h3>
+<p>The most manual option. It submits work to a stream and returns immediately,
+<strong>without</strong> synchronizing. The caller must ensure the stream is synchronized
+before reading results. This is useful for batching many operations onto a
+stream before a single sync at the end:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="n">stream</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ctx</span><span class="p">.</span><span class="n">new_stream</span><span class="p">()</span><span class="o">?</span><span class="p">;</span>
+<span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">op_a</span><span class="p">.</span><span class="n">async_on</span><span class="p">(</span><span class="o">&amp;</span><span class="n">stream</span><span class="p">)</span><span class="o">?</span><span class="w"> </span><span class="p">};</span>
+<span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">op_b</span><span class="p">.</span><span class="n">async_on</span><span class="p">(</span><span class="o">&amp;</span><span class="n">stream</span><span class="p">)</span><span class="o">?</span><span class="w"> </span><span class="p">};</span>
+<span class="n">stream</span><span class="p">.</span><span class="n">synchronize</span><span class="p">()</span><span class="o">?</span><span class="p">;</span><span class="w">  </span><span class="c1">// now both are done</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="lifting-host-data-with-value">
+<h2>Lifting host data with <code class="docutils literal notranslate"><span class="pre">value()</span></code><a class="headerlink" href="#lifting-host-data-with-value" title="Link to this heading">#</a></h2>
+<p>Not every step in a pipeline involves the GPU. Sometimes you need to feed a
+host-side value – a configuration parameter, a set of dimensions, a pre-loaded
+weight vector – into a chain of device operations. The <code class="docutils literal notranslate"><span class="pre">value()</span></code> function
+wraps any <code class="docutils literal notranslate"><span class="pre">Send</span></code> type in a no-op <code class="docutils literal notranslate"><span class="pre">DeviceOperation</span></code> that returns it immediately:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_async</span><span class="p">::</span><span class="n">device_operation</span><span class="p">::</span><span class="n">value</span><span class="p">;</span>
+
+<span class="kd">let</span><span class="w"> </span><span class="n">weights</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="fm">vec!</span><span class="p">[</span><span class="mf">1.0</span><span class="k">f32</span><span class="p">;</span><span class="w"> </span><span class="mi">1024</span><span class="p">];</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">op</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="p">(</span><span class="n">weights</span><span class="p">);</span><span class="w">  </span><span class="c1">// impl DeviceOperation&lt;Output = Vec&lt;f32&gt;&gt;</span>
+</pre></div>
+</div>
+<p>On its own, <code class="docutils literal notranslate"><span class="pre">value()</span></code> looks pointless. Its power shows up in composition. If
+you are zipping together a host-to-device transfer and a configuration struct,
+<code class="docutils literal notranslate"><span class="pre">value()</span></code> makes the configuration fit the pipeline:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="p">(</span><span class="n">device_buf</span><span class="p">,</span><span class="w"> </span><span class="n">config</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">zip</span><span class="o">!</span><span class="p">(</span>
+<span class="w">    </span><span class="n">h2d</span><span class="p">(</span><span class="n">raw_data</span><span class="p">),</span>
+<span class="w">    </span><span class="n">value</span><span class="p">(</span><span class="n">ModelConfig</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">dim</span><span class="p">:</span><span class="w"> </span><span class="mi">64</span><span class="p">,</span><span class="w"> </span><span class="n">layers</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="p">})</span>
+<span class="p">).</span><span class="n">sync</span><span class="p">()</span><span class="o">?</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Both arms of <code class="docutils literal notranslate"><span class="pre">zip!</span></code> must be <code class="docutils literal notranslate"><span class="pre">DeviceOperation</span></code>s. <code class="docutils literal notranslate"><span class="pre">value()</span></code> is the adapter that
+makes host data play nicely with device work.</p>
+</section>
+<section id="talking-to-the-stream-with-with-context">
+<h2>Talking to the stream with <code class="docutils literal notranslate"><span class="pre">with_context</span></code><a class="headerlink" href="#talking-to-the-stream-with-with-context" title="Link to this heading">#</a></h2>
+<p>Some operations need access to the stream itself at execution time. Memory
+allocation (<code class="docutils literal notranslate"><span class="pre">malloc_async</span></code>), asynchronous copies (<code class="docutils literal notranslate"><span class="pre">memcpy_htod_async</span></code>), and
+event recording all require a raw <code class="docutils literal notranslate"><span class="pre">CUstream</span></code> handle. But remember – a
+<code class="docutils literal notranslate"><span class="pre">DeviceOperation</span></code> does not know which stream it will run on when it is created.
+The stream is assigned later, by the scheduling policy.</p>
+<p><code class="docutils literal notranslate"><span class="pre">with_context</span></code> bridges this gap. It creates an operation whose body is deferred
+until the <code class="docutils literal notranslate"><span class="pre">ExecutionContext</span></code> is available:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_async</span><span class="p">::</span><span class="n">device_operation</span><span class="p">::{</span><span class="n">with_context</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">};</span>
+<span class="k">use</span><span class="w"> </span><span class="n">cuda_core</span><span class="p">::</span><span class="n">memory</span><span class="p">::{</span><span class="n">malloc_async</span><span class="p">,</span><span class="w"> </span><span class="n">memcpy_htod_async</span><span class="p">};</span>
+
+<span class="k">fn</span><span class="w"> </span><span class="nf">h2d</span><span class="p">(</span><span class="n">host_data</span><span class="p">:</span><span class="w"> </span><span class="nb">Vec</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nc">impl</span><span class="w"> </span><span class="n">DeviceOperation</span><span class="o">&lt;</span><span class="n">Output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DeviceBox</span><span class="o">&lt;</span><span class="p">[</span><span class="kt">f32</span><span class="p">]</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">with_context</span><span class="p">(</span><span class="k">move</span><span class="w"> </span><span class="o">|</span><span class="n">ctx</span><span class="o">|</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">stream</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ctx</span><span class="p">.</span><span class="n">get_cuda_stream</span><span class="p">();</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">host_data</span><span class="p">.</span><span class="n">len</span><span class="p">();</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">num_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">std</span><span class="p">::</span><span class="n">mem</span><span class="p">::</span><span class="n">size_of</span><span class="p">::</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="w">        </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="n">dptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">malloc_async</span><span class="p">(</span><span class="n">stream</span><span class="p">.</span><span class="n">cu_stream</span><span class="p">(),</span><span class="w"> </span><span class="n">num_bytes</span><span class="p">).</span><span class="n">unwrap</span><span class="p">();</span>
+<span class="w">            </span><span class="n">memcpy_htod_async</span><span class="p">(</span><span class="n">dptr</span><span class="p">,</span><span class="w"> </span><span class="n">host_data</span><span class="p">.</span><span class="n">as_ptr</span><span class="p">(),</span><span class="w"> </span><span class="n">num_bytes</span><span class="p">,</span><span class="w"> </span><span class="n">stream</span><span class="p">.</span><span class="n">cu_stream</span><span class="p">())</span>
+<span class="w">                </span><span class="p">.</span><span class="n">unwrap</span><span class="p">();</span>
+<span class="w">            </span><span class="n">value</span><span class="p">(</span><span class="n">DeviceBox</span><span class="p">::</span><span class="n">from_raw_parts</span><span class="p">(</span><span class="n">dptr</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">ctx</span><span class="p">.</span><span class="n">get_device_id</span><span class="p">()))</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">})</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The closure receives the <code class="docutils literal notranslate"><span class="pre">ExecutionContext</span></code> and must return another
+<code class="docutils literal notranslate"><span class="pre">DeviceOperation</span></code>. Here it returns a <code class="docutils literal notranslate"><span class="pre">Value</span></code> wrapping the freshly allocated
+device pointer. The inner operation is executed immediately on the same stream.</p>
+<p>This pattern – <code class="docutils literal notranslate"><span class="pre">with_context</span></code> wrapping raw driver calls, returning <code class="docutils literal notranslate"><span class="pre">value()</span></code>
+at the end – is how you turn any low-level CUDA operation into a composable
+building block. The <code class="docutils literal notranslate"><span class="pre">async_mlp</span></code> example uses it for <code class="docutils literal notranslate"><span class="pre">h2d</span></code>, <code class="docutils literal notranslate"><span class="pre">d2h</span></code>, and <code class="docutils literal notranslate"><span class="pre">zeros</span></code>
+helpers that slot cleanly into <code class="docutils literal notranslate"><span class="pre">and_then</span></code> chains.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p><code class="docutils literal notranslate"><span class="pre">with_context</span></code> is the escape hatch for raw driver calls that need a
+<code class="docutils literal notranslate"><span class="pre">CUstream</span></code>. For kernel launches, prefer contracted generated async methods:
+they handle argument marshalling and buffer lifetimes, and accept a checked
+<code class="docutils literal notranslate"><span class="pre">PreparedLaunch&lt;K&gt;</span></code>. Uncontracted generated methods still require an unsafe
+raw-launch proof.</p>
+</div>
+</section>
+<section id="how-the-gpu-tells-rust-it-is-done">
+<h2>How the GPU tells Rust it is done<a class="headerlink" href="#how-the-gpu-tells-rust-it-is-done" title="Link to this heading">#</a></h2>
+<p>When you <code class="docutils literal notranslate"><span class="pre">.await</span></code> a <code class="docutils literal notranslate"><span class="pre">DeviceOperation</span></code>, something interesting happens under the
+hood. The operation becomes a <code class="docutils literal notranslate"><span class="pre">DeviceFuture</span></code> – a type that implements Rust’s
+<code class="docutils literal notranslate"><span class="pre">std::future::Future</span></code> – and the async runtime polls it. But how does a poll-
+based system know when <em>hardware</em> has finished its work?</p>
+<p>The answer is <code class="docutils literal notranslate"><span class="pre">cuLaunchHostFunc</span></code>, a CUDA driver API that enqueues a host-side
+callback into a stream. When all preceding GPU work on that stream finishes,
+the driver calls the callback on a driver thread. cuda-oxide uses this to build
+a zero-busy-wait bridge between CUDA and Rust’s async model.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">DeviceFuture</span></code> is a three-state machine:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>  Idle ───poll()───► Executing ───callback fires───► Complete
+                         │                               │
+                   (submit GPU work               (return result
+                    + enqueue callback)             to the runtime)
+</pre></div>
+</div>
+<p>On the <strong>first poll</strong>, the future:</p>
+<ol class="arabic simple">
+<li><p>Calls <code class="docutils literal notranslate"><span class="pre">execute()</span></code> on the operation, submitting GPU work to the stream.</p></li>
+<li><p>Enqueues a <code class="docutils literal notranslate"><span class="pre">cuLaunchHostFunc</span></code> callback on the <strong>same stream</strong>, right after
+the GPU work. CUDA guarantees stream ordering: this callback will not fire
+until the kernel finishes.</p></li>
+<li><p>Returns <code class="docutils literal notranslate"><span class="pre">Poll::Pending</span></code>. The async runtime parks the task and moves on.</p></li>
+</ol>
+<p>When the <strong>GPU finishes</strong> the kernel, the CUDA driver calls the host callback
+on a driver thread. The callback sets an <code class="docutils literal notranslate"><span class="pre">AtomicBool</span></code> flag and wakes the
+task’s <code class="docutils literal notranslate"><span class="pre">AtomicWaker</span></code>. The async runtime notices the wake and re-polls the
+future.</p>
+<p>On the <strong>second poll</strong>, the future sees the flag and returns
+<code class="docutils literal notranslate"><span class="pre">Poll::Ready(Ok(result))</span></code>. The task resumes with the value.</p>
+<p>The critical property: <strong>no host thread spins or sleeps</strong> while the GPU works.
+The async executor is free to run other tasks – including other <code class="docutils literal notranslate"><span class="pre">DeviceFuture</span></code>s
+on other streams. This is how cuda-oxide achieves true concurrent execution
+without dedicating a thread per GPU operation.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>The <a class="reference internal" href="combinators-and-composition.html"><span class="std std-doc">Combinators and Composition</span></a> chapter shows
+how to build multi-stage pipelines from these primitives, and
+<a class="reference internal" href="scheduling-and-streams.html"><span class="std std-doc">Scheduling and Streams</span></a> explains how the scheduling
+policy selects a stream and creates the <code class="docutils literal notranslate"><span class="pre">ExecutionContext</span></code> that ties everything
+together.</p>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../gpu-safety/the-safety-model.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">The Safety Model</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="combinators-and-composition.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Combinators and Composition</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-lazy-operations">Why lazy operations?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#recipes-and-kitchens">Recipes and kitchens</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#your-first-async-launch">Your first async launch</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-makes-a-deviceoperation">What makes a <code class="docutils literal notranslate"><span class="pre">DeviceOperation</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-executioncontext-where-the-stream-lives">The <code class="docutils literal notranslate"><span class="pre">ExecutionContext</span></code> – where the stream lives</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#running-the-recipe-four-ways-to-execute">Running the recipe: four ways to execute</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sync-block-and-wait"><code class="docutils literal notranslate"><span class="pre">.sync()</span></code> – block and wait</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#await-yield-and-resume"><code class="docutils literal notranslate"><span class="pre">.await</span></code> – yield and resume</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sync-on-stream-you-choose-the-stream"><code class="docutils literal notranslate"><span class="pre">.sync_on(&amp;stream)</span></code> – you choose the stream</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#unsafe-async-on-stream-fire-and-forget"><code class="docutils literal notranslate"><span class="pre">unsafe</span> <span class="pre">async_on(&amp;stream)</span></code> – fire and forget</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lifting-host-data-with-value">Lifting host data with <code class="docutils literal notranslate"><span class="pre">value()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#talking-to-the-stream-with-with-context">Talking to the stream with <code class="docutils literal notranslate"><span class="pre">with_context</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-the-gpu-tells-rust-it-is-done">How the GPU tells Rust it is done</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+    <div class="footer-items__center">
+      
+        <div class="footer-item"><footer class="bd-footer-content">
+  <div class="footer-container" style="padding: 1rem 0 2rem 0; border-top: 1px solid var(--pst-color-border); text-align: left;">
+    
+    <!-- NVIDIA Logo -->
+    <div style="margin-bottom: 1rem;">
+      <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem; filter: brightness(0);"
+           class="only-light">
+      <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem;"
+           class="only-dark pst-js-only">
+    </div>
+    
+    <!-- Footer Links - single line, left aligned -->
+    <div style="font-size: 0.8125rem; margin-bottom: 0.5rem; color: var(--pst-color-text-muted);">
+      <a href="https://www.nvidia.com/en-us/about-nvidia/privacy-policy/" target="_blank" style="color: inherit; text-decoration: none;">Privacy Policy</a> | 
+      <a href="https://www.nvidia.com/en-us/preferences/email-preferences/" target="_blank" style="color: inherit; text-decoration: none;">Your Privacy Choices</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/terms-of-service/" target="_blank" style="color: inherit; text-decoration: none;">Terms of Service</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/accessibility/" target="_blank" style="color: inherit; text-decoration: none;">Accessibility</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/company-policies/" target="_blank" style="color: inherit; text-decoration: none;">Corporate Policies</a> | 
+      <a href="https://www.nvidia.com/en-us/product-security/" target="_blank" style="color: inherit; text-decoration: none;">Product Security</a> | 
+      <a href="https://www.nvidia.com/en-us/contact/" target="_blank" style="color: inherit; text-decoration: none;">Contact</a>
+    </div>
+    
+    <!-- Copyright -->
+    <div style="font-size: 0.8125rem; color: var(--pst-color-text-muted);">
+      Copyright &copy; 2025-2026, NVIDIA.
+    </div>
+    
+  </div>
+</footer></div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

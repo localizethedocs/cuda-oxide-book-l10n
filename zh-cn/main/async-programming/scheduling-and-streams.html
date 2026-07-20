@@ -1,0 +1,852 @@
+
+<!DOCTYPE html>
+
+
+<html lang="zh-CN" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Scheduling and Streams &#8212; cuda-oxide</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/nvidia-sphinx-theme.css?v=5d97cc0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=196aea71" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/lightbox.css?v=31fdf494" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../_static/documentation_options.js?v=d786bb5c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/translations.js?v=540d3cec"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'async-programming/scheduling-and-streams';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../_static/js/lightbox.js?v=8cf6bc2b"></script>
+    <script src="../_static/js/spa-nav.js?v=9a4d0bbe"></script>
+    <link rel="canonical" href="https://projects.localizethedocs.org/cuda-oxide-book-l10n/async-programming/scheduling-and-streams.html" />
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="Concurrent Execution" href="concurrent-execution.html" />
+    <link rel="prev" title="Combinators and Composition" href="combinators-and-composition.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="zh-CN"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+<script type="text/javascript" src="../ltd-provenance.js"></script>
+<script type="text/javascript" src="../ltd-current.js"></script>
+<script type="text/javascript" src="../../../ltd-config.js"></script>
+<script type="text/javascript" src="../../../ltd-flyout.js"></script>
+
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">跳转至主要内容</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>回到顶部</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="版本警告"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="网页导航">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">cuda-oxide</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="亮色"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="暗色"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>亮色</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>暗色</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="当前页面">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="亮色"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="暗色"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>亮色</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>暗色</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><div class="sidebar-tree">
+    <p class="sidebar-tree-title">
+        Table of Contents
+    </p>
+    <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/hello-gpu.html">Writing Your First Kernel</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Writing GPU Programs</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/execution-model.html">The CUDA Execution Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/kernels-and-device-functions.html">Kernels and Device Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/memory-and-data-movement.html">Memory and Data Movement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/launching-kernels.html">Launching Kernels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/closures-and-generics.html">Closures and Generics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/error-handling-and-debugging.html">Error Handling and Debugging</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Safety on the GPU</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-safety/the-safety-model.html">The Safety Model</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Async GPU Programming</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="the-device-operation-model.html">The DeviceOperation Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="combinators-and-composition.html">Combinators and Composition</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Scheduling and Streams</a></li>
+<li class="toctree-l1"><a class="reference internal" href="concurrent-execution.html">Concurrent Execution</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Building a Real Application</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../projects/async-mlp-pipeline.html">Project: Async MLP Pipeline</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Advanced GPU Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/shared-memory-and-synchronization.html">Shared Memory and Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/warp-level-programming.html">Warp-Level Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/tensor-memory-accelerator.html">Tensor Memory Accelerator (TMA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/matrix-multiply-accelerators.html">Matrix Multiply Accelerators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cluster-programming.html">Cluster Programming</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Inside the Compiler</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/architecture-overview.html">Architecture Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/pliron.html">Pliron -- Pliron IR (MLIR-like)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/rustc-public.html">rustc_public -- Stable MIR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/rustc-codegen-cuda.html">The Code Generator: rustc-codegen-cuda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/mir-importer.html">The MIR Importer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/compiler-optimizations.html">Compiler Optimizations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/mlir-dialects.html">Pliron Dialects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/lowering-pipeline.html">The Lowering Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/adding-new-intrinsics.html">Adding New Intrinsics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/fuzzing-and-differential-testing.html">Fuzzing and Differential Testing</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Appendix</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/building-from-source.html">Building from Source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/api-quick-reference.html">API Quick Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/supported-features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/cuda-cpp-comparison.html">cuda-oxide vs CUDA C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/ecosystem.html">The Rust + GPU Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/glossary.html">Glossary</a></li>
+</ul>
+
+</div></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="初始页面">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Scheduling and Streams</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="scheduling-and-streams">
+<h1>Scheduling and Streams<a class="headerlink" href="#scheduling-and-streams" title="链接到此标题。">#</a></h1>
+<p>The previous chapters built up a vocabulary for describing GPU work --
+<code class="docutils literal notranslate"><span class="pre">DeviceOperation</span></code>s, <code class="docutils literal notranslate"><span class="pre">and_then</span></code> chains, <code class="docutils literal notranslate"><span class="pre">zip!</span></code> bundles. But a description is
+not execution. At some point, the recipe has to reach a kitchen. This chapter
+is about the kitchens: what CUDA streams are, how cuda-oxide's scheduling
+policies assign work to them, and what happens behind the scenes when a
+<code class="docutils literal notranslate"><span class="pre">DeviceOperation</span></code> becomes a running <code class="docutils literal notranslate"><span class="pre">DeviceFuture</span></code>.</p>
+<div class="admonition seealso">
+<p class="admonition-title">参见</p>
+<p><a class="reference external" href="https://docs.nvidia.com/cuda/cuda-programming-guide/#streams">CUDA Programming Guide -- Streams</a>
+for the underlying CUDA stream semantics that scheduling policies build on.</p>
+</div>
+<section id="checkout-lanes">
+<h2>Checkout lanes<a class="headerlink" href="#checkout-lanes" title="链接到此标题。">#</a></h2>
+<p>Think of a CUDA stream as a <strong>checkout lane</strong> at a grocery store. Each lane
+processes customers in order -- whoever is first in line gets served first. But
+multiple lanes operate independently, so lane 1 can ring up a customer while
+lane 2 bags a different order. The store gets more throughput because work on
+different lanes overlaps in time.</p>
+<p>A GPU works the same way. A <strong>stream</strong> is an in-order queue of operations.
+Within a single stream, everything executes sequentially -- kernel A finishes
+before kernel B starts. But if you put kernel A on stream 0 and kernel B on
+stream 1, they can overlap on the hardware:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Stream 0:  ┌─── Kernel A ───┐
+           └────────────────┘
+Stream 1:       ┌─── Kernel B ───┐
+                └────────────────┘
+
+           ◄─── time ────────────────►
+</pre></div>
+</div>
+<p>With one stream, everything is serial. With multiple streams, independent work
+overlaps and the GPU stays busier. This is the fundamental mechanism for
+concurrency on the GPU.</p>
+</section>
+<section id="why-you-rarely-touch-streams-directly">
+<h2>Why you rarely touch streams directly<a class="headerlink" href="#why-you-rarely-touch-streams-directly" title="链接到此标题。">#</a></h2>
+<p>In CUDA C++, the programmer creates streams, decides which stream each
+operation goes on, and manually inserts events when work on one stream depends
+on results from another. This is powerful but tedious, and it couples every
+function to a specific concurrency strategy.</p>
+<p>cuda-oxide inserts a layer of indirection: the <strong>scheduling policy</strong>. Instead
+of choosing a stream yourself, you hand your <code class="docutils literal notranslate"><span class="pre">DeviceOperation</span></code> to the policy,
+and it picks the stream for you. This means the same pipeline can run on a
+single stream (for debugging), a pool of four streams (for throughput), or a
+custom policy you write yourself -- all without changing the pipeline code.</p>
+</section>
+<section id="the-schedulingpolicy-trait">
+<h2>The <code class="docutils literal notranslate"><span class="pre">SchedulingPolicy</span></code> trait<a class="headerlink" href="#the-schedulingpolicy-trait" title="链接到此标题。">#</a></h2>
+<p>A scheduling policy answers one question: &quot;given this operation, which stream
+should it run on?&quot; The trait has three methods:</p>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">init</span></code></strong> -- called once at startup to create the CUDA streams.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">schedule</span></code></strong> -- picks a stream and wraps the operation in a <code class="docutils literal notranslate"><span class="pre">DeviceFuture</span></code>
+for <code class="docutils literal notranslate"><span class="pre">.await</span></code>.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">sync</span></code></strong> -- picks a stream, executes the operation, and blocks until it
+finishes.</p></li>
+</ul>
+<p>The policy is <code class="docutils literal notranslate"><span class="pre">Sync</span></code>, meaning a single instance is shared across all operations
+on a device. Stream selection must be thread-safe.</p>
+</section>
+<section id="streampoolroundrobin-the-default">
+<h2><code class="docutils literal notranslate"><span class="pre">StreamPoolRoundRobin</span></code> -- the default<a class="headerlink" href="#streampoolroundrobin-the-default" title="链接到此标题。">#</a></h2>
+<p>When you call <code class="docutils literal notranslate"><span class="pre">init_device_contexts(0,</span> <span class="pre">1)</span></code>, cuda-oxide creates a
+<code class="docutils literal notranslate"><span class="pre">StreamPoolRoundRobin</span></code> with four CUDA streams. Every time an operation is
+scheduled, an atomic counter advances and the next stream in the pool is
+selected:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Operation 1  →  Stream 0  ──► ████████
+Operation 2  →  Stream 1  ──►    ████████         (overlaps 1)
+Operation 3  →  Stream 2  ──►       ████████      (overlaps 1, 2)
+Operation 4  →  Stream 3  ──►          ████████
+Operation 5  →  Stream 0  ──►                ████████  (waits for 1)
+</pre></div>
+</div>
+<p>The selection is lock-free -- a single <code class="docutils literal notranslate"><span class="pre">fetch_add</span></code> on an <code class="docutils literal notranslate"><span class="pre">AtomicUsize</span></code>,
+modulo the pool size. The overhead is negligible compared to the cost of GPU
+work.</p>
+<p>Four streams is a good default. It gives the GPU enough in-flight work to
+overlap kernel execution with memory transfers, without excessive context-
+switching overhead. For most workloads, you will never need to think about
+it -- the policy just works.</p>
+<section id="when-round-robin-shines">
+<h3>When round-robin shines<a class="headerlink" href="#when-round-robin-shines" title="链接到此标题。">#</a></h3>
+<ul class="simple">
+<li><p><strong>Batched inference:</strong> Each batch is an independent pipeline. Round-robin
+distributes batches across streams, overlapping compute.</p></li>
+<li><p><strong>Mixed compute + transfer:</strong> While one stream runs a kernel, another copies
+data. The GPU's copy engines and compute units work simultaneously.</p></li>
+<li><p><strong>Many small kernels:</strong> Overlapping launch overhead reduces the gap between
+kernels, keeping the GPU busier.</p></li>
+</ul>
+</section>
+<section id="when-to-reconsider">
+<h3>When to reconsider<a class="headerlink" href="#when-to-reconsider" title="链接到此标题。">#</a></h3>
+<ul class="simple">
+<li><p><strong>Dependency-heavy chains:</strong> If you build a single <code class="docutils literal notranslate"><span class="pre">and_then</span></code> chain (like
+the forward pass in the previous chapter), the chain runs entirely on one
+stream anyway. Round-robin only matters when you schedule <em>multiple
+independent</em> operations.</p></li>
+<li><p><strong>Very large kernels:</strong> A single kernel that saturates the GPU gains nothing
+from multi-stream scheduling. The extra streams sit idle.</p></li>
+</ul>
+</section>
+</section>
+<section id="singlestream-one-lane-strict-order">
+<h2><code class="docutils literal notranslate"><span class="pre">SingleStream</span></code> -- one lane, strict order<a class="headerlink" href="#singlestream-one-lane-strict-order" title="链接到此标题。">#</a></h2>
+<div class="admonition note">
+<p class="admonition-title">备注</p>
+<p><code class="docutils literal notranslate"><span class="pre">SingleStream</span></code> is implemented in the scheduling internals but is <strong>not
+currently wired into <code class="docutils literal notranslate"><span class="pre">GlobalSchedulingPolicy</span></code></strong> or exposed through
+<code class="docutils literal notranslate"><span class="pre">init_device_contexts</span></code>. The default setup always uses <code class="docutils literal notranslate"><span class="pre">StreamPoolRoundRobin</span></code>.
+This section describes the design intent for a future API surface.</p>
+</div>
+<p>For debugging, or when you need guaranteed ordering across <em>all</em> operations,
+<code class="docutils literal notranslate"><span class="pre">SingleStream</span></code> routes everything to one stream. Every operation sees the results
+of every previous operation, eliminating any possibility of stream-related
+concurrency bugs:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Operation 1  →  Stream 0  ──► ████████
+Operation 2  →  Stream 0  ──►          ████████   (waits for 1)
+Operation 3  →  Stream 0  ──►                  ████████
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">小技巧</p>
+<p>If you suspect a concurrency bug in your GPU pipeline, switching to
+<code class="docutils literal notranslate"><span class="pre">SingleStream</span></code> is the fastest way to check. If the bug disappears, it was a
+missing dependency between operations on different streams. If it persists,
+the problem is elsewhere.</p>
+</div>
+</section>
+<section id="setting-up-the-runtime">
+<h2>Setting up the runtime<a class="headerlink" href="#setting-up-the-runtime" title="链接到此标题。">#</a></h2>
+<p>Before any async operation can run, you initialize the thread-local device
+context:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_async</span><span class="p">::</span><span class="n">device_context</span><span class="p">::</span><span class="n">init_device_contexts</span><span class="p">;</span>
+
+<span class="n">init_device_contexts</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>The first argument is the default GPU ordinal; the second is how many devices to
+manage. Under the hood, this registers a thread-local that lazily creates a
+<code class="docutils literal notranslate"><span class="pre">StreamPoolRoundRobin</span></code> for each device on first use. The pool holds four streams
+by default.</p>
+<p>Call this once at the start of your program, before any <code class="docutils literal notranslate"><span class="pre">.sync()</span></code> or <code class="docutils literal notranslate"><span class="pre">.await</span></code>.
+Calling it twice on the same thread returns an error.</p>
+</section>
+<section id="what-happens-when-you-await">
+<h2>What happens when you <code class="docutils literal notranslate"><span class="pre">.await</span></code><a class="headerlink" href="#what-happens-when-you-await" title="链接到此标题。">#</a></h2>
+<figure class="align-center" id="id1">
+<a class="reference internal image-reference" href="../_images/device-future-polling.svg"><img alt="../_images/device-future-polling.svg" src="../_images/device-future-polling.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">Left: the DeviceFuture three-state machine. On the first poll, GPU work and a
+<code class="docutils literal notranslate"><span class="pre">cuLaunchHostFunc</span></code> callback are submitted — then <code class="docutils literal notranslate"><span class="pre">Poll::Pending</span></code> is returned.
+When the GPU finishes, the callback sets an <code class="docutils literal notranslate"><span class="pre">AtomicBool</span></code> and wakes the task.
+On the second poll, the result is delivered. Right: comparison of <code class="docutils literal notranslate"><span class="pre">.sync()</span></code>
+(thread blocked the entire time) vs <code class="docutils literal notranslate"><span class="pre">.await</span></code> (thread runs other tasks while
+the GPU works).</span><a class="headerlink" href="#id1" title="链接到此图片">#</a></p>
+</figcaption>
+</figure>
+<p>Here is the full journey of an operation from construction to completion:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>module.kernel_async(&amp;prepared, ...)  ← build a checked recipe (no GPU work)
+        │
+        ▼
+  AsyncKernelLaunch            ← a DeviceOperation, lazy and stream-agnostic
+        │
+        │  .await
+        ▼
+  IntoFuture::into_future()    ← scheduling policy picks a stream
+        │
+        ▼
+  DeviceFuture                 ← bound to a stream, ready for polling
+        │
+        │  first poll()
+        ▼
+  execute() on stream 2        ← GPU work is submitted
+  cuLaunchHostFunc on stream 2 ← host callback enqueued after the kernel
+  return Poll::Pending
+        │
+        │  ... GPU is working, host thread is free ...
+        │
+        │  callback fires on a CUDA driver thread
+        │  → sets AtomicBool, wakes AtomicWaker
+        │
+        │  second poll()
+        ▼
+  return Poll::Ready(Ok(()))   ← result delivered to the caller
+</pre></div>
+</div>
+<p>The key insight is that between the first <code class="docutils literal notranslate"><span class="pre">poll()</span></code> and the callback, <strong>no host
+thread is occupied</strong>. The async runtime parks the task and runs other tasks.
+The GPU notifies the runtime when it is done, via the <code class="docutils literal notranslate"><span class="pre">cuLaunchHostFunc</span></code>
+callback. This is why <code class="docutils literal notranslate"><span class="pre">.await</span></code> scales better than <code class="docutils literal notranslate"><span class="pre">.sync()</span></code> for concurrent
+workloads -- you can have dozens of in-flight operations without tying up a
+thread for each one.</p>
+</section>
+<section id="manual-stream-control">
+<h2>Manual stream control<a class="headerlink" href="#manual-stream-control" title="链接到此标题。">#</a></h2>
+<p>Most of the time, the scheduling policy handles streams for you. But there are
+situations where you need direct control -- interop with a CUDA library that
+expects a specific stream, fine-grained overlapping of compute and transfers,
+or profiling a single kernel in isolation. cuda-oxide exposes the full stream
+API for these cases.</p>
+<section id="creating-streams">
+<h3>Creating streams<a class="headerlink" href="#creating-streams" title="链接到此标题。">#</a></h3>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="n">ctx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CudaContext</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">default</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ctx</span><span class="p">.</span><span class="n">default_stream</span><span class="p">();</span><span class="w">  </span><span class="c1">// the per-context default (null) stream</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">custom</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">ctx</span><span class="p">.</span><span class="n">new_stream</span><span class="p">()</span><span class="o">?</span><span class="p">;</span><span class="w">     </span><span class="c1">// a new non-blocking stream</span>
+</pre></div>
+</div>
+<p>The default stream has special synchronization semantics in CUDA (it implicitly
+serializes with most other streams). Non-blocking streams created by
+<code class="docutils literal notranslate"><span class="pre">new_stream()</span></code> do not have this constraint, which is why the scheduling policy
+uses them exclusively.</p>
+</section>
+<section id="fork-and-join">
+<h3>Fork and join<a class="headerlink" href="#fork-and-join" title="链接到此标题。">#</a></h3>
+<p>A common pattern is to fork a child stream from a parent, run independent work
+on the child, and join the results back. <code class="docutils literal notranslate"><span class="pre">fork</span></code> creates a new stream with an
+implicit dependency on the parent's current position -- the child will not start
+until all prior work on the parent finishes. <code class="docutils literal notranslate"><span class="pre">join</span></code> does the reverse: the parent
+waits for the child to finish before proceeding.</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="n">main</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ctx</span><span class="p">.</span><span class="n">default_stream</span><span class="p">();</span>
+
+<span class="c1">// Upload data on main</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">buf_a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DeviceBuffer</span><span class="p">::</span><span class="n">from_host</span><span class="p">(</span><span class="o">&amp;</span><span class="n">main</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">data_a</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">buf_b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DeviceBuffer</span><span class="p">::</span><span class="n">from_host</span><span class="p">(</span><span class="o">&amp;</span><span class="n">main</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">data_b</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+
+<span class="c1">// Fork: children see the uploads</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">child_1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">main</span><span class="p">.</span><span class="n">fork</span><span class="p">()</span><span class="o">?</span><span class="p">;</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">child_2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">main</span><span class="p">.</span><span class="n">fork</span><span class="p">()</span><span class="o">?</span><span class="p">;</span>
+
+<span class="c1">// SAFETY: cfg matches process&#39;s indexing/resources and both buffers&#39; bounds.</span>
+<span class="c1">// Run independent work in parallel.</span>
+<span class="k">unsafe</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">module</span><span class="p">.</span><span class="n">process</span><span class="p">(</span><span class="o">&amp;</span><span class="n">child_1</span><span class="p">,</span><span class="w"> </span><span class="n">cfg</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">buf_a</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+<span class="w">    </span><span class="n">module</span><span class="p">.</span><span class="n">process</span><span class="p">(</span><span class="o">&amp;</span><span class="n">child_2</span><span class="p">,</span><span class="w"> </span><span class="n">cfg</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">buf_b</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// Join: main waits for both children</span>
+<span class="n">main</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="o">&amp;</span><span class="n">child_1</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+<span class="n">main</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="o">&amp;</span><span class="n">child_2</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+
+<span class="c1">// SAFETY: cfg matches combine&#39;s indexing/resources and both input bounds.</span>
+<span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">module</span><span class="p">.</span><span class="n">combine</span><span class="p">(</span><span class="o">&amp;</span><span class="n">main</span><span class="p">,</span><span class="w"> </span><span class="n">cfg</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">buf_a</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">buf_b</span><span class="p">)</span><span class="w"> </span><span class="p">}</span><span class="o">?</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>The GPU timeline for this looks like:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>main:      ██ upload_a ██ upload_b ██ ──fork──────────────── join ──► ██ combine ██
+                                         |                    ^  ^
+child_1:                                 └─► ██ process_a ██ ─┘  |
+                                         |                       |
+child_2:                                 └─► ██ process_b ██ ────┘
+</pre></div>
+</div>
+<p>Under the hood, <code class="docutils literal notranslate"><span class="pre">fork</span></code> and <code class="docutils literal notranslate"><span class="pre">join</span></code> use CUDA events -- <code class="docutils literal notranslate"><span class="pre">cuEventRecord</span></code> on one
+stream, <code class="docutils literal notranslate"><span class="pre">cuStreamWaitEvent</span></code> on another. The events are GPU-side synchronization
+tokens; no host thread blocks during the fork or the join.</p>
+</section>
+<section id="events-for-fine-grained-ordering">
+<h3>Events for fine-grained ordering<a class="headerlink" href="#events-for-fine-grained-ordering" title="链接到此标题。">#</a></h3>
+<p>When <code class="docutils literal notranslate"><span class="pre">fork</span></code>/<code class="docutils literal notranslate"><span class="pre">join</span></code> is too coarse, you can use events directly to establish
+ordering between specific points in different streams:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="c1">// Record an event on stream A after the kernel finishes</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">event</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stream_a</span><span class="p">.</span><span class="n">record_event</span><span class="p">(</span><span class="nb">None</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+
+<span class="c1">// Stream B waits for that specific point before proceeding</span>
+<span class="n">stream_b</span><span class="p">.</span><span class="n">wait</span><span class="p">(</span><span class="o">&amp;</span><span class="n">event</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>A CUDA event is not owned by a stream -- it is a standalone synchronization
+token. <code class="docutils literal notranslate"><span class="pre">record</span></code> stamps it at a specific point on one stream; <code class="docutils literal notranslate"><span class="pre">wait</span></code> inserts a
+dependency into another stream. The event is the rendezvous point: nothing
+after the <code class="docutils literal notranslate"><span class="pre">wait</span></code> on stream B runs until the event fires on stream A.</p>
+<p>Events are also the standard way to measure GPU execution time. Note that
+timing requires events created <strong>without</strong> <code class="docutils literal notranslate"><span class="pre">CU_EVENT_DISABLE_TIMING</span></code> -- pass
+explicit flags to enable timing:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_bindings</span><span class="p">::</span><span class="n">CUevent_flags_enum</span><span class="p">::</span><span class="n">CU_EVENT_DEFAULT</span><span class="p">;</span>
+
+<span class="kd">let</span><span class="w"> </span><span class="n">start</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stream</span><span class="p">.</span><span class="n">record_event</span><span class="p">(</span><span class="nb">Some</span><span class="p">(</span><span class="n">CU_EVENT_DEFAULT</span><span class="p">))</span><span class="o">?</span><span class="p">;</span>
+<span class="c1">// SAFETY: config and arguments satisfy my_kernel&#39;s requirements.</span>
+<span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">module</span><span class="p">.</span><span class="n">my_kernel</span><span class="p">(</span><span class="o">&amp;</span><span class="n">stream</span><span class="p">,</span><span class="w"> </span><span class="n">config</span><span class="p">)</span><span class="w"> </span><span class="p">}</span><span class="o">?</span><span class="p">;</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">end</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stream</span><span class="p">.</span><span class="n">record_event</span><span class="p">(</span><span class="nb">Some</span><span class="p">(</span><span class="n">CU_EVENT_DEFAULT</span><span class="p">))</span><span class="o">?</span><span class="p">;</span>
+<span class="n">end</span><span class="p">.</span><span class="n">synchronize</span><span class="p">()</span><span class="o">?</span><span class="p">;</span>
+<span class="fm">println!</span><span class="p">(</span><span class="s">&quot;Kernel took {:.2} ms&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">start</span><span class="p">.</span><span class="n">elapsed_ms</span><span class="p">(</span><span class="o">&amp;</span><span class="n">end</span><span class="p">)</span><span class="o">?</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>This measures actual GPU time, not host-side scheduling overhead. <code class="docutils literal notranslate"><span class="pre">record_event(None)</span></code> creates timing-disabled events by default, which cannot be used with <code class="docutils literal notranslate"><span class="pre">elapsed_ms</span></code>.</p>
+<div class="admonition tip">
+<p class="admonition-title">小技巧</p>
+<p>For everyday async pipelines, you never need to create streams, events, or
+fork/join manually. The scheduling policy and <code class="docutils literal notranslate"><span class="pre">and_then</span></code> chains handle
+ordering automatically. The manual API exists for interop, profiling, and
+advanced optimization.</p>
+</div>
+</section>
+</section>
+<section id="choosing-the-right-approach">
+<h2>Choosing the right approach<a class="headerlink" href="#choosing-the-right-approach" title="链接到此标题。">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Situation</p></th>
+<th class="head text-left"><p>Recommended approach</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>Simple script, one contracted kernel</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">module.kernel_async(&amp;prepared,</span> <span class="pre">...).sync()</span></code></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Multi-stage pipeline (GEMM → ReLU → D2H)</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">and_then</span></code> chain, policy picks one stream</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Independent batches running concurrently</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">tokio::spawn</span></code> each batch, round-robin distributes</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Debugging a suspected stream-ordering bug</p></td>
+<td class="text-left"><p>Switch to <code class="docutils literal notranslate"><span class="pre">SingleStream</span></code></p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Interop with an existing CUDA library</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">.sync_on(&amp;stream)</span></code> with their stream</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Profiling a kernel in isolation</p></td>
+<td class="text-left"><p>Explicit events around the launch</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Maximum throughput</p></td>
+<td class="text-left"><p>Profile with Nsight Systems, tune pool size</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">参见</p>
+<p><a class="reference external" href="https://docs.nvidia.com/cuda/cuda-programming-guide/#events">CUDA Programming Guide -- Events</a>
+for the full specification of CUDA events. The
+<a class="reference internal" href="concurrent-execution.html"><span class="std std-doc">Concurrent Execution</span></a> chapter shows these scheduling
+concepts applied to real multi-batch workloads.</p>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="combinators-and-composition.html"
+       title="上一页">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">上一页</p>
+        <p class="prev-next-title">Combinators and Composition</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="concurrent-execution.html"
+       title="下一页">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">下一页</p>
+        <p class="prev-next-title">Concurrent Execution</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> 当前页面
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#checkout-lanes">Checkout lanes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-you-rarely-touch-streams-directly">Why you rarely touch streams directly</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-schedulingpolicy-trait">The <code class="docutils literal notranslate"><span class="pre">SchedulingPolicy</span></code> trait</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#streampoolroundrobin-the-default"><code class="docutils literal notranslate"><span class="pre">StreamPoolRoundRobin</span></code> -- the default</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#when-round-robin-shines">When round-robin shines</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#when-to-reconsider">When to reconsider</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#singlestream-one-lane-strict-order"><code class="docutils literal notranslate"><span class="pre">SingleStream</span></code> -- one lane, strict order</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#setting-up-the-runtime">Setting up the runtime</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-happens-when-you-await">What happens when you <code class="docutils literal notranslate"><span class="pre">.await</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#manual-stream-control">Manual stream control</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#creating-streams">Creating streams</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fork-and-join">Fork and join</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#events-for-fine-grained-ordering">Events for fine-grained ordering</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-the-right-approach">Choosing the right approach</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+    <div class="footer-items__center">
+      
+        <div class="footer-item"><footer class="bd-footer-content">
+  <div class="footer-container" style="padding: 1rem 0 2rem 0; border-top: 1px solid var(--pst-color-border); text-align: left;">
+    
+    <!-- NVIDIA Logo -->
+    <div style="margin-bottom: 1rem;">
+      <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem; filter: brightness(0);"
+           class="only-light">
+      <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem;"
+           class="only-dark pst-js-only">
+    </div>
+    
+    <!-- Footer Links - single line, left aligned -->
+    <div style="font-size: 0.8125rem; margin-bottom: 0.5rem; color: var(--pst-color-text-muted);">
+      <a href="https://www.nvidia.com/en-us/about-nvidia/privacy-policy/" target="_blank" style="color: inherit; text-decoration: none;">Privacy Policy</a> | 
+      <a href="https://www.nvidia.com/en-us/preferences/email-preferences/" target="_blank" style="color: inherit; text-decoration: none;">Your Privacy Choices</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/terms-of-service/" target="_blank" style="color: inherit; text-decoration: none;">Terms of Service</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/accessibility/" target="_blank" style="color: inherit; text-decoration: none;">Accessibility</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/company-policies/" target="_blank" style="color: inherit; text-decoration: none;">Corporate Policies</a> | 
+      <a href="https://www.nvidia.com/en-us/product-security/" target="_blank" style="color: inherit; text-decoration: none;">Product Security</a> | 
+      <a href="https://www.nvidia.com/en-us/contact/" target="_blank" style="color: inherit; text-decoration: none;">Contact</a>
+    </div>
+    
+    <!-- Copyright -->
+    <div style="font-size: 0.8125rem; color: var(--pst-color-text-muted);">
+      Copyright &copy; 2025-2026, NVIDIA.
+    </div>
+    
+  </div>
+</footer></div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

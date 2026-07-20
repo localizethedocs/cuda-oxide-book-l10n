@@ -1,0 +1,774 @@
+
+<!DOCTYPE html>
+
+
+<html lang="zh-TW" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Building from Source &#8212; cuda-oxide</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/nvidia-sphinx-theme.css?v=5d97cc0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=196aea71" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/lightbox.css?v=31fdf494" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../_static/documentation_options.js?v=a7999bab"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/translations.js?v=cbf116e0"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'appendix/building-from-source';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../_static/js/lightbox.js?v=8cf6bc2b"></script>
+    <script src="../_static/js/spa-nav.js?v=9a4d0bbe"></script>
+    <link rel="canonical" href="https://projects.localizethedocs.org/cuda-oxide-book-l10n/appendix/building-from-source.html" />
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜尋" href="../search.html" />
+    <link rel="next" title="API Quick Reference" href="api-quick-reference.html" />
+    <link rel="prev" title="Fuzzing and Differential Testing" href="../compiler/fuzzing-and-differential-testing.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="zh-TW"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+<script type="text/javascript" src="../ltd-provenance.js"></script>
+<script type="text/javascript" src="../ltd-current.js"></script>
+<script type="text/javascript" src="../../../ltd-config.js"></script>
+<script type="text/javascript" src="../../../ltd-flyout.js"></script>
+
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">跳转至主要内容</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>回到顶部</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="版本警告"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="网页导航">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">cuda-oxide</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜尋" aria-label="搜尋" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="亮色"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="暗色"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>亮色</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>暗色</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="当前页面">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜尋" aria-label="搜尋" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="亮色"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="暗色"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>亮色</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>暗色</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><div class="sidebar-tree">
+    <p class="sidebar-tree-title">
+        Table of Contents
+    </p>
+    <p aria-level="2" class="caption" role="heading"><span class="caption-text">開始使用</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/hello-gpu.html">Writing Your First Kernel</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">編寫 GPU 程式</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/execution-model.html">The CUDA Execution Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/kernels-and-device-functions.html">Kernels and Device Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/memory-and-data-movement.html">Memory and Data Movement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/launching-kernels.html">Launching Kernels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/closures-and-generics.html">Closures and Generics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/error-handling-and-debugging.html">Error Handling and Debugging</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Safety on the GPU</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-safety/the-safety-model.html">The Safety Model</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">異步 GPU 程式設計</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/the-device-operation-model.html">The DeviceOperation Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/combinators-and-composition.html">Combinators and Composition</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/scheduling-and-streams.html">Scheduling and Streams</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/concurrent-execution.html">Concurrent Execution</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Building a Real Application</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../projects/async-mlp-pipeline.html">Project: Async MLP Pipeline</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Advanced GPU Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/shared-memory-and-synchronization.html">Shared Memory and Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/warp-level-programming.html">Warp-Level Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/tensor-memory-accelerator.html">張量記憶體加速器（TMA）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/matrix-multiply-accelerators.html">Matrix Multiply Accelerators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cluster-programming.html">Cluster Programming</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Inside the Compiler</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/architecture-overview.html">Architecture Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/pliron.html">Pliron -- Pliron IR (MLIR-like)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/rustc-public.html">rustc_public -- Stable MIR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/rustc-codegen-cuda.html">The Code Generator: rustc-codegen-cuda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/mir-importer.html">The MIR Importer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/compiler-optimizations.html">Compiler Optimizations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/mlir-dialects.html">Pliron Dialects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/lowering-pipeline.html">The Lowering Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/adding-new-intrinsics.html">Adding New Intrinsics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/fuzzing-and-differential-testing.html">Fuzzing and Differential Testing</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">附錄</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Building from Source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api-quick-reference.html">API Quick Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="supported-features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cuda-cpp-comparison.html">cuda-oxide vs CUDA C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ecosystem.html">The Rust + GPU Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+</ul>
+
+</div></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="初始页面">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Building from Source</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="building-from-source">
+<h1>Building from Source<a class="headerlink" href="#building-from-source" title="連結到這個標頭">#</a></h1>
+<p>This appendix walks through setting up a development environment for cuda-oxide
+from a fresh checkout. If you just want to run an example, the
+<a class="reference internal" href="../getting-started/hello-gpu.html"><span class="std std-doc">Writing Your First Kernel</span></a> chapter is faster.</p>
+<hr class="docutils" />
+<section id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="連結到這個標頭">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Dependency</p></th>
+<th class="head text-left"><p>Version</p></th>
+<th class="head text-left"><p>Purpose</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><strong>Rust nightly</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">nightly-2026-04-03</span></code> (pinned)</p></td>
+<td class="text-left"><p>Compiler toolchain with <code class="docutils literal notranslate"><span class="pre">rustc-dev</span></code> for the codegen backend</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><strong>CUDA Toolkit</strong></p></td>
+<td class="text-left"><p>12.x+</p></td>
+<td class="text-left"><p>Driver API, <code class="docutils literal notranslate"><span class="pre">nvcc</span></code>, PTX assembler</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><strong>Clang</strong></p></td>
+<td class="text-left"><p>21+ (<code class="docutils literal notranslate"><span class="pre">clang-21</span></code> pkg)</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">bindgen</span></code> in host <code class="docutils literal notranslate"><span class="pre">cuda-bindings</span></code> needs clang's headers</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><strong>Linux</strong></p></td>
+<td class="text-left"><p>Tested on Ubuntu 24.04</p></td>
+<td class="text-left"><p>Windows and macOS are not supported</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><strong>GPU</strong></p></td>
+<td class="text-left"><p>sm_80, sm_90, sm_100a</p></td>
+<td class="text-left"><p>Hardware target</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="clone-the-repository">
+<h2>Clone the repository<a class="headerlink" href="#clone-the-repository" title="連結到這個標頭">#</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/NVlabs/cuda-oxide.git
+<span class="nb">cd</span><span class="w"> </span>cuda-oxide
+</pre></div>
+</div>
+</section>
+<section id="install-the-rust-toolchain">
+<h2>Install the Rust toolchain<a class="headerlink" href="#install-the-rust-toolchain" title="連結到這個標頭">#</a></h2>
+<p>The repo ships a <code class="docutils literal notranslate"><span class="pre">rust-toolchain.toml</span></code> that pins the exact nightly version and
+components. Rustup picks it up automatically:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="c1"># rust-toolchain.toml (already in the repo root)</span>
+<span class="k">[toolchain]</span>
+<span class="n">channel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;nightly-2026-04-03&quot;</span>
+<span class="n">components</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;rust-src&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;rustc-dev&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;rust-analyzer&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;clippy&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;llvm-tools&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>If you need to install manually:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rustup<span class="w"> </span>toolchain<span class="w"> </span>install<span class="w"> </span>nightly-2026-04-03
+rustup<span class="w"> </span>component<span class="w"> </span>add<span class="w"> </span>rust-src<span class="w"> </span>rustc-dev<span class="w"> </span>--toolchain<span class="w"> </span>nightly-2026-04-03
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">rust-src</span></code> provides the standard library source for cross-compilation and
+<code class="docutils literal notranslate"><span class="pre">rustc-dev</span></code> exposes compiler internals that the codegen backend links against.</p>
+</section>
+<section id="install-cuda">
+<h2>安裝 CUDA<a class="headerlink" href="#install-cuda" title="連結到這個標頭">#</a></h2>
+<p>Make sure the CUDA toolkit is on your <code class="docutils literal notranslate"><span class="pre">PATH</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;/usr/local/cuda/bin:</span><span class="nv">$PATH</span><span class="s2">&quot;</span>
+nvcc<span class="w"> </span>--version<span class="w">   </span><span class="c1"># should print 12.x or later</span>
+</pre></div>
+</div>
+<p>If you are building on a system without a GPU (e.g. CI), the toolkit is still
+required for <code class="docutils literal notranslate"><span class="pre">ptxas</span></code> and header files, but you will not be able to run kernels.</p>
+</section>
+<section id="install-llvm-usually-optional">
+<h2>Install LLVM (usually optional)<a class="headerlink" href="#install-llvm-usually-optional" title="連結到這個標頭">#</a></h2>
+<p>The codegen pipeline emits LLVM IR and invokes <code class="docutils literal notranslate"><span class="pre">llc</span></code> to produce PTX. The
+pinned Rust toolchain (<code class="docutils literal notranslate"><span class="pre">nightly-2026-04-03</span></code>) already ships LLVM 22 with the
+NVPTX backend enabled via the <code class="docutils literal notranslate"><span class="pre">llvm-tools</span></code> component, so the recommended
+path is:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rustup<span class="w"> </span>component<span class="w"> </span>add<span class="w"> </span>llvm-tools
+</pre></div>
+</div>
+<p>The component is already listed in <code class="docutils literal notranslate"><span class="pre">rust-toolchain.toml</span></code>, so on a fresh
+clone rustup installs it automatically; running the command above is the
+one-shot fix for older clones. The pipeline auto-detects this <code class="docutils literal notranslate"><span class="pre">llc</span></code> at
+<code class="docutils literal notranslate"><span class="pre">&lt;sysroot&gt;/lib/rustlib/&lt;host&gt;/bin/llc</span></code>.</p>
+<p>If you would rather use a system LLVM (for a specific patch level, or
+because you already have one installed), the pipeline falls back to
+<code class="docutils literal notranslate"><span class="pre">llc-22</span></code> / <code class="docutils literal notranslate"><span class="pre">llc-21</span></code> on <code class="docutils literal notranslate"><span class="pre">PATH</span></code>. LLVM 21 is the minimum — earlier releases
+reject the TMA / tcgen05 / WGMMA intrinsic signatures that cuda-oxide
+emits.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Ubuntu / Debian</span>
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>llvm-21
+</pre></div>
+</div>
+<p>If your distro packages do not provide <code class="docutils literal notranslate"><span class="pre">llvm-21</span></code>, use LLVM's apt helper:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>lsb-release<span class="w"> </span>wget<span class="w"> </span>software-properties-common<span class="w"> </span>gnupg
+wget<span class="w"> </span>https://apt.llvm.org/llvm.sh<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>chmod<span class="w"> </span>+x<span class="w"> </span>llvm.sh
+sudo<span class="w"> </span>./llvm.sh<span class="w"> </span><span class="m">21</span>
+</pre></div>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Verify NVPTX support</span>
+llc-21<span class="w"> </span>--version<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>nvptx
+</pre></div>
+</div>
+<p>You should see <code class="docutils literal notranslate"><span class="pre">nvptx64</span> <span class="pre">-</span> <span class="pre">NVIDIA</span> <span class="pre">PTX</span> <span class="pre">64-bit</span></code> in the target list.</p>
+<p>To pin a specific binary (rustup's, a distro's, or a custom build), set
+<code class="docutils literal notranslate"><span class="pre">CUDA_OXIDE_LLC=/path/to/llc</span></code>. The pipeline's full resolution order is:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">$CUDA_OXIDE_LLC</span></code> (if set)</p></li>
+<li><p>The Rust toolchain's <code class="docutils literal notranslate"><span class="pre">llvm-tools</span></code> llc</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">llc-22</span></code>, then <code class="docutils literal notranslate"><span class="pre">llc-21</span></code>, then bare <code class="docutils literal notranslate"><span class="pre">llc</span></code> on <code class="docutils literal notranslate"><span class="pre">PATH</span></code></p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">備註</p>
+<p>Older <code class="docutils literal notranslate"><span class="pre">llc</span></code> binaries (LLVM 20 and earlier) will compile simpler kernels when
+pointed at via <code class="docutils literal notranslate"><span class="pre">CUDA_OXIDE_LLC=/path/to/llc-20</span></code>, but any example that uses
+modern TMA / tcgen05 / WGMMA intrinsics (<code class="docutils literal notranslate"><span class="pre">tma_copy</span></code>, <code class="docutils literal notranslate"><span class="pre">gemm_sol</span></code>,
+<code class="docutils literal notranslate"><span class="pre">tcgen05_matmul</span></code>, <code class="docutils literal notranslate"><span class="pre">wgmma</span></code>, …) will fail with
+<code class="docutils literal notranslate"><span class="pre">Intrinsic</span> <span class="pre">has</span> <span class="pre">incorrect</span> <span class="pre">argument</span> <span class="pre">type!</span></code> until you upgrade to LLVM 21+.</p>
+</div>
+</section>
+<section id="install-clang-for-host-cuda-bindings">
+<h2>Install Clang (for host <code class="docutils literal notranslate"><span class="pre">cuda-bindings</span></code>)<a class="headerlink" href="#install-clang-for-host-cuda-bindings" title="連結到這個標頭">#</a></h2>
+<p>The host <code class="docutils literal notranslate"><span class="pre">cuda-bindings</span></code> crate runs <code class="docutils literal notranslate"><span class="pre">bindgen</span></code>, which loads libclang and needs
+clang's own resource-dir <code class="docutils literal notranslate"><span class="pre">stddef.h</span></code> — a bare <code class="docutils literal notranslate"><span class="pre">libclang1-*</span></code> runtime is not
+enough.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>clang-21<span class="w">   </span><span class="c1"># or libclang-common-21-dev</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">oxide</span> <span class="pre">doctor</span></code> verifies this up front.</p>
+</section>
+<section id="build-the-workspace">
+<h2>建置工作空間<a class="headerlink" href="#build-the-workspace" title="連結到這個標頭">#</a></h2>
+<p>The main workspace contains the user-facing crates (<code class="docutils literal notranslate"><span class="pre">cuda-device</span></code>, <code class="docutils literal notranslate"><span class="pre">cuda-core</span></code>,
+<code class="docutils literal notranslate"><span class="pre">cuda-async</span></code>, etc.) and the build tooling (<code class="docutils literal notranslate"><span class="pre">cargo-oxide</span></code>):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cargo<span class="w"> </span>build
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">備註</p>
+<p>The codegen backend (<code class="docutils literal notranslate"><span class="pre">crates/rustc-codegen-cuda/</span></code>) is intentionally <strong>not</strong> a
+workspace member because it requires special nightly features and a different
+build process. <code class="docutils literal notranslate"><span class="pre">cargo-oxide</span></code> handles building it transparently.</p>
+</div>
+</section>
+<section id="install-cargo-oxide">
+<h2>Install cargo-oxide<a class="headerlink" href="#install-cargo-oxide" title="連結到這個標頭">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">cargo-oxide</span></code> is the cargo subcommand that drives the full compilation
+pipeline. Inside the repo, it works via a workspace alias. For standalone use, install it with the pinned nightly toolchain:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cargo<span class="w"> </span>+nightly-2026-04-03<span class="w"> </span>install<span class="w"> </span>--git<span class="w"> </span>https://github.com/NVlabs/cuda-oxide.git<span class="w"> </span>cargo-oxide
+</pre></div>
+</div>
+<p>On first run, <code class="docutils literal notranslate"><span class="pre">cargo-oxide</span></code> automatically fetches and builds the codegen backend
+dylib.</p>
+</section>
+<section id="verify-the-installation">
+<h2>Verify the installation<a class="headerlink" href="#verify-the-installation" title="連結到這個標頭">#</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Check all prerequisites</span>
+cargo<span class="w"> </span>oxide<span class="w"> </span>doctor
+
+<span class="c1"># Compile and run the canonical first example</span>
+cargo<span class="w"> </span>oxide<span class="w"> </span>run<span class="w"> </span>vecadd
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">oxide</span> <span class="pre">doctor</span></code> validates your Rust toolchain, CUDA toolkit (including
+libNVVM / nvJitLink / libdevice for kernels that use math intrinsics), LLVM
+installation, and codegen backend. If everything is configured correctly,
+<code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">oxide</span> <span class="pre">run</span> <span class="pre">vecadd</span></code> compiles a Rust kernel to PTX, launches it on the GPU,
+and prints a success message.</p>
+</section>
+<section id="common-commands">
+<h2>Common commands<a class="headerlink" href="#common-commands" title="連結到這個標頭">#</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Build and run an example</span>
+cargo<span class="w"> </span>oxide<span class="w"> </span>run<span class="w"> </span>&lt;example&gt;
+
+<span class="c1"># Show the full compilation pipeline (MIR → LLVM IR → PTX)</span>
+cargo<span class="w"> </span>oxide<span class="w"> </span>pipeline<span class="w"> </span>&lt;example&gt;
+
+<span class="c1"># Run under NVIDIA Compute Sanitizer</span>
+cargo<span class="w"> </span>oxide<span class="w"> </span>sanitize<span class="w"> </span>&lt;example&gt;<span class="w"> </span>--tool<span class="w"> </span>memcheck
+
+<span class="c1"># Debug with cuda-gdb</span>
+cargo<span class="w"> </span>oxide<span class="w"> </span>debug<span class="w"> </span>&lt;example&gt;<span class="w"> </span>--tui
+
+<span class="c1"># Build NVVM IR for libNVVM/nvJitLink interop</span>
+cargo<span class="w"> </span>oxide<span class="w"> </span>build<span class="w"> </span>&lt;example&gt;<span class="w"> </span>--emit-nvvm-ir<span class="w"> </span>--arch<span class="w"> </span>sm_120
+</pre></div>
+</div>
+</section>
+<section id="building-the-book">
+<h2>Building the book<a class="headerlink" href="#building-the-book" title="連結到這個標頭">#</a></h2>
+<p>The documentation lives in <code class="docutils literal notranslate"><span class="pre">cuda-oxide-book/</span></code> and uses Sphinx with MyST
+Markdown. To build and serve locally:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>cuda-oxide-book
+make<span class="w"> </span>setup<span class="w">      </span><span class="c1"># creates venv, installs dependencies</span>
+<span class="nb">source</span><span class="w"> </span>.venv/bin/activate
+make<span class="w"> </span>livehtml<span class="w">   </span><span class="c1"># starts dev server on http://localhost:8000</span>
+</pre></div>
+</div>
+</section>
+<section id="generating-api-documentation">
+<h2>Generating API documentation<a class="headerlink" href="#generating-api-documentation" title="連結到這個標頭">#</a></h2>
+<p>Standard <code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">doc</span></code> works for the workspace crates:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cargo<span class="w"> </span>doc<span class="w"> </span>--no-deps<span class="w"> </span>--open
+</pre></div>
+</div>
+<p>This generates rustdoc for <code class="docutils literal notranslate"><span class="pre">cuda-device</span></code>, <code class="docutils literal notranslate"><span class="pre">cuda-core</span></code>, <code class="docutils literal notranslate"><span class="pre">cuda-async</span></code>, and all
+other workspace members. The codegen backend is excluded since it is not a
+workspace member.</p>
+</section>
+<section id="workspace-structure">
+<h2>工作空間結構<a class="headerlink" href="#workspace-structure" title="連結到這個標頭">#</a></h2>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>cuda-oxide/
+├── Cargo.toml              # Workspace root
+├── rust-toolchain.toml     # Pinned nightly + components
+├── crates/
+│   ├── cuda-device/          # Device intrinsics (#![no_std])
+│   ├── cuda-host/            # Host launch APIs
+│   ├── cuda-macros/          # Proc macros (#[kernel], #[device], gpu_printf!)
+│   ├── cuda-bindings/        # Raw bindgen FFI to cuda.h
+│   ├── cuda-core/            # Safe RAII wrappers (CudaContext, DeviceBuffer)
+│   ├── cuda-async/           # Async execution (DeviceOperation, DeviceFuture)
+│   ├── cargo-oxide/          # Cargo subcommand
+│   ├── rustc-codegen-cuda/   # Codegen backend (not a workspace member)
+│   ├── mir-importer/         # MIR → Pliron IR translation
+│   ├── mir-lower/            # `dialect-mir` → LLVM dialect lowering
+│   ├── dialect-mir/          # pliron dialect modelling Rust MIR
+│   ├── llvm-export/          # shim re-exporting pliron-llvm + textual .ll export
+│   ├── dialect-nvvm/         # NVVM intrinsics dialect
+│   ├── libnvvm-sys/          # dlopen bindings to libNVVM
+│   ├── nvjitlink-sys/        # dlopen bindings to nvJitLink
+│   ├── reserved-oxide-symbols/ # Shared naming contract
+│   └── fuzzer/               # Differential testing support
+└── cuda-oxide-book/        # This book (Sphinx + MyST)
+</pre></div>
+</div>
+</section>
+<section id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="連結到這個標頭">#</a></h2>
+<dl class="simple myst">
+<dt><code class="docutils literal notranslate"><span class="pre">llc</span></code> not found or missing NVPTX</dt><dd><p>The fastest fix is <code class="docutils literal notranslate"><span class="pre">rustup</span> <span class="pre">component</span> <span class="pre">add</span> <span class="pre">llvm-tools</span></code> — the pinned
+toolchain's <code class="docutils literal notranslate"><span class="pre">llc</span></code> is LLVM 22 with NVPTX enabled and is auto-picked up.
+Otherwise install a system LLVM 21+ (<code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt</span> <span class="pre">install</span> <span class="pre">llvm-21</span></code>); the
+pipeline probes the rustup <code class="docutils literal notranslate"><span class="pre">llc</span></code> first, then <code class="docutils literal notranslate"><span class="pre">llc-22</span></code> → <code class="docutils literal notranslate"><span class="pre">llc-21</span></code> on
+<code class="docutils literal notranslate"><span class="pre">PATH</span></code>. To pin a specific binary set <code class="docutils literal notranslate"><span class="pre">CUDA_OXIDE_LLC=/path/to/llc</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">Intrinsic</span> <span class="pre">has</span> <span class="pre">incorrect</span> <span class="pre">argument</span> <span class="pre">type!</span></code> (from <code class="docutils literal notranslate"><span class="pre">llc</span></code>)</dt><dd><p>Your <code class="docutils literal notranslate"><span class="pre">llc</span></code> is older than LLVM 21 and cannot lower the modern TMA / tcgen05
+/ WGMMA intrinsic signatures. Install <code class="docutils literal notranslate"><span class="pre">llvm-21</span></code> and re-run.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">error[E0463]:</span> <span class="pre">can't</span> <span class="pre">find</span> <span class="pre">crate</span> <span class="pre">for</span> <span class="pre">rustc_middle</span></code></dt><dd><p>You are missing the <code class="docutils literal notranslate"><span class="pre">rustc-dev</span></code> component. Run:
+<code class="docutils literal notranslate"><span class="pre">rustup</span> <span class="pre">component</span> <span class="pre">add</span> <span class="pre">rustc-dev</span> <span class="pre">--toolchain</span> <span class="pre">nightly-2026-04-03</span></code>.</p>
+</dd>
+<dt>CUDA driver version mismatch</dt><dd><p>The toolkit version (compile-time) and driver version (runtime) must be
+compatible. Run <code class="docutils literal notranslate"><span class="pre">nvidia-smi</span></code> to check the driver version, and
+<code class="docutils literal notranslate"><span class="pre">nvcc</span> <span class="pre">--version</span></code> for the toolkit.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">oxide</span> <span class="pre">doctor</span></code> fails on codegen backend</dt><dd><p>The backend is built on first use. If the build fails, check that
+<code class="docutils literal notranslate"><span class="pre">rust-src</span></code> is installed and that the nightly version matches
+<code class="docutils literal notranslate"><span class="pre">rust-toolchain.toml</span></code>.</p>
+</dd>
+</dl>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../compiler/fuzzing-and-differential-testing.html"
+       title="上一页">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">上一頁</p>
+        <p class="prev-next-title">Fuzzing and Differential Testing</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="api-quick-reference.html"
+       title="下一页">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">下一頁</p>
+        <p class="prev-next-title">API Quick Reference</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> 当前页面
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#requirements">Requirements</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clone-the-repository">Clone the repository</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#install-the-rust-toolchain">Install the Rust toolchain</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#install-cuda">安裝 CUDA</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#install-llvm-usually-optional">Install LLVM (usually optional)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#install-clang-for-host-cuda-bindings">Install Clang (for host <code class="docutils literal notranslate"><span class="pre">cuda-bindings</span></code>)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#build-the-workspace">建置工作空間</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#install-cargo-oxide">Install cargo-oxide</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#verify-the-installation">Verify the installation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#common-commands">Common commands</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#building-the-book">Building the book</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generating-api-documentation">Generating API documentation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#workspace-structure">工作空間結構</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#troubleshooting">Troubleshooting</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+    <div class="footer-items__center">
+      
+        <div class="footer-item"><footer class="bd-footer-content">
+  <div class="footer-container" style="padding: 1rem 0 2rem 0; border-top: 1px solid var(--pst-color-border); text-align: left;">
+    
+    <!-- NVIDIA Logo -->
+    <div style="margin-bottom: 1rem;">
+      <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem; filter: brightness(0);"
+           class="only-light">
+      <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem;"
+           class="only-dark pst-js-only">
+    </div>
+    
+    <!-- Footer Links - single line, left aligned -->
+    <div style="font-size: 0.8125rem; margin-bottom: 0.5rem; color: var(--pst-color-text-muted);">
+      <a href="https://www.nvidia.com/en-us/about-nvidia/privacy-policy/" target="_blank" style="color: inherit; text-decoration: none;">Privacy Policy</a> | 
+      <a href="https://www.nvidia.com/en-us/preferences/email-preferences/" target="_blank" style="color: inherit; text-decoration: none;">Your Privacy Choices</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/terms-of-service/" target="_blank" style="color: inherit; text-decoration: none;">Terms of Service</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/accessibility/" target="_blank" style="color: inherit; text-decoration: none;">Accessibility</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/company-policies/" target="_blank" style="color: inherit; text-decoration: none;">Corporate Policies</a> | 
+      <a href="https://www.nvidia.com/en-us/product-security/" target="_blank" style="color: inherit; text-decoration: none;">Product Security</a> | 
+      <a href="https://www.nvidia.com/en-us/contact/" target="_blank" style="color: inherit; text-decoration: none;">Contact</a>
+    </div>
+    
+    <!-- Copyright -->
+    <div style="font-size: 0.8125rem; color: var(--pst-color-text-muted);">
+      Copyright &copy; 2025-2026, NVIDIA.
+    </div>
+    
+  </div>
+</footer></div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

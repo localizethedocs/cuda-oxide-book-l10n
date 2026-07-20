@@ -1,0 +1,878 @@
+
+<!DOCTYPE html>
+
+
+<html lang="zh-CN" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Combinators and Composition &#8212; cuda-oxide</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/nvidia-sphinx-theme.css?v=5d97cc0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=196aea71" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/lightbox.css?v=31fdf494" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../_static/documentation_options.js?v=d786bb5c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/translations.js?v=540d3cec"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'async-programming/combinators-and-composition';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../_static/js/lightbox.js?v=8cf6bc2b"></script>
+    <script src="../_static/js/spa-nav.js?v=9a4d0bbe"></script>
+    <link rel="canonical" href="https://projects.localizethedocs.org/cuda-oxide-book-l10n/async-programming/combinators-and-composition.html" />
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="Scheduling and Streams" href="scheduling-and-streams.html" />
+    <link rel="prev" title="The DeviceOperation Model" href="the-device-operation-model.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="zh-CN"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+<script type="text/javascript" src="../ltd-provenance.js"></script>
+<script type="text/javascript" src="../ltd-current.js"></script>
+<script type="text/javascript" src="../../../ltd-config.js"></script>
+<script type="text/javascript" src="../../../ltd-flyout.js"></script>
+
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">跳转至主要内容</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>回到顶部</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="版本警告"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="网页导航">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">cuda-oxide</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="亮色"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="暗色"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>亮色</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>暗色</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="当前页面">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="亮色"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="暗色"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>亮色</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>暗色</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><div class="sidebar-tree">
+    <p class="sidebar-tree-title">
+        Table of Contents
+    </p>
+    <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/hello-gpu.html">Writing Your First Kernel</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Writing GPU Programs</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/execution-model.html">The CUDA Execution Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/kernels-and-device-functions.html">Kernels and Device Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/memory-and-data-movement.html">Memory and Data Movement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/launching-kernels.html">Launching Kernels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/closures-and-generics.html">Closures and Generics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/error-handling-and-debugging.html">Error Handling and Debugging</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Safety on the GPU</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-safety/the-safety-model.html">The Safety Model</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Async GPU Programming</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="the-device-operation-model.html">The DeviceOperation Model</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Combinators and Composition</a></li>
+<li class="toctree-l1"><a class="reference internal" href="scheduling-and-streams.html">Scheduling and Streams</a></li>
+<li class="toctree-l1"><a class="reference internal" href="concurrent-execution.html">Concurrent Execution</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Building a Real Application</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../projects/async-mlp-pipeline.html">Project: Async MLP Pipeline</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Advanced GPU Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/shared-memory-and-synchronization.html">Shared Memory and Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/warp-level-programming.html">Warp-Level Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/tensor-memory-accelerator.html">Tensor Memory Accelerator (TMA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/matrix-multiply-accelerators.html">Matrix Multiply Accelerators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cluster-programming.html">Cluster Programming</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Inside the Compiler</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/architecture-overview.html">Architecture Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/pliron.html">Pliron -- Pliron IR (MLIR-like)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/rustc-public.html">rustc_public -- Stable MIR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/rustc-codegen-cuda.html">The Code Generator: rustc-codegen-cuda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/mir-importer.html">The MIR Importer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/compiler-optimizations.html">Compiler Optimizations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/mlir-dialects.html">Pliron Dialects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/lowering-pipeline.html">The Lowering Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/adding-new-intrinsics.html">Adding New Intrinsics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/fuzzing-and-differential-testing.html">Fuzzing and Differential Testing</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Appendix</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/building-from-source.html">Building from Source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/api-quick-reference.html">API Quick Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/supported-features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/cuda-cpp-comparison.html">cuda-oxide vs CUDA C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/ecosystem.html">The Rust + GPU Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/glossary.html">Glossary</a></li>
+</ul>
+
+</div></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="初始页面">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Combinators and Composition</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="combinators-and-composition">
+<h1>Combinators and Composition<a class="headerlink" href="#combinators-and-composition" title="链接到此标题。">#</a></h1>
+<p>A single kernel launch is rarely the whole story. A real GPU workload might
+upload input data, multiply two matrices, apply an activation function, and
+copy the result back to the host -- four distinct operations that must happen
+in exactly that order. This chapter shows how cuda-oxide's combinator system
+lets you snap these pieces together into a pipeline that stays lazy and
+stream-agnostic until the moment you execute it.</p>
+<div class="admonition seealso">
+<p class="admonition-title">参见</p>
+<p><a class="reference internal" href="the-device-operation-model.html"><span class="std std-doc">The DeviceOperation Model</span></a> for the foundational
+trait and execution methods that combinators build on.</p>
+</div>
+<section id="the-problem-multi-step-gpu-work">
+<h2>The problem: multi-step GPU work<a class="headerlink" href="#the-problem-multi-step-gpu-work" title="链接到此标题。">#</a></h2>
+<p>Imagine you are building a simple neural-network forward pass. The steps are:</p>
+<ol class="arabic simple">
+<li><p><strong>Upload</strong> the input batch from host to device.</p></li>
+<li><p><strong>GEMM</strong> -- multiply the input by weight matrix W0.</p></li>
+<li><p><strong>ReLU</strong> -- apply an activation function to the result.</p></li>
+<li><p><strong>Download</strong> the output back to the host.</p></li>
+</ol>
+<p>Each step depends on the previous one. You cannot run the GEMM until the upload
+finishes, and you cannot download until the ReLU is done. In the synchronous
+world, you would write four separate <code class="docutils literal notranslate"><span class="pre">.sync()</span></code> calls:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="n">input</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">h2d</span><span class="p">(</span><span class="n">batch_data</span><span class="p">).</span><span class="n">sync</span><span class="p">()</span><span class="o">?</span><span class="p">;</span><span class="w">       </span><span class="c1">// upload</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">hidden</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">launch_gemm</span><span class="p">(</span><span class="n">input</span><span class="p">,</span><span class="w"> </span><span class="n">w0</span><span class="p">).</span><span class="n">sync</span><span class="p">()</span><span class="o">?</span><span class="p">;</span><span class="w"> </span><span class="c1">// GEMM</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">launch_relu</span><span class="p">(</span><span class="n">hidden</span><span class="p">).</span><span class="n">sync</span><span class="p">()</span><span class="o">?</span><span class="p">;</span><span class="w">    </span><span class="c1">// ReLU</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d2h</span><span class="p">(</span><span class="n">output</span><span class="p">).</span><span class="n">sync</span><span class="p">()</span><span class="o">?</span><span class="p">;</span><span class="w">            </span><span class="c1">// download</span>
+</pre></div>
+</div>
+<p>This works, but it has a problem. Each <code class="docutils literal notranslate"><span class="pre">.sync()</span></code> goes through the scheduling
+policy, which may assign a <em>different</em> stream each time. Between streams there
+are no ordering guarantees -- the GEMM might start before the upload finishes on
+a different stream. And even if the policy happens to pick the same stream,
+every <code class="docutils literal notranslate"><span class="pre">.sync()</span></code> blocks the host thread, submits one operation, blocks again,
+submits the next, and so on. You are paying the round-trip cost of &quot;hand the
+recipe to the kitchen, wait for the dish, hand the next recipe&quot; four times over.</p>
+<p>What you really want is to write the entire meal plan on one card and hand it to
+the kitchen once.</p>
+</section>
+<section id="and-then-when-this-finishes-do-that">
+<h2><code class="docutils literal notranslate"><span class="pre">and_then</span></code> -- &quot;when this finishes, do that&quot;<a class="headerlink" href="#and-then-when-this-finishes-do-that" title="链接到此标题。">#</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">and_then</span></code> combinator chains two operations: run the first, pass its output
+to a closure, and the closure produces the second operation. Both run on the
+<strong>same stream</strong>, so CUDA's in-order guarantee means the second always sees the
+first's results:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="n">pipeline</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">h2d</span><span class="p">(</span><span class="n">batch_data</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="n">and_then</span><span class="p">(</span><span class="o">|</span><span class="n">input</span><span class="o">|</span><span class="w"> </span><span class="n">launch_gemm</span><span class="p">(</span><span class="n">input</span><span class="p">,</span><span class="w"> </span><span class="n">w0</span><span class="p">))</span>
+<span class="w">    </span><span class="p">.</span><span class="n">and_then</span><span class="p">(</span><span class="o">|</span><span class="n">hidden</span><span class="o">|</span><span class="w"> </span><span class="n">launch_relu</span><span class="p">(</span><span class="n">hidden</span><span class="p">))</span>
+<span class="w">    </span><span class="p">.</span><span class="n">and_then</span><span class="p">(</span><span class="o">|</span><span class="n">output</span><span class="o">|</span><span class="w"> </span><span class="n">d2h</span><span class="p">(</span><span class="n">output</span><span class="p">));</span>
+
+<span class="kd">let</span><span class="w"> </span><span class="n">result</span><span class="p">:</span><span class="w"> </span><span class="nb">Vec</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pipeline</span><span class="p">.</span><span class="n">sync</span><span class="p">()</span><span class="o">?</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>The entire chain is a single <code class="docutils literal notranslate"><span class="pre">DeviceOperation</span></code>. No GPU work happens when you
+write it -- you are just describing the sequence. When you call <code class="docutils literal notranslate"><span class="pre">.sync()</span></code>, the
+scheduling policy picks <strong>one</strong> stream, and the chain runs from top to bottom on
+that stream. One trip to the kitchen, one wait, four courses.</p>
+<section id="how-data-flows-through-the-chain">
+<h3>How data flows through the chain<a class="headerlink" href="#how-data-flows-through-the-chain" title="链接到此标题。">#</a></h3>
+<p>Each <code class="docutils literal notranslate"><span class="pre">and_then</span></code> closure receives the previous stage's <code class="docutils literal notranslate"><span class="pre">Output</span></code> as its argument.
+The closure must return a new <code class="docutils literal notranslate"><span class="pre">DeviceOperation</span></code>, which becomes the next link in
+the chain:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>h2d(batch)         → DeviceBox&lt;[f32]&gt;
+    │
+    └─ and_then ─► launch_gemm(input, w0)   → DeviceBox&lt;[f32]&gt;
+                        │
+                        └─ and_then ─► launch_relu(hidden)   → DeviceBox&lt;[f32]&gt;
+                                            │
+                                            └─ and_then ─► d2h(output)   → Vec&lt;f32&gt;
+</pre></div>
+</div>
+<p>The type of the whole chain is inferred by the compiler. You never need to name
+the intermediate types -- they flow through the closures automatically.</p>
+</section>
+<section id="carrying-extra-data-with-value">
+<h3>Carrying extra data with <code class="docutils literal notranslate"><span class="pre">value()</span></code><a class="headerlink" href="#carrying-extra-data-with-value" title="链接到此标题。">#</a></h3>
+<p>Kernel launches produce <code class="docutils literal notranslate"><span class="pre">()</span></code> -- they work through side effects on device memory,
+not return values. But the next stage needs the buffer handles, the module
+reference, and possibly other metadata. The trick is to use <code class="docutils literal notranslate"><span class="pre">value()</span></code> to bundle
+everything the next stage needs:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="n">pipeline</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">launch_gemm</span><span class="p">(</span><span class="n">input</span><span class="p">,</span><span class="w"> </span><span class="n">hidden</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="n">and_then</span><span class="p">(</span><span class="k">move</span><span class="w"> </span><span class="o">|</span><span class="p">()</span><span class="o">|</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// The kernel produced () but we still have `hidden` and `module`</span>
+<span class="w">        </span><span class="c1">// from the enclosing scope. Pack them up for the next stage.</span>
+<span class="w">        </span><span class="n">value</span><span class="p">((</span><span class="n">hidden</span><span class="p">,</span><span class="w"> </span><span class="n">module</span><span class="p">))</span>
+<span class="w">    </span><span class="p">})</span>
+<span class="w">    </span><span class="p">.</span><span class="n">and_then</span><span class="p">(</span><span class="k">move</span><span class="w"> </span><span class="o">|</span><span class="p">(</span><span class="n">hidden</span><span class="p">,</span><span class="w"> </span><span class="n">module</span><span class="p">)</span><span class="o">|</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">launch_relu</span><span class="p">(</span><span class="n">hidden</span><span class="p">,</span><span class="w"> </span><span class="n">module</span><span class="p">)</span>
+<span class="w">    </span><span class="p">});</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">move</span></code> keyword is important -- each closure captures the data it needs by
+ownership. When the closure runs, it consumes those values and passes them
+forward via <code class="docutils literal notranslate"><span class="pre">value()</span></code>. This is Rust's ownership system doing exactly what it
+was designed for: ensuring each buffer is used by exactly one stage at a time,
+with no dangling references.</p>
+</section>
+<section id="and-then-with-context-when-you-need-the-stream">
+<h3><code class="docutils literal notranslate"><span class="pre">and_then_with_context</span></code> -- when you need the stream<a class="headerlink" href="#and-then-with-context-when-you-need-the-stream" title="链接到此标题。">#</a></h3>
+<p>Sometimes a closure between stages needs to perform a raw CUDA operation --
+an async memory copy, an event record, or a synchronization call. These
+require the <code class="docutils literal notranslate"><span class="pre">CUstream</span></code> handle, which is not available in a normal <code class="docutils literal notranslate"><span class="pre">and_then</span></code>
+closure. <code class="docutils literal notranslate"><span class="pre">and_then_with_context</span></code> passes both the previous result and the
+<code class="docutils literal notranslate"><span class="pre">ExecutionContext</span></code>:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="n">pipeline</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">launch_kernel</span><span class="p">(</span><span class="n">input</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="n">and_then_with_context</span><span class="p">(</span><span class="o">|</span><span class="n">ctx</span><span class="p">,</span><span class="w"> </span><span class="n">gpu_result</span><span class="o">|</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">stream</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ctx</span><span class="p">.</span><span class="n">get_cuda_stream</span><span class="p">();</span>
+<span class="w">        </span><span class="n">copy_result_to_staging</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span><span class="w"> </span><span class="n">gpu_result</span><span class="p">)</span>
+<span class="w">    </span><span class="p">});</span>
+</pre></div>
+</div>
+<p>Use this sparingly -- most pipelines can be built entirely with <code class="docutils literal notranslate"><span class="pre">and_then</span></code> and
+the helper functions (<code class="docutils literal notranslate"><span class="pre">h2d</span></code>, <code class="docutils literal notranslate"><span class="pre">d2h</span></code>, <code class="docutils literal notranslate"><span class="pre">zeros</span></code>) that internally use <code class="docutils literal notranslate"><span class="pre">with_context</span></code>.</p>
+</section>
+</section>
+<section id="zip-bundling-independent-work">
+<h2><code class="docutils literal notranslate"><span class="pre">zip!</span></code> -- bundling independent work<a class="headerlink" href="#zip-bundling-independent-work" title="链接到此标题。">#</a></h2>
+<p>Not everything is sequential. Before you can run the forward pass, you need to
+allocate three buffers: the input, a scratch buffer for the hidden layer, and an
+output buffer. These allocations are independent -- none depends on the others.
+But each one returns a value you need later.</p>
+<p>If you used <code class="docutils literal notranslate"><span class="pre">and_then</span></code> for all three, you would end up nesting closures awkwardly
+to carry all the results forward:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="c1">// Don&#39;t do this -- it works but is hard to read</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">pipeline</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">h2d</span><span class="p">(</span><span class="n">batch_data</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="n">and_then</span><span class="p">(</span><span class="o">|</span><span class="n">input</span><span class="o">|</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">zeros</span><span class="p">(</span><span class="n">DIM</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">DIM</span><span class="p">).</span><span class="n">and_then</span><span class="p">(</span><span class="k">move</span><span class="w"> </span><span class="o">|</span><span class="n">hidden</span><span class="o">|</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">zeros</span><span class="p">(</span><span class="n">DIM</span><span class="p">).</span><span class="n">and_then</span><span class="p">(</span><span class="k">move</span><span class="w"> </span><span class="o">|</span><span class="n">output</span><span class="o">|</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">value</span><span class="p">((</span><span class="n">input</span><span class="p">,</span><span class="w"> </span><span class="n">hidden</span><span class="p">,</span><span class="w"> </span><span class="n">output</span><span class="p">))</span>
+<span class="w">            </span><span class="p">})</span>
+<span class="w">        </span><span class="p">})</span>
+<span class="w">    </span><span class="p">});</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">zip!</span></code> solves this by combining independent operations into a single operation
+that returns a tuple of their results:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_async</span><span class="p">::</span><span class="n">zip</span><span class="p">;</span>
+
+<span class="kd">let</span><span class="w"> </span><span class="n">pipeline</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">zip</span><span class="o">!</span><span class="p">(</span><span class="n">h2d</span><span class="p">(</span><span class="n">batch_data</span><span class="p">),</span><span class="w"> </span><span class="n">zeros</span><span class="p">(</span><span class="n">DIM</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">DIM</span><span class="p">),</span><span class="w"> </span><span class="n">zeros</span><span class="p">(</span><span class="n">DIM</span><span class="p">));</span>
+<span class="c1">// pipeline: impl DeviceOperation&lt;Output = (DeviceBox, DeviceBox, DeviceBox)&gt;</span>
+
+<span class="kd">let</span><span class="w"> </span><span class="p">(</span><span class="n">input</span><span class="p">,</span><span class="w"> </span><span class="n">hidden</span><span class="p">,</span><span class="w"> </span><span class="n">output</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pipeline</span><span class="p">.</span><span class="n">sync</span><span class="p">()</span><span class="o">?</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Much cleaner. <code class="docutils literal notranslate"><span class="pre">zip!</span></code> accepts two or three arguments and executes them in
+sequence on the same stream. The results are collected into a tuple and
+returned together.</p>
+<div class="admonition tip">
+<p class="admonition-title">小技巧</p>
+<p>The name <code class="docutils literal notranslate"><span class="pre">zip</span></code> comes from the data-composition pattern -- two independent
+results zipped into a tuple -- not from parallel execution. All arms run on
+the same stream in order. For true concurrent execution across streams, see
+<a class="reference internal" href="concurrent-execution.html"><span class="std std-doc">Concurrent Execution</span></a>.</p>
+</div>
+<section id="combining-zip-with-and-then">
+<h3>Combining <code class="docutils literal notranslate"><span class="pre">zip!</span></code> with <code class="docutils literal notranslate"><span class="pre">and_then</span></code><a class="headerlink" href="#combining-zip-with-and-then" title="链接到此标题。">#</a></h3>
+<p>The real power shows when you combine them. <code class="docutils literal notranslate"><span class="pre">zip!</span></code> handles the independent
+setup, and <code class="docutils literal notranslate"><span class="pre">and_then</span></code> handles the dependent pipeline:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="n">pipeline</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">zip</span><span class="o">!</span><span class="p">(</span><span class="n">h2d</span><span class="p">(</span><span class="n">batch_data</span><span class="p">),</span><span class="w"> </span><span class="n">zeros</span><span class="p">(</span><span class="n">DIM</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">DIM</span><span class="p">),</span><span class="w"> </span><span class="n">zeros</span><span class="p">(</span><span class="n">DIM</span><span class="p">))</span>
+<span class="w">    </span><span class="p">.</span><span class="n">and_then</span><span class="p">(</span><span class="o">|</span><span class="p">(</span><span class="n">input</span><span class="p">,</span><span class="w"> </span><span class="n">hidden</span><span class="p">,</span><span class="w"> </span><span class="n">output</span><span class="p">)</span><span class="o">|</span><span class="w"> </span><span class="n">launch_gemm</span><span class="p">(</span><span class="n">input</span><span class="p">,</span><span class="w"> </span><span class="n">hidden</span><span class="p">,</span><span class="w"> </span><span class="n">w0</span><span class="p">))</span>
+<span class="w">    </span><span class="p">.</span><span class="n">and_then</span><span class="p">(</span><span class="o">|</span><span class="n">hidden</span><span class="o">|</span><span class="w"> </span><span class="n">launch_relu</span><span class="p">(</span><span class="n">hidden</span><span class="p">))</span>
+<span class="w">    </span><span class="p">.</span><span class="n">and_then</span><span class="p">(</span><span class="o">|</span><span class="n">result</span><span class="o">|</span><span class="w"> </span><span class="n">d2h</span><span class="p">(</span><span class="n">result</span><span class="p">));</span>
+</pre></div>
+</div>
+<p>This reads almost like pseudocode: &quot;allocate three buffers, then GEMM, then
+ReLU, then download.&quot; The entire thing is one <code class="docutils literal notranslate"><span class="pre">DeviceOperation</span></code> that runs on
+one stream when you <code class="docutils literal notranslate"><span class="pre">.sync()</span></code> or <code class="docutils literal notranslate"><span class="pre">.await</span></code> it.</p>
+</section>
+</section>
+<section id="arc-sharing-results-across-pipelines">
+<h2><code class="docutils literal notranslate"><span class="pre">.arc()</span></code> -- sharing results across pipelines<a class="headerlink" href="#arc-sharing-results-across-pipelines" title="链接到此标题。">#</a></h2>
+<p>In a batch-processing scenario, you might load model weights once and share
+them across multiple forward passes. Each batch pipeline needs a reference to
+the weights, but <code class="docutils literal notranslate"><span class="pre">DeviceOperation</span></code> consumes its output by value. You cannot
+move the same <code class="docutils literal notranslate"><span class="pre">DeviceBox</span></code> into four different closures.</p>
+<p><code class="docutils literal notranslate"><span class="pre">.arc()</span></code> wraps the output in <code class="docutils literal notranslate"><span class="pre">Arc&lt;T&gt;</span></code>, making it cheaply cloneable:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="p">(</span><span class="n">w0</span><span class="p">,</span><span class="w"> </span><span class="n">w1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">zip</span><span class="o">!</span><span class="p">(</span>
+<span class="w">    </span><span class="n">h2d</span><span class="p">(</span><span class="n">w0_host</span><span class="p">).</span><span class="n">arc</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">h2d</span><span class="p">(</span><span class="n">w1_host</span><span class="p">).</span><span class="n">arc</span><span class="p">()</span>
+<span class="p">).</span><span class="k">await</span><span class="o">?</span><span class="p">;</span>
+
+<span class="c1">// w0: Arc&lt;DeviceBox&lt;[f32]&gt;&gt;  -- clone it into each batch</span>
+<span class="k">for</span><span class="w"> </span><span class="n">batch</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">batches</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">w0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">w0</span><span class="p">.</span><span class="n">clone</span><span class="p">();</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">w1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">w1</span><span class="p">.</span><span class="n">clone</span><span class="p">();</span>
+<span class="w">    </span><span class="n">tokio</span><span class="p">::</span><span class="n">spawn</span><span class="p">(</span><span class="n">build_forward_pass</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span><span class="w"> </span><span class="n">w0</span><span class="p">,</span><span class="w"> </span><span class="n">w1</span><span class="p">).</span><span class="n">into_future</span><span class="p">());</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The weight buffers live on the device, shared via <code class="docutils literal notranslate"><span class="pre">Arc</span></code>, and each batch pipeline
+holds a cheap <code class="docutils literal notranslate"><span class="pre">Arc::clone</span></code>. The weights stay alive as long as any batch is still
+using them, and Rust's reference counting handles the cleanup automatically.</p>
+</section>
+<section id="unzip-splitting-a-paired-result">
+<h2><code class="docutils literal notranslate"><span class="pre">unzip!</span></code> -- splitting a paired result<a class="headerlink" href="#unzip-splitting-a-paired-result" title="链接到此标题。">#</a></h2>
+<p>Occasionally you have an operation that produces a tuple but you want to feed
+each element into a different downstream chain. <code class="docutils literal notranslate"><span class="pre">unzip!</span></code> splits a pair-producing
+operation into two independent operations that share execution -- the source
+runs at most once:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_async</span><span class="p">::</span><span class="n">unzip</span><span class="p">;</span>
+
+<span class="kd">let</span><span class="w"> </span><span class="n">pair_op</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">zip</span><span class="o">!</span><span class="p">(</span><span class="n">allocate_a</span><span class="p">(),</span><span class="w"> </span><span class="n">allocate_b</span><span class="p">());</span>
+<span class="kd">let</span><span class="w"> </span><span class="p">(</span><span class="n">op_a</span><span class="p">,</span><span class="w"> </span><span class="n">op_b</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">unzip</span><span class="o">!</span><span class="p">(</span><span class="n">pair_op</span><span class="p">);</span>
+
+<span class="kd">let</span><span class="w"> </span><span class="n">result_a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">op_a</span><span class="p">.</span><span class="n">and_then</span><span class="p">(</span><span class="o">|</span><span class="n">a</span><span class="o">|</span><span class="w"> </span><span class="n">process_a</span><span class="p">(</span><span class="n">a</span><span class="p">));</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">result_b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">op_b</span><span class="p">.</span><span class="n">and_then</span><span class="p">(</span><span class="o">|</span><span class="n">b</span><span class="o">|</span><span class="w"> </span><span class="n">process_b</span><span class="p">(</span><span class="n">b</span><span class="p">));</span>
+</pre></div>
+</div>
+<p>Under the hood, <code class="docutils literal notranslate"><span class="pre">unzip!</span></code> creates a shared memoization node. Whichever branch
+executes first triggers the source; the second reads the cached result. This is
+useful for splitting a shared setup step into diverging downstream pipelines.</p>
+</section>
+<section id="putting-it-all-together-an-mlp-forward-pass">
+<h2>Putting it all together: an MLP forward pass<a class="headerlink" href="#putting-it-all-together-an-mlp-forward-pass" title="链接到此标题。">#</a></h2>
+<figure class="align-center" id="id1">
+<a class="reference internal image-reference" href="../_images/combinator-dataflow.svg"><img alt="../_images/combinator-dataflow.svg" src="../_images/combinator-dataflow.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">Data flow through an MLP forward pass built with combinators. <code class="docutils literal notranslate"><span class="pre">zip!</span></code> bundles
+three independent allocations at the top. Four <code class="docutils literal notranslate"><span class="pre">and_then</span></code> stages chain
+sequentially: GEMM, MatVec, ReLU, and D2H. Types flow between stages via
+<code class="docutils literal notranslate"><span class="pre">value()</span></code> tuples. The entire chain is one <code class="docutils literal notranslate"><span class="pre">DeviceOperation</span></code> — nothing executes
+until <code class="docutils literal notranslate"><span class="pre">.sync()</span></code> or <code class="docutils literal notranslate"><span class="pre">.await</span></code>.</span><a class="headerlink" href="#id1" title="链接到此图片">#</a></p>
+</figcaption>
+</figure>
+<p>Here is a simplified version of the <code class="docutils literal notranslate"><span class="pre">async_mlp</span></code> example that demonstrates
+every combinator working together. This function returns a single
+<code class="docutils literal notranslate"><span class="pre">DeviceOperation</span></code> describing the entire forward pass for one batch:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_async</span><span class="p">::</span><span class="n">launch</span><span class="p">::{</span><span class="n">AsyncKernelLaunchBuilder</span><span class="p">,</span><span class="w"> </span><span class="n">OwnedAsyncKernelLaunch</span><span class="p">};</span>
+
+<span class="k">fn</span><span class="w"> </span><span class="nf">forward_pass</span><span class="p">(</span>
+<span class="w">    </span><span class="n">batch</span><span class="p">:</span><span class="w"> </span><span class="nb">Vec</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">w0</span><span class="p">:</span><span class="w"> </span><span class="nc">Arc</span><span class="o">&lt;</span><span class="n">DeviceBox</span><span class="o">&lt;</span><span class="p">[</span><span class="kt">f32</span><span class="p">]</span><span class="o">&gt;&gt;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">w1</span><span class="p">:</span><span class="w"> </span><span class="nc">Arc</span><span class="o">&lt;</span><span class="n">DeviceBox</span><span class="o">&lt;</span><span class="p">[</span><span class="kt">f32</span><span class="p">]</span><span class="o">&gt;&gt;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">module</span><span class="p">:</span><span class="w"> </span><span class="nc">Arc</span><span class="o">&lt;</span><span class="n">CudaModule</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nc">impl</span><span class="w"> </span><span class="n">DeviceOperation</span><span class="o">&lt;</span><span class="n">Output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">Vec</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Setup: allocate input + scratch buffers (independent → zip them)</span>
+<span class="w">    </span><span class="n">zip</span><span class="o">!</span><span class="p">(</span><span class="n">h2d</span><span class="p">(</span><span class="n">batch</span><span class="p">),</span><span class="w"> </span><span class="n">zeros</span><span class="p">(</span><span class="n">DIM</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">DIM</span><span class="p">),</span><span class="w"> </span><span class="n">zeros</span><span class="p">(</span><span class="n">DIM</span><span class="p">))</span>
+<span class="w">        </span><span class="c1">// Stage 1: GEMM — hidden = input × W0</span>
+<span class="w">        </span><span class="p">.</span><span class="n">and_then</span><span class="p">(</span><span class="k">move</span><span class="w"> </span><span class="o">|</span><span class="p">(</span><span class="n">input</span><span class="p">,</span><span class="w"> </span><span class="n">hidden</span><span class="p">,</span><span class="w"> </span><span class="n">output</span><span class="p">)</span><span class="o">|</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="n">func</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">module</span><span class="p">.</span><span class="n">load_function</span><span class="p">(</span><span class="s">&quot;sgemm_naive&quot;</span><span class="p">).</span><span class="n">unwrap</span><span class="p">();</span>
+<span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">builder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AsyncKernelLaunchBuilder</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="n">Arc</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="n">func</span><span class="p">));</span>
+<span class="w">            </span><span class="n">builder</span><span class="p">.</span><span class="n">push_args</span><span class="p">((</span><span class="n">DIM</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">u32</span><span class="p">,</span><span class="w"> </span><span class="n">DIM</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">u32</span><span class="p">,</span><span class="w"> </span><span class="n">DIM</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">u32</span><span class="p">,</span>
+<span class="w">                               </span><span class="mf">1.0</span><span class="k">f32</span><span class="p">,</span>
+<span class="w">                               </span><span class="n">input</span><span class="p">.</span><span class="n">cu_deviceptr</span><span class="p">(),</span><span class="w"> </span><span class="n">input</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">u64</span><span class="p">,</span>
+<span class="w">                               </span><span class="n">w0</span><span class="p">.</span><span class="n">cu_deviceptr</span><span class="p">(),</span><span class="w"> </span><span class="n">w0</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">u64</span><span class="p">,</span>
+<span class="w">                               </span><span class="mf">0.0</span><span class="k">f32</span><span class="p">,</span>
+<span class="w">                               </span><span class="n">hidden</span><span class="p">.</span><span class="n">cu_deviceptr</span><span class="p">(),</span><span class="w"> </span><span class="n">hidden</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">u64</span><span class="p">));</span>
+<span class="w">            </span><span class="c1">// SAFETY: packet/config match sgemm_naive, the scheduler uses the</span>
+<span class="w">            </span><span class="c1">// module&#39;s context, and the owned wrapper retains its allocations.</span>
+<span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="n">launch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">builder</span><span class="p">.</span><span class="n">finalize_unchecked</span><span class="p">(</span><span class="n">gemm_cfg</span><span class="p">)</span><span class="w"> </span><span class="p">};</span>
+<span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="n">launch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OwnedAsyncKernelLaunch</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="n">launch</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">input</span><span class="p">,</span><span class="w"> </span><span class="n">w0</span><span class="p">,</span><span class="w"> </span><span class="n">hidden</span><span class="p">));</span>
+<span class="w">            </span><span class="c1">// Kernel returns (). Carry forward the buffers we still need.</span>
+<span class="w">            </span><span class="n">launch</span><span class="p">.</span><span class="n">and_then</span><span class="p">(</span><span class="k">move</span><span class="w"> </span><span class="o">|</span><span class="p">(</span><span class="n">_input</span><span class="p">,</span><span class="w"> </span><span class="n">_w0</span><span class="p">,</span><span class="w"> </span><span class="n">hidden</span><span class="p">)</span><span class="o">|</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">value</span><span class="p">((</span><span class="n">hidden</span><span class="p">,</span><span class="w"> </span><span class="n">output</span><span class="p">,</span><span class="w"> </span><span class="n">w1</span><span class="p">,</span><span class="w"> </span><span class="n">module</span><span class="p">))</span>
+<span class="w">            </span><span class="p">})</span>
+<span class="w">        </span><span class="p">})</span>
+<span class="w">        </span><span class="c1">// Stage 2: MatVec — output = hidden × W1</span>
+<span class="w">        </span><span class="p">.</span><span class="n">and_then</span><span class="p">(</span><span class="k">move</span><span class="w"> </span><span class="o">|</span><span class="p">(</span><span class="n">hidden</span><span class="p">,</span><span class="w"> </span><span class="n">output</span><span class="p">,</span><span class="w"> </span><span class="n">w1</span><span class="p">,</span><span class="w"> </span><span class="n">module</span><span class="p">)</span><span class="o">|</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="n">func</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">module</span><span class="p">.</span><span class="n">load_function</span><span class="p">(</span><span class="s">&quot;matvec_naive&quot;</span><span class="p">).</span><span class="n">unwrap</span><span class="p">();</span>
+<span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">builder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AsyncKernelLaunchBuilder</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="n">Arc</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="n">func</span><span class="p">));</span>
+<span class="w">            </span><span class="n">builder</span><span class="p">.</span><span class="n">push_args</span><span class="p">((</span><span class="n">DIM</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">u32</span><span class="p">,</span><span class="w"> </span><span class="n">DIM</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">u32</span><span class="p">,</span>
+<span class="w">                               </span><span class="n">hidden</span><span class="p">.</span><span class="n">cu_deviceptr</span><span class="p">(),</span><span class="w"> </span><span class="n">hidden</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">u64</span><span class="p">,</span>
+<span class="w">                               </span><span class="n">w1</span><span class="p">.</span><span class="n">cu_deviceptr</span><span class="p">(),</span><span class="w"> </span><span class="n">w1</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">u64</span><span class="p">,</span>
+<span class="w">                               </span><span class="n">output</span><span class="p">.</span><span class="n">cu_deviceptr</span><span class="p">(),</span><span class="w"> </span><span class="n">output</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">u64</span><span class="p">));</span>
+<span class="w">            </span><span class="c1">// SAFETY: packet/config match matvec_naive, the scheduler uses the</span>
+<span class="w">            </span><span class="c1">// module&#39;s context, and the owned wrapper retains its allocations.</span>
+<span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="n">launch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">builder</span><span class="p">.</span><span class="n">finalize_unchecked</span><span class="p">(</span><span class="n">matvec_cfg</span><span class="p">)</span><span class="w"> </span><span class="p">};</span>
+<span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="n">launch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OwnedAsyncKernelLaunch</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="n">launch</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">hidden</span><span class="p">,</span><span class="w"> </span><span class="n">w1</span><span class="p">,</span><span class="w"> </span><span class="n">output</span><span class="p">));</span>
+<span class="w">            </span><span class="n">launch</span><span class="p">.</span><span class="n">and_then</span><span class="p">(</span><span class="k">move</span><span class="w"> </span><span class="o">|</span><span class="p">(</span><span class="n">_hidden</span><span class="p">,</span><span class="w"> </span><span class="n">_w1</span><span class="p">,</span><span class="w"> </span><span class="n">output</span><span class="p">)</span><span class="o">|</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">value</span><span class="p">((</span><span class="n">output</span><span class="p">,</span><span class="w"> </span><span class="n">module</span><span class="p">))</span>
+<span class="w">            </span><span class="p">})</span>
+<span class="w">        </span><span class="p">})</span>
+<span class="w">        </span><span class="c1">// Stage 3: ReLU — result = max(0, output)</span>
+<span class="w">        </span><span class="p">.</span><span class="n">and_then</span><span class="p">(</span><span class="k">move</span><span class="w"> </span><span class="o">|</span><span class="p">(</span><span class="n">output</span><span class="p">,</span><span class="w"> </span><span class="n">module</span><span class="p">)</span><span class="o">|</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="n">func</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">module</span><span class="p">.</span><span class="n">load_function</span><span class="p">(</span><span class="s">&quot;relu&quot;</span><span class="p">).</span><span class="n">unwrap</span><span class="p">();</span>
+<span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">builder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AsyncKernelLaunchBuilder</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="n">Arc</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="n">func</span><span class="p">));</span>
+<span class="w">            </span><span class="n">builder</span><span class="p">.</span><span class="n">push_args</span><span class="p">((</span><span class="n">output</span><span class="p">.</span><span class="n">cu_deviceptr</span><span class="p">(),</span><span class="w"> </span><span class="n">output</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">u64</span><span class="p">,</span>
+<span class="w">                               </span><span class="n">output</span><span class="p">.</span><span class="n">cu_deviceptr</span><span class="p">(),</span><span class="w"> </span><span class="n">output</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">u64</span><span class="p">));</span>
+<span class="w">            </span><span class="c1">// SAFETY: packet/config match relu, the scheduler uses the module&#39;s</span>
+<span class="w">            </span><span class="c1">// context, and the owned wrapper retains output.</span>
+<span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="n">launch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">builder</span><span class="p">.</span><span class="n">finalize_unchecked</span><span class="p">(</span><span class="n">relu_cfg</span><span class="p">)</span><span class="w"> </span><span class="p">};</span>
+<span class="w">            </span><span class="n">OwnedAsyncKernelLaunch</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="n">launch</span><span class="p">,</span><span class="w"> </span><span class="n">output</span><span class="p">)</span>
+<span class="w">        </span><span class="p">})</span>
+<span class="w">        </span><span class="c1">// Stage 4: download result to host</span>
+<span class="w">        </span><span class="p">.</span><span class="n">and_then</span><span class="p">(</span><span class="n">d2h</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Study how data flows through this pipeline:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">zip!</span></code> produces three <code class="docutils literal notranslate"><span class="pre">DeviceBox</span></code> handles.</p></li>
+<li><p>The first <code class="docutils literal notranslate"><span class="pre">and_then</span></code> consumes all three, launches GEMM, and packs the
+buffers it still needs into a tuple via <code class="docutils literal notranslate"><span class="pre">value()</span></code>.</p></li>
+<li><p>The second <code class="docutils literal notranslate"><span class="pre">and_then</span></code> unpacks the tuple, launches MatVec, and passes
+forward only what the next stage needs.</p></li>
+<li><p>The third <code class="docutils literal notranslate"><span class="pre">and_then</span></code> launches ReLU in-place.</p></li>
+<li><p>The final <code class="docutils literal notranslate"><span class="pre">and_then</span></code> calls <code class="docutils literal notranslate"><span class="pre">d2h</span></code> to copy the result to the host.</p></li>
+</ol>
+<p>The entire function returns <code class="docutils literal notranslate"><span class="pre">impl</span> <span class="pre">DeviceOperation&lt;Output</span> <span class="pre">=</span> <span class="pre">Vec&lt;f32&gt;&gt;</span></code>. Nothing
+has executed. You can <code class="docutils literal notranslate"><span class="pre">.sync()</span></code> it, <code class="docutils literal notranslate"><span class="pre">.await</span></code> it, or hand it to <code class="docutils literal notranslate"><span class="pre">tokio::spawn</span></code>
+and let the scheduling policy figure out which stream to use.</p>
+<p><code class="docutils literal notranslate"><span class="pre">AsyncKernelLaunchBuilder</span></code> is inert and safe to populate. Only
+<code class="docutils literal notranslate"><span class="pre">finalize_unchecked(raw_config)</span></code> crosses the unsafe boundary and creates a
+runnable operation. <code class="docutils literal notranslate"><span class="pre">OwnedAsyncKernelLaunch</span></code> keeps each stage's buffers alive
+until that launch returns them. Application code should prefer generated
+owned-async methods with <code class="docutils literal notranslate"><span class="pre">PreparedLaunch&lt;K&gt;</span></code>; the low-level form above is useful
+when a module is loaded by name and no generated contract is available.</p>
+</section>
+<section id="quick-reference">
+<h2>Quick reference<a class="headerlink" href="#quick-reference" title="链接到此标题。">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Combinator</p></th>
+<th class="head text-left"><p>What it does</p></th>
+<th class="head text-left"><p>When to use it</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">.and_then(f)</span></code></p></td>
+<td class="text-left"><p>Run self, then <code class="docutils literal notranslate"><span class="pre">f(result)</span></code> on the same stream</p></td>
+<td class="text-left"><p>Sequential dependent stages</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">.and_then_with_context(f)</span></code></p></td>
+<td class="text-left"><p>Like <code class="docutils literal notranslate"><span class="pre">and_then</span></code> but <code class="docutils literal notranslate"><span class="pre">f</span></code> also gets the <code class="docutils literal notranslate"><span class="pre">ExecutionContext</span></code></p></td>
+<td class="text-left"><p>When the closure needs the raw stream</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">.apply(f)</span></code></p></td>
+<td class="text-left"><p>Alias for <code class="docutils literal notranslate"><span class="pre">and_then</span></code></p></td>
+<td class="text-left"><p>Whichever reads better in context</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">zip!(a,</span> <span class="pre">b)</span></code></p></td>
+<td class="text-left"><p>Run both, return <code class="docutils literal notranslate"><span class="pre">(A,</span> <span class="pre">B)</span></code></p></td>
+<td class="text-left"><p>Independent setup steps</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">zip!(a,</span> <span class="pre">b,</span> <span class="pre">c)</span></code></p></td>
+<td class="text-left"><p>Run all three, return <code class="docutils literal notranslate"><span class="pre">(A,</span> <span class="pre">B,</span> <span class="pre">C)</span></code></p></td>
+<td class="text-left"><p>Same, for three operands</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">.arc()</span></code></p></td>
+<td class="text-left"><p>Wrap output in <code class="docutils literal notranslate"><span class="pre">Arc&lt;T&gt;</span></code></p></td>
+<td class="text-left"><p>Sharing results across pipelines</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">unzip!(op)</span></code></p></td>
+<td class="text-left"><p>Split a tuple-producing op into two</p></td>
+<td class="text-left"><p>Diverging downstream chains</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">value(x)</span></code></p></td>
+<td class="text-left"><p>Wrap <code class="docutils literal notranslate"><span class="pre">x</span></code> as a no-op operation</p></td>
+<td class="text-left"><p>Feeding host data into pipelines</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">with_context(f)</span></code></p></td>
+<td class="text-left"><p>Defer construction until the stream is known</p></td>
+<td class="text-left"><p>Wrapping raw CUDA driver calls</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">参见</p>
+<p>The <a class="reference internal" href="concurrent-execution.html"><span class="std std-doc">Concurrent Execution</span></a> chapter shows how to run
+multiple pipelines concurrently using <code class="docutils literal notranslate"><span class="pre">tokio::spawn</span></code>, and the
+<a class="reference internal" href="scheduling-and-streams.html"><span class="std std-doc">Scheduling and Streams</span></a> chapter explains how the
+scheduling policy distributes pipelines across CUDA streams.</p>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="the-device-operation-model.html"
+       title="上一页">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">上一页</p>
+        <p class="prev-next-title">The DeviceOperation Model</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="scheduling-and-streams.html"
+       title="下一页">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">下一页</p>
+        <p class="prev-next-title">Scheduling and Streams</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> 当前页面
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-problem-multi-step-gpu-work">The problem: multi-step GPU work</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#and-then-when-this-finishes-do-that"><code class="docutils literal notranslate"><span class="pre">and_then</span></code> -- "when this finishes, do that"</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-data-flows-through-the-chain">How data flows through the chain</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#carrying-extra-data-with-value">Carrying extra data with <code class="docutils literal notranslate"><span class="pre">value()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#and-then-with-context-when-you-need-the-stream"><code class="docutils literal notranslate"><span class="pre">and_then_with_context</span></code> -- when you need the stream</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#zip-bundling-independent-work"><code class="docutils literal notranslate"><span class="pre">zip!</span></code> -- bundling independent work</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#combining-zip-with-and-then">Combining <code class="docutils literal notranslate"><span class="pre">zip!</span></code> with <code class="docutils literal notranslate"><span class="pre">and_then</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#arc-sharing-results-across-pipelines"><code class="docutils literal notranslate"><span class="pre">.arc()</span></code> -- sharing results across pipelines</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#unzip-splitting-a-paired-result"><code class="docutils literal notranslate"><span class="pre">unzip!</span></code> -- splitting a paired result</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#putting-it-all-together-an-mlp-forward-pass">Putting it all together: an MLP forward pass</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#quick-reference">Quick reference</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+    <div class="footer-items__center">
+      
+        <div class="footer-item"><footer class="bd-footer-content">
+  <div class="footer-container" style="padding: 1rem 0 2rem 0; border-top: 1px solid var(--pst-color-border); text-align: left;">
+    
+    <!-- NVIDIA Logo -->
+    <div style="margin-bottom: 1rem;">
+      <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem; filter: brightness(0);"
+           class="only-light">
+      <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem;"
+           class="only-dark pst-js-only">
+    </div>
+    
+    <!-- Footer Links - single line, left aligned -->
+    <div style="font-size: 0.8125rem; margin-bottom: 0.5rem; color: var(--pst-color-text-muted);">
+      <a href="https://www.nvidia.com/en-us/about-nvidia/privacy-policy/" target="_blank" style="color: inherit; text-decoration: none;">Privacy Policy</a> | 
+      <a href="https://www.nvidia.com/en-us/preferences/email-preferences/" target="_blank" style="color: inherit; text-decoration: none;">Your Privacy Choices</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/terms-of-service/" target="_blank" style="color: inherit; text-decoration: none;">Terms of Service</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/accessibility/" target="_blank" style="color: inherit; text-decoration: none;">Accessibility</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/company-policies/" target="_blank" style="color: inherit; text-decoration: none;">Corporate Policies</a> | 
+      <a href="https://www.nvidia.com/en-us/product-security/" target="_blank" style="color: inherit; text-decoration: none;">Product Security</a> | 
+      <a href="https://www.nvidia.com/en-us/contact/" target="_blank" style="color: inherit; text-decoration: none;">Contact</a>
+    </div>
+    
+    <!-- Copyright -->
+    <div style="font-size: 0.8125rem; color: var(--pst-color-text-muted);">
+      Copyright &copy; 2025-2026, NVIDIA.
+    </div>
+    
+  </div>
+</footer></div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

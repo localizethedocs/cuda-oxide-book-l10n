@@ -1,0 +1,804 @@
+
+<!DOCTYPE html>
+
+
+<html lang="zh-CN" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>The CUDA Execution Model &#8212; cuda-oxide</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/nvidia-sphinx-theme.css?v=5d97cc0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=196aea71" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/lightbox.css?v=31fdf494" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../_static/documentation_options.js?v=d786bb5c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/translations.js?v=540d3cec"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'gpu-programming/execution-model';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../_static/js/lightbox.js?v=8cf6bc2b"></script>
+    <script src="../_static/js/spa-nav.js?v=9a4d0bbe"></script>
+    <link rel="canonical" href="https://projects.localizethedocs.org/cuda-oxide-book-l10n/gpu-programming/execution-model.html" />
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="Kernels and Device Functions" href="kernels-and-device-functions.html" />
+    <link rel="prev" title="Writing Your First Kernel" href="../getting-started/hello-gpu.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="zh-CN"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+<script type="text/javascript" src="../ltd-provenance.js"></script>
+<script type="text/javascript" src="../ltd-current.js"></script>
+<script type="text/javascript" src="../../../ltd-config.js"></script>
+<script type="text/javascript" src="../../../ltd-flyout.js"></script>
+
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">跳转至主要内容</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>回到顶部</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="版本警告"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="网页导航">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">cuda-oxide</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="亮色"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="暗色"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>亮色</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>暗色</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="当前页面">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="亮色"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="暗色"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>亮色</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>暗色</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><div class="sidebar-tree">
+    <p class="sidebar-tree-title">
+        Table of Contents
+    </p>
+    <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/hello-gpu.html">Writing Your First Kernel</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Writing GPU Programs</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">The CUDA Execution Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kernels-and-device-functions.html">Kernels and Device Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="memory-and-data-movement.html">Memory and Data Movement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="launching-kernels.html">Launching Kernels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="closures-and-generics.html">Closures and Generics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="error-handling-and-debugging.html">Error Handling and Debugging</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Safety on the GPU</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-safety/the-safety-model.html">The Safety Model</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Async GPU Programming</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/the-device-operation-model.html">The DeviceOperation Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/combinators-and-composition.html">Combinators and Composition</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/scheduling-and-streams.html">Scheduling and Streams</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/concurrent-execution.html">Concurrent Execution</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Building a Real Application</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../projects/async-mlp-pipeline.html">Project: Async MLP Pipeline</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Advanced GPU Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/shared-memory-and-synchronization.html">Shared Memory and Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/warp-level-programming.html">Warp-Level Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/tensor-memory-accelerator.html">Tensor Memory Accelerator (TMA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/matrix-multiply-accelerators.html">Matrix Multiply Accelerators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cluster-programming.html">Cluster Programming</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Inside the Compiler</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/architecture-overview.html">Architecture Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/pliron.html">Pliron -- Pliron IR (MLIR-like)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/rustc-public.html">rustc_public -- Stable MIR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/rustc-codegen-cuda.html">The Code Generator: rustc-codegen-cuda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/mir-importer.html">The MIR Importer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/compiler-optimizations.html">Compiler Optimizations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/mlir-dialects.html">Pliron Dialects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/lowering-pipeline.html">The Lowering Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/adding-new-intrinsics.html">Adding New Intrinsics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/fuzzing-and-differential-testing.html">Fuzzing and Differential Testing</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Appendix</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/building-from-source.html">Building from Source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/api-quick-reference.html">API Quick Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/supported-features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/cuda-cpp-comparison.html">cuda-oxide vs CUDA C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/ecosystem.html">The Rust + GPU Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/glossary.html">Glossary</a></li>
+</ul>
+
+</div></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="初始页面">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">The CUDA Execution Model</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="the-cuda-execution-model">
+<h1>The CUDA Execution Model<a class="headerlink" href="#the-cuda-execution-model" title="链接到此标题。">#</a></h1>
+<p>This chapter covers the CUDA SIMT execution model -- how work is organized into
+threads, warps, blocks, and grids -- and how cuda-oxide exposes each level
+through safe, ergonomic Rust APIs.</p>
+<div class="admonition seealso">
+<p class="admonition-title">参见</p>
+<p><a class="reference external" href="https://docs.nvidia.com/cuda/cuda-programming-guide/#programming-model">CUDA Programming Guide -- Programming Model</a>
+for the authoritative reference on the CUDA execution model.</p>
+</div>
+<section id="threads-blocks-and-grids">
+<h2>Threads, blocks, and grids<a class="headerlink" href="#threads-blocks-and-grids" title="链接到此标题。">#</a></h2>
+<p>Every kernel launch creates a <strong>grid</strong> of <strong>thread blocks</strong>.
+The three-level hierarchy is the foundation of GPU programming:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Level</p></th>
+<th class="head text-left"><p>What it is</p></th>
+<th class="head text-left"><p>Size</p></th>
+<th class="head text-left"><p>Key property</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><strong>Grid</strong></p></td>
+<td class="text-left"><p>All blocks launched by one kernel call</p></td>
+<td class="text-left"><p>Up to 2³¹ - 1 blocks per dimension</p></td>
+<td class="text-left"><p>Blocks execute independently</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><strong>Block</strong></p></td>
+<td class="text-left"><p>A group of threads that can cooperate</p></td>
+<td class="text-left"><p>Up to 1024 threads</p></td>
+<td class="text-left"><p>Threads share fast on-chip memory</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><strong>Warp</strong></p></td>
+<td class="text-left"><p>32 consecutive threads within a block</p></td>
+<td class="text-left"><p>Always 32</p></td>
+<td class="text-left"><p>Execute instructions in lockstep (SIMT)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>A kernel launch specifies two things: how many blocks in the grid (the <strong>grid
+dimensions</strong>) and how many threads in each block (the <strong>block dimensions</strong>). The
+hardware then groups every 32 consecutive threads into warps automatically -- you
+never create warps explicitly.</p>
+<figure class="align-center" id="id1">
+<a class="reference internal image-reference" href="../_images/simt-thread-hierarchy.svg"><img alt="../_images/simt-thread-hierarchy.svg" src="../_images/simt-thread-hierarchy.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">The three-level CUDA thread hierarchy. A 2×2 grid of blocks, each containing
+256 threads arranged in 8 warps of 32. The bottom legend maps CUDA concepts to
+their cuda-oxide API equivalents.</span><a class="headerlink" href="#id1" title="链接到此图片">#</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="thread-indexing-in-cuda-oxide">
+<h2>Thread indexing in cuda-oxide<a class="headerlink" href="#thread-indexing-in-cuda-oxide" title="链接到此标题。">#</a></h2>
+<p>Inside a kernel, every thread needs to know <em>which</em> element it should work on.
+CUDA provides built-in variables (<code class="docutils literal notranslate"><span class="pre">threadIdx</span></code>, <code class="docutils literal notranslate"><span class="pre">blockIdx</span></code>, <code class="docutils literal notranslate"><span class="pre">blockDim</span></code>,
+<code class="docutils literal notranslate"><span class="pre">gridDim</span></code>); cuda-oxide wraps these in the <code class="docutils literal notranslate"><span class="pre">cuda_device::thread</span></code> module:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::{</span><span class="n">kernel</span><span class="p">,</span><span class="w"> </span><span class="n">thread</span><span class="p">,</span><span class="w"> </span><span class="n">DisjointSlice</span><span class="p">};</span>
+
+<span class="cp">#[kernel]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">vecadd</span><span class="p">(</span><span class="n">a</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span><span class="w"> </span><span class="n">b</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">c</span><span class="p">:</span><span class="w"> </span><span class="nc">DisjointSlice</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">thread</span><span class="p">::</span><span class="n">index_1d</span><span class="p">();</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nb">Some</span><span class="p">(</span><span class="n">c_elem</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">get_mut</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="o">*</span><span class="n">c_elem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="n">idx</span><span class="p">.</span><span class="n">get</span><span class="p">()]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="p">[</span><span class="n">idx</span><span class="p">.</span><span class="n">get</span><span class="p">()];</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">thread::index_1d()</span></code> computes <code class="docutils literal notranslate"><span class="pre">blockIdx.x</span> <span class="pre">*</span> <span class="pre">blockDim.x</span> <span class="pre">+</span> <span class="pre">threadIdx.x</span></code>. It maps
+threads to distinct array elements when grid and block Y/Z dimensions are 1.
+That is the common shape for 1D data-parallel kernels; a <code class="docutils literal notranslate"><span class="pre">domain</span> <span class="pre">=</span> <span class="pre">1</span></code> prepared
+launch proves it.</p>
+<p>For cases where you need individual components, cuda-oxide exposes the raw
+accessors:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>cuda-oxide API</p></th>
+<th class="head text-left"><p>Equivalent CUDA C++</p></th>
+<th class="head text-left"><p>Returns</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">thread::index_1d()</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">blockIdx.x</span> <span class="pre">*</span> <span class="pre">blockDim.x</span> <span class="pre">+</span> <span class="pre">threadIdx.x</span></code></p></td>
+<td class="text-left"><p>Global 1D thread index</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">thread::threadIdx_x()</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">threadIdx.x</span></code></p></td>
+<td class="text-left"><p>Thread's position within its block</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">thread::blockIdx_x()</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">blockIdx.x</span></code></p></td>
+<td class="text-left"><p>Block's position within the grid</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">thread::blockDim_x()</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">blockDim.x</span></code></p></td>
+<td class="text-left"><p>Number of threads per block (x)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">小技巧</p>
+<p>For multi-dimensional indexing (e.g., 2D matrix operations), use <code class="docutils literal notranslate"><span class="pre">threadIdx_y()</span></code>,
+<code class="docutils literal notranslate"><span class="pre">blockIdx_y()</span></code>, and <code class="docutils literal notranslate"><span class="pre">blockDim_y()</span></code> alongside the <code class="docutils literal notranslate"><span class="pre">_x</span></code> variants to compute
+row/column indices.</p>
+</div>
+</section>
+<section id="warps-and-simt-execution">
+<h2>Warps and SIMT execution<a class="headerlink" href="#warps-and-simt-execution" title="链接到此标题。">#</a></h2>
+<p>A <strong>warp</strong> is the fundamental scheduling unit on NVIDIA GPUs. Every 32
+consecutive threads in a block form one warp, and all 32 threads in a warp
+execute the <strong>same instruction</strong> at the <strong>same time</strong> -- but on <strong>different
+data</strong>. This model is called <strong>SIMT</strong> (Single Instruction, Multiple Thread).</p>
+<p>When all threads in a warp follow the same control-flow path, the warp achieves
+full throughput. When threads diverge (different threads take different <code class="docutils literal notranslate"><span class="pre">if</span></code>
+branches), the hardware serializes the paths: it executes one branch with some
+threads masked off, then the other branch, then reconverges. This is called
+<strong>branch divergence</strong> and it directly reduces throughput.</p>
+<figure class="align-center" id="id2">
+<a class="reference internal image-reference" href="../_images/simt-warp-execution.svg"><img alt="../_images/simt-warp-execution.svg" src="../_images/simt-warp-execution.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">Left: uniform execution where all 32 threads run the same instruction in one
+cycle. Right: branch divergence where even and odd threads take different
+paths, requiring two serial passes.</span><a class="headerlink" href="#id2" title="链接到此图片">#</a></p>
+</figcaption>
+</figure>
+<section id="why-this-matters">
+<h3>Why this matters<a class="headerlink" href="#why-this-matters" title="链接到此标题。">#</a></h3>
+<p>You don't need to think about warps to write <em>correct</em> kernels -- cuda-oxide
+handles the details. But understanding SIMT helps you write <em>fast</em> ones:</p>
+<ul class="simple">
+<li><p><strong>Prefer uniform control flow.</strong> When all threads in a warp evaluate the
+same branch, there is no divergence penalty.</p></li>
+<li><p><strong>Data-dependent branches are fine</strong> as long as nearby threads (those in the
+same warp) tend to take the same path.</p></li>
+<li><p><strong>Avoid thread-ID-based branching</strong> like <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">thread::threadIdx_x()</span> <span class="pre">%</span> <span class="pre">2</span> <span class="pre">==</span> <span class="pre">0</span></code>
+inside hot loops -- this guarantees every warp diverges.</p></li>
+</ul>
+<div class="admonition seealso">
+<p class="admonition-title">参见</p>
+<p><a class="reference external" href="https://docs.nvidia.com/cuda/cuda-programming-guide/#simt-architecture">CUDA Programming Guide -- SIMT Architecture</a>
+for the full hardware specification of warp execution and reconvergence.</p>
+</div>
+</section>
+</section>
+<section id="hardware-mapping">
+<h2>Hardware mapping<a class="headerlink" href="#hardware-mapping" title="链接到此标题。">#</a></h2>
+<p>When you launch a kernel, the GPU's hardware scheduler assigns each block to a
+<strong>Streaming Multiprocessor</strong> (SM). Multiple blocks can run concurrently on the
+same SM -- the exact number depends on the block's resource usage (registers,
+shared memory, threads).</p>
+<p>The key insight: <strong>you control the grid and block dimensions; the hardware
+controls everything else.</strong> You never specify which SM runs which block, or in
+what order blocks execute. This separation is what lets the same kernel scale
+from a laptop GPU with a handful of SMs to a data-center GPU with 100+.</p>
+<figure class="align-center" id="id3">
+<a class="reference internal image-reference" href="../_images/simt-hardware-mapping.svg"><img alt="../_images/simt-hardware-mapping.svg" src="../_images/simt-hardware-mapping.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">Eight blocks assigned to four SMs by the GPU scheduler. Each SM has its own
+warp schedulers, CUDA cores, and shared memory/L1 cache. Blocks 4-7 (dashed
+arrows) run after blocks 0-3 complete or are queued alongside them if
+resources permit.</span><a class="headerlink" href="#id3" title="链接到此图片">#</a></p>
+</figcaption>
+</figure>
+<section id="what-limits-concurrency">
+<h3>What limits concurrency<a class="headerlink" href="#what-limits-concurrency" title="链接到此标题。">#</a></h3>
+<p>Each SM has a fixed pool of resources. A block is assigned to an SM only if the
+SM has enough of <em>all</em> of the following:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Resource</p></th>
+<th class="head text-left"><p>Typical limit (Ampere)</p></th>
+<th class="head text-left"><p>Controlled by</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>Threads</p></td>
+<td class="text-left"><p>2048 per SM</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">block_dim</span></code></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Registers</p></td>
+<td class="text-left"><p>65536 per SM</p></td>
+<td class="text-left"><p>Compiler allocation</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Shared memory</p></td>
+<td class="text-left"><p>164 KB per SM (configurable)</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">shared_mem_bytes</span></code></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Block slots</p></td>
+<td class="text-left"><p>32 per SM</p></td>
+<td class="text-left"><p>Grid size</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>When a block finishes, its resources are freed and the scheduler immediately
+assigns a queued block to that SM. This is why launching <em>more</em> blocks than the
+GPU has SMs is not just okay -- it's the normal and expected pattern.</p>
+<div class="admonition seealso">
+<p class="admonition-title">参见</p>
+<p><a class="reference external" href="https://docs.nvidia.com/cuda/cuda-programming-guide/#hardware-implementation">CUDA Programming Guide -- Hardware Implementation</a>
+for architecture-specific SM resource limits and occupancy calculations.</p>
+</div>
+</section>
+</section>
+<section id="launch-configuration">
+<h2>Launch configuration<a class="headerlink" href="#launch-configuration" title="链接到此标题。">#</a></h2>
+<p>On the host side, <code class="docutils literal notranslate"><span class="pre">LaunchConfig</span></code> tells the runtime how to shape the grid:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_core</span><span class="p">::</span><span class="n">LaunchConfig</span><span class="p">;</span>
+
+<span class="c1">// Quick 1D launch: 256 threads per block, enough blocks to cover N elements</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">cfg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LaunchConfig</span><span class="p">::</span><span class="n">for_num_elems</span><span class="p">(</span><span class="n">N</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">u32</span><span class="p">);</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">for_num_elems</span></code> uses a block size of 256 and computes the grid size via ceiling
+division -- the right default for most element-wise kernels. For more control,
+construct <code class="docutils literal notranslate"><span class="pre">LaunchConfig</span></code> directly:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="n">cfg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LaunchConfig</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">grid_dim</span><span class="p">:</span><span class="w"> </span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span><span class="w">      </span><span class="c1">// 4×4 = 16 blocks</span>
+<span class="w">    </span><span class="n">block_dim</span><span class="p">:</span><span class="w"> </span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="w"> </span><span class="mi">16</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span><span class="w">   </span><span class="c1">// 16×16 = 256 threads per block</span>
+<span class="w">    </span><span class="n">shared_mem_bytes</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">       </span><span class="c1">// no dynamic shared memory</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>Then pass it to the generated raw launch method. The call is unsafe because
+<code class="docutils literal notranslate"><span class="pre">LaunchConfig</span></code> itself does not prove that hidden Y/Z dimensions are inactive:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="c1">// SAFETY: `for_num_elems` is 1D and all three buffers contain N elements.</span>
+<span class="k">unsafe</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">module</span><span class="p">.</span><span class="n">vecadd</span><span class="p">(</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="n">stream</span><span class="p">,</span>
+<span class="w">        </span><span class="n">LaunchConfig</span><span class="p">::</span><span class="n">for_num_elems</span><span class="p">(</span><span class="n">N</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">u32</span><span class="p">),</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="n">a_dev</span><span class="p">,</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="n">b_dev</span><span class="p">,</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">c_dev</span><span class="p">,</span>
+<span class="w">    </span><span class="p">)</span>
+<span class="p">}</span>
+<span class="p">.</span><span class="n">expect</span><span class="p">(</span><span class="s">&quot;Kernel launch failed&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Or with the async API:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="c1">// SAFETY: this is 1D, buffers contain N elements, and module/scheduler share a context.</span>
+<span class="k">unsafe</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">module</span><span class="p">.</span><span class="n">vecadd_async</span><span class="p">(</span>
+<span class="w">        </span><span class="n">LaunchConfig</span><span class="p">::</span><span class="n">for_num_elems</span><span class="p">(</span><span class="n">N</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">u32</span><span class="p">),</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="n">a_dev</span><span class="p">,</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="n">b_dev</span><span class="p">,</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">c_dev</span><span class="p">,</span>
+<span class="w">    </span><span class="p">)</span>
+<span class="p">}</span><span class="o">?</span>
+<span class="p">.</span><span class="n">sync</span><span class="p">()</span><span class="o">?</span><span class="p">;</span>
+</pre></div>
+</div>
+<section id="choosing-block-size">
+<span id="execution-choosing-block-size"></span><h3>Choosing block size<a class="headerlink" href="#choosing-block-size" title="链接到此标题。">#</a></h3>
+<p>The block size is the single most important tuning knob:</p>
+<ul class="simple">
+<li><p><strong>256 threads</strong> is a safe default. It balances occupancy (multiple blocks per
+SM) with register pressure on most architectures.</p></li>
+<li><p><strong>Powers of 2</strong> (128, 256, 512) align naturally with warp boundaries and
+avoid wasting threads.</p></li>
+<li><p><strong>Too small</strong> (&lt; 128) may leave warp schedulers underutilized.</p></li>
+<li><p><strong>Too large</strong> (1024) uses the full block thread limit, which may reduce the
+number of concurrent blocks per SM.</p></li>
+</ul>
+<p>The grid size follows from the block size and the problem size:
+<code class="docutils literal notranslate"><span class="pre">grid_x</span> <span class="pre">=</span> <span class="pre">(N</span> <span class="pre">+</span> <span class="pre">block_x</span> <span class="pre">-</span> <span class="pre">1)</span> <span class="pre">/</span> <span class="pre">block_x</span></code>. This is exactly what
+<code class="docutils literal notranslate"><span class="pre">LaunchConfig::for_num_elems</span></code> computes.</p>
+</section>
+<section id="bounds-checking">
+<h3>Bounds checking<a class="headerlink" href="#bounds-checking" title="链接到此标题。">#</a></h3>
+<p>Because the grid size is rounded up, some threads will have indices beyond the
+array length. cuda-oxide's <code class="docutils literal notranslate"><span class="pre">DisjointSlice</span></code> handles this safely -- <code class="docutils literal notranslate"><span class="pre">get_mut</span></code>
+returns <code class="docutils literal notranslate"><span class="pre">None</span></code> for out-of-bounds indices, so those threads simply do nothing:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="cp">#[kernel]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">vecadd</span><span class="p">(</span><span class="n">a</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span><span class="w"> </span><span class="n">b</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">c</span><span class="p">:</span><span class="w"> </span><span class="nc">DisjointSlice</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">thread</span><span class="p">::</span><span class="n">index_1d</span><span class="p">();</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nb">Some</span><span class="p">(</span><span class="n">c_elem</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">get_mut</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">   </span><span class="c1">// out-of-bounds threads skip</span>
+<span class="w">        </span><span class="o">*</span><span class="n">c_elem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="n">idx</span><span class="p">.</span><span class="n">get</span><span class="p">()]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="p">[</span><span class="n">idx</span><span class="p">.</span><span class="n">get</span><span class="p">()];</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This is a deliberate departure from CUDA C++, where bounds-checking is the
+programmer's responsibility. cuda-oxide's approach eliminates an entire class of
+out-of-bounds memory bugs at the cost of a single branch (which is uniform
+across the warp for all but the last block).</p>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../getting-started/hello-gpu.html"
+       title="上一页">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">上一页</p>
+        <p class="prev-next-title">Writing Your First Kernel</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="kernels-and-device-functions.html"
+       title="下一页">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">下一页</p>
+        <p class="prev-next-title">Kernels and Device Functions</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> 当前页面
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#threads-blocks-and-grids">Threads, blocks, and grids</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thread-indexing-in-cuda-oxide">Thread indexing in cuda-oxide</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#warps-and-simt-execution">Warps and SIMT execution</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-this-matters">Why this matters</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hardware-mapping">Hardware mapping</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-limits-concurrency">What limits concurrency</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#launch-configuration">Launch configuration</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-block-size">Choosing block size</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bounds-checking">Bounds checking</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+    <div class="footer-items__center">
+      
+        <div class="footer-item"><footer class="bd-footer-content">
+  <div class="footer-container" style="padding: 1rem 0 2rem 0; border-top: 1px solid var(--pst-color-border); text-align: left;">
+    
+    <!-- NVIDIA Logo -->
+    <div style="margin-bottom: 1rem;">
+      <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem; filter: brightness(0);"
+           class="only-light">
+      <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem;"
+           class="only-dark pst-js-only">
+    </div>
+    
+    <!-- Footer Links - single line, left aligned -->
+    <div style="font-size: 0.8125rem; margin-bottom: 0.5rem; color: var(--pst-color-text-muted);">
+      <a href="https://www.nvidia.com/en-us/about-nvidia/privacy-policy/" target="_blank" style="color: inherit; text-decoration: none;">Privacy Policy</a> | 
+      <a href="https://www.nvidia.com/en-us/preferences/email-preferences/" target="_blank" style="color: inherit; text-decoration: none;">Your Privacy Choices</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/terms-of-service/" target="_blank" style="color: inherit; text-decoration: none;">Terms of Service</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/accessibility/" target="_blank" style="color: inherit; text-decoration: none;">Accessibility</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/company-policies/" target="_blank" style="color: inherit; text-decoration: none;">Corporate Policies</a> | 
+      <a href="https://www.nvidia.com/en-us/product-security/" target="_blank" style="color: inherit; text-decoration: none;">Product Security</a> | 
+      <a href="https://www.nvidia.com/en-us/contact/" target="_blank" style="color: inherit; text-decoration: none;">Contact</a>
+    </div>
+    
+    <!-- Copyright -->
+    <div style="font-size: 0.8125rem; color: var(--pst-color-text-muted);">
+      Copyright &copy; 2025-2026, NVIDIA.
+    </div>
+    
+  </div>
+</footer></div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,1260 @@
+
+<!DOCTYPE html>
+
+
+<html lang="zh-CN" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>The Safety Model &#8212; cuda-oxide</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/nvidia-sphinx-theme.css?v=5d97cc0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=196aea71" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/lightbox.css?v=31fdf494" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../_static/documentation_options.js?v=d786bb5c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/translations.js?v=540d3cec"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'gpu-safety/the-safety-model';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../_static/js/lightbox.js?v=8cf6bc2b"></script>
+    <script src="../_static/js/spa-nav.js?v=9a4d0bbe"></script>
+    <link rel="canonical" href="https://projects.localizethedocs.org/cuda-oxide-book-l10n/gpu-safety/the-safety-model.html" />
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="The DeviceOperation Model" href="../async-programming/the-device-operation-model.html" />
+    <link rel="prev" title="Error Handling and Debugging" href="../gpu-programming/error-handling-and-debugging.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="zh-CN"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+<script type="text/javascript" src="../ltd-provenance.js"></script>
+<script type="text/javascript" src="../ltd-current.js"></script>
+<script type="text/javascript" src="../../../ltd-config.js"></script>
+<script type="text/javascript" src="../../../ltd-flyout.js"></script>
+
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">跳转至主要内容</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>回到顶部</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="版本警告"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="网页导航">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">cuda-oxide</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="亮色"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="暗色"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>亮色</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>暗色</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="当前页面">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="亮色"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="暗色"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>亮色</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>暗色</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><div class="sidebar-tree">
+    <p class="sidebar-tree-title">
+        Table of Contents
+    </p>
+    <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/hello-gpu.html">Writing Your First Kernel</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Writing GPU Programs</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/execution-model.html">The CUDA Execution Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/kernels-and-device-functions.html">Kernels and Device Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/memory-and-data-movement.html">Memory and Data Movement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/launching-kernels.html">Launching Kernels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/closures-and-generics.html">Closures and Generics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/error-handling-and-debugging.html">Error Handling and Debugging</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Safety on the GPU</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">The Safety Model</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Async GPU Programming</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/the-device-operation-model.html">The DeviceOperation Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/combinators-and-composition.html">Combinators and Composition</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/scheduling-and-streams.html">Scheduling and Streams</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/concurrent-execution.html">Concurrent Execution</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Building a Real Application</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../projects/async-mlp-pipeline.html">Project: Async MLP Pipeline</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Advanced GPU Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/shared-memory-and-synchronization.html">Shared Memory and Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/warp-level-programming.html">Warp-Level Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/tensor-memory-accelerator.html">Tensor Memory Accelerator (TMA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/matrix-multiply-accelerators.html">Matrix Multiply Accelerators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cluster-programming.html">Cluster Programming</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Inside the Compiler</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/architecture-overview.html">Architecture Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/pliron.html">Pliron -- Pliron IR (MLIR-like)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/rustc-public.html">rustc_public -- Stable MIR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/rustc-codegen-cuda.html">The Code Generator: rustc-codegen-cuda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/mir-importer.html">The MIR Importer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/compiler-optimizations.html">Compiler Optimizations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/mlir-dialects.html">Pliron Dialects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/lowering-pipeline.html">The Lowering Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/adding-new-intrinsics.html">Adding New Intrinsics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/fuzzing-and-differential-testing.html">Fuzzing and Differential Testing</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Appendix</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/building-from-source.html">Building from Source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/api-quick-reference.html">API Quick Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/supported-features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/cuda-cpp-comparison.html">cuda-oxide vs CUDA C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/ecosystem.html">The Rust + GPU Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/glossary.html">Glossary</a></li>
+</ul>
+
+</div></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="初始页面">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">The Safety Model</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="the-safety-model">
+<h1>The Safety Model<a class="headerlink" href="#the-safety-model" title="链接到此标题。">#</a></h1>
+<p>A GPU kernel runs thousands of threads that all see the same memory at the
+same time. On a CPU, Rust prevents data races through ownership and borrowing
+-- one mutable reference, no aliases, enforced at compile time. On a GPU,
+you have 2048 threads per SM, all launched from the same function, all
+pointing at the same output buffer. The borrow checker was not designed for
+this.</p>
+<p>cuda-oxide solves the problem in layers. The common case -- one thread writes
+one element under a checked launch contract -- is safe by construction.
+Uncommon cases -- shared memory, warp shuffles, hardware intrinsics -- require
+<code class="docutils literal notranslate"><span class="pre">unsafe</span></code> with documented contracts. And the frontier cases -- TMA, tensor
+cores, cluster-level communication -- are fully manual, matching the
+complexity of the hardware they control.</p>
+<p>This chapter explains the model, walks through each layer, and tells you
+exactly when you need <code class="docutils literal notranslate"><span class="pre">unsafe</span></code> and why.</p>
+<hr class="docutils" />
+<section id="three-tiers">
+<h2>Three tiers<a class="headerlink" href="#three-tiers" title="链接到此标题。">#</a></h2>
+<p>cuda-oxide organizes kernel safety into three tiers based on how much the
+compiler can verify:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Tier</p></th>
+<th class="head text-left"><p>Description</p></th>
+<th class="head text-left"><p><code class="docutils literal notranslate"><span class="pre">unsafe</span></code> Required?</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><strong>Tier 1</strong></p></td>
+<td class="text-left"><p>Safe kernel body plus a checked <code class="docutils literal notranslate"><span class="pre">PreparedLaunch</span></code></p></td>
+<td class="text-left"><p>No</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><strong>Tier 2</strong></p></td>
+<td class="text-left"><p>Explicit <code class="docutils literal notranslate"><span class="pre">unsafe</span></code> with clear safety contracts</p></td>
+<td class="text-left"><p>Yes, scoped</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><strong>Tier 3</strong></p></td>
+<td class="text-left"><p>Raw hardware intrinsics -- full user responsibility</p></td>
+<td class="text-left"><p>Yes, pervasive</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Most application kernels live entirely in Tier 1 or straddle Tier 1 and 2.
+Tier 3 is for performance engineers building at the level of CUTLASS or
+Triton IR. If you are writing a vecadd, a GEMM, or a reduction, you will
+rarely leave Tier 2.</p>
+</section>
+<hr class="docutils" />
+<section id="tier-1-safe-by-default">
+<h2>Tier 1: safe by default<a class="headerlink" href="#tier-1-safe-by-default" title="链接到此标题。">#</a></h2>
+<section id="the-core-idea-disjointslice-t-threadindex">
+<h3>The core idea: <code class="docutils literal notranslate"><span class="pre">DisjointSlice&lt;T&gt;</span></code> + <code class="docutils literal notranslate"><span class="pre">ThreadIndex</span></code><a class="headerlink" href="#the-core-idea-disjointslice-t-threadindex" title="链接到此标题。">#</a></h3>
+<p>The primary device-side safety abstraction is a pair of types that together
+support race-free parallel writes:</p>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">ThreadIndex&lt;'kernel,</span> <span class="pre">IndexSpace&gt;</span></code></strong> -- an opaque witness around a
+<code class="docutils literal notranslate"><span class="pre">usize</span></code>, with no public constructor. The only way to obtain one is
+through trusted functions (<code class="docutils literal notranslate"><span class="pre">index_1d</span></code>, <code class="docutils literal notranslate"><span class="pre">index_2d::&lt;S&gt;</span></code>) that derive
+the value from <strong>hardware built-in variables</strong> (<code class="docutils literal notranslate"><span class="pre">threadIdx</span></code>, <code class="docutils literal notranslate"><span class="pre">blockIdx</span></code>,
+<code class="docutils literal notranslate"><span class="pre">blockDim</span></code>) -- read-only special registers the runtime fills in at
+launch. <code class="docutils literal notranslate"><span class="pre">ThreadIndex</span></code> is <code class="docutils literal notranslate"><span class="pre">!Send</span> <span class="pre">+</span> <span class="pre">!Sync</span> <span class="pre">+</span> <span class="pre">!Copy</span> <span class="pre">+</span> <span class="pre">!Clone</span></code>, and the
+<code class="docutils literal notranslate"><span class="pre">'kernel</span></code> lifetime ties it to a stack-local scope inside the kernel
+body, so it cannot be smuggled across threads via shared memory or
+outlive the kernel.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">DisjointSlice&lt;T,</span> <span class="pre">IndexSpace&gt;</span></code></strong> -- a slice-like type whose
+<code class="docutils literal notranslate"><span class="pre">get_mut()</span></code> method only accepts a <code class="docutils literal notranslate"><span class="pre">ThreadIndex</span></code> whose <code class="docutils literal notranslate"><span class="pre">IndexSpace</span></code>
+matches its own. Returns <code class="docutils literal notranslate"><span class="pre">Option&lt;&amp;mut</span> <span class="pre">T&gt;</span></code> -- <code class="docutils literal notranslate"><span class="pre">None</span></code> for out-of-bounds
+indices.</p></li>
+</ul>
+<p>Put them together and you get a kernel body with zero <code class="docutils literal notranslate"><span class="pre">unsafe</span></code>:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::{</span><span class="n">kernel</span><span class="p">,</span><span class="w"> </span><span class="n">DisjointSlice</span><span class="p">};</span>
+
+<span class="cp">#[kernel]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">vecadd</span><span class="p">(</span><span class="n">a</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span><span class="w"> </span><span class="n">b</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">c</span><span class="p">:</span><span class="w"> </span><span class="nc">DisjointSlice</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nb">Some</span><span class="p">((</span><span class="n">c_elem</span><span class="p">,</span><span class="w"> </span><span class="n">idx</span><span class="p">))</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">get_mut_indexed</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">idx</span><span class="p">.</span><span class="n">get</span><span class="p">();</span>
+<span class="w">        </span><span class="o">*</span><span class="n">c_elem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">get_mut_indexed</span></code> is the one-call form: it mints the per-thread witness
+and resolves it to a <code class="docutils literal notranslate"><span class="pre">&amp;mut</span> <span class="pre">T</span></code> in a single shot. The explicit two-step
+form is also available when you need the index for parallel arithmetic
+on multiple slices:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="cp">#[kernel]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">vecadd</span><span class="p">(</span><span class="n">a</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span><span class="w"> </span><span class="n">b</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">c</span><span class="p">:</span><span class="w"> </span><span class="nc">DisjointSlice</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">thread</span><span class="p">::</span><span class="n">index_1d</span><span class="p">();</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nb">Some</span><span class="p">(</span><span class="n">c_elem</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">get_mut</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">idx</span><span class="p">.</span><span class="n">get</span><span class="p">();</span>
+<span class="w">        </span><span class="o">*</span><span class="n">c_elem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Safety follows from five facts:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">index_1d()</span></code> uses only X coordinates. Its value is unique when block and
+grid Y/Z dimensions are all 1. A <code class="docutils literal notranslate"><span class="pre">domain</span> <span class="pre">=</span> <span class="pre">1</span></code> prepared launch proves that;
+a raw launch must prove it in its <code class="docutils literal notranslate"><span class="pre">unsafe</span></code> block.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">get_mut()</span></code> is bounds-checked -- out-of-range threads get <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">IndexSpace</span></code> parameter ties each witness to its layout: a
+<code class="docutils literal notranslate"><span class="pre">DisjointSlice&lt;T,</span> <span class="pre">Index2D&lt;128&gt;&gt;</span></code> will not accept a
+<code class="docutils literal notranslate"><span class="pre">ThreadIndex&lt;'_,</span> <span class="pre">Index2D&lt;256&gt;&gt;</span></code> -- mixing strides is a compile error.</p></li>
+<li><p>The witness is <code class="docutils literal notranslate"><span class="pre">!Send</span> <span class="pre">+</span> <span class="pre">!Sync</span> <span class="pre">+</span> <span class="pre">!Copy</span> <span class="pre">+</span> <span class="pre">!Clone</span></code> and <code class="docutils literal notranslate"><span class="pre">'kernel</span></code>-scoped,
+so threads cannot launder each other's indices through shared memory.</p></li>
+<li><p>A checked <code class="docutils literal notranslate"><span class="pre">PreparedLaunch&lt;K&gt;</span></code> ties the host geometry to the exact kernel.</p></li>
+</ol>
+<p>The borrow checker sees a single <code class="docutils literal notranslate"><span class="pre">&amp;mut</span> <span class="pre">T</span></code> per thread. The hardware
+provides the coordinates; the launch proof makes their linearization disjoint.
+The type system ties the device and host proofs together.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>1D prepared launch: Y=Z=1 -&gt; index_1d values are unique -&gt; safe get_mut
+raw 2D launch:       grid/block Y &gt; 1 repeats X indices -&gt; caller-unsafe
+</pre></div>
+</div>
+</section>
+<section id="trusted-index-functions">
+<h3>Trusted index functions<a class="headerlink" href="#trusted-index-functions" title="链接到此标题。">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">ThreadIndex</span></code> is only as trustworthy as the functions that create it. Here
+are the constructors cuda-oxide provides:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Function</p></th>
+<th class="head text-left"><p>Formula</p></th>
+<th class="head text-left"><p>Return Type</p></th>
+<th class="head text-left"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">index_1d()</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">blockIdx.x</span> <span class="pre">*</span> <span class="pre">blockDim.x</span> <span class="pre">+</span> <span class="pre">threadIdx.x</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">ThreadIndex&lt;'kernel,</span> <span class="pre">Index1D&gt;</span></code></p></td>
+<td class="text-left"><p>Unique only for a 1D launch (Y/Z inactive)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">index_2d::&lt;S&gt;()</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">row</span> <span class="pre">*</span> <span class="pre">S</span> <span class="pre">+</span> <span class="pre">col</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">Option&lt;ThreadIndex&lt;'kernel,</span> <span class="pre">Index2D&lt;S&gt;&gt;&gt;</span></code></p></td>
+<td class="text-left"><p>Const stride; mixing strides is a compile error</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">unsafe</span> <span class="pre">index_2d_runtime(s)</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">row</span> <span class="pre">*</span> <span class="pre">s</span> <span class="pre">+</span> <span class="pre">col</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">Option&lt;ThreadIndex&lt;'kernel,</span> <span class="pre">Runtime2DIndex&gt;&gt;</span></code></p></td>
+<td class="text-left"><p>Caller asserts every thread used the same <code class="docutils literal notranslate"><span class="pre">s</span></code></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">index_2d_row()</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">blockIdx.y</span> <span class="pre">*</span> <span class="pre">blockDim.y</span> <span class="pre">+</span> <span class="pre">threadIdx.y</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">usize</span></code></p></td>
+<td class="text-left"><p>Component accessor, not a witness constructor</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">index_2d_col()</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">blockIdx.x</span> <span class="pre">*</span> <span class="pre">blockDim.x</span> <span class="pre">+</span> <span class="pre">threadIdx.x</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">usize</span></code></p></td>
+<td class="text-left"><p>Component accessor, not a witness constructor</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">index_2d_row()</span></code> and <code class="docutils literal notranslate"><span class="pre">index_2d_col()</span></code> return plain <code class="docutils literal notranslate"><span class="pre">usize</span></code> -- they give
+you the components for arithmetic, but cannot be used to index into a
+<code class="docutils literal notranslate"><span class="pre">DisjointSlice</span></code>. Only the linearized result earns a <code class="docutils literal notranslate"><span class="pre">ThreadIndex</span></code>.
+Likewise, 2D uniqueness assumes the launch has no active Z dimension. A
+<code class="docutils literal notranslate"><span class="pre">domain</span> <span class="pre">=</span> <span class="pre">2</span></code> prepared launch proves that; a raw launch must assert it.</p>
+</section>
+<section id="how-index-2d-is-type-safe">
+<h3>How <code class="docutils literal notranslate"><span class="pre">index_2d</span></code> is type-safe<a class="headerlink" href="#how-index-2d-is-type-safe" title="链接到此标题。">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">index_2d::&lt;S&gt;()</span></code> is const-generic over the row stride. The witness
+comes back as <code class="docutils literal notranslate"><span class="pre">ThreadIndex&lt;'kernel,</span> <span class="pre">Index2D&lt;S&gt;&gt;</span></code>, and a
+<code class="docutils literal notranslate"><span class="pre">DisjointSlice&lt;T,</span> <span class="pre">Index2D&lt;S&gt;&gt;</span></code> only accepts that exact <code class="docutils literal notranslate"><span class="pre">S</span></code>. Two
+threads cannot mint witnesses with different strides and feed them
+into the same slice -- the type system rejects it:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="cp">#[kernel]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">ok</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">out</span><span class="p">:</span><span class="w"> </span><span class="nc">DisjointSlice</span><span class="o">&lt;</span><span class="kt">u32</span><span class="p">,</span><span class="w"> </span><span class="n">Index2D</span><span class="o">&lt;</span><span class="mi">128</span><span class="o">&gt;&gt;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nb">Some</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">thread</span><span class="p">::</span><span class="n">index_2d</span><span class="p">::</span><span class="o">&lt;</span><span class="mi">128</span><span class="o">&gt;</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">  </span><span class="c1">// matches</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nb">Some</span><span class="p">(</span><span class="n">slot</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">out</span><span class="p">.</span><span class="n">get_mut</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">*</span><span class="n">slot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="cp">#[kernel]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">rejected</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">out</span><span class="p">:</span><span class="w"> </span><span class="nc">DisjointSlice</span><span class="o">&lt;</span><span class="kt">u32</span><span class="p">,</span><span class="w"> </span><span class="n">Index2D</span><span class="o">&lt;</span><span class="mi">128</span><span class="o">&gt;&gt;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nb">Some</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">thread</span><span class="p">::</span><span class="n">index_2d</span><span class="p">::</span><span class="o">&lt;</span><span class="mi">256</span><span class="o">&gt;</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="c1">// ⛔ Index2D&lt;256&gt; != Index2D&lt;128&gt;</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nb">Some</span><span class="p">(</span><span class="n">slot</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">out</span><span class="p">.</span><span class="n">get_mut</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">*</span><span class="n">slot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The witness is also <code class="docutils literal notranslate"><span class="pre">!Send</span> <span class="pre">+</span> <span class="pre">!Sync</span> <span class="pre">+</span> <span class="pre">!Copy</span> <span class="pre">+</span> <span class="pre">!Clone</span></code>, and its <code class="docutils literal notranslate"><span class="pre">'kernel</span></code>
+lifetime is borrowed from a stack-local scope the macros inject -- so a
+thread can't park its <code class="docutils literal notranslate"><span class="pre">ThreadIndex</span></code> in shared memory and have a neighbour
+pick it up later, and the witness can't outlive the kernel body.</p>
+<section id="truly-runtime-strides-unsafe-index-2d-runtime">
+<h4>Truly runtime strides: <code class="docutils literal notranslate"><span class="pre">unsafe</span> <span class="pre">index_2d_runtime</span></code><a class="headerlink" href="#truly-runtime-strides-unsafe-index-2d-runtime" title="链接到此标题。">#</a></h4>
+<p>Some kernels really do receive their stride at launch time
+(e.g. matrix dimensions known only on the host). For those cases there's
+a corresponding witness <code class="docutils literal notranslate"><span class="pre">Runtime2DIndex</span></code> and an <code class="docutils literal notranslate"><span class="pre">unsafe</span></code> constructor:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="n">idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">thread</span><span class="p">::</span><span class="n">index_2d_runtime</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">?</span><span class="w"> </span><span class="p">};</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">unsafe</span></code> is the contract: every thread in the kernel that feeds a
+<code class="docutils literal notranslate"><span class="pre">Runtime2DIndex</span></code> into the same <code class="docutils literal notranslate"><span class="pre">DisjointSlice&lt;T,</span> <span class="pre">Runtime2DIndex&gt;</span></code> must
+have used the same <code class="docutils literal notranslate"><span class="pre">n</span></code>. The type system <em>can't</em> prove this -- two
+<code class="docutils literal notranslate"><span class="pre">ThreadIndex&lt;'_,</span> <span class="pre">Runtime2DIndex&gt;</span></code> values produced under different
+runtime strides have the same type. If you can pin the stride at compile
+time, prefer <code class="docutils literal notranslate"><span class="pre">index_2d::&lt;S&gt;()</span></code>. If you can't, the <code class="docutils literal notranslate"><span class="pre">unsafe</span></code> keyword on
+<code class="docutils literal notranslate"><span class="pre">index_2d_runtime</span></code> is the marker that the safety obligation is yours.</p>
+</section>
+</section>
+<section id="the-gemm-pattern">
+<h3>The GEMM pattern<a class="headerlink" href="#the-gemm-pattern" title="链接到此标题。">#</a></h3>
+<p>For const-stride 2D kernels (the common case -- tiled GEMM, stencil
+kernels, image kernels with a fixed channel count), the const-generic
+form is the safe default:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">const</span><span class="w"> </span><span class="n">STRIDE</span><span class="p">:</span><span class="w"> </span><span class="kt">usize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1024</span><span class="p">;</span><span class="w">     </span><span class="c1">// C is M x STRIDE</span>
+
+<span class="cp">#[kernel]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">gemm</span><span class="p">(</span><span class="n">a</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span><span class="w"> </span><span class="n">b</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">c</span><span class="p">:</span><span class="w"> </span><span class="nc">DisjointSlice</span><span class="o">&lt;</span><span class="kt">f32</span><span class="p">,</span><span class="w"> </span><span class="n">Index2D</span><span class="o">&lt;</span><span class="n">STRIDE</span><span class="o">&gt;&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="p">:</span><span class="w"> </span><span class="kt">u32</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">thread</span><span class="p">::</span><span class="n">index_2d_row</span><span class="p">();</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nb">Some</span><span class="p">((</span><span class="n">c_elem</span><span class="p">,</span><span class="w"> </span><span class="n">_</span><span class="p">))</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">get_mut_indexed</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// col &lt; STRIDE is guaranteed by `Some` -- no manual check needed</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">usize</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">// ... compute dot product into a local accumulator `sum` ...</span>
+<span class="w">            </span><span class="o">*</span><span class="n">c_elem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">alpha</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">beta</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">c_elem</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>For runtime strides, the same shape works but the linearisation step is
+explicit and <code class="docutils literal notranslate"><span class="pre">unsafe</span></code>:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="cp">#[kernel]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">gemm_runtime</span><span class="p">(</span><span class="n">a</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span><span class="w"> </span><span class="n">b</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">c</span><span class="p">:</span><span class="w"> </span><span class="nc">DisjointSlice</span><span class="o">&lt;</span><span class="kt">f32</span><span class="p">,</span><span class="w"> </span><span class="n">Runtime2DIndex</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="p">:</span><span class="w"> </span><span class="kt">u32</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">:</span><span class="w"> </span><span class="kt">u32</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">usize</span><span class="p">;</span><span class="w">             </span><span class="c1">// ONE binding, ONE stride value</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">thread</span><span class="p">::</span><span class="n">index_2d_row</span><span class="p">();</span>
+
+<span class="w">    </span><span class="c1">// SAFETY: every thread in the kernel sees the same `n` (kernel arg).</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nb">Some</span><span class="p">(</span><span class="n">c_idx</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">thread</span><span class="p">::</span><span class="n">index_2d_runtime</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">usize</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">// ... compute dot product ...</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nb">Some</span><span class="p">(</span><span class="n">c_elem</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">get_mut</span><span class="p">(</span><span class="n">c_idx</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="o">*</span><span class="n">c_elem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">alpha</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">beta</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">c_elem</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">let</span> <span class="pre">Some</span></code> from <code class="docutils literal notranslate"><span class="pre">index_2d_runtime</span></code> replaces the manual <code class="docutils literal notranslate"><span class="pre">col</span> <span class="pre">&lt;</span> <span class="pre">n</span></code>
+guard you'd write in CUDA C++. The <code class="docutils literal notranslate"><span class="pre">row</span> <span class="pre">&lt;</span> <span class="pre">m</span></code> check remains because it
+guards against reading garbage from the input matrices.</p>
+</section>
+<section id="what-makes-a-kernel-tier-1">
+<h3>What makes a kernel Tier 1<a class="headerlink" href="#what-makes-a-kernel-tier-1" title="链接到此标题。">#</a></h3>
+<p>A kernel and its launch are fully safe -- Tier 1 -- when:</p>
+<ol class="arabic simple">
+<li><p>All mutable output access goes through <code class="docutils literal notranslate"><span class="pre">DisjointSlice::get_mut(ThreadIndex)</span></code></p></li>
+<li><p>All inputs are shared immutable references (<code class="docutils literal notranslate"><span class="pre">&amp;[T]</span></code>)</p></li>
+<li><p>No shared memory, no raw pointers, no intrinsics beyond thread indexing</p></li>
+<li><p>The host uses a matching checked <code class="docutils literal notranslate"><span class="pre">PreparedLaunch&lt;K&gt;</span></code></p></li>
+</ol>
+<p>Examples in this tier include <code class="docutils literal notranslate"><span class="pre">vecadd</span></code>, <code class="docutils literal notranslate"><span class="pre">helper_fn</span></code>, <code class="docutils literal notranslate"><span class="pre">generic</span></code>, <code class="docutils literal notranslate"><span class="pre">host_closure</span></code>,
+and the naive GEMM kernels in the <code class="docutils literal notranslate"><span class="pre">gemm</span></code> and <code class="docutils literal notranslate"><span class="pre">async_mlp</span></code> examples when launched
+through matching contracts. Their raw <code class="docutils literal notranslate"><span class="pre">LaunchConfig</span></code> paths remain unsafe.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="tier-2-scoped-unsafe">
+<h2>Tier 2: scoped <code class="docutils literal notranslate"><span class="pre">unsafe</span></code><a class="headerlink" href="#tier-2-scoped-unsafe" title="链接到此标题。">#</a></h2>
+<p>Not every kernel fits the &quot;one thread, one output element&quot; pattern. When
+threads need to cooperate -- sharing data through fast on-chip memory,
+communicating across lanes in a warp, or performing atomic updates -- you
+need <code class="docutils literal notranslate"><span class="pre">unsafe</span></code>. The key property of Tier 2 is that the <code class="docutils literal notranslate"><span class="pre">unsafe</span></code> is <em>scoped</em>
+and <em>auditable</em>: each block has a documented safety contract, and the rest
+of the kernel remains safe.</p>
+<section id="shared-memory">
+<h3>Shared memory<a class="headerlink" href="#shared-memory" title="链接到此标题。">#</a></h3>
+<p>Shared memory is fast, on-chip, and visible to every thread in a block.
+That last property is exactly why it requires <code class="docutils literal notranslate"><span class="pre">unsafe</span></code> -- the borrow checker
+cannot reason about 256 threads writing to the same <code class="docutils literal notranslate"><span class="pre">static</span> <span class="pre">mut</span></code> array:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">TILE</span><span class="p">:</span><span class="w"> </span><span class="nc">SharedArray</span><span class="o">&lt;</span><span class="kt">f32</span><span class="p">,</span><span class="w"> </span><span class="mi">256</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SharedArray</span><span class="p">::</span><span class="n">UNINIT</span><span class="p">;</span>
+
+<span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">TILE</span><span class="p">[</span><span class="n">ty</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">TILE_SIZE</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">tx</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+
+<span class="n">thread</span><span class="p">::</span><span class="n">sync_threads</span><span class="p">();</span>
+
+<span class="kd">let</span><span class="w"> </span><span class="n">neighbor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">TILE</span><span class="p">[</span><span class="n">other_idx</span><span class="p">]</span><span class="w"> </span><span class="p">};</span>
+</pre></div>
+</div>
+<p>The contract: ensure no conflicting writes from concurrent threads without
+synchronization. The <code class="docutils literal notranslate"><span class="pre">sync_threads()</span></code> barrier is the tool that makes this
+work -- it guarantees all threads have finished writing before any thread
+reads.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>API</p></th>
+<th class="head text-left"><p>Safety Obligation</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">SharedArray&lt;T,</span> <span class="pre">N&gt;</span></code></p></td>
+<td class="text-left"><p>Accessed via <code class="docutils literal notranslate"><span class="pre">static</span> <span class="pre">mut</span></code>. No conflicting writes without synchronization.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">DynamicSharedArray&lt;T&gt;</span></code></p></td>
+<td class="text-left"><p>Same rules, but size is set at launch time via <code class="docutils literal notranslate"><span class="pre">LaunchConfig::shared_mem_bytes</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">参见</p>
+<p><a class="reference internal" href="../advanced/shared-memory-and-synchronization.html"><span class="std std-doc">Shared Memory and Synchronization</span></a>
+for the full treatment: tiling, bank conflicts, dynamic allocation, and
+double-buffered pipelines.</p>
+</div>
+</section>
+<section id="warp-intrinsics">
+<h3>Warp intrinsics<a class="headerlink" href="#warp-intrinsics" title="链接到此标题。">#</a></h3>
+<p>Warp-level primitives let threads within a warp exchange data without
+touching memory at all -- register-to-register transfers, coordinated in
+hardware. They are <code class="docutils literal notranslate"><span class="pre">unsafe</span></code> because the hardware does not check thread
+convergence: if you pass a mask that includes a diverged thread, you get
+undefined behavior (typically a silent hang, which is worse than a crash).</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>API</p></th>
+<th class="head text-left"><p>Safety Obligation</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">shfl_sync</span></code>, <code class="docutils literal notranslate"><span class="pre">shfl_up_sync</span></code>, <code class="docutils literal notranslate"><span class="pre">shfl_down_sync</span></code>, <code class="docutils literal notranslate"><span class="pre">shfl_xor_sync</span></code></p></td>
+<td class="text-left"><p>Source lane must be active; mask must include calling thread</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">ballot_sync</span></code>, <code class="docutils literal notranslate"><span class="pre">any_sync</span></code>, <code class="docutils literal notranslate"><span class="pre">all_sync</span></code></p></td>
+<td class="text-left"><p>All threads in mask must be converged</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">activemask</span></code></p></td>
+<td class="text-left"><p>Result is only meaningful at the point of call</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">参见</p>
+<p><a class="reference internal" href="../advanced/warp-level-programming.html"><span class="std std-doc">Warp-Level Programming</span></a> for shuffle
+patterns, reductions, and prefix sums using warp intrinsics.</p>
+</div>
+</section>
+<section id="barriers-and-lifecycle">
+<h3>Barriers and lifecycle<a class="headerlink" href="#barriers-and-lifecycle" title="链接到此标题。">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">ManagedBarrier</span></code> typestate API encodes the barrier lifecycle
+(<code class="docutils literal notranslate"><span class="pre">Uninit</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Ready</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Invalidated</span></code>) in the type system, so you cannot
+wait on a barrier that was never initialized or use one that has been
+invalidated. The <code class="docutils literal notranslate"><span class="pre">init()</span></code> and <code class="docutils literal notranslate"><span class="pre">inval()</span></code> transitions still require <code class="docutils literal notranslate"><span class="pre">unsafe</span></code>
+because they interact with the hardware, but the type states prevent the
+most common mistakes at compile time.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>API</p></th>
+<th class="head text-left"><p>Safety Obligation</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">mbarrier_init</span></code></p></td>
+<td class="text-left"><p>Must be called by exactly one thread; barrier must be in shared memory</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">mbarrier_arrive</span></code> / <code class="docutils literal notranslate"><span class="pre">mbarrier_wait</span></code></p></td>
+<td class="text-left"><p>Barrier must be initialized; token must match</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">ManagedBarrier</span></code> (typestate)</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">init()</span></code> and <code class="docutils literal notranslate"><span class="pre">inval()</span></code> require <code class="docutils literal notranslate"><span class="pre">unsafe</span></code>; state machine enforced at compile time</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="atomics">
+<h3>Atomics<a class="headerlink" href="#atomics" title="链接到此标题。">#</a></h3>
+<p>Atomic operations are safe to <em>call</em> once you have a valid atomic reference.
+The <code class="docutils literal notranslate"><span class="pre">unsafe</span></code> surface is at construction -- creating a <code class="docutils literal notranslate"><span class="pre">DeviceAtomicU32</span></code>
+from a raw pointer requires the caller to guarantee that the pointer is
+valid and properly aligned:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="n">atom</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">DeviceAtomicU32</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="n">ptr</span><span class="p">)</span><span class="w"> </span><span class="p">};</span>
+<span class="n">atom</span><span class="p">.</span><span class="n">fetch_add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">Ordering</span><span class="p">::</span><span class="n">Relaxed</span><span class="p">);</span><span class="w">  </span><span class="c1">// safe call</span>
+</pre></div>
+</div>
+</section>
+<section id="unchecked-slice-access">
+<h3>Unchecked slice access<a class="headerlink" href="#unchecked-slice-access" title="链接到此标题。">#</a></h3>
+<p>When the &quot;one thread, one element&quot; model does not fit -- for instance, in a
+warp-level reduction where only lane 0 writes the result --
+<code class="docutils literal notranslate"><span class="pre">DisjointSlice::get_unchecked_mut(usize)</span></code> provides an escape hatch:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">if</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">lane_id</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">warp_idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">gid</span><span class="p">.</span><span class="n">get</span><span class="p">()</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">32</span><span class="p">;</span>
+<span class="w">    </span><span class="c1">// SAFETY: Only lane 0 of each warp writes; warp indices are unique</span>
+<span class="w">    </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">*</span><span class="n">out</span><span class="p">.</span><span class="n">get_unchecked_mut</span><span class="p">(</span><span class="n">warp_idx</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sum</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The safety obligation is the same as the <code class="docutils literal notranslate"><span class="pre">ThreadIndex</span></code> system enforces
+automatically: index in bounds, no two threads share the same index. The
+difference is that you prove it yourself instead of letting the type system
+do it for you.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="tier-3-raw-hardware">
+<h2>Tier 3: raw hardware<a class="headerlink" href="#tier-3-raw-hardware" title="链接到此标题。">#</a></h2>
+<p>At the bottom of the stack are the raw hardware intrinsics -- the APIs
+that talk directly to specific functional units on specific GPU
+architectures. Every call is <code class="docutils literal notranslate"><span class="pre">unsafe</span></code>, the safety contracts are complex
+and architecture-dependent, and the documentation lives in the PTX ISA
+manual more than in Rust doc comments.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Feature</p></th>
+<th class="head text-left"><p>Key APIs</p></th>
+<th class="head text-left"><p>Architectures</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><strong>TMA</strong> (Tensor Memory Accelerator)</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">tma_load_2d</span></code>, <code class="docutils literal notranslate"><span class="pre">tma_store_2d</span></code>, <code class="docutils literal notranslate"><span class="pre">TmaDescriptor</span></code></p></td>
+<td class="text-left"><p>sm_90+ (Hopper)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><strong>tcgen05</strong> (Tensor Core Gen 5)</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">tcgen05_mma</span></code>, <code class="docutils literal notranslate"><span class="pre">tcgen05_commit</span></code>, <code class="docutils literal notranslate"><span class="pre">TensorMemoryHandle</span></code></p></td>
+<td class="text-left"><p>sm_120 (Blackwell)</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><strong>WGMMA</strong> (Warpgroup MMA)</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">wgmma_mma_async</span></code>, <code class="docutils literal notranslate"><span class="pre">wgmma_commit_group</span></code>, <code class="docutils literal notranslate"><span class="pre">wgmma_wait_group</span></code></p></td>
+<td class="text-left"><p>sm_90+ (Hopper)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><strong>Cluster</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cluster_rank</span></code>, <code class="docutils literal notranslate"><span class="pre">map_shared_rank</span></code>, <code class="docutils literal notranslate"><span class="pre">cluster_barrier_arrive</span></code></p></td>
+<td class="text-left"><p>sm_90+ (Hopper)</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><strong>CLC</strong> (Cluster Launch Control)</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">clc_prefetch</span></code>, <code class="docutils literal notranslate"><span class="pre">clc_query_channel</span></code></p></td>
+<td class="text-left"><p>sm_120 (Blackwell)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><strong>TMEM</strong> (Tensor Memory)</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">TmemGuard</span></code> (typestate), <code class="docutils literal notranslate"><span class="pre">tmem_alloc</span></code>, <code class="docutils literal notranslate"><span class="pre">tmem_dealloc</span></code></p></td>
+<td class="text-left"><p>sm_120 (Blackwell)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>If you are writing application-level kernels, you should not need Tier 3
+APIs. They exist for the people building the next CUTLASS -- and for those
+people, cuda-oxide provides the same hardware access as inline PTX in
+CUDA C++, with Rust's type system available (but not enforced) as a
+guardrail.</p>
+<div class="admonition seealso">
+<p class="admonition-title">参见</p>
+<p><a class="reference internal" href="../advanced/tensor-memory-accelerator.html"><span class="std std-doc">Tensor Memory Accelerator</span></a>,
+<a class="reference internal" href="../advanced/matrix-multiply-accelerators.html"><span class="std std-doc">Matrix Multiply Accelerators</span></a>,
+and <a class="reference internal" href="../advanced/cluster-programming.html"><span class="std std-doc">Cluster Programming</span></a> for detailed
+coverage of Tier 3 features.</p>
+</div>
+</section>
+<hr class="docutils" />
+<section id="what-the-borrow-checker-gives-you">
+<h2>What the borrow checker gives you<a class="headerlink" href="#what-the-borrow-checker-gives-you" title="链接到此标题。">#</a></h2>
+<p>cuda-oxide is not a DSL or a macro system -- it runs the real <code class="docutils literal notranslate"><span class="pre">rustc</span></code>
+frontend on your kernel code. That means every safety guarantee Rust
+provides on the CPU is also enforced on the GPU:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Guarantee</p></th>
+<th class="head text-left"><p>How It Works</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><strong>Ownership and borrowing</strong></p></td>
+<td class="text-left"><p>Lifetime errors, use-after-free, and aliasing violations caught at compile time</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><strong>Safe parallel writes</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">DisjointSlice&lt;T&gt;</span></code> + <code class="docutils literal notranslate"><span class="pre">ThreadIndex</span></code> + matching prepared geometry prove that writes do not race</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><strong>Explicit <code class="docutils literal notranslate"><span class="pre">unsafe</span></code> scoping</strong></p></td>
+<td class="text-left"><p>Raw pointer access requires <code class="docutils literal notranslate"><span class="pre">unsafe</span></code>, making obligations visible and auditable</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><strong>Convergent attribute enforcement</strong></p></td>
+<td class="text-left"><p>Sync primitives (barriers, fences, shuffles) marked <code class="docutils literal notranslate"><span class="pre">convergent</span></code> in the IR, preventing the optimizer from moving or duplicating them across control flow</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The first three are standard Rust. The fourth is GPU-specific: CUDA's
+<code class="docutils literal notranslate"><span class="pre">bar.sync</span></code>, fence, and warp shuffle instructions must not be duplicated or
+reordered by the compiler. cuda-oxide marks them <code class="docutils literal notranslate"><span class="pre">convergent</span></code> in the IR so
+that LLVM's optimization passes leave them alone.</p>
+</section>
+<hr class="docutils" />
+<section id="the-hard-problems">
+<h2>The hard problems<a class="headerlink" href="#the-hard-problems" title="链接到此标题。">#</a></h2>
+<p>Rust's borrow checker was designed for single-threaded ownership with
+<code class="docutils literal notranslate"><span class="pre">Send</span></code>/<code class="docutils literal notranslate"><span class="pre">Sync</span></code> for CPU concurrency. SIMT execution introduces patterns that
+the borrow checker was never taught to reason about. Here is an honest
+accounting of what cuda-oxide does <em>not</em> enforce today -- and why these
+problems are solvable.</p>
+<section id="thread-divergent-control-flow">
+<h3>Thread-divergent control flow<a class="headerlink" href="#thread-divergent-control-flow" title="链接到此标题。">#</a></h3>
+<p>Rustc's JumpThreading MIR optimization duplicates function calls into both
+branches of an if-statement -- a perfectly sound optimization on CPUs, but
+it breaks GPU barrier semantics where all threads in a block must converge
+at the same <code class="docutils literal notranslate"><span class="pre">bar.sync</span></code> instruction. cuda-oxide currently disables
+JumpThreading for device code (<code class="docutils literal notranslate"><span class="pre">-Z</span> <span class="pre">mir-enable-passes=-JumpThreading</span></code>). A
+proper solution would teach the compiler about convergence requirements so
+it can optimize around them instead of disabling the pass entirely.</p>
+</section>
+<section id="shared-memory-access-patterns">
+<h3>Shared memory access patterns<a class="headerlink" href="#shared-memory-access-patterns" title="链接到此标题。">#</a></h3>
+<p>The borrow checker cannot reason about whether thread 0 writing <code class="docutils literal notranslate"><span class="pre">smem[0]</span></code>
+and thread 1 writing <code class="docutils literal notranslate"><span class="pre">smem[1]</span></code> is safe -- it sees <code class="docutils literal notranslate"><span class="pre">&amp;mut</span> <span class="pre">smem</span></code> and rejects
+it. <code class="docutils literal notranslate"><span class="pre">DisjointSlice</span></code> solves the unique-index-write pattern, but not
+cooperative patterns like reductions, scans, or producer/consumer pipelines
+where multiple threads intentionally access overlapping regions with
+synchronization between phases.</p>
+</section>
+<section id="warp-level-convergence">
+<h3>Warp-level convergence<a class="headerlink" href="#warp-level-convergence" title="链接到此标题。">#</a></h3>
+<p>Operations like <code class="docutils literal notranslate"><span class="pre">shfl_sync</span></code> and <code class="docutils literal notranslate"><span class="pre">ballot_sync</span></code> require that all threads
+named in the participation mask are actually converged at the call site.
+The type system cannot enforce this today. If threads have diverged and you
+pass a full mask, you get a silent hang -- the worst kind of bug, because
+there is no crash and no error message, just a kernel that never finishes.</p>
+</section>
+<section id="memory-space-awareness">
+<h3>Memory space awareness<a class="headerlink" href="#memory-space-awareness" title="链接到此标题。">#</a></h3>
+<p>GPU memory has distinct address spaces -- global, shared, local, TMEM.
+A <code class="docutils literal notranslate"><span class="pre">&amp;mut</span></code> to shared memory is visible to every thread in the block; a
+<code class="docutils literal notranslate"><span class="pre">&amp;mut</span></code> to local memory is private to one thread. The borrow checker treats
+them identically. This is conservative (it rejects some safe programs) but
+never unsound (it does not accept unsafe ones). Still, a memory-space-aware
+borrow checker could accept more programs without <code class="docutils literal notranslate"><span class="pre">unsafe</span></code>.</p>
+</section>
+<section id="why-these-are-solvable">
+<h3>Why these are solvable<a class="headerlink" href="#why-these-are-solvable" title="链接到此标题。">#</a></h3>
+<p>The building blocks already exist in Rust's type system. They need to be
+extended, not reinvented:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Idea</p></th>
+<th class="head text-left"><p>What It Solves</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><strong>Execution-resource-aware types</strong></p></td>
+<td class="text-left"><p>Functions annotated with their execution level (grid / block / warp / thread). A barrier call inside a divergent branch becomes a compile-time error.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><strong>Memory views</strong></p></td>
+<td class="text-left"><p>Generalized parallel access patterns -- like <code class="docutils literal notranslate"><span class="pre">DisjointSlice</span></code> but covering blocked, striped, transposed, and composed layouts. Type-checked race-freedom at scale.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><strong>Extended borrow checking for sync</strong></p></td>
+<td class="text-left"><p>Statically enforce that barriers cannot be forgotten, placed at divergent control flow, or duplicated by the optimizer. Convergence in the type system.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>All of this is compile-time analysis. The generated PTX is identical to what
+you would write by hand -- the safety net disappears at code generation.
+Zero runtime cost.</p>
+<p>cuda-oxide is well-positioned to deliver this incrementally. The real <code class="docutils literal notranslate"><span class="pre">rustc</span></code>
+borrow checker already runs on device code. The IR infrastructure (pliron
+dialects) supports GPU-aware analysis passes. The full compilation pipeline
+from MIR to PTX is under our control. And each new safety check is additive
+-- existing kernels keep compiling while new ones get stronger guarantees.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="writing-safe-kernels-a-cheat-sheet">
+<h2>Writing safe kernels: a cheat sheet<a class="headerlink" href="#writing-safe-kernels-a-cheat-sheet" title="链接到此标题。">#</a></h2>
+<section id="the-default-path">
+<h3>The default path<a class="headerlink" href="#the-default-path" title="链接到此标题。">#</a></h3>
+<p>For most kernels, start here:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="cp">#[kernel]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">my_kernel</span><span class="p">(</span><span class="n">input</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">output</span><span class="p">:</span><span class="w"> </span><span class="nc">DisjointSlice</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nb">Some</span><span class="p">((</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">idx</span><span class="p">))</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">output</span><span class="p">.</span><span class="n">get_mut_indexed</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="o">*</span><span class="n">out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">transform</span><span class="p">(</span><span class="n">input</span><span class="p">[</span><span class="n">idx</span><span class="p">.</span><span class="n">get</span><span class="p">()]);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>For const-stride 2D, parameterise the slice and ask for the const index:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="cp">#[kernel]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">tile_kernel</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">output</span><span class="p">:</span><span class="w"> </span><span class="nc">DisjointSlice</span><span class="o">&lt;</span><span class="kt">f32</span><span class="p">,</span><span class="w"> </span><span class="n">Index2D</span><span class="o">&lt;</span><span class="mi">1024</span><span class="o">&gt;&gt;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nb">Some</span><span class="p">((</span><span class="n">out</span><span class="p">,</span><span class="w"> </span><span class="n">_idx</span><span class="p">))</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">output</span><span class="p">.</span><span class="n">get_mut_indexed</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="o">*</span><span class="n">out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">..</span><span class="p">.;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The rules:</p>
+<ul class="simple">
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">DisjointSlice</span></code> for all mutable outputs.</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">&amp;[T]</span></code> for all read-only inputs.</p></li>
+<li><p>For 1D grids, declare <code class="docutils literal notranslate"><span class="pre">launch_contract(domain</span> <span class="pre">=</span> <span class="pre">1,</span> <span class="pre">...)</span></code> and use a prepared
+launch. Inside the kernel, default to <code class="docutils literal notranslate"><span class="pre">get_mut_indexed()</span></code>. If you need the index for
+arithmetic against multiple slices, fall back to the explicit pair:
+<code class="docutils literal notranslate"><span class="pre">let</span> <span class="pre">idx</span> <span class="pre">=</span> <span class="pre">thread::index_1d();</span> <span class="pre">slice.get_mut(idx)</span></code>.</p></li>
+<li><p>For const-stride 2D grids, parameterise the slice as
+<code class="docutils literal notranslate"><span class="pre">DisjointSlice&lt;T,</span> <span class="pre">Index2D&lt;S&gt;&gt;</span></code> and use <code class="docutils literal notranslate"><span class="pre">get_mut_indexed()</span></code> or
+<code class="docutils literal notranslate"><span class="pre">thread::index_2d::&lt;S&gt;()</span></code>. Mismatched strides are a compile error.</p></li>
+<li><p>For runtime strides, reach for <code class="docutils literal notranslate"><span class="pre">unsafe</span> <span class="pre">{</span> <span class="pre">thread::index_2d_runtime(n)</span> <span class="pre">}</span></code>
+with a <code class="docutils literal notranslate"><span class="pre">Runtime2DIndex</span></code>-tagged slice. The <code class="docutils literal notranslate"><span class="pre">unsafe</span></code> is the contract that
+every thread used the same <code class="docutils literal notranslate"><span class="pre">n</span></code>.</p></li>
+<li><p>Always bounds-check via <code class="docutils literal notranslate"><span class="pre">get_mut()</span></code> / <code class="docutils literal notranslate"><span class="pre">get_mut_indexed()</span></code> (both return
+<code class="docutils literal notranslate"><span class="pre">Option</span></code>).</p></li>
+</ul>
+<p>If the kernel body compiles without <code class="docutils literal notranslate"><span class="pre">unsafe</span></code>, it satisfies the device-side
+part of the proof. Race freedom also requires a matching prepared launch, or
+an explicit unsafe proof for a raw configuration.</p>
+</section>
+<section id="when-you-need-unsafe">
+<h3>When you need <code class="docutils literal notranslate"><span class="pre">unsafe</span></code><a class="headerlink" href="#when-you-need-unsafe" title="链接到此标题。">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Pattern</p></th>
+<th class="head text-left"><p>Why</p></th>
+<th class="head text-left"><p>Mitigation</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>Shared memory</p></td>
+<td class="text-left"><p>Multiple threads access the same <code class="docutils literal notranslate"><span class="pre">static</span> <span class="pre">mut</span></code></p></td>
+<td class="text-left"><p>Synchronize with <code class="docutils literal notranslate"><span class="pre">sync_threads()</span></code> before cross-thread reads</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Warp shuffles</p></td>
+<td class="text-left"><p>Thread convergence is not compiler-checked</p></td>
+<td class="text-left"><p>Use <code class="docutils literal notranslate"><span class="pre">FULL_MASK</span></code> for full-warp operations; document partial masks</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Atomics</p></td>
+<td class="text-left"><p>Construction from a raw pointer</p></td>
+<td class="text-left"><p>Wrap in a helper; the atomic operations themselves are safe</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Non-uniform writes</p></td>
+<td class="text-left"><p>Not every thread writes to its own index</p></td>
+<td class="text-left"><p>Use <code class="docutils literal notranslate"><span class="pre">get_unchecked_mut</span></code> with a documented uniqueness argument</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Hardware intrinsics</p></td>
+<td class="text-left"><p>Complex, architecture-specific contracts</p></td>
+<td class="text-left"><p>Follow the PTX ISA documentation; test on target hardware</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="the-safety-comment">
+<h3>The <code class="docutils literal notranslate"><span class="pre">SAFETY</span></code> comment<a class="headerlink" href="#the-safety-comment" title="链接到此标题。">#</a></h3>
+<p>For every <code class="docutils literal notranslate"><span class="pre">unsafe</span></code> block, document <em>why</em> the invariants hold. Not what the
+code does -- the code already says that -- but why this particular usage is
+safe:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="c1">// SAFETY: Only lane 0 of each warp executes this branch.</span>
+<span class="c1">// Warp indices (gid / 32) are unique across warps, so no two</span>
+<span class="c1">// threads write to the same output element.</span>
+<span class="k">if</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">lane_id</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">warp_idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">gid</span><span class="p">.</span><span class="n">get</span><span class="p">()</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">32</span><span class="p">;</span>
+<span class="w">    </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">*</span><span class="n">partial_sums</span><span class="p">.</span><span class="n">get_unchecked_mut</span><span class="p">(</span><span class="n">warp_idx</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">warp_sum</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This is not ceremony. When a kernel data-races at 2 AM and you are staring
+at a <code class="docutils literal notranslate"><span class="pre">compute-sanitizer</span></code> log, past-you's safety comments are the fastest
+path to the bug.</p>
+<div class="admonition tip">
+<p class="admonition-title">小技巧</p>
+<p>If you cannot write a convincing <code class="docutils literal notranslate"><span class="pre">SAFETY</span></code> comment for an <code class="docutils literal notranslate"><span class="pre">unsafe</span></code> block,
+that is a signal that the invariant is not actually maintained. Restructure
+the code until the argument is obvious, or use a safe API instead.</p>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="链接到此标题。">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Property</p></th>
+<th class="head text-left"><p>Status</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>Borrow checker on device code</p></td>
+<td class="text-left"><p>Enforced (real <code class="docutils literal notranslate"><span class="pre">rustc</span></code> frontend)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Safe 1D parallel writes (<code class="docutils literal notranslate"><span class="pre">DisjointSlice</span> <span class="pre">+</span> <span class="pre">index_1d</span></code>)</p></td>
+<td class="text-left"><p>Enforced with a <code class="docutils literal notranslate"><span class="pre">domain</span> <span class="pre">=</span> <span class="pre">1</span></code> prepared launch</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Safe 2D parallel writes -- const stride</p></td>
+<td class="text-left"><p>Enforced (<code class="docutils literal notranslate"><span class="pre">Index2D&lt;S&gt;</span></code> mismatch is a compile error)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Safe 2D parallel writes -- runtime stride</p></td>
+<td class="text-left"><p>Caller-asserted via <code class="docutils literal notranslate"><span class="pre">unsafe</span> <span class="pre">index_2d_runtime</span></code></p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">ThreadIndex</span></code> non-transferable across threads (smem laundering)</p></td>
+<td class="text-left"><p>Enforced (<code class="docutils literal notranslate"><span class="pre">!Send</span> <span class="pre">+</span> <span class="pre">!Sync</span> <span class="pre">+</span> <span class="pre">!Copy</span> <span class="pre">+</span> <span class="pre">!Clone</span> <span class="pre">+</span> <span class="pre">'kernel</span></code>)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">&amp;mut</span> <span class="pre">[T]</span></code> kernel parameter</p></td>
+<td class="text-left"><p>NOT enforced -- treat any <code class="docutils literal notranslate"><span class="pre">&amp;mut</span></code> arg as <code class="docutils literal notranslate"><span class="pre">unsafe</span></code></p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Explicit <code class="docutils literal notranslate"><span class="pre">unsafe</span></code> for shared memory, intrinsics</p></td>
+<td class="text-left"><p>Enforced (Rust language rules)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Convergent attribute on sync primitives</p></td>
+<td class="text-left"><p>Enforced (IR-level <code class="docutils literal notranslate"><span class="pre">convergent</span></code> marking)</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Thread convergence for warp ops</p></td>
+<td class="text-left"><p>NOT enforced (runtime obligation)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Memory space awareness (shared vs global)</p></td>
+<td class="text-left"><p>NOT enforced (future work)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">&amp;mut</span> <span class="pre">[T]</span></code> as a kernel parameter is the next outstanding gap: the macro
+accepts the type today but the runtime layout (every thread sees the same
+backing pointer) means a write through <code class="docutils literal notranslate"><span class="pre">&amp;mut</span> <span class="pre">data[i]</span></code> from two different
+threads is the same kind of aliasing that <code class="docutils literal notranslate"><span class="pre">DisjointSlice</span></code> exists to
+prevent. Until the macro rejects <code class="docutils literal notranslate"><span class="pre">&amp;mut</span> <span class="pre">[T]</span></code> outright (or rewrites it to
+<code class="docutils literal notranslate"><span class="pre">DisjointSlice</span></code>), treat any kernel that takes one as if every line in it
+were <code class="docutils literal notranslate"><span class="pre">unsafe</span></code>.</p>
+<p>The safety model is designed to make the common case safe through a kernel
+body plus a prepared launch, while providing explicit escape hatches for
+everything else. Use <code class="docutils literal notranslate"><span class="pre">unsafe</span></code> only when you are supplying a proof that the
+compiler and launch contract do not carry.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../gpu-programming/error-handling-and-debugging.html"
+       title="上一页">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">上一页</p>
+        <p class="prev-next-title">Error Handling and Debugging</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../async-programming/the-device-operation-model.html"
+       title="下一页">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">下一页</p>
+        <p class="prev-next-title">The DeviceOperation Model</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> 当前页面
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#three-tiers">Three tiers</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tier-1-safe-by-default">Tier 1: safe by default</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-core-idea-disjointslice-t-threadindex">The core idea: <code class="docutils literal notranslate"><span class="pre">DisjointSlice&lt;T&gt;</span></code> + <code class="docutils literal notranslate"><span class="pre">ThreadIndex</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#trusted-index-functions">Trusted index functions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-index-2d-is-type-safe">How <code class="docutils literal notranslate"><span class="pre">index_2d</span></code> is type-safe</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#truly-runtime-strides-unsafe-index-2d-runtime">Truly runtime strides: <code class="docutils literal notranslate"><span class="pre">unsafe</span> <span class="pre">index_2d_runtime</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-gemm-pattern">The GEMM pattern</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-makes-a-kernel-tier-1">What makes a kernel Tier 1</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tier-2-scoped-unsafe">Tier 2: scoped <code class="docutils literal notranslate"><span class="pre">unsafe</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#shared-memory">Shared memory</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#warp-intrinsics">Warp intrinsics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#barriers-and-lifecycle">Barriers and lifecycle</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#atomics">Atomics</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#unchecked-slice-access">Unchecked slice access</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tier-3-raw-hardware">Tier 3: raw hardware</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-the-borrow-checker-gives-you">What the borrow checker gives you</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-hard-problems">The hard problems</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#thread-divergent-control-flow">Thread-divergent control flow</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#shared-memory-access-patterns">Shared memory access patterns</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#warp-level-convergence">Warp-level convergence</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#memory-space-awareness">Memory space awareness</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-these-are-solvable">Why these are solvable</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#writing-safe-kernels-a-cheat-sheet">Writing safe kernels: a cheat sheet</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-default-path">The default path</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#when-you-need-unsafe">When you need <code class="docutils literal notranslate"><span class="pre">unsafe</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-safety-comment">The <code class="docutils literal notranslate"><span class="pre">SAFETY</span></code> comment</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+    <div class="footer-items__center">
+      
+        <div class="footer-item"><footer class="bd-footer-content">
+  <div class="footer-container" style="padding: 1rem 0 2rem 0; border-top: 1px solid var(--pst-color-border); text-align: left;">
+    
+    <!-- NVIDIA Logo -->
+    <div style="margin-bottom: 1rem;">
+      <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem; filter: brightness(0);"
+           class="only-light">
+      <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem;"
+           class="only-dark pst-js-only">
+    </div>
+    
+    <!-- Footer Links - single line, left aligned -->
+    <div style="font-size: 0.8125rem; margin-bottom: 0.5rem; color: var(--pst-color-text-muted);">
+      <a href="https://www.nvidia.com/en-us/about-nvidia/privacy-policy/" target="_blank" style="color: inherit; text-decoration: none;">Privacy Policy</a> | 
+      <a href="https://www.nvidia.com/en-us/preferences/email-preferences/" target="_blank" style="color: inherit; text-decoration: none;">Your Privacy Choices</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/terms-of-service/" target="_blank" style="color: inherit; text-decoration: none;">Terms of Service</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/accessibility/" target="_blank" style="color: inherit; text-decoration: none;">Accessibility</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/company-policies/" target="_blank" style="color: inherit; text-decoration: none;">Corporate Policies</a> | 
+      <a href="https://www.nvidia.com/en-us/product-security/" target="_blank" style="color: inherit; text-decoration: none;">Product Security</a> | 
+      <a href="https://www.nvidia.com/en-us/contact/" target="_blank" style="color: inherit; text-decoration: none;">Contact</a>
+    </div>
+    
+    <!-- Copyright -->
+    <div style="font-size: 0.8125rem; color: var(--pst-color-text-muted);">
+      Copyright &copy; 2025-2026, NVIDIA.
+    </div>
+    
+  </div>
+</footer></div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

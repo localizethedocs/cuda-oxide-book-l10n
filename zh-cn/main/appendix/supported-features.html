@@ -1,0 +1,1155 @@
+
+<!DOCTYPE html>
+
+
+<html lang="zh-CN" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Supported Features &#8212; cuda-oxide</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/nvidia-sphinx-theme.css?v=5d97cc0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=196aea71" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/lightbox.css?v=31fdf494" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../_static/documentation_options.js?v=d786bb5c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/translations.js?v=540d3cec"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'appendix/supported-features';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../_static/js/lightbox.js?v=8cf6bc2b"></script>
+    <script src="../_static/js/spa-nav.js?v=9a4d0bbe"></script>
+    <link rel="canonical" href="https://projects.localizethedocs.org/cuda-oxide-book-l10n/appendix/supported-features.html" />
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="cuda-oxide vs CUDA C++" href="cuda-cpp-comparison.html" />
+    <link rel="prev" title="API Quick Reference" href="api-quick-reference.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="zh-CN"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+<script type="text/javascript" src="../ltd-provenance.js"></script>
+<script type="text/javascript" src="../ltd-current.js"></script>
+<script type="text/javascript" src="../../../ltd-config.js"></script>
+<script type="text/javascript" src="../../../ltd-flyout.js"></script>
+
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">跳转至主要内容</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>回到顶部</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="版本警告"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="网页导航">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">cuda-oxide</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="亮色"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="暗色"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>亮色</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>暗色</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="当前页面">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="亮色"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="暗色"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>亮色</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>暗色</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><div class="sidebar-tree">
+    <p class="sidebar-tree-title">
+        Table of Contents
+    </p>
+    <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/hello-gpu.html">Writing Your First Kernel</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Writing GPU Programs</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/execution-model.html">The CUDA Execution Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/kernels-and-device-functions.html">Kernels and Device Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/memory-and-data-movement.html">Memory and Data Movement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/launching-kernels.html">Launching Kernels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/closures-and-generics.html">Closures and Generics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/error-handling-and-debugging.html">Error Handling and Debugging</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Safety on the GPU</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-safety/the-safety-model.html">The Safety Model</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Async GPU Programming</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/the-device-operation-model.html">The DeviceOperation Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/combinators-and-composition.html">Combinators and Composition</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/scheduling-and-streams.html">Scheduling and Streams</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/concurrent-execution.html">Concurrent Execution</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Building a Real Application</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../projects/async-mlp-pipeline.html">Project: Async MLP Pipeline</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Advanced GPU Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/shared-memory-and-synchronization.html">Shared Memory and Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/warp-level-programming.html">Warp-Level Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/tensor-memory-accelerator.html">Tensor Memory Accelerator (TMA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/matrix-multiply-accelerators.html">Matrix Multiply Accelerators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cluster-programming.html">Cluster Programming</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Inside the Compiler</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/architecture-overview.html">Architecture Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/pliron.html">Pliron -- Pliron IR (MLIR-like)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/rustc-public.html">rustc_public -- Stable MIR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/rustc-codegen-cuda.html">The Code Generator: rustc-codegen-cuda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/mir-importer.html">The MIR Importer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/compiler-optimizations.html">Compiler Optimizations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/mlir-dialects.html">Pliron Dialects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/lowering-pipeline.html">The Lowering Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/adding-new-intrinsics.html">Adding New Intrinsics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/fuzzing-and-differential-testing.html">Fuzzing and Differential Testing</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Appendix</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="building-from-source.html">Building from Source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api-quick-reference.html">API Quick Reference</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cuda-cpp-comparison.html">cuda-oxide vs CUDA C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ecosystem.html">The Rust + GPU Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+</ul>
+
+</div></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="初始页面">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Supported Features</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="supported-features">
+<h1>Supported Features<a class="headerlink" href="#supported-features" title="链接到此标题。">#</a></h1>
+<p>This appendix presents the cuda-oxide feature matrix: every compiler capability,
+runtime API, and hardware feature along with its current support status. The
+data is drawn from the compiler/runtime sources and the test suite.</p>
+<p><strong>Legend:</strong> <strong>Full</strong> = tested and working, <strong>Partial</strong> = ships and works but
+has a known gap (called out in the row description), <strong>Planned</strong> = on the
+roadmap, <strong>N/A</strong> = not applicable or no identified need.</p>
+<hr class="docutils" />
+<section id="compiler-memory-model">
+<h2>Compiler: Memory Model<a class="headerlink" href="#compiler-memory-model" title="链接到此标题。">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Feature</p></th>
+<th class="head text-left"><p>Status</p></th>
+<th class="head text-left"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>HMM / Unified Memory Management</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>GPU directly reads/writes host memory without <code class="docutils literal notranslate"><span class="pre">cudaMemcpy</span></code>. Reference captures in closures leverage HMM for host pointer access. Requires Turing+ GPU, Linux 6.1.24+, CUDA 12.2+.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Unified Struct ABI (no <code class="docutils literal notranslate"><span class="pre">#[repr(C)]</span></code>)</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Device struct layout matches host exactly. The compiler queries rustc's actual layout and reproduces it with explicit padding in LLVM IR. Works with <code class="docutils literal notranslate"><span class="pre">#[repr(Rust)]</span></code> default.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Dynamic Layout Matching</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Compiler queries rustc's <code class="docutils literal notranslate"><span class="pre">fields_by_offset_order()</span></code> and byte offsets, builds LLVM structs with correct field order and explicit padding bytes. Independent of LLVM's datalayout.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Pointer Distance (<code class="docutils literal notranslate"><span class="pre">offset_from</span></code>)</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">ptr_offset_from</span></code> / <code class="docutils literal notranslate"><span class="pre">ptr_offset_from_unsigned</span></code> intrinsics (and the <code class="docutils literal notranslate"><span class="pre">offset_from</span></code>, <code class="docutils literal notranslate"><span class="pre">offset_from_unsigned</span></code>, <code class="docutils literal notranslate"><span class="pre">byte_offset_from</span></code>, <code class="docutils literal notranslate"><span class="pre">byte_offset_from_unsigned</span></code> methods) lower to an address difference divided by the rustc-reported pointee size, returning <code class="docutils literal notranslate"><span class="pre">isize</span></code> (signed) or <code class="docutils literal notranslate"><span class="pre">usize</span></code> (unsigned). Errors on a zero-sized pointee.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Volatile Load/Store</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">core::ptr::read_volatile</span></code> / <code class="docutils literal notranslate"><span class="pre">write_volatile</span></code> carry an explicit volatile bit through MIR import, mem2reg (volatile accesses are never promoted), MIR-to-LLVM lowering, and textual export (<code class="docutils literal notranslate"><span class="pre">load</span> <span class="pre">volatile</span></code> / <code class="docutils literal notranslate"><span class="pre">store</span> <span class="pre">volatile</span></code>). Emits <code class="docutils literal notranslate"><span class="pre">ld.volatile</span></code> / <code class="docutils literal notranslate"><span class="pre">st.volatile</span></code> in PTX.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Bulk Copy (<code class="docutils literal notranslate"><span class="pre">copy_nonoverlapping</span></code>)</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">core::ptr::copy_nonoverlapping</span></code> lowers to a <code class="docutils literal notranslate"><span class="pre">mir.memcpy</span></code> op and then <code class="docutils literal notranslate"><span class="pre">llvm.memcpy</span></code>, with the element count scaled to bytes for the pointee. The intrinsic overload suffix is derived from the operand address spaces and length width.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="compiler-type-system">
+<h2>Compiler: Type System<a class="headerlink" href="#compiler-type-system" title="链接到此标题。">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Feature</p></th>
+<th class="head text-left"><p>Status</p></th>
+<th class="head text-left"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>Generics and Monomorphization</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Generic kernels and device functions with trait bounds. Monomorphized instances collected from rustc MIR. Const generics supported.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Enums (<code class="docutils literal notranslate"><span class="pre">Option&lt;T&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">Result&lt;T,E&gt;</span></code>, custom)</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Full enum support including discriminant extraction and payload access. Pattern matching on enums works.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Struct Construction and Field Access</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Struct literals, field access, pass-by-value and return values. User-defined structs supported without annotations.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Array Types (<code class="docutils literal notranslate"><span class="pre">[T;</span> <span class="pre">N]</span></code>)</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Static construction, constant- and runtime-index access. Array value constants (bare and nested) materialized. Mutable arrays auto-promoted to memory-backed.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">CuSimd&lt;T,</span> <span class="pre">N&gt;</span></code> SIMD Type</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Generic SIMD register type with named accessors (<code class="docutils literal notranslate"><span class="pre">x</span></code>/<code class="docutils literal notranslate"><span class="pre">y</span></code>/<code class="docutils literal notranslate"><span class="pre">z</span></code>/<code class="docutils literal notranslate"><span class="pre">w</span></code>), runtime and compile-time indexing, <code class="docutils literal notranslate"><span class="pre">to_array</span></code> conversion.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>ABI Scalarization</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Slices are scalarized at kernel boundaries (<code class="docutils literal notranslate"><span class="pre">&amp;[T]</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">(ptr,</span> <span class="pre">len)</span></code>, reconstructed inside the function). Structs and closures pass by value as one byval <code class="docutils literal notranslate"><span class="pre">.param</span></code>; field flattening still applies on internal device-to-device calls.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Array value constants are limited to primitive leaves (integers, <code class="docutils literal notranslate"><span class="pre">f16</span></code>,
+<code class="docutils literal notranslate"><span class="pre">f32</span></code>, <code class="docutils literal notranslate"><span class="pre">f64</span></code>) and nested arrays of those. Arrays whose elements are
+structs or other ADTs are not yet materialized as constants; they need
+layout-aware field decoding rather than the primitive byte-slicing rule.</p>
+</section>
+<section id="compiler-closures">
+<h2>Compiler: Closures<a class="headerlink" href="#compiler-closures" title="链接到此标题。">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Feature</p></th>
+<th class="head text-left"><p>Status</p></th>
+<th class="head text-left"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>Move Closures (<code class="docutils literal notranslate"><span class="pre">FnOnce</span></code>)</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Closures that capture by value. The whole closure struct is pushed as one byval kernel argument. <code class="docutils literal notranslate"><span class="pre">move</span> <span class="pre">|x|</span> <span class="pre">x</span> <span class="pre">*</span> <span class="pre">factor</span></code> pattern.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Reference Closures (<code class="docutils literal notranslate"><span class="pre">Fn</span></code>/<code class="docutils literal notranslate"><span class="pre">FnMut</span></code>)</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Non-move closures that capture by reference. The closure struct (containing host pointers) still travels as one byval argument; the GPU reads through those pointers via HMM.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Host-to-Device Closures</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Closures defined on host passed to generic kernels. Polynomial evaluation with captured coefficients tested.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Device-Internal Closures</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Closures created and used entirely on device, including closures passed to device functions.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="compiler-control-flow">
+<h2>Compiler: Control Flow<a class="headerlink" href="#compiler-control-flow" title="链接到此标题。">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Feature</p></th>
+<th class="head text-left"><p>Status</p></th>
+<th class="head text-left"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>Match Expressions (integer switch)</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Multi-way match on integers. Generates chain of conditional branches.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Match on Enums</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Pattern matching on <code class="docutils literal notranslate"><span class="pre">Option&lt;T&gt;</span></code> and custom enums. Discriminant extraction + payload access.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>For Loops (range, iterator, enumerate)</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Full iterator desugaring: range-based, <code class="docutils literal notranslate"><span class="pre">slice.iter()</span></code>, <code class="docutils literal notranslate"><span class="pre">enumerate()</span></code>, nested loops, <code class="docutils literal notranslate"><span class="pre">break</span></code>, <code class="docutils literal notranslate"><span class="pre">continue</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>While Loops / If-Else</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Baseline control flow fully supported.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Break and Continue</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">break</span></code> and <code class="docutils literal notranslate"><span class="pre">continue</span></code> in for/while loops, including early exit.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Loop Unroll Annotations</p></td>
+<td class="text-left"><p><strong>Partial</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">#[unroll]</span></code> and <code class="docutils literal notranslate"><span class="pre">#[unroll(N)]</span></code> request unrolling of explicit counted <code class="docutils literal notranslate"><span class="pre">while</span></code> loops. Nested loops and multiple <code class="docutils literal notranslate"><span class="pre">continue</span></code> paths work; full unrolling preserves <code class="docutils literal notranslate"><span class="pre">break</span></code> paths and multiple exit targets, while partial unrolling requires a positive-step <code class="docutils literal notranslate"><span class="pre">&lt;</span></code>/<code class="docutils literal notranslate"><span class="pre">&lt;=</span></code> loop with an invariant limit and only the normal header exit. Requests are capped at 1,024 copies, 8,192 cloned blocks, and 65,536 cloned operations.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="compiler-arithmetic-and-casting">
+<h2>Compiler: Arithmetic and Casting<a class="headerlink" href="#compiler-arithmetic-and-casting" title="链接到此标题。">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Feature</p></th>
+<th class="head text-left"><p>Status</p></th>
+<th class="head text-left"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>64-bit Arithmetic</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Full 64-bit integer arithmetic including shifts, bitwise ops, and descriptor field packing.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Type Casting (all kinds)</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>IntToInt, IntToFloat, FloatToInt, FloatToFloat, Transmute (bitcast), PtrToPtr, PtrToInt, IntToPtr, pointer coercions.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Packed bf16x2 FMA</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">bf16x2::fma_bf16x2(a,</span> <span class="pre">b,</span> <span class="pre">c)</span></code> lowers to PTX <code class="docutils literal notranslate"><span class="pre">fma.rn.bf16x2</span></code>, two bf16 lanes per <code class="docutils literal notranslate"><span class="pre">u32</span></code>. sm_80+.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="compiler-interop">
+<h2>Compiler: Interop<a class="headerlink" href="#compiler-interop" title="链接到此标题。">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Feature</p></th>
+<th class="head text-left"><p>Status</p></th>
+<th class="head text-left"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>Bi-directional LTOIR Support</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Rust kernels call CUDA C++ device functions <strong>and</strong> C++ calls Rust device functions. Via NVVM IR → libNVVM → LTOIR → nvJitLink.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Device FFI (<code class="docutils literal notranslate"><span class="pre">extern</span> <span class="pre">&quot;C&quot;</span></code>)</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">#[device]</span> <span class="pre">extern</span> <span class="pre">&quot;C&quot;</span> <span class="pre">{</span> <span class="pre">fn</span> <span class="pre">...</span> <span class="pre">}</span></code> declarations for external LTOIR functions. CUB/CCCL integration demonstrated.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>MathDx FFI (cuFFTDx / cuBLASDx)</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>cuFFTDx (8/16/32-point thread-level FFT), cuBLASDx (32x32x32 block-level GEMM) via LTOIR.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Tile interop</p></td>
+<td class="text-left"><p><strong>Experimental</strong></p></td>
+<td class="text-left"><p>Inter-kernel interop works today: a <a class="reference external" href="https://github.com/NVlabs/cutile-rs">cutile-rs Tile kernel</a> and a cuda-oxide SIMT PTX kernel can run in one host process on the same CUDA stream over shared device tensors. Intra-kernel Tile interop is work in progress and tracked in <a class="reference external" href="https://github.com/NVlabs/cuda-oxide/issues/96">#96</a>.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Cross-Crate Kernels</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Kernels and device functions defined in library crates with monomorphization at the binary crate use site.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="compiler-functions">
+<h2>Compiler: Functions<a class="headerlink" href="#compiler-functions" title="链接到此标题。">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Feature</p></th>
+<th class="head text-left"><p>Status</p></th>
+<th class="head text-left"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">#[kernel]</span></code> Attribute</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Marks functions as GPU kernel entry points (<code class="docutils literal notranslate"><span class="pre">ptx_kernel</span></code> calling convention). Multiple kernels per file.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">#[device]</span></code> Helper Functions</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Device-side helper functions callable from kernels. <code class="docutils literal notranslate"><span class="pre">#[inline(always)]</span></code> is preserved as the LLVM <code class="docutils literal notranslate"><span class="pre">alwaysinline</span></code> attribute (emitted alongside the convergent group and any <code class="docutils literal notranslate"><span class="pre">!dbg</span></code> scope), so <code class="docutils literal notranslate"><span class="pre">opt</span></code> honors the inline intent.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Standalone <code class="docutils literal notranslate"><span class="pre">#[device]</span></code> Functions</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Device functions compiled without any kernel present. Clean export names for C++ consumption.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Multi-Kernel Modules</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Multiple <code class="docutils literal notranslate"><span class="pre">#[kernel]</span></code> functions in a single source file compile to a single PTX module.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="compiler-compilation-pipeline">
+<h2>Compiler: Compilation Pipeline<a class="headerlink" href="#compiler-compilation-pipeline" title="链接到此标题。">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Feature</p></th>
+<th class="head text-left"><p>Status</p></th>
+<th class="head text-left"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>Unified Single-Source Compilation</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Host and device code in the same file. Custom rustc codegen backend intercepts codegen. No <code class="docutils literal notranslate"><span class="pre">#[cfg]</span></code> needed.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>PTX Output</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Default output: Rust MIR → <code class="docutils literal notranslate"><span class="pre">dialect-mir</span></code> → <code class="docutils literal notranslate"><span class="pre">mem2reg</span></code> → annotated loop unroll → LLVM dialect → LLVM IR → <code class="docutils literal notranslate"><span class="pre">llc</span></code> → PTX. Targets sm_80 through sm_100a.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>NVVM IR Output</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Selects LLVM 7 typed-pointer syntax for pre-Blackwell GPUs and opaque-pointer syntax for Blackwell and newer GPUs. The generated module is verified by libNVVM, and unsupported legacy operations produce a compile error.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>LTOIR Linking</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Device-side LTO via libNVVM and nvJitLink.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Float Math Intrinsics (libdevice)</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Rust <code class="docutils literal notranslate"><span class="pre">f32</span></code>/<code class="docutils literal notranslate"><span class="pre">f64</span></code> math methods (<code class="docutils literal notranslate"><span class="pre">sin</span></code>, <code class="docutils literal notranslate"><span class="pre">cos</span></code>, <code class="docutils literal notranslate"><span class="pre">exp</span></code>, <code class="docutils literal notranslate"><span class="pre">pow</span></code>, <code class="docutils literal notranslate"><span class="pre">sqrt</span></code>, ...) lower to CUDA libdevice (<code class="docutils literal notranslate"><span class="pre">__nv_*</span></code>) on pre-Blackwell and Blackwell GPUs. cuda-oxide selects the matching NVVM IR syntax automatically. On Blackwell, the runtime can also JIT PTX produced from a standard pre-Blackwell target such as <code class="docutils literal notranslate"><span class="pre">sm_86</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Pipeline Inspection</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">oxide</span> <span class="pre">pipeline</span> <span class="pre">&lt;example&gt;</span></code> shows imported and post-<code class="docutils literal notranslate"><span class="pre">mem2reg</span></code> MIR, LLVM dialect, exported LLVM IR, and PTX.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Compute Sanitizer Wrapper</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">oxide</span> <span class="pre">sanitize</span> <span class="pre">&lt;example&gt;</span></code> builds the example and runs the host binary under NVIDIA Compute Sanitizer (<code class="docutils literal notranslate"><span class="pre">memcheck</span></code>, <code class="docutils literal notranslate"><span class="pre">racecheck</span></code>, <code class="docutils literal notranslate"><span class="pre">initcheck</span></code>, or <code class="docutils literal notranslate"><span class="pre">synccheck</span></code>).</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>cuda-gdb Source Debugging</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">oxide</span> <span class="pre">debug</span></code> builds device debug information on the PTX path and launches <code class="docutils literal notranslate"><span class="pre">cuda-gdb</span></code>. Legacy NVVM IR does not yet support debug metadata.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>cuda-gdb Local / Argument Inspection</p></td>
+<td class="text-left"><p><strong>Partial</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">CUDA_OXIDE_DEBUG=full</span></code> is a <code class="docutils literal notranslate"><span class="pre">-G</span></code>-style build (optimization off, locals kept in memory) so <code class="docutils literal notranslate"><span class="pre">info</span> <span class="pre">args</span></code>/<code class="docutils literal notranslate"><span class="pre">info</span> <span class="pre">locals</span></code> show real values for scalars, pointers/references, and structs/tuples/arrays with their fields. Enums, ABI-split bare slices, closures, and projections (<code class="docutils literal notranslate"><span class="pre">x.0</span></code>) are not yet described.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="compiler-inline-ptx">
+<h2>Compiler: Inline PTX<a class="headerlink" href="#compiler-inline-ptx" title="链接到此标题。">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Feature</p></th>
+<th class="head text-left"><p>Status</p></th>
+<th class="head text-left"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">ptx_asm!</span></code> Macro</p></td>
+<td class="text-left"><p><strong>Partial</strong></p></td>
+<td class="text-left"><p>CUDA inline PTX with <code class="docutils literal notranslate"><span class="pre">%0</span></code> operands, <code class="docutils literal notranslate"><span class="pre">in</span></code>, zero or one <code class="docutils literal notranslate"><span class="pre">out</span></code>, up to 16 inputs, CUDA register constraints <code class="docutils literal notranslate"><span class="pre">h</span></code>, <code class="docutils literal notranslate"><span class="pre">r</span></code>, <code class="docutils literal notranslate"><span class="pre">l</span></code>, <code class="docutils literal notranslate"><span class="pre">q</span></code>, <code class="docutils literal notranslate"><span class="pre">f</span></code>, and <code class="docutils literal notranslate"><span class="pre">d</span></code>, immediate integer constraint <code class="docutils literal notranslate"><span class="pre">n</span></code>, <code class="docutils literal notranslate"><span class="pre">clobber(&quot;memory&quot;)</span></code>, and <code class="docutils literal notranslate"><span class="pre">options(register_only)</span></code> for pure register snippets. By default, snippets are treated as side-effecting and stay inside their current control flow. Use <code class="docutils literal notranslate"><span class="pre">options(register_only,</span> <span class="pre">may_diverge)</span></code> only for pure snippets that are safe to move across divergent control flow; <strong>never</strong> use it for <code class="docutils literal notranslate"><span class="pre">.sync</span></code> instructions or collectives. Multiple outputs, read-write operands, and the <code class="docutils literal notranslate"><span class="pre">&quot;C&quot;</span></code> constraint are not implemented yet.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<hr class="docutils" />
+<section id="runtime-library-safety">
+<h2>Runtime Library: Safety<a class="headerlink" href="#runtime-library-safety" title="链接到此标题。">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Feature</p></th>
+<th class="head text-left"><p>Status</p></th>
+<th class="head text-left"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">DisjointSlice&lt;T,</span> <span class="pre">IndexSpace&gt;</span></code></p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Bounds-checked parallel write output slice. <code class="docutils literal notranslate"><span class="pre">IndexSpace</span></code> rejects mismatched layouts; uniqueness also requires matching prepared launch geometry (or a raw unsafe proof).</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">ThreadIndex&lt;'kernel,</span> <span class="pre">IndexSpace&gt;</span></code></p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Opaque, non-transferable witness. <code class="docutils literal notranslate"><span class="pre">index_1d</span></code> uniqueness requires inactive Y/Z dimensions, proven by a <code class="docutils literal notranslate"><span class="pre">domain</span> <span class="pre">=</span> <span class="pre">1</span></code> prepared launch or by the caller of a raw unsafe launch.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">PreparedLaunch&lt;K&gt;</span></code></p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Checked, reusable launch geometry branded for the exact kernel. Raw <code class="docutils literal notranslate"><span class="pre">LaunchConfig</span></code> generated methods are unsafe.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">ManagedBarrier</span></code> Typestate</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Compile-time barrier lifecycle: <code class="docutils literal notranslate"><span class="pre">Uninit</span> <span class="pre">→</span> <span class="pre">Ready</span> <span class="pre">→</span> <span class="pre">Invalidated</span></code>. Invalid transitions are compile errors.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="runtime-library-atomics">
+<h2>Runtime Library: Atomics<a class="headerlink" href="#runtime-library-atomics" title="链接到此标题。">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Feature</p></th>
+<th class="head text-left"><p>Status</p></th>
+<th class="head text-left"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>Device-Scope Atomics</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">DeviceAtomic{U32,I32,U64,I64,F32,F64}</span></code> with <code class="docutils literal notranslate"><span class="pre">.gpu</span></code> scope. All 5 orderings.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Block-Scope Atomics</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">BlockAtomic{U32,I32,U64,I64,F32,F64}</span></code> with <code class="docutils literal notranslate"><span class="pre">.cta</span></code> scope.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>System-Scope Atomics</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">SystemAtomic{U32,I32,U64,I64,F32,F64}</span></code> with <code class="docutils literal notranslate"><span class="pre">.sys</span></code> scope. For CPU-GPU shared data.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">core::sync::atomic</span></code> Support</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Standard library atomic types lowered to PTX <code class="docutils literal notranslate"><span class="pre">atom.sys</span></code> instructions.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="runtime-library-shared-memory">
+<h2>Runtime Library: Shared Memory<a class="headerlink" href="#runtime-library-shared-memory" title="链接到此标题。">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Feature</p></th>
+<th class="head text-left"><p>Status</p></th>
+<th class="head text-left"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>Static Shared Memory</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">SharedArray&lt;T,</span> <span class="pre">N,</span> <span class="pre">ALIGN&gt;</span></code> — compile-time sized, block-scoped. Optional alignment up to 256B.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Dynamic Shared Memory</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">DynamicSharedArray&lt;T,</span> <span class="pre">ALIGN&gt;</span></code> — runtime-sized, set via <code class="docutils literal notranslate"><span class="pre">LaunchConfig::shared_mem_bytes</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Distributed Shared Memory (DSMEM)</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Direct access to other blocks' shared memory within a cluster. <code class="docutils literal notranslate"><span class="pre">map_shared_rank()</span></code> for address mapping. sm_90+.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="runtime-library-thread-and-synchronization">
+<h2>Runtime Library: Thread and Synchronization<a class="headerlink" href="#runtime-library-thread-and-synchronization" title="链接到此标题。">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Feature</p></th>
+<th class="head text-left"><p>Status</p></th>
+<th class="head text-left"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>Thread/Block/Grid Intrinsics</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">threadIdx</span></code>, <code class="docutils literal notranslate"><span class="pre">blockIdx</span></code>, <code class="docutils literal notranslate"><span class="pre">blockDim</span></code>, <code class="docutils literal notranslate"><span class="pre">gridDim</span></code>. Index witnesses are layout-typed; their uniqueness also depends on matching launch dimensionality. <code class="docutils literal notranslate"><span class="pre">index_2d_runtime(s)</span></code> adds a caller-proved stride. See <a class="reference internal" href="../gpu-safety/the-safety-model.html"><span class="std std-doc">The Safety Model</span></a>.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Block Synchronization</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">sync_threads()</span></code> — thread block barrier.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Async Barriers (mbarrier)</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Hardware async barriers for Hopper+: init, arrive, test_wait, try_wait, inval.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Cluster Synchronization</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cluster_sync()</span></code> for all blocks in a cluster. sm_90+.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Fence Operations</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">fence_proxy_async_shared_cta()</span></code> for TMA visibility, <code class="docutils literal notranslate"><span class="pre">nanosleep(ns)</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="runtime-library-warp">
+<h2>Runtime Library: Warp<a class="headerlink" href="#runtime-library-warp" title="链接到此标题。">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Feature</p></th>
+<th class="head text-left"><p>Status</p></th>
+<th class="head text-left"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>Warp Shuffle Operations</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">shuffle</span></code>, <code class="docutils literal notranslate"><span class="pre">shuffle_xor</span></code>, <code class="docutils literal notranslate"><span class="pre">shuffle_down</span></code>, <code class="docutils literal notranslate"><span class="pre">shuffle_up</span></code> for <code class="docutils literal notranslate"><span class="pre">i32</span></code> and <code class="docutils literal notranslate"><span class="pre">f32</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Warp Vote Operations</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">all(pred)</span></code>, <code class="docutils literal notranslate"><span class="pre">any(pred)</span></code>, <code class="docutils literal notranslate"><span class="pre">ballot(pred)</span></code> → bitmask.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Lane/Warp ID</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">lane_id()</span></code> (0–31), <code class="docutils literal notranslate"><span class="pre">warp_id()</span></code>. Direct register reads.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="runtime-library-cooperative-groups">
+<h2>Runtime Library: Cooperative Groups<a class="headerlink" href="#runtime-library-cooperative-groups" title="链接到此标题。">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Feature</p></th>
+<th class="head text-left"><p>Status</p></th>
+<th class="head text-left"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>Typed Group Handles</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">Grid</span></code>, <code class="docutils literal notranslate"><span class="pre">Cluster</span></code>, <code class="docutils literal notranslate"><span class="pre">ThreadBlock</span></code>, <code class="docutils literal notranslate"><span class="pre">WarpTile&lt;N&gt;</span></code> (N ∈ {1,2,4,8,16,32}), <code class="docutils literal notranslate"><span class="pre">CoalescedThreads</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Group Universal API</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">size()</span></code>, <code class="docutils literal notranslate"><span class="pre">thread_rank()</span></code>, <code class="docutils literal notranslate"><span class="pre">sync()</span></code> on every group handle.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Warp Tile Partitioning</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">ThreadBlock::tiled_partition::&lt;N&gt;()</span></code> carves a sub-warp <code class="docutils literal notranslate"><span class="pre">WarpTile&lt;N&gt;</span></code>. <code class="docutils literal notranslate"><span class="pre">coalesced_threads()</span></code> materialises the active-lane group.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Warp Collectives</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">ballot</span></code>, <code class="docutils literal notranslate"><span class="pre">all</span></code>, <code class="docutils literal notranslate"><span class="pre">any</span></code>, <code class="docutils literal notranslate"><span class="pre">shfl</span></code>, <code class="docutils literal notranslate"><span class="pre">shfl_xor</span></code>, <code class="docutils literal notranslate"><span class="pre">shfl_down</span></code>, <code class="docutils literal notranslate"><span class="pre">shfl_up</span></code> (<code class="docutils literal notranslate"><span class="pre">i32</span></code> and <code class="docutils literal notranslate"><span class="pre">f32</span></code>); <code class="docutils literal notranslate"><span class="pre">match_any</span></code> / <code class="docutils literal notranslate"><span class="pre">match_all</span></code> (<code class="docutils literal notranslate"><span class="pre">i32</span></code> and <code class="docutils literal notranslate"><span class="pre">i64</span></code>); <code class="docutils literal notranslate"><span class="pre">active_mask</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Warp Reductions / Scans</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">warp_reduce</span></code>, <code class="docutils literal notranslate"><span class="pre">warp_scan</span></code> (inclusive). <code class="docutils literal notranslate"><span class="pre">Sum</span></code>/<code class="docutils literal notranslate"><span class="pre">Min</span></code>/<code class="docutils literal notranslate"><span class="pre">Max</span></code> for <code class="docutils literal notranslate"><span class="pre">u32</span></code>/<code class="docutils literal notranslate"><span class="pre">i32</span></code>/<code class="docutils literal notranslate"><span class="pre">f32</span></code>; <code class="docutils literal notranslate"><span class="pre">BitAnd</span></code>/<code class="docutils literal notranslate"><span class="pre">BitOr</span></code>/<code class="docutils literal notranslate"><span class="pre">BitXor</span></code> for <code class="docutils literal notranslate"><span class="pre">u32</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Block Reductions / Scans</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">block_reduce</span></code>, <code class="docutils literal notranslate"><span class="pre">block_scan</span></code> (inclusive). Const-generic over <code class="docutils literal notranslate"><span class="pre">NUM_WARPS</span></code>; same op/type matrix as warp variants; uses <code class="docutils literal notranslate"><span class="pre">__shared__</span></code> scratch.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Cooperative Kernel Launch</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">#[cooperative_launch]</span></code> on a <code class="docutils literal notranslate"><span class="pre">#[cuda_module]</span></code> kernel (or <code class="docutils literal notranslate"><span class="pre">unsafe</span> <span class="pre">{</span> <span class="pre">cuda_launch!</span> <span class="pre">{</span> <span class="pre">cooperative:</span> <span class="pre">true,</span> <span class="pre">...</span> <span class="pre">}</span> <span class="pre">}</span></code>) enables <code class="docutils literal notranslate"><span class="pre">Grid::sync()</span></code> for grid-wide barriers.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="runtime-library-debug">
+<h2>Runtime Library: Debug<a class="headerlink" href="#runtime-library-debug" title="链接到此标题。">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Feature</p></th>
+<th class="head text-left"><p>Status</p></th>
+<th class="head text-left"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">gpu_printf!</span></code> Macro</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Formatted GPU output with full format specifier support. Lowers to <code class="docutils literal notranslate"><span class="pre">vprintf</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">gpu_assert!</span></code> Macro</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Runtime GPU assertion. Calls <code class="docutils literal notranslate"><span class="pre">trap()</span></code> if condition is false.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Debug Intrinsics</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">clock()</span></code>, <code class="docutils literal notranslate"><span class="pre">clock64()</span></code>, <code class="docutils literal notranslate"><span class="pre">trap()</span></code>, <code class="docutils literal notranslate"><span class="pre">breakpoint()</span></code>, <code class="docutils literal notranslate"><span class="pre">prof_trigger::&lt;N&gt;()</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="runtime-library-kernel-launch">
+<h2>Runtime Library: Kernel Launch<a class="headerlink" href="#runtime-library-kernel-launch" title="链接到此标题。">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Feature</p></th>
+<th class="head text-left"><p>Status</p></th>
+<th class="head text-left"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">#[cuda_module]</span></code> Typed Launch</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Embedded module loading with typed sync/async arguments. Raw configuration methods are unsafe.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">#[launch_contract]</span></code> / <code class="docutils literal notranslate"><span class="pre">PreparedLaunch&lt;K&gt;</span></code></p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Checked dimensionality, exact block shape, resources, capabilities, context, and kernel identity.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cuda_launch!</span></code> Macro</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Unsafe lower-level launch for runtime-loaded modules; requires <code class="docutils literal notranslate"><span class="pre">unsafe</span> <span class="pre">{</span> <span class="pre">}</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cuda_launch_async!</span></code> Macro</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Unsafe lower-level lazy launch; requires <code class="docutils literal notranslate"><span class="pre">unsafe</span> <span class="pre">{</span> <span class="pre">}</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">#[launch_bounds]</span></code></p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Occupancy hints: max threads per block, min blocks per SM.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">#[cluster_launch]</span></code></p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Compile-time cluster dimensions. Emits <code class="docutils literal notranslate"><span class="pre">.reqnctapercluster</span></code> in PTX.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="runtime-library-tma">
+<h2>Runtime Library: TMA<a class="headerlink" href="#runtime-library-tma" title="链接到此标题。">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Feature</p></th>
+<th class="head text-left"><p>Status</p></th>
+<th class="head text-left"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>TMA Bulk Tensor Copy (1D–5D)</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cp_async_bulk_tensor_{1..5}d_g2s</span></code>. 128-byte TMA descriptors. sm_90+.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>TMA Multicast</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p>Single TMA load broadcast to all CTAs in cluster. sm_100a for full multicast.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>TMA Commit/Wait Groups</p></td>
+<td class="text-left"><p><strong>Full</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cp_async_bulk_commit_group</span></code>, <code class="docutils literal notranslate"><span class="pre">cp_async_bulk_wait_group</span></code> for async completion tracking.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<hr class="docutils" />
+<section id="not-yet-implemented">
+<h2>Not Yet Implemented<a class="headerlink" href="#not-yet-implemented" title="链接到此标题。">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Feature</p></th>
+<th class="head text-left"><p>Status</p></th>
+<th class="head text-left"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>Rust <code class="docutils literal notranslate"><span class="pre">asm!</span></code> macro</p></td>
+<td class="text-left"><p><strong>Planned</strong></p></td>
+<td class="text-left"><p>Use <code class="docutils literal notranslate"><span class="pre">ptx_asm!</span></code> for CUDA inline PTX. Direct lowering of Rust MIR <code class="docutils literal notranslate"><span class="pre">InlineAsm</span></code> is not implemented.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>FP8 / MX Data Types</p></td>
+<td class="text-left"><p><strong>Planned</strong></p></td>
+<td class="text-left"><p>Roadmap item for Blackwell. No architectural limitation.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Dynamic Dispatch (<code class="docutils literal notranslate"><span class="pre">dyn</span> <span class="pre">Trait</span></code>)</p></td>
+<td class="text-left"><p><strong>N/A</strong></p></td>
+<td class="text-left"><p>Use generics with static dispatch. Haven't found a real need for this.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Heap Allocation (<code class="docutils literal notranslate"><span class="pre">Box</span></code>, <code class="docutils literal notranslate"><span class="pre">Vec</span></code>)</p></td>
+<td class="text-left"><p><strong>N/A</strong></p></td>
+<td class="text-left"><p>CUDA has a device-side heap (<code class="docutils literal notranslate"><span class="pre">malloc</span></code>/<code class="docutils literal notranslate"><span class="pre">free</span></code> in kernels), and the compiler allows the <code class="docutils literal notranslate"><span class="pre">alloc</span></code> crate through -- but no device-side <code class="docutils literal notranslate"><span class="pre">#[global_allocator]</span></code> is wired up today. Even if it were, device <code class="docutils literal notranslate"><span class="pre">malloc</span></code> is extremely slow (serialized, fragmented, uncoalesced). Use slices and <code class="docutils literal notranslate"><span class="pre">SharedArray</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">String</span></code> / <code class="docutils literal notranslate"><span class="pre">format_args!</span></code></p></td>
+<td class="text-left"><p><strong>N/A</strong></p></td>
+<td class="text-left"><p>Use <code class="docutils literal notranslate"><span class="pre">gpu_printf!</span></code> for formatted output.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Panic / Unwinding</p></td>
+<td class="text-left"><p><strong>N/A</strong></p></td>
+<td class="text-left"><p>Panic paths exist in MIR but the compiler strips <code class="docutils literal notranslate"><span class="pre">core::panicking::*</span></code> and all unwind edges. The GPU hardware <em>can</em> support unwinding (absolute branches + per-thread call stack tracking post-Volta), but the CUDA toolchain (nvcc/ptxas) doesn't expose it today -- no landing pads survive to PTX. If a panic path is reached at runtime the GPU traps (same as <code class="docutils literal notranslate"><span class="pre">panic=abort</span></code>). NVIDIA has an active project to add C++ exception support to CUDA for automotive safety; the current cuda-oxide design is forward-compatible with that work. Use <code class="docutils literal notranslate"><span class="pre">gpu_assert!()</span></code> + <code class="docutils literal notranslate"><span class="pre">trap()</span></code> for explicit runtime checks today.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Standard Library (<code class="docutils literal notranslate"><span class="pre">std</span></code>/<code class="docutils literal notranslate"><span class="pre">alloc</span></code>)</p></td>
+<td class="text-left"><p><strong>N/A</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">std</span></code> is forbidden. <code class="docutils literal notranslate"><span class="pre">alloc</span></code> is allowed by the collector but has no backing allocator. Only <code class="docutils literal notranslate"><span class="pre">core</span></code> is fully functional. <code class="docutils literal notranslate"><span class="pre">Option</span></code>, <code class="docutils literal notranslate"><span class="pre">Result</span></code>, iterators all work.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Texture Memory</p></td>
+<td class="text-left"><p><strong>N/A</strong></p></td>
+<td class="text-left"><p>Lower priority given TMA availability on Hopper+.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="api-quick-reference.html"
+       title="上一页">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">上一页</p>
+        <p class="prev-next-title">API Quick Reference</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="cuda-cpp-comparison.html"
+       title="下一页">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">下一页</p>
+        <p class="prev-next-title">cuda-oxide vs CUDA C++</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> 当前页面
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compiler-memory-model">Compiler: Memory Model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compiler-type-system">Compiler: Type System</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compiler-closures">Compiler: Closures</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compiler-control-flow">Compiler: Control Flow</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compiler-arithmetic-and-casting">Compiler: Arithmetic and Casting</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compiler-interop">Compiler: Interop</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compiler-functions">Compiler: Functions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compiler-compilation-pipeline">Compiler: Compilation Pipeline</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compiler-inline-ptx">Compiler: Inline PTX</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#runtime-library-safety">Runtime Library: Safety</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#runtime-library-atomics">Runtime Library: Atomics</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#runtime-library-shared-memory">Runtime Library: Shared Memory</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#runtime-library-thread-and-synchronization">Runtime Library: Thread and Synchronization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#runtime-library-warp">Runtime Library: Warp</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#runtime-library-cooperative-groups">Runtime Library: Cooperative Groups</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#runtime-library-debug">Runtime Library: Debug</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#runtime-library-kernel-launch">Runtime Library: Kernel Launch</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#runtime-library-tma">Runtime Library: TMA</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#not-yet-implemented">Not Yet Implemented</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+    <div class="footer-items__center">
+      
+        <div class="footer-item"><footer class="bd-footer-content">
+  <div class="footer-container" style="padding: 1rem 0 2rem 0; border-top: 1px solid var(--pst-color-border); text-align: left;">
+    
+    <!-- NVIDIA Logo -->
+    <div style="margin-bottom: 1rem;">
+      <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem; filter: brightness(0);"
+           class="only-light">
+      <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem;"
+           class="only-dark pst-js-only">
+    </div>
+    
+    <!-- Footer Links - single line, left aligned -->
+    <div style="font-size: 0.8125rem; margin-bottom: 0.5rem; color: var(--pst-color-text-muted);">
+      <a href="https://www.nvidia.com/en-us/about-nvidia/privacy-policy/" target="_blank" style="color: inherit; text-decoration: none;">Privacy Policy</a> | 
+      <a href="https://www.nvidia.com/en-us/preferences/email-preferences/" target="_blank" style="color: inherit; text-decoration: none;">Your Privacy Choices</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/terms-of-service/" target="_blank" style="color: inherit; text-decoration: none;">Terms of Service</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/accessibility/" target="_blank" style="color: inherit; text-decoration: none;">Accessibility</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/company-policies/" target="_blank" style="color: inherit; text-decoration: none;">Corporate Policies</a> | 
+      <a href="https://www.nvidia.com/en-us/product-security/" target="_blank" style="color: inherit; text-decoration: none;">Product Security</a> | 
+      <a href="https://www.nvidia.com/en-us/contact/" target="_blank" style="color: inherit; text-decoration: none;">Contact</a>
+    </div>
+    
+    <!-- Copyright -->
+    <div style="font-size: 0.8125rem; color: var(--pst-color-text-muted);">
+      Copyright &copy; 2025-2026, NVIDIA.
+    </div>
+    
+  </div>
+</footer></div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

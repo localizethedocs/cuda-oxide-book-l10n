@@ -1,0 +1,846 @@
+
+<!DOCTYPE html>
+
+
+<html lang="zh-TW" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Compiler Optimizations &#8212; cuda-oxide</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/nvidia-sphinx-theme.css?v=5d97cc0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=196aea71" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/lightbox.css?v=31fdf494" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../_static/documentation_options.js?v=a7999bab"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/translations.js?v=cbf116e0"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'compiler/compiler-optimizations';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../_static/js/lightbox.js?v=8cf6bc2b"></script>
+    <script src="../_static/js/spa-nav.js?v=9a4d0bbe"></script>
+    <link rel="canonical" href="https://projects.localizethedocs.org/cuda-oxide-book-l10n/compiler/compiler-optimizations.html" />
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜尋" href="../search.html" />
+    <link rel="next" title="Pliron Dialects" href="mlir-dialects.html" />
+    <link rel="prev" title="The MIR Importer" href="mir-importer.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="zh-TW"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+<script type="text/javascript" src="../ltd-provenance.js"></script>
+<script type="text/javascript" src="../ltd-current.js"></script>
+<script type="text/javascript" src="../../../ltd-config.js"></script>
+<script type="text/javascript" src="../../../ltd-flyout.js"></script>
+
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">跳转至主要内容</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>回到顶部</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="版本警告"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="网页导航">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">cuda-oxide</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜尋" aria-label="搜尋" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="亮色"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="暗色"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>亮色</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>暗色</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="当前页面">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜尋" aria-label="搜尋" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="亮色"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="暗色"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>亮色</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>暗色</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><div class="sidebar-tree">
+    <p class="sidebar-tree-title">
+        Table of Contents
+    </p>
+    <p aria-level="2" class="caption" role="heading"><span class="caption-text">開始使用</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/hello-gpu.html">Writing Your First Kernel</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">編寫 GPU 程式</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/execution-model.html">The CUDA Execution Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/kernels-and-device-functions.html">Kernels and Device Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/memory-and-data-movement.html">Memory and Data Movement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/launching-kernels.html">Launching Kernels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/closures-and-generics.html">Closures and Generics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/error-handling-and-debugging.html">Error Handling and Debugging</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Safety on the GPU</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-safety/the-safety-model.html">The Safety Model</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">異步 GPU 程式設計</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/the-device-operation-model.html">The DeviceOperation Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/combinators-and-composition.html">Combinators and Composition</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/scheduling-and-streams.html">Scheduling and Streams</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/concurrent-execution.html">Concurrent Execution</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Building a Real Application</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../projects/async-mlp-pipeline.html">Project: Async MLP Pipeline</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Advanced GPU Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/shared-memory-and-synchronization.html">Shared Memory and Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/warp-level-programming.html">Warp-Level Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/tensor-memory-accelerator.html">張量記憶體加速器（TMA）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/matrix-multiply-accelerators.html">Matrix Multiply Accelerators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cluster-programming.html">Cluster Programming</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Inside the Compiler</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="architecture-overview.html">Architecture Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pliron.html">Pliron -- Pliron IR (MLIR-like)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rustc-public.html">rustc_public -- Stable MIR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rustc-codegen-cuda.html">The Code Generator: rustc-codegen-cuda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mir-importer.html">The MIR Importer</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Compiler Optimizations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mlir-dialects.html">Pliron Dialects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lowering-pipeline.html">The Lowering Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="adding-new-intrinsics.html">Adding New Intrinsics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fuzzing-and-differential-testing.html">Fuzzing and Differential Testing</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">附錄</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/building-from-source.html">Building from Source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/api-quick-reference.html">API Quick Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/supported-features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/cuda-cpp-comparison.html">cuda-oxide vs CUDA C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/ecosystem.html">The Rust + GPU Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/glossary.html">Glossary</a></li>
+</ul>
+
+</div></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="初始页面">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Compiler Optimizations</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="compiler-optimizations">
+<h1>Compiler Optimizations<a class="headerlink" href="#compiler-optimizations" title="連結到這個標頭">#</a></h1>
+<p>cuda-oxide already benefits from optimizations in rustc and LLVM. The
+<code class="docutils literal notranslate"><span class="pre">mir-transforms</span></code> crate is where cuda-oxide adds its own passes while a program
+is still represented as <code class="docutils literal notranslate"><span class="pre">dialect-mir</span></code>. Loop unrolling is the first
+cuda-oxide-owned optimization pass in this layer.</p>
+<p>This page starts with the user-facing idea, then follows one loop through the
+compiler. You do not need compiler experience to read it.</p>
+<hr class="docutils" />
+<section id="what-is-a-mir-transform">
+<h2>What is a MIR transform?<a class="headerlink" href="#what-is-a-mir-transform" title="連結到這個標頭">#</a></h2>
+<p>After rustc lowers Rust source to MIR, cuda-oxide imports it into <code class="docutils literal notranslate"><span class="pre">dialect-mir</span></code>,
+where typed operations and control-flow branches are explicit.</p>
+<p>There are three related jobs in this part of the compiler:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Job</p></th>
+<th class="head text-left"><p>What it does</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><strong>Analysis</strong></p></td>
+<td class="text-left"><p>Reads the IR and records facts, such as which blocks form a loop</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><strong>Transform</strong></p></td>
+<td class="text-left"><p>Rewrites the IR without changing what the program computes</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><strong>Lowering</strong></p></td>
+<td class="text-left"><p>Converts the program from one IR dialect into a lower-level dialect</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Loop analysis can identify a loop's counter, step, and bound. The unroll
+transform uses those facts to rewrite the loop so that each trip performs
+several original iterations. Lowering later converts the result to LLVM.</p>
+<div class="admonition note">
+<p class="admonition-title">備註</p>
+<p>In this chapter, <strong>MIR transforms</strong> means transforms over cuda-oxide's imported
+<code class="docutils literal notranslate"><span class="pre">dialect-mir</span></code>. They do not modify rustc's internal MIR directly.</p>
+</div>
+</section>
+<hr class="docutils" />
+<section id="where-transforms-run">
+<h2>Where transforms run<a class="headerlink" href="#where-transforms-run" title="連結到這個標頭">#</a></h2>
+<p>The optimization layer sits in the middle of the device compilation pipeline:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Rust source
+    → rustc MIR
+    → mir-importer
+    → dialect-mir
+    → mem2reg
+    → mir-transforms       ← cuda-oxide optimizations
+    → mir-lower
+    → LLVM dialect
+    → LLVM IR
+    → PTX
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="mir-importer.html"><span class="std std-doc">MIR importer</span></a> initially represents local variables with
+loads and stores. <code class="docutils literal notranslate"><span class="pre">mem2reg</span></code> promotes eligible locals to <strong>SSA values</strong>, where
+each value has one definition and block arguments carry values between blocks.
+That makes loop counters and their updates explicit enough for an optimization
+pass to reason about.</p>
+<p>Transforms run here because <code class="docutils literal notranslate"><span class="pre">dialect-mir</span></code> retains Rust-level types and
+operations, making targeted cuda-oxide rewrites easier to express. The
+<a class="reference internal" href="lowering-pipeline.html"><span class="std std-doc">lowering pipeline</span></a> then converts the optimized result.</p>
+<p>Full variable-debug builds skip <code class="docutils literal notranslate"><span class="pre">mem2reg</span></code> and loop unrolling. Keeping source
+variables in stable memory locations gives cuda-gdb a better debugging
+experience.</p>
+</section>
+<hr class="docutils" />
+<section id="the-first-pass-loop-unrolling">
+<h2>The first pass: loop unrolling<a class="headerlink" href="#the-first-pass-loop-unrolling" title="連結到這個標頭">#</a></h2>
+<p>A loop normally tests its condition and branches back after every iteration.
+<strong>Unrolling</strong> copies the body so that one trip through the new loop performs
+several iterations' work.</p>
+<p>Consider this small counted loop inside a kernel or device function:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="k">u32</span><span class="p">;</span>
+<span class="cp">#[unroll]</span>
+<span class="k">while</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">4</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">work</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>
+<span class="w">    </span><span class="n">i</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Conceptually, full unrolling turns it into:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="n">work</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="n">work</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">work</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+<span class="n">work</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The condition and branch back to the loop header disappear. More importantly,
+each copy now has a constant value for <code class="docutils literal notranslate"><span class="pre">i</span></code>, exposing further simplifications.</p>
+<p>The tradeoff is larger generated code. A larger body may also need more
+registers, so unrolling is a request to the compiler, not a promise of better
+performance.</p>
+</section>
+<hr class="docutils" />
+<section id="full-and-partial-unrolling">
+<h2>Full and partial unrolling<a class="headerlink" href="#full-and-partial-unrolling" title="連結到這個標頭">#</a></h2>
+<p>cuda-oxide provides two forms:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Annotation</p></th>
+<th class="head text-left"><p>Use it when</p></th>
+<th class="head text-left"><p>What the pass produces</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">#[unroll]</span></code></p></td>
+<td class="text-left"><p>The trip count is known at compile time</p></td>
+<td class="text-left"><p>One body copy per iteration; the loop disappears</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">#[unroll(N)]</span></code></p></td>
+<td class="text-left"><p>The trip count may be known only at runtime</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">N</span></code> copies in a main loop, plus a remainder loop</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<section id="full-unrolling">
+<h3>Full unrolling<a class="headerlink" href="#full-unrolling" title="連結到這個標頭">#</a></h3>
+<p>Bare <code class="docutils literal notranslate"><span class="pre">#[unroll]</span></code> needs a compile-time-known trip count:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="k">u32</span><span class="p">;</span>
+<span class="cp">#[unroll]</span>
+<span class="k">while</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">8</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">sum</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span>
+<span class="w">    </span><span class="n">i</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The pass gives the eight copies counter values <code class="docutils literal notranslate"><span class="pre">0</span></code> through <code class="docutils literal notranslate"><span class="pre">7</span></code>. Constant
+propagation can then fold expressions derived from those literals.</p>
+</section>
+<section id="partial-unrolling">
+<h3>Partial unrolling<a class="headerlink" href="#partial-unrolling" title="連結到這個標頭">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">#[unroll(4)]</span></code> also works when the limit is a runtime value:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="k">u32</span><span class="p">;</span>
+<span class="cp">#[unroll(4)]</span>
+<span class="k">while</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">process</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>
+<span class="w">    </span><span class="n">i</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>If <code class="docutils literal notranslate"><span class="pre">n</span></code> is <code class="docutils literal notranslate"><span class="pre">10</span></code>, the main loop handles two groups of four iterations. The
+remainder loop handles iterations <code class="docutils literal notranslate"><span class="pre">8</span></code> and <code class="docutils literal notranslate"><span class="pre">9</span></code>. The result is still correct
+when <code class="docutils literal notranslate"><span class="pre">n</span></code> is not divisible by four.</p>
+<p>This removes three out of every four main-loop tests and gives the compiler a
+larger straight-line region to optimize.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="a-useful-peephole-folding-pipeline-stages">
+<h2>A useful peephole: folding pipeline stages<a class="headerlink" href="#a-useful-peephole-folding-pipeline-stages" title="連結到這個標頭">#</a></h2>
+<p>Partial unrolling has one wrinkle: the main loop still has a runtime counter.
+cuda-oxide includes a small <strong>peephole optimization</strong> for a common
+software-pipeline pattern:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">k_idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="k">u32</span><span class="p">;</span>
+<span class="cp">#[unroll(4)]</span>
+<span class="k">while</span><span class="w"> </span><span class="n">k_idx</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">k_iters</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">stage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">k_idx</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+<span class="w">    </span><span class="k">match</span><span class="w"> </span><span class="n">stage</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="mi">0</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">consume_stage_0</span><span class="p">(),</span>
+<span class="w">        </span><span class="mi">1</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">consume_stage_1</span><span class="p">(),</span>
+<span class="w">        </span><span class="mi">2</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">consume_stage_2</span><span class="p">(),</span>
+<span class="w">        </span><span class="mi">3</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">consume_stage_3</span><span class="p">(),</span>
+<span class="w">        </span><span class="n">_</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">{}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="n">k_idx</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The unrolled main-loop counter advances by four. Its low two bits therefore do
+not change between groups, so the four copies have fixed stage values:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>copy 0: (k_idx + 0) &amp; 3  →  0
+copy 1: (k_idx + 1) &amp; 3  →  1
+copy 2: (k_idx + 2) &amp; 3  →  2
+copy 3: (k_idx + 3) &amp; 3  →  3
+</pre></div>
+</div>
+<p>The peephole replaces those expressions with literals. Constant propagation
+then removes the dead <code class="docutils literal notranslate"><span class="pre">match</span></code> arms, leaving four straight-line,
+stage-specific bodies. The remainder loop stays intact for leftover
+iterations.</p>
+<p><code class="docutils literal notranslate"><span class="pre">k_idx</span> <span class="pre">%</span> <span class="pre">4</span></code> works too when <code class="docutils literal notranslate"><span class="pre">k_idx</span></code> is unsigned, and constant offsets such as
+<code class="docutils literal notranslate"><span class="pre">(k_idx</span> <span class="pre">+</span> <span class="pre">1)</span> <span class="pre">&amp;</span> <span class="pre">3</span></code> are also recognized. The pass folds these forms only when
+their power-of-two period divides the unrolled step.</p>
+<section id="why-a-runtime-base-does-not-fold">
+<h3>Why a runtime base does not fold<a class="headerlink" href="#why-a-runtime-base-does-not-fold" title="連結到這個標頭">#</a></h3>
+<p>The expression must be based directly on the loop counter:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="n">stage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">k_idx</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span><span class="w">                    </span><span class="c1">// can fold</span>
+
+<span class="kd">let</span><span class="w"> </span><span class="n">global_k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tile_k_base</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">k_idx</span><span class="p">;</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">stage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">global_k</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span><span class="w">                 </span><span class="c1">// tile_k_base is runtime: cannot fold</span>
+</pre></div>
+</div>
+<p>Because the low bits of runtime <code class="docutils literal notranslate"><span class="pre">tile_k_base</span></code> are unknown at compile time, the
+compiler cannot choose one literal stage for each copy. Rewriting it to the
+first form is correct only when the algorithm separately guarantees that
+<code class="docutils literal notranslate"><span class="pre">tile_k_base</span></code> is a multiple of four. The pass deliberately refuses to guess.</p>
+<div class="admonition note">
+<p class="admonition-title">備註</p>
+<p>Full unrolling does not need this peephole. A fully unrolled counter is already
+a literal in every copy, so ordinary constant propagation can do the work.</p>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="how-the-annotation-reaches-the-pass">
+<h2>How the annotation reaches the pass<a class="headerlink" href="#how-the-annotation-reaches-the-pass" title="連結到這個標頭">#</a></h2>
+<p>The source attribute travels through the compiler in six stages:</p>
+<ol class="arabic simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">#[kernel]</span></code> or <code class="docutils literal notranslate"><span class="pre">#[device]</span></code> macro consumes <code class="docutils literal notranslate"><span class="pre">#[unroll]</span></code> or <code class="docutils literal notranslate"><span class="pre">#[unroll(N)]</span></code>
+and inserts an internal marker call at the start of that loop.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mir-importer</span></code> recognizes the call and emits a <code class="docutils literal notranslate"><span class="pre">mir.unroll_hint</span></code> operation.
+The marker produces no runtime code.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LoopInfo</span></code> finds the enclosing loop, while induction analysis finds its
+counter, start, step, bound, and—when possible—trip count.</p></li>
+<li><p>The pass normalizes supported control flow. It joins multiple <code class="docutils literal notranslate"><span class="pre">continue</span></code>
+paths into one path back to the loop header and routes supported
+loop-carried values out of a fully unrolled loop.</p></li>
+<li><p>The transform clones and reconnects the body for full or partial unrolling.</p></li>
+<li><p>A cleanup phase folds constants, simplifies branches, and removes dead or
+unreachable code.</p></li>
+</ol>
+<p>The unroll pass leaves functions without an unroll hint untouched. If it cannot
+prove a requested rewrite is safe, it prints a warning and does not apply the
+unroll; the loop continues with the same behavior.</p>
+</section>
+<hr class="docutils" />
+<section id="supported-loops-and-safe-fallback">
+<h2>Supported loops and safe fallback<a class="headerlink" href="#supported-loops-and-safe-fallback" title="連結到這個標頭">#</a></h2>
+<p>The current pass intentionally recognizes a conservative set of loop shapes:</p>
+<p>Both forms need a counter the pass can follow: a compile-time-constant starting
+value, the same fixed step on every path back to the header, and a simple,
+side-effect-free test that directly compares the counter with its bound. The
+loop must also have one ordinary entry before its header. For unusual or
+irreducible control flow, the compiler warns and does not unroll the loop.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Shape</p></th>
+<th class="head text-left"><p>Current behavior</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>Explicit counted <code class="docutils literal notranslate"><span class="pre">while</span></code> loop</p></td>
+<td class="text-left"><p>Supported when the requirements above hold</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Range-based <code class="docutils literal notranslate"><span class="pre">for</span></code> loop</p></td>
+<td class="text-left"><p>Not yet recognized</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Constant trip count with <code class="docutils literal notranslate"><span class="pre">#[unroll]</span></code></p></td>
+<td class="text-left"><p>Fully unrolled</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Runtime, loop-invariant limit with <code class="docutils literal notranslate"><span class="pre">#[unroll(N)]</span></code></p></td>
+<td class="text-left"><p>Partially unrolled</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Several <code class="docutils literal notranslate"><span class="pre">continue</span></code> paths with the same counter step</p></td>
+<td class="text-left"><p>Joined and unrolled</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Early <code class="docutils literal notranslate"><span class="pre">break</span></code> or multiple exits with <code class="docutils literal notranslate"><span class="pre">#[unroll]</span></code></p></td>
+<td class="text-left"><p>Supported</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Early <code class="docutils literal notranslate"><span class="pre">break</span></code> or another exit with <code class="docutils literal notranslate"><span class="pre">#[unroll(N)]</span></code></p></td>
+<td class="text-left"><p>Warns; partial unroll is skipped</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Nested loops</p></td>
+<td class="text-left"><p>Only the annotated loop is unrolled</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Partial unrolling also requires <code class="docutils literal notranslate"><span class="pre">N</span> <span class="pre">&gt;=</span> <span class="pre">2</span></code>, a positive counter step, a <code class="docutils literal notranslate"><span class="pre">&lt;</span></code> or
+<code class="docutils literal notranslate"><span class="pre">&lt;=</span></code> comparison, and a limit that does not change inside the loop.</p>
+<p>When an annotated outer loop contains an unannotated inner loop, each outer
+copy receives an intact clone of that inner loop; the inner loop remains a
+loop. When both loops are annotated, the compiler handles the inner loop
+first.</p>
+<p>To bound compile time and memory, one annotation may create at most 1,024 body
+copies, 8,192 cloned basic blocks, and 65,536 cloned operations. A request over
+one of those limits warns and is not unrolled.</p>
+<p>For the complete kernel-author reference, see <a class="reference internal" href="../gpu-programming/kernels-and-device-functions.html#loop-unrolling"><span class="std std-ref">Loop unrolling</span></a>.</p>
+</section>
+<hr class="docutils" />
+<section id="when-should-you-unroll">
+<h2>When should you unroll?<a class="headerlink" href="#when-should-you-unroll" title="連結到這個標頭">#</a></h2>
+<p>Good candidates are:</p>
+<ul class="simple">
+<li><p>small loops with a fixed trip count;</p></li>
+<li><p>hot counted loops where branch overhead matters;</p></li>
+<li><p>software pipelines whose stage selection becomes constant after unrolling;</p></li>
+<li><p>loops where several independent copies expose instruction-level parallelism.</p></li>
+</ul>
+<p>Be cautious when the body is large or already uses many registers. Extra code
+can increase register pressure, reduce occupancy, or put more pressure on the
+instruction cache.</p>
+<p>Choose a factor that matches the structure of the algorithm—often a pipeline
+depth or another small natural group—and benchmark the result. Removing
+<code class="docutils literal notranslate"><span class="pre">#[unroll]</span></code> should always remain an easy comparison.</p>
+<p>To inspect the pass's analysis, build verbosely:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cargo<span class="w"> </span>oxide<span class="w"> </span>build<span class="w"> </span>&lt;example&gt;<span class="w"> </span>--verbose
+</pre></div>
+</div>
+<p>Verbose mode prints the requested factor and the loop facts the pass found.
+If a request is skipped, a warning explains why. Loop numbers and analysis
+fields are internal details and may change.</p>
+</section>
+<hr class="docutils" />
+<section id="a-home-for-future-transforms">
+<h2>A home for future transforms<a class="headerlink" href="#a-home-for-future-transforms" title="連結到這個標頭">#</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">mir-transforms</span></code> crate keeps reusable analysis separate from IR mutation:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>crates/mir-transforms/src/
+├── analyses/
+│   ├── loop_info.rs      # which blocks belong to each loop?
+│   └── induction.rs      # what are the counter, step, bound, and trip count?
+├── canonicalize.rs       # put supported control flow into a simpler shape
+└── unroll.rs             # prove, clone, reconnect, and clean up loops
+</pre></div>
+</div>
+<p>This separation gives future optimizations a predictable place to live:
+analyses gather facts, canonicalization normalizes equivalent shapes, and
+transforms perform behavior-preserving rewrites. <code class="docutils literal notranslate"><span class="pre">mir-importer/src/pipeline.rs</span></code>
+controls when each pass runs.</p>
+<p>Every transform should follow the same rule as the unroller: prove the rewrite
+is safe, bound its resource use, and fall back without changing behavior when a
+program is outside the supported shape.</p>
+<p>The focused test suite runs with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cargo<span class="w"> </span><span class="nb">test</span><span class="w"> </span>-p<span class="w"> </span>mir-transforms<span class="w"> </span>--all-targets
+</pre></div>
+</div>
+<p>From here, <a class="reference internal" href="lowering-pipeline.html"><span class="std std-doc">The Lowering Pipeline</span></a> explains how the
+optimized <code class="docutils literal notranslate"><span class="pre">dialect-mir</span></code> becomes the LLVM dialect and, eventually, PTX.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="mir-importer.html"
+       title="上一页">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">上一頁</p>
+        <p class="prev-next-title">The MIR Importer</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="mlir-dialects.html"
+       title="下一页">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">下一頁</p>
+        <p class="prev-next-title">Pliron Dialects</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> 当前页面
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-a-mir-transform">What is a MIR transform?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#where-transforms-run">Where transforms run</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-first-pass-loop-unrolling">The first pass: loop unrolling</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#full-and-partial-unrolling">Full and partial unrolling</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#full-unrolling">Full unrolling</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#partial-unrolling">Partial unrolling</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-useful-peephole-folding-pipeline-stages">A useful peephole: folding pipeline stages</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-a-runtime-base-does-not-fold">Why a runtime base does not fold</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-the-annotation-reaches-the-pass">How the annotation reaches the pass</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#supported-loops-and-safe-fallback">Supported loops and safe fallback</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#when-should-you-unroll">When should you unroll?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-home-for-future-transforms">A home for future transforms</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+    <div class="footer-items__center">
+      
+        <div class="footer-item"><footer class="bd-footer-content">
+  <div class="footer-container" style="padding: 1rem 0 2rem 0; border-top: 1px solid var(--pst-color-border); text-align: left;">
+    
+    <!-- NVIDIA Logo -->
+    <div style="margin-bottom: 1rem;">
+      <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem; filter: brightness(0);"
+           class="only-light">
+      <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem;"
+           class="only-dark pst-js-only">
+    </div>
+    
+    <!-- Footer Links - single line, left aligned -->
+    <div style="font-size: 0.8125rem; margin-bottom: 0.5rem; color: var(--pst-color-text-muted);">
+      <a href="https://www.nvidia.com/en-us/about-nvidia/privacy-policy/" target="_blank" style="color: inherit; text-decoration: none;">Privacy Policy</a> | 
+      <a href="https://www.nvidia.com/en-us/preferences/email-preferences/" target="_blank" style="color: inherit; text-decoration: none;">Your Privacy Choices</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/terms-of-service/" target="_blank" style="color: inherit; text-decoration: none;">Terms of Service</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/accessibility/" target="_blank" style="color: inherit; text-decoration: none;">Accessibility</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/company-policies/" target="_blank" style="color: inherit; text-decoration: none;">Corporate Policies</a> | 
+      <a href="https://www.nvidia.com/en-us/product-security/" target="_blank" style="color: inherit; text-decoration: none;">Product Security</a> | 
+      <a href="https://www.nvidia.com/en-us/contact/" target="_blank" style="color: inherit; text-decoration: none;">Contact</a>
+    </div>
+    
+    <!-- Copyright -->
+    <div style="font-size: 0.8125rem; color: var(--pst-color-text-muted);">
+      Copyright &copy; 2025-2026, NVIDIA.
+    </div>
+    
+  </div>
+</footer></div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

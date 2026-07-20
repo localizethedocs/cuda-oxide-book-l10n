@@ -1,0 +1,831 @@
+
+<!DOCTYPE html>
+
+
+<html lang="zh-TW" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>rustc_public -- Stable MIR &#8212; cuda-oxide</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/nvidia-sphinx-theme.css?v=5d97cc0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=196aea71" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/lightbox.css?v=31fdf494" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../_static/documentation_options.js?v=a7999bab"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/translations.js?v=cbf116e0"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'compiler/rustc-public';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../_static/js/lightbox.js?v=8cf6bc2b"></script>
+    <script src="../_static/js/spa-nav.js?v=9a4d0bbe"></script>
+    <link rel="canonical" href="https://projects.localizethedocs.org/cuda-oxide-book-l10n/compiler/rustc-public.html" />
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜尋" href="../search.html" />
+    <link rel="next" title="The Code Generator: rustc-codegen-cuda" href="rustc-codegen-cuda.html" />
+    <link rel="prev" title="Pliron -- Pliron IR (MLIR-like)" href="pliron.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="zh-TW"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+<script type="text/javascript" src="../ltd-provenance.js"></script>
+<script type="text/javascript" src="../ltd-current.js"></script>
+<script type="text/javascript" src="../../../ltd-config.js"></script>
+<script type="text/javascript" src="../../../ltd-flyout.js"></script>
+
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">跳转至主要内容</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>回到顶部</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="版本警告"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="网页导航">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">cuda-oxide</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜尋" aria-label="搜尋" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="亮色"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="暗色"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>亮色</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>暗色</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="当前页面">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜尋" aria-label="搜尋" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="亮色"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="暗色"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>亮色</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>暗色</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><div class="sidebar-tree">
+    <p class="sidebar-tree-title">
+        Table of Contents
+    </p>
+    <p aria-level="2" class="caption" role="heading"><span class="caption-text">開始使用</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/hello-gpu.html">Writing Your First Kernel</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">編寫 GPU 程式</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/execution-model.html">The CUDA Execution Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/kernels-and-device-functions.html">Kernels and Device Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/memory-and-data-movement.html">Memory and Data Movement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/launching-kernels.html">Launching Kernels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/closures-and-generics.html">Closures and Generics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/error-handling-and-debugging.html">Error Handling and Debugging</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Safety on the GPU</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-safety/the-safety-model.html">The Safety Model</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">異步 GPU 程式設計</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/the-device-operation-model.html">The DeviceOperation Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/combinators-and-composition.html">Combinators and Composition</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/scheduling-and-streams.html">Scheduling and Streams</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/concurrent-execution.html">Concurrent Execution</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Building a Real Application</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../projects/async-mlp-pipeline.html">Project: Async MLP Pipeline</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Advanced GPU Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/shared-memory-and-synchronization.html">Shared Memory and Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/warp-level-programming.html">Warp-Level Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/tensor-memory-accelerator.html">張量記憶體加速器（TMA）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/matrix-multiply-accelerators.html">Matrix Multiply Accelerators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cluster-programming.html">Cluster Programming</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Inside the Compiler</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="architecture-overview.html">Architecture Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pliron.html">Pliron -- Pliron IR (MLIR-like)</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">rustc_public -- Stable MIR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rustc-codegen-cuda.html">The Code Generator: rustc-codegen-cuda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mir-importer.html">The MIR Importer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compiler-optimizations.html">Compiler Optimizations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mlir-dialects.html">Pliron Dialects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lowering-pipeline.html">The Lowering Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="adding-new-intrinsics.html">Adding New Intrinsics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fuzzing-and-differential-testing.html">Fuzzing and Differential Testing</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">附錄</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/building-from-source.html">Building from Source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/api-quick-reference.html">API Quick Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/supported-features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/cuda-cpp-comparison.html">cuda-oxide vs CUDA C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/ecosystem.html">The Rust + GPU Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/glossary.html">Glossary</a></li>
+</ul>
+
+</div></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="初始页面">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">rustc_public -- Stable MIR</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="rustc-public-stable-mir">
+<h1>rustc_public -- Stable MIR<a class="headerlink" href="#rustc-public-stable-mir" title="連結到這個標頭">#</a></h1>
+<p>cuda-oxide does not invent its own Rust parser or type system. It piggybacks on
+the real Rust compiler, intercepts the internal representation that <code class="docutils literal notranslate"><span class="pre">rustc</span></code>
+produces after type-checking and monomorphization, and compiles <em>that</em> to PTX.
+This chapter explains the intermediate representation cuda-oxide reads (MIR),
+the stability layer it reads it through (<code class="docutils literal notranslate"><span class="pre">rustc_public</span></code>), and the bridge
+pattern that connects the two worlds.</p>
+<section id="what-is-mir">
+<h2>What is MIR?<a class="headerlink" href="#what-is-mir" title="連結到這個標頭">#</a></h2>
+<p>After <code class="docutils literal notranslate"><span class="pre">rustc</span></code> parses your source code, resolves names, checks types, and
+desugars all the syntactic conveniences (closures, <code class="docutils literal notranslate"><span class="pre">for</span></code> loops, <code class="docutils literal notranslate"><span class="pre">?</span></code> operator),
+it produces <strong>MIR</strong> -- the <strong>Mid-level Intermediate Representation</strong>. MIR is a
+simplified, control-flow-oriented form of your program that looks much closer
+to what a machine would execute than the abstract syntax tree you wrote.</p>
+<p>MIR is where the heavy lifting happens:</p>
+<ul class="simple">
+<li><p><strong>Borrow checking</strong> -- Rust's ownership rules are verified against MIR, not
+against your source code.</p></li>
+<li><p><strong>Optimizations</strong> -- constant propagation, copy propagation, dead store
+elimination, and inlining all operate on MIR.</p></li>
+<li><p><strong>Monomorphization</strong> -- generic functions are stamped out into concrete
+versions for each set of type parameters.</p></li>
+</ul>
+<p>In a normal Rust compilation, MIR is lowered to LLVM IR (or Cranelift IR if
+you are using the <code class="docutils literal notranslate"><span class="pre">cranelift</span></code> backend), and from there to machine code. But
+what if you could intercept MIR <em>before</em> it reaches LLVM and do something else
+with it -- like compile it to PTX for GPUs?</p>
+<p>That is exactly what cuda-oxide does.</p>
+</section>
+<section id="the-stability-problem">
+<h2>The stability problem<a class="headerlink" href="#the-stability-problem" title="連結到這個標頭">#</a></h2>
+<p>There is a catch. MIR is <code class="docutils literal notranslate"><span class="pre">rustc</span></code>'s <strong>internal</strong> intermediate representation.
+It was never designed as a public API. Types get renamed, enum variants get
+reordered, fields appear and disappear -- all between consecutive nightly
+releases, sometimes between consecutive <em>commits</em>. The compiler team is under
+no obligation to keep any of it stable, and they don't.</p>
+<p>If cuda-oxide consumed <code class="docutils literal notranslate"><span class="pre">rustc_middle</span></code> types directly, every nightly update
+would be a game of whack-a-mole: something moves, something breaks, someone
+spends a weekend patching compilation errors instead of writing GPU code.</p>
+<p>This is where <code class="docutils literal notranslate"><span class="pre">rustc_public</span></code> comes in.</p>
+</section>
+<section id="what-is-rustc-public">
+<h2>What is rustc_public?<a class="headerlink" href="#what-is-rustc-public" title="連結到這個標頭">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">rustc_public</span></code> (formerly known as <code class="docutils literal notranslate"><span class="pre">stable_mir</span></code>) is a <strong>stable interface</strong> to
+the Rust compiler's internals. It lets tool developers -- verifiers, linters,
+codegen backends like cuda-oxide -- perform analyses and code generation
+without breaking every time the compiler's plumbing shifts.</p>
+<p>The implementation lives in two crates inside the <code class="docutils literal notranslate"><span class="pre">rustc</span></code> repository:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Crate</p></th>
+<th class="head text-left"><p>Role</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">rustc_public</span></code></p></td>
+<td class="text-left"><p>The user-facing public API. Defines stable types for <code class="docutils literal notranslate"><span class="pre">Body</span></code>, <code class="docutils literal notranslate"><span class="pre">BasicBlock</span></code>, <code class="docutils literal notranslate"><span class="pre">Local</span></code>, <code class="docutils literal notranslate"><span class="pre">Place</span></code>, <code class="docutils literal notranslate"><span class="pre">Ty</span></code>, <code class="docutils literal notranslate"><span class="pre">StatementKind</span></code>, <code class="docutils literal notranslate"><span class="pre">TerminatorKind</span></code>, and the rest of MIR. Will eventually be published on crates.io.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">rustc_public_bridge</span></code></p></td>
+<td class="text-left"><p>The translation layer. Converts between <code class="docutils literal notranslate"><span class="pre">rustc_public</span></code> types and the real <code class="docutils literal notranslate"><span class="pre">rustc_middle</span></code> types that live inside the compiler.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The stable API covers the types cuda-oxide cares about most:</p>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">Body</span></code></strong> -- the MIR of a single function (basic blocks, locals, types).</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">BasicBlock</span></code></strong> -- a straight-line sequence of statements followed by a
+terminator.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">Local</span></code> and <code class="docutils literal notranslate"><span class="pre">Place</span></code></strong> -- variables and memory locations.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">Ty</span></code></strong> -- the full Rust type system: primitives, references, tuples,
+ADTs, function pointers, closures.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">StatementKind</span></code></strong> -- assignments, storage annotations, discriminant reads.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">TerminatorKind</span></code></strong> -- branches, calls, returns, asserts, drops.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">Instance</span></code></strong> -- a monomorphized function (concrete types filled in).</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">備註</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">rustc_public</span></code> effort is driven by the <a class="reference external" href="https://github.com/model-checking/kani">Kani</a>
+team at AWS (formal verification for Rust) and other projects that need stable
+compiler access. cuda-oxide benefits from their work without having to
+maintain the bridge itself.</p>
+</div>
+</section>
+<section id="how-cuda-oxide-hooks-in">
+<h2>How cuda-oxide hooks in<a class="headerlink" href="#how-cuda-oxide-hooks-in" title="連結到這個標頭">#</a></h2>
+<section id="the-codegenbackend-trait">
+<h3>The CodegenBackend trait<a class="headerlink" href="#the-codegenbackend-trait" title="連結到這個標頭">#</a></h3>
+<p>Deep inside <code class="docutils literal notranslate"><span class="pre">rustc</span></code>, compilation is organized around a trait called
+<code class="docutils literal notranslate"><span class="pre">CodegenBackend</span></code>. Its key method is <code class="docutils literal notranslate"><span class="pre">codegen_crate</span></code>, which receives a
+<code class="docutils literal notranslate"><span class="pre">TyCtxt</span></code> -- the compiler's god-object containing all type information,
+MIR bodies, and metadata for the current compilation -- and must produce
+compiled output.</p>
+<p>Normally, <code class="docutils literal notranslate"><span class="pre">rustc_codegen_llvm</span></code> implements this trait and turns MIR into
+machine code via LLVM. cuda-oxide provides <code class="docutils literal notranslate"><span class="pre">CudaCodegenBackend</span></code>, which
+<strong>wraps</strong> the LLVM backend rather than replacing it. This is a deliberate
+design choice: cuda-oxide is not a full replacement for LLVM, it is a
+specialist that handles the GPU side while letting LLVM do what LLVM does
+best.</p>
+<p>The wrapping flow looks like this:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">rustc</span></code> calls <code class="docutils literal notranslate"><span class="pre">CudaCodegenBackend::codegen_crate(tcx)</span></code>.</p></li>
+<li><p>cuda-oxide intercepts, runs its <strong>collector</strong> to identify all device
+functions (kernels and their transitive callees), and enters the stable MIR
+context to compile them to PTX via <code class="docutils literal notranslate"><span class="pre">mir-importer</span></code>.</p></li>
+<li><p>The PTX output is written to disk alongside the build artifacts.</p></li>
+<li><p>cuda-oxide delegates the host code to the wrapped LLVM backend, which
+compiles it into a native binary as normal.</p></li>
+</ol>
+<p>The result is a single <code class="docutils literal notranslate"><span class="pre">cargo</span></code> invocation that produces both a native host
+binary <em>and</em> a PTX module, without requiring two separate toolchains or a
+split build system.</p>
+</section>
+<section id="entering-the-stable-mir-context">
+<h3>Entering the stable MIR context<a class="headerlink" href="#entering-the-stable-mir-context" title="連結到這個標頭">#</a></h3>
+<p>Inside <code class="docutils literal notranslate"><span class="pre">codegen_crate</span></code>, cuda-oxide receives <code class="docutils literal notranslate"><span class="pre">rustc_middle</span></code> types -- the
+internal, unstable kind. But the <code class="docutils literal notranslate"><span class="pre">mir-importer</span></code> crate, which does the actual
+MIR-to-Pliron-IR translation, is built entirely on <code class="docutils literal notranslate"><span class="pre">rustc_public</span></code> types. To
+cross the boundary, cuda-oxide uses the bridge:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="c1">// Inside codegen_crate():</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rustc_internal</span><span class="p">::</span><span class="n">run</span><span class="p">(</span><span class="n">tcx</span><span class="p">,</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Now in stable MIR context</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">stable_instance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rustc_internal</span><span class="p">::</span><span class="n">stable</span><span class="p">(</span><span class="n">func</span><span class="p">.</span><span class="n">instance</span><span class="p">);</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">body</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stable_instance</span><span class="p">.</span><span class="n">body</span><span class="p">().</span><span class="n">unwrap</span><span class="p">();</span>
+<span class="w">    </span><span class="c1">// Feed to cuda-oxide pipeline</span>
+<span class="w">    </span><span class="n">mir_importer</span><span class="p">::</span><span class="n">run_pipeline</span><span class="p">(</span><span class="o">&amp;</span><span class="n">functions</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">config</span><span class="p">)</span>
+<span class="p">});</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">rustc_internal::run(tcx,</span> <span class="pre">||</span> <span class="pre">{</span> <span class="pre">...</span> <span class="pre">})</span></code> sets up a scoped context where stable
+MIR queries are available. Inside the closure, <code class="docutils literal notranslate"><span class="pre">rustc_internal::stable()</span></code>
+converts an internal <code class="docutils literal notranslate"><span class="pre">rustc_middle::ty::Instance&lt;'tcx&gt;</span></code> into its stable
+counterpart <code class="docutils literal notranslate"><span class="pre">rustc_public::mir::mono::Instance</span></code>. From there, calling
+<code class="docutils literal notranslate"><span class="pre">Instance::body()</span></code> retrieves the MIR through the stable API -- no direct
+contact with <code class="docutils literal notranslate"><span class="pre">rustc_middle</span></code> needed.</p>
+</section>
+</section>
+<section id="thread-local-context-management">
+<h2>Thread-local context management<a class="headerlink" href="#thread-local-context-management" title="連結到這個標頭">#</a></h2>
+<p>You might wonder why the bridge needs a special <code class="docutils literal notranslate"><span class="pre">run()</span></code> scope instead of just
+passing a context object around. The answer is lifetime entanglement.</p>
+<p><code class="docutils literal notranslate"><span class="pre">TyCtxt&lt;'tcx&gt;</span></code> borrows data from the compiler's arena allocator. The <code class="docutils literal notranslate"><span class="pre">'tcx</span></code>
+lifetime is tied to the compilation session, and it cannot escape the arena's
+scope. You cannot store a <code class="docutils literal notranslate"><span class="pre">TyCtxt</span></code> in a struct, return it from a function, or
+send it to another thread. The compiler's solution is <strong>scoped thread-local
+storage</strong>: the context is available only while you are inside the scope, and
+the type system (plus runtime checks) prevents it from leaking out.</p>
+<p>The bridge sets up two nested thread-local variables (TLVs):</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>TLV</p></th>
+<th class="head text-left"><p>Type</p></th>
+<th class="head text-left"><p>Purpose</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">compiler_interface::TLV</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">&amp;dyn</span> <span class="pre">CompilerInterface</span></code></p></td>
+<td class="text-left"><p>High-level queries: <code class="docutils literal notranslate"><span class="pre">local_crate()</span></code>, <code class="docutils literal notranslate"><span class="pre">all_local_items()</span></code>, entry point lookup</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">rustc_internal::TLV</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">&amp;Container</span></code></p></td>
+<td class="text-left"><p>Stable-to-internal type translation via the <code class="docutils literal notranslate"><span class="pre">Tables</span></code> mapping</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Both point to the same underlying <code class="docutils literal notranslate"><span class="pre">Container</span></code> struct, but provide different
+access patterns:</p>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">with()</span></code></strong> accesses the outer TLV for making high-level compiler queries.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">with_container()</span></code></strong> accesses the inner TLV for converting between stable
+and internal types.</p></li>
+</ul>
+<p>This two-level design keeps the query interface separate from the raw
+translation machinery, so code that only needs to ask &quot;give me all functions
+in the local crate&quot; does not have to know about internal ID mappings.</p>
+<p>If you have ever used a web framework's request-scoped context (think Actix's
+<code class="docutils literal notranslate"><span class="pre">web::Data</span></code> or Axum's extractors), the mental model is similar: the data
+exists for the duration of the request (here, the compilation), and the
+framework makes it available without you having to thread it through every
+function signature.</p>
+</section>
+<section id="the-bridge-pattern">
+<h2>The bridge pattern<a class="headerlink" href="#the-bridge-pattern" title="連結到這個標頭">#</a></h2>
+<p>At the heart of the <code class="docutils literal notranslate"><span class="pre">Container</span></code> sits a <strong><code class="docutils literal notranslate"><span class="pre">Tables</span></code></strong> struct -- a bidirectional
+mapping between <code class="docutils literal notranslate"><span class="pre">rustc</span></code>'s internal IDs and the stable API's types. When you
+call <code class="docutils literal notranslate"><span class="pre">rustc_internal::stable(instance)</span></code>, the bridge looks up (or creates) the
+corresponding stable ID in the tables. When the stable API needs to query the
+compiler on your behalf -- say, to fetch a function's MIR body -- it goes
+through the tables in the opposite direction to recover the internal type.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>    rustc_middle::ty::Instance&lt;&#39;tcx&gt;
+              │
+              ▼
+         ┌─────────┐
+         │  Tables │  (bidirectional: internal ↔ stable)
+         └─────────┘
+              │
+              ▼
+    rustc_public::mir::mono::Instance
+</pre></div>
+</div>
+<p>A few implementation details worth knowing:</p>
+<ul class="simple">
+<li><p><strong>Interior mutability</strong> -- <code class="docutils literal notranslate"><span class="pre">Tables</span></code> uses <code class="docutils literal notranslate"><span class="pre">RefCell</span></code> because multiple parts
+of the codebase need mutable access to the mapping during a single
+translation pass. This is safe because access is single-threaded
+(guaranteed by the thread-local storage).</p></li>
+<li><p><strong>Caching</strong> -- once a type or instance is translated, the result is stored
+in the tables. Repeated lookups hit the cache instead of recomputing.</p></li>
+<li><p><strong>Automatic cleanup</strong> -- when <code class="docutils literal notranslate"><span class="pre">rustc_internal::run()</span></code> returns, the
+thread-local storage is torn down and the tables are dropped. No manual
+cleanup required, no stale references possible.</p></li>
+</ul>
+<p>From cuda-oxide's perspective, the bridge is invisible. The <code class="docutils literal notranslate"><span class="pre">mir-importer</span></code>
+crate only ever sees <code class="docutils literal notranslate"><span class="pre">rustc_public</span></code> types -- it never imports <code class="docutils literal notranslate"><span class="pre">rustc_middle</span></code>,
+never deals with <code class="docutils literal notranslate"><span class="pre">'tcx</span></code> lifetimes, and never touches the <code class="docutils literal notranslate"><span class="pre">Tables</span></code> directly.
+All of that complexity is encapsulated behind <code class="docutils literal notranslate"><span class="pre">rustc_internal::run()</span></code> and
+<code class="docutils literal notranslate"><span class="pre">rustc_internal::stable()</span></code>, which live in the <code class="docutils literal notranslate"><span class="pre">rustc-codegen-cuda</span></code> crate at
+the boundary between the compiler and cuda-oxide's pipeline.</p>
+</section>
+<section id="what-mir-looks-like">
+<h2>What MIR looks like<a class="headerlink" href="#what-mir-looks-like" title="連結到這個標頭">#</a></h2>
+<p>Before cuda-oxide can translate MIR, it helps to know what MIR actually
+<em>is</em>. Here is a simple function and its MIR:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="n">x</span><span class="p">:</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">:</span><span class="w"> </span><span class="kt">i32</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">y</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>// MIR for `add`:
+// _0: i32              (return place)
+// _1: i32              (argument `x`)
+// _2: i32              (argument `y`)
+// _3: (i32, bool)      (temporary for checked arithmetic)
+//
+// bb0: {
+//     _3 = CheckedAdd(_1, _2);
+//     assert(!(_3.1), &quot;attempt to compute `{} + {}`, which would overflow&quot;) -&gt; bb1;
+// }
+// bb1: {
+//     _0 = (_3.0);
+//     return;
+// }
+</pre></div>
+</div>
+<p>A few things to notice:</p>
+<ul class="simple">
+<li><p><strong>Locals</strong> are numbered. <code class="docutils literal notranslate"><span class="pre">_0</span></code> is always the return place (where the result
+goes). <code class="docutils literal notranslate"><span class="pre">_1</span></code>, <code class="docutils literal notranslate"><span class="pre">_2</span></code>, ... are function arguments. Higher-numbered locals are
+temporaries the compiler introduces.</p></li>
+<li><p><strong>Basic blocks</strong> (<code class="docutils literal notranslate"><span class="pre">bb0</span></code>, <code class="docutils literal notranslate"><span class="pre">bb1</span></code>, ...) are straight-line sequences of
+statements. Every block ends with exactly one <strong>terminator</strong> that
+transfers control -- a branch, a call, a return, or an assert.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">CheckedAdd</span></code></strong> returns a tuple <code class="docutils literal notranslate"><span class="pre">(i32,</span> <span class="pre">bool)</span></code>. The <code class="docutils literal notranslate"><span class="pre">bool</span></code> is an overflow
+flag. The <code class="docutils literal notranslate"><span class="pre">assert</span></code> terminator checks it and either continues to <code class="docutils literal notranslate"><span class="pre">bb1</span></code> or
+panics. In debug builds this catches integer overflow; in release builds
+the check is optimized away.</p></li>
+<li><p><strong>No expressions are nested.</strong> <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">+</span> <span class="pre">y</span></code> in the source becomes two separate
+operations in MIR: compute the checked add, then extract the result. Every
+intermediate value gets its own local. This flat structure is what makes MIR
+easy for tools like cuda-oxide to consume -- no recursive expression trees,
+just a flat list of operations per block.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">備註</p>
+<p>You can see the MIR for any function by passing <code class="docutils literal notranslate"><span class="pre">--emit=mir</span></code> to <code class="docutils literal notranslate"><span class="pre">rustc</span></code>, or
+by visiting the <a class="reference external" href="https://play.rust-lang.org/">Rust Playground</a> and selecting
+MIR output. It is a surprisingly readable format once you get used to the
+local numbering.</p>
+</div>
+<section id="why-this-matters-for-cuda-oxide">
+<h3>Why this matters for cuda-oxide<a class="headerlink" href="#why-this-matters-for-cuda-oxide" title="連結到這個標頭">#</a></h3>
+<p>MIR's flat, explicit structure is what makes it feasible to build a GPU
+compiler on top of it. Consider the alternative: if cuda-oxide operated on
+Rust's AST or HIR (the high-level IR), it would have to handle closures,
+method resolution, trait dispatch, type inference, and a hundred other
+language features that are <em>already</em> resolved by the time MIR is produced.
+By reading MIR, cuda-oxide gets a representation where generics are already
+monomorphized, closures are already lowered to structs, and control flow is
+already explicit. The <code class="docutils literal notranslate"><span class="pre">mir-importer</span></code> crate translates this into Pliron IR
+(an MLIR-like framework), and from there the
+<a class="reference internal" href="lowering-pipeline.html"><span class="std std-doc">lowering pipeline</span></a> takes it the rest of the way to PTX.</p>
+</section>
+</section>
+<section id="nightly-pinning">
+<h2>Nightly pinning<a class="headerlink" href="#nightly-pinning" title="連結到這個標頭">#</a></h2>
+<p>Even with <code class="docutils literal notranslate"><span class="pre">rustc_public</span></code> providing a stable <em>API</em>, the bridge layer
+(<code class="docutils literal notranslate"><span class="pre">rustc_public_bridge</span></code>) is still compiled against the compiler's internals
+and is not independently versioned. In practice, this means a specific
+version of cuda-oxide works with a specific nightly.</p>
+<p>cuda-oxide pins to an exact nightly release via <code class="docutils literal notranslate"><span class="pre">rust-toolchain.toml</span></code>:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[toolchain]</span>
+<span class="n">channel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;nightly-2026-04-03&quot;</span>
+<span class="n">components</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;rust-src&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;rustc-dev&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;rust-analyzer&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;clippy&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;llvm-tools&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>This pin guarantees reproducible builds: anyone who clones the repository
+gets the same compiler, the same MIR shapes, and the same bridge behavior.
+When updating the pin, the process is:</p>
+<ol class="arabic simple">
+<li><p>Bump the nightly date in <code class="docutils literal notranslate"><span class="pre">rust-toolchain.toml</span></code>.</p></li>
+<li><p>Fix any <code class="docutils literal notranslate"><span class="pre">rustc_public</span></code> API changes (usually minor -- that is the whole
+point of the stable API).</p></li>
+<li><p>Run the full test suite to verify that all examples still compile and
+produce correct PTX.</p></li>
+<li><p>Celebrate, or revert and try next week's nightly.</p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">備註</p>
+<p>As <code class="docutils literal notranslate"><span class="pre">rustc_public</span></code> matures and moves toward a crates.io release, the coupling
+to a specific nightly will loosen. The long-term goal is for cuda-oxide to
+work with any sufficiently recent stable Rust toolchain -- but we are not
+there yet.</p>
+</div>
+<hr class="docutils" />
+<p>Now that you understand how cuda-oxide talks to the Rust compiler, the next
+chapter covers what happens when that conversation reaches the codegen
+backend: <a class="reference internal" href="rustc-codegen-cuda.html"><span class="std std-doc">The Code Generator</span></a>.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="pliron.html"
+       title="上一页">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">上一頁</p>
+        <p class="prev-next-title">Pliron -- Pliron IR (MLIR-like)</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="rustc-codegen-cuda.html"
+       title="下一页">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">下一頁</p>
+        <p class="prev-next-title">The Code Generator: rustc-codegen-cuda</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> 当前页面
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-mir">What is MIR?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-stability-problem">The stability problem</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-rustc-public">What is rustc_public?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-cuda-oxide-hooks-in">How cuda-oxide hooks in</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-codegenbackend-trait">The CodegenBackend trait</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#entering-the-stable-mir-context">Entering the stable MIR context</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thread-local-context-management">Thread-local context management</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-bridge-pattern">The bridge pattern</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-mir-looks-like">What MIR looks like</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-this-matters-for-cuda-oxide">Why this matters for cuda-oxide</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#nightly-pinning">Nightly pinning</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+    <div class="footer-items__center">
+      
+        <div class="footer-item"><footer class="bd-footer-content">
+  <div class="footer-container" style="padding: 1rem 0 2rem 0; border-top: 1px solid var(--pst-color-border); text-align: left;">
+    
+    <!-- NVIDIA Logo -->
+    <div style="margin-bottom: 1rem;">
+      <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem; filter: brightness(0);"
+           class="only-light">
+      <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem;"
+           class="only-dark pst-js-only">
+    </div>
+    
+    <!-- Footer Links - single line, left aligned -->
+    <div style="font-size: 0.8125rem; margin-bottom: 0.5rem; color: var(--pst-color-text-muted);">
+      <a href="https://www.nvidia.com/en-us/about-nvidia/privacy-policy/" target="_blank" style="color: inherit; text-decoration: none;">Privacy Policy</a> | 
+      <a href="https://www.nvidia.com/en-us/preferences/email-preferences/" target="_blank" style="color: inherit; text-decoration: none;">Your Privacy Choices</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/terms-of-service/" target="_blank" style="color: inherit; text-decoration: none;">Terms of Service</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/accessibility/" target="_blank" style="color: inherit; text-decoration: none;">Accessibility</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/company-policies/" target="_blank" style="color: inherit; text-decoration: none;">Corporate Policies</a> | 
+      <a href="https://www.nvidia.com/en-us/product-security/" target="_blank" style="color: inherit; text-decoration: none;">Product Security</a> | 
+      <a href="https://www.nvidia.com/en-us/contact/" target="_blank" style="color: inherit; text-decoration: none;">Contact</a>
+    </div>
+    
+    <!-- Copyright -->
+    <div style="font-size: 0.8125rem; color: var(--pst-color-text-muted);">
+      Copyright &copy; 2025-2026, NVIDIA.
+    </div>
+    
+  </div>
+</footer></div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

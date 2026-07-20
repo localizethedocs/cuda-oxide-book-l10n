@@ -1,0 +1,1174 @@
+
+<!DOCTYPE html>
+
+
+<html lang="zh-TW" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Pliron Dialects &#8212; cuda-oxide</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/nvidia-sphinx-theme.css?v=5d97cc0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=196aea71" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/lightbox.css?v=31fdf494" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../_static/documentation_options.js?v=a7999bab"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/translations.js?v=cbf116e0"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'compiler/mlir-dialects';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../_static/js/lightbox.js?v=8cf6bc2b"></script>
+    <script src="../_static/js/spa-nav.js?v=9a4d0bbe"></script>
+    <link rel="canonical" href="https://projects.localizethedocs.org/cuda-oxide-book-l10n/compiler/mlir-dialects.html" />
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜尋" href="../search.html" />
+    <link rel="next" title="The Lowering Pipeline" href="lowering-pipeline.html" />
+    <link rel="prev" title="Compiler Optimizations" href="compiler-optimizations.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="zh-TW"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+<script type="text/javascript" src="../ltd-provenance.js"></script>
+<script type="text/javascript" src="../ltd-current.js"></script>
+<script type="text/javascript" src="../../../ltd-config.js"></script>
+<script type="text/javascript" src="../../../ltd-flyout.js"></script>
+
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">跳转至主要内容</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>回到顶部</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="版本警告"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="网页导航">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">cuda-oxide</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜尋" aria-label="搜尋" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="亮色"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="暗色"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>亮色</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>暗色</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="当前页面">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜尋" aria-label="搜尋" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="亮色"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="暗色"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>亮色</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>暗色</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><div class="sidebar-tree">
+    <p class="sidebar-tree-title">
+        Table of Contents
+    </p>
+    <p aria-level="2" class="caption" role="heading"><span class="caption-text">開始使用</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/hello-gpu.html">Writing Your First Kernel</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">編寫 GPU 程式</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/execution-model.html">The CUDA Execution Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/kernels-and-device-functions.html">Kernels and Device Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/memory-and-data-movement.html">Memory and Data Movement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/launching-kernels.html">Launching Kernels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/closures-and-generics.html">Closures and Generics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/error-handling-and-debugging.html">Error Handling and Debugging</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Safety on the GPU</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-safety/the-safety-model.html">The Safety Model</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">異步 GPU 程式設計</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/the-device-operation-model.html">The DeviceOperation Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/combinators-and-composition.html">Combinators and Composition</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/scheduling-and-streams.html">Scheduling and Streams</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/concurrent-execution.html">Concurrent Execution</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Building a Real Application</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../projects/async-mlp-pipeline.html">Project: Async MLP Pipeline</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Advanced GPU Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/shared-memory-and-synchronization.html">Shared Memory and Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/warp-level-programming.html">Warp-Level Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/tensor-memory-accelerator.html">張量記憶體加速器（TMA）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/matrix-multiply-accelerators.html">Matrix Multiply Accelerators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cluster-programming.html">Cluster Programming</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Inside the Compiler</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="architecture-overview.html">Architecture Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pliron.html">Pliron -- Pliron IR (MLIR-like)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rustc-public.html">rustc_public -- Stable MIR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rustc-codegen-cuda.html">The Code Generator: rustc-codegen-cuda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mir-importer.html">The MIR Importer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compiler-optimizations.html">Compiler Optimizations</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Pliron Dialects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lowering-pipeline.html">The Lowering Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="adding-new-intrinsics.html">Adding New Intrinsics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fuzzing-and-differential-testing.html">Fuzzing and Differential Testing</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">附錄</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/building-from-source.html">Building from Source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/api-quick-reference.html">API Quick Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/supported-features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/cuda-cpp-comparison.html">cuda-oxide vs CUDA C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/ecosystem.html">The Rust + GPU Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/glossary.html">Glossary</a></li>
+</ul>
+
+</div></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="初始页面">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Pliron Dialects</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="pliron-dialects">
+<h1>Pliron Dialects<a class="headerlink" href="#pliron-dialects" title="連結到這個標頭">#</a></h1>
+<p>cuda-oxide does not lower Rust to PTX in a single, heroic transformation. It
+works across three pliron dialects, each modeling a different level of
+abstraction: two defined locally (<code class="docutils literal notranslate"><span class="pre">dialect-mir</span></code>, <code class="docutils literal notranslate"><span class="pre">dialect-nvvm</span></code>) and the LLVM
+dialect provided by the upstream <code class="docutils literal notranslate"><span class="pre">pliron-llvm</span></code> crate. This chapter walks
+through all three -- their types, their operations, and how they fit together
+to form the compilation pipeline.</p>
+<p>If you have not read the <a class="reference internal" href="pliron.html"><span class="std std-doc">Pliron -- Pliron IR (MLIR-like)</span></a> chapter yet, now
+is a good time. The concepts there (operations, types, attributes, regions,
+<code class="docutils literal notranslate"><span class="pre">Ptr&lt;T&gt;</span></code>, def-use chains) are the building blocks of everything on this page.</p>
+<hr class="docutils" />
+<section id="the-three-dialects-at-a-glance">
+<h2>The Three Dialects at a Glance<a class="headerlink" href="#the-three-dialects-at-a-glance" title="連結到這個標頭">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Dialect</p></th>
+<th class="head text-left"><p>Purpose</p></th>
+<th class="head text-left"><p>Level</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><strong>dialect-mir</strong></p></td>
+<td class="text-left"><p>Models Rust MIR semantics</p></td>
+<td class="text-left"><p>Highest -- Rust types, tuples, enums, slices, checked arithmetic</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><strong>LLVM dialect</strong></p></td>
+<td class="text-left"><p>Models LLVM IR</p></td>
+<td class="text-left"><p>Middle -- flat types, GEP, PHI-ready control flow</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><strong>dialect-nvvm</strong></p></td>
+<td class="text-left"><p>Models NVIDIA GPU intrinsics</p></td>
+<td class="text-left"><p>Orthogonal -- thread indexing, warps, TMA, WGMMA, tcgen05</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The LLVM dialect is not a cuda-oxide crate: its modeling (ops, types,
+attributes, op-interfaces) lives upstream in the <code class="docutils literal notranslate"><span class="pre">pliron-llvm</span></code> crate, which
+cuda-oxide consumes as a dependency.</p>
+<p><code class="docutils literal notranslate"><span class="pre">dialect-nvvm</span></code> is &quot;orthogonal&quot; rather than a layer in the stack because its
+operations appear <em>alongside</em> LLVM dialect operations, not below them. A
+warp shuffle and an integer add coexist in the same function body.</p>
+<p>Data flows through the pipeline like this:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>dialect-mir ──(mem2reg)──▶ dialect-mir (SSA) ──(annotated unroll)──▶ dialect-mir
+  ──(DialectConversion)──▶ LLVM dialect + dialect-nvvm ops ──(export)──▶ LLVM IR ──(llc)──▶ PTX
+</pre></div>
+</div>
+<p>Each arrow is a well-defined transformation over pliron or LLVM IR. The last
+one is LLVM's NVPTX backend doing what it does best.</p>
+</section>
+<hr class="docutils" />
+<section id="dialect-mir-the-rust-layer">
+<h2>dialect-mir -- The Rust Layer<a class="headerlink" href="#dialect-mir-the-rust-layer" title="連結到這個標頭">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">dialect-mir</span></code> preserves Rust's type system and control flow semantics as
+pliron operations. This is deliberate: we want to reason about Rust concepts
+(tuples, enums, checked arithmetic, address spaces) <em>before</em> flattening them
+to LLVM's type system.</p>
+<section id="types">
+<h3>Types<a class="headerlink" href="#types" title="連結到這個標頭">#</a></h3>
+<p>The dialect defines seven custom types that mirror Rust's compound types:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Type</p></th>
+<th class="head text-left"><p>Example</p></th>
+<th class="head text-left"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">mir.tuple</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">mir.tuple&lt;i32,</span> <span class="pre">f32,</span> <span class="pre">i64&gt;</span></code></p></td>
+<td class="text-left"><p>Heterogeneous tuples</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">mir.ptr</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">mir.ptr&lt;f32,</span> <span class="pre">mutable,</span> <span class="pre">addrspace:</span> <span class="pre">1&gt;</span></code></p></td>
+<td class="text-left"><p>Pointers with GPU address space</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">mir.array</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">mir.array&lt;f32,</span> <span class="pre">256&gt;</span></code></p></td>
+<td class="text-left"><p>Fixed-size arrays</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">mir.struct</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">mir.struct&lt;&quot;Point&quot;,</span> <span class="pre">[f32,</span> <span class="pre">f32]&gt;</span></code></p></td>
+<td class="text-left"><p>Named structs with layout info</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">mir.slice</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">mir.slice&lt;f32,</span> <span class="pre">addrspace:</span> <span class="pre">1&gt;</span></code></p></td>
+<td class="text-left"><p>Fat pointers (ptr + length)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">mir.disjoint_slice</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">mir.disjoint_slice&lt;f32&gt;</span></code></p></td>
+<td class="text-left"><p>Bounds-checked slice carrying a typed index space</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">mir.enum</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">mir.enum&lt;&quot;Option_i32&quot;,</span> <span class="pre">[(&quot;None&quot;,</span> <span class="pre">[]),</span> <span class="pre">(&quot;Some&quot;,</span> <span class="pre">[i32])]&gt;</span></code></p></td>
+<td class="text-left"><p>Rust enums with discriminant and variant payloads</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The address spaces on <code class="docutils literal notranslate"><span class="pre">mir.ptr</span></code> and <code class="docutils literal notranslate"><span class="pre">mir.slice</span></code> track where data lives in
+the GPU memory hierarchy:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Address Space</p></th>
+<th class="head text-left"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>0</p></td>
+<td class="text-left"><p>Generic (resolved at runtime)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>1</p></td>
+<td class="text-left"><p>Global (device DRAM)</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>3</p></td>
+<td class="text-left"><p>Shared (per-block SRAM)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>4</p></td>
+<td class="text-left"><p>Constant (read-only cache)</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>5</p></td>
+<td class="text-left"><p>Local (per-thread stack, spills to DRAM)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>6</p></td>
+<td class="text-left"><p>Tensor memory (Blackwell TMEM)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="operations">
+<h3>Operations<a class="headerlink" href="#operations" title="連結到這個標頭">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">dialect-mir</span></code> defines 54 operations across 11 categories:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Category</p></th>
+<th class="head text-left"><p>Examples</p></th>
+<th class="head text-right"><p>Count</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>Function</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">mir.func</span></code></p></td>
+<td class="text-right"><p>1</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Control flow</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">mir.goto</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.cond_br</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.return</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.assert</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.unreachable</span></code></p></td>
+<td class="text-right"><p>5</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Constants</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">mir.constant</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.float_constant</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.undef</span></code></p></td>
+<td class="text-right"><p>3</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Memory</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">mir.alloca</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.load</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.store</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.assign</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.ref</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.ptr_offset</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.shared_alloc</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.global_alloc</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.extern_shared</span></code></p></td>
+<td class="text-right"><p>9</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Arithmetic</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">mir.add</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.sub</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.mul</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.div</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.rem</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.checked_add</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.checked_sub</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.checked_mul</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.neg</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.not</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.shr</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.shl</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.bitand</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.bitor</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.bitxor</span></code></p></td>
+<td class="text-right"><p>15</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Comparison</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">mir.eq</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.ne</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.lt</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.le</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.gt</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.ge</span></code></p></td>
+<td class="text-right"><p>6</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Aggregate</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">mir.extract_field</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.insert_field</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.construct_struct</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.construct_tuple</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.construct_array</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.extract_array_element</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.field_addr</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.array_element_addr</span></code></p></td>
+<td class="text-right"><p>8</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Enum</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">mir.get_discriminant</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.construct_enum</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.enum_payload</span></code></p></td>
+<td class="text-right"><p>3</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Cast</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">mir.cast</span></code></p></td>
+<td class="text-right"><p>1</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Storage</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">mir.storage_live</span></code>, <code class="docutils literal notranslate"><span class="pre">mir.storage_dead</span></code></p></td>
+<td class="text-right"><p>2</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Call</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">mir.call</span></code></p></td>
+<td class="text-right"><p>1</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>That is a lot of operations, but they fall into natural groups. If you know
+Rust MIR (or have read the <a class="reference internal" href="rustc-public.html"><span class="std std-doc">rustc_public chapter</span></a>), each
+operation maps directly to a MIR concept.</p>
+</section>
+<section id="what-the-ir-looks-like">
+<h3>What the IR Looks Like<a class="headerlink" href="#what-the-ir-looks-like" title="連結到這個標頭">#</a></h3>
+<p>Here are a few examples of <code class="docutils literal notranslate"><span class="pre">dialect-mir</span></code> operations in practice. These are
+simplified for readability -- the actual printed form includes more metadata.</p>
+<p><strong>Checked addition</strong> (Rust: <code class="docutils literal notranslate"><span class="pre">let</span> <span class="pre">sum</span> <span class="pre">=</span> <span class="pre">a</span> <span class="pre">+</span> <span class="pre">b</span></code> where <code class="docutils literal notranslate"><span class="pre">a,</span> <span class="pre">b:</span> <span class="pre">i32</span></code>):</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>// mir.checked_add returns a tuple (result, overflow_flag)
+%checked = mir.checked_add %a, %b : i32
+%sum     = mir.extract_field %checked, 0 : mir.tuple&lt;i32, i1&gt;
+%overflowed = mir.extract_field %checked, 1 : mir.tuple&lt;i32, i1&gt;
+mir.assert %overflowed == false, &quot;attempt to add with overflow&quot; -&gt; bb1
+</pre></div>
+</div>
+<p><strong>Struct construction and field access</strong> (Rust: <code class="docutils literal notranslate"><span class="pre">point.x</span></code>):</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>%point = mir.construct_struct %x, %y : mir.struct&lt;&quot;Point&quot;, [f32, f32]&gt;
+%x_val = mir.extract_field %point, 0 : mir.struct&lt;&quot;Point&quot;, [f32, f32]&gt;
+</pre></div>
+</div>
+<p><strong>Shared memory allocation</strong> (the GPU-specific part):</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>%shmem = mir.shared_alloc : mir.ptr&lt;f32, mutable, addrspace: 3&gt;
+mir.store %value, %shmem : f32
+</pre></div>
+</div>
+</section>
+<section id="verification">
+<h3>Verification<a class="headerlink" href="#verification" title="連結到這個標頭">#</a></h3>
+<p>Every MIR operation verifies type consistency when constructed. This catches
+import bugs early -- before they have a chance to propagate through the
+lowering pipeline and surface as cryptic LLVM errors three passes later.</p>
+<p>Examples of what gets checked:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">mir.add</span></code> verifies that both operands have the same type.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mir.cond_br</span></code> verifies that the condition is <code class="docutils literal notranslate"><span class="pre">i1</span></code> (a boolean).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mir.extract_field</span></code> verifies that the field index is in bounds and the
+result type matches the field's type.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mir.store</span></code> verifies that the value type matches the pointee type of the
+pointer.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">DisjointSlice</span></code> accepts only a matching <code class="docutils literal notranslate"><span class="pre">ThreadIndex</span></code>, so the type system checks
+the device-side index space. Host launch geometry completes the uniqueness
+proof through <code class="docutils literal notranslate"><span class="pre">PreparedLaunch&lt;K&gt;</span></code> or an unsafe raw-launch obligation. There is
+no separate disjoint-access compiler pass; the safety comes from these APIs.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="the-llvm-dialect-the-llvm-layer">
+<h2>The LLVM Dialect -- The LLVM Layer<a class="headerlink" href="#the-llvm-dialect-the-llvm-layer" title="連結到這個標頭">#</a></h2>
+<p>The LLVM dialect models LLVM IR as pliron operations. It provides a near-1:1
+mapping to textual <code class="docutils literal notranslate"><span class="pre">.ll</span></code> files -- every LLVM instruction has a corresponding
+pliron operation, and the types map directly to LLVM's type system. The
+dialect itself (ops, types, attributes, op-interfaces) is defined upstream in
+the <code class="docutils literal notranslate"><span class="pre">pliron-llvm</span></code> crate; cuda-oxide consumes it and re-exports it through the
+thin <code class="docutils literal notranslate"><span class="pre">llvm-export</span></code> crate, which also carries the textual <code class="docutils literal notranslate"><span class="pre">.ll</span></code> exporter and a
+few GPU-specific extensions (named address spaces, a syncscope enum, fp16 bit
+helpers) that pliron-llvm does not ship.</p>
+<section id="id1">
+<h3>Types<a class="headerlink" href="#id1" title="連結到這個標頭">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Type</p></th>
+<th class="head text-left"><p>Example</p></th>
+<th class="head text-left"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>Integers</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">i1</span></code>, <code class="docutils literal notranslate"><span class="pre">i8</span></code>, <code class="docutils literal notranslate"><span class="pre">i16</span></code>, <code class="docutils literal notranslate"><span class="pre">i32</span></code>, <code class="docutils literal notranslate"><span class="pre">i64</span></code>, <code class="docutils literal notranslate"><span class="pre">i128</span></code></p></td>
+<td class="text-left"><p>Pliron built-in, used directly</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Floats</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">half</span></code>, <code class="docutils literal notranslate"><span class="pre">float</span></code>, <code class="docutils literal notranslate"><span class="pre">double</span></code></p></td>
+<td class="text-left"><p>Pliron built-in (<code class="docutils literal notranslate"><span class="pre">FP16Type</span></code>, <code class="docutils literal notranslate"><span class="pre">FP32Type</span></code>, <code class="docutils literal notranslate"><span class="pre">FP64Type</span></code>)</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">llvm.ptr</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">ptr</span> <span class="pre">addrspace(1)</span></code></p></td>
+<td class="text-left"><p>Opaque pointers with optional address space</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">llvm.struct</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">i32,</span> <span class="pre">float</span> <span class="pre">}</span></code> or <code class="docutils literal notranslate"><span class="pre">%MyStruct</span></code></p></td>
+<td class="text-left"><p>Named or anonymous, may be opaque</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">llvm.array</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">[256</span> <span class="pre">x</span> <span class="pre">float]</span></code></p></td>
+<td class="text-left"><p>Fixed-size arrays</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">llvm.vector</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">&lt;4</span> <span class="pre">x</span> <span class="pre">float&gt;</span></code></p></td>
+<td class="text-left"><p>SIMD vectors</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">llvm.func</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">(i32,</span> <span class="pre">ptr)</span> <span class="pre">-&gt;</span> <span class="pre">void</span></code></p></td>
+<td class="text-left"><p>Function signatures</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">llvm.void</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">void</span></code></p></td>
+<td class="text-left"><p>The unit type</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Note the absence of Rust-specific types. By the time code reaches the
+LLVM dialect, tuples have become structs, enums have become
+discriminant-indexed structs, and slices have become pointer-length pairs.
+The lowering pass (covered in <a class="reference internal" href="lowering-pipeline.html"><span class="std std-doc">The Lowering Pipeline</span></a>)
+handles all of that flattening.</p>
+</section>
+<section id="id2">
+<h3>Operations<a class="headerlink" href="#id2" title="連結到這個標頭">#</a></h3>
+<p>The dialect defines 62 operations:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Category</p></th>
+<th class="head text-left"><p>Examples</p></th>
+<th class="head text-right"><p>Count</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>Arithmetic</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">add</span></code>, <code class="docutils literal notranslate"><span class="pre">sub</span></code>, <code class="docutils literal notranslate"><span class="pre">mul</span></code>, <code class="docutils literal notranslate"><span class="pre">fadd</span></code>, <code class="docutils literal notranslate"><span class="pre">fsub</span></code>, <code class="docutils literal notranslate"><span class="pre">fmul</span></code>, <code class="docutils literal notranslate"><span class="pre">fdiv</span></code>, <code class="docutils literal notranslate"><span class="pre">frem</span></code>, <code class="docutils literal notranslate"><span class="pre">fneg</span></code>, ...</p></td>
+<td class="text-right"><p>19</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Cast</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">zext</span></code>, <code class="docutils literal notranslate"><span class="pre">sext</span></code>, <code class="docutils literal notranslate"><span class="pre">trunc</span></code>, <code class="docutils literal notranslate"><span class="pre">fpext</span></code>, <code class="docutils literal notranslate"><span class="pre">fptrunc</span></code>, <code class="docutils literal notranslate"><span class="pre">sitofp</span></code>, <code class="docutils literal notranslate"><span class="pre">uitofp</span></code>, <code class="docutils literal notranslate"><span class="pre">fptosi</span></code>, <code class="docutils literal notranslate"><span class="pre">fptoui</span></code>, <code class="docutils literal notranslate"><span class="pre">ptrtoint</span></code>, <code class="docutils literal notranslate"><span class="pre">inttoptr</span></code>, <code class="docutils literal notranslate"><span class="pre">addrspacecast</span></code>, <code class="docutils literal notranslate"><span class="pre">bitcast</span></code></p></td>
+<td class="text-right"><p>13</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Control flow</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">br</span></code>, <code class="docutils literal notranslate"><span class="pre">cond_br</span></code>, <code class="docutils literal notranslate"><span class="pre">switch</span></code>, <code class="docutils literal notranslate"><span class="pre">return</span></code>, <code class="docutils literal notranslate"><span class="pre">unreachable</span></code></p></td>
+<td class="text-right"><p>5</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Memory</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">load</span></code>, <code class="docutils literal notranslate"><span class="pre">store</span></code>, <code class="docutils literal notranslate"><span class="pre">alloca</span></code>, <code class="docutils literal notranslate"><span class="pre">gep</span></code></p></td>
+<td class="text-right"><p>4</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Atomic</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">atomic_load</span></code>, <code class="docutils literal notranslate"><span class="pre">atomic_store</span></code>, <code class="docutils literal notranslate"><span class="pre">atomicrmw</span></code>, <code class="docutils literal notranslate"><span class="pre">cmpxchg</span></code>, <code class="docutils literal notranslate"><span class="pre">fence</span></code></p></td>
+<td class="text-right"><p>5</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Comparison</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">icmp</span></code>, <code class="docutils literal notranslate"><span class="pre">fcmp</span></code></p></td>
+<td class="text-right"><p>2</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Aggregate</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">extract_value</span></code>, <code class="docutils literal notranslate"><span class="pre">insert_value</span></code>, <code class="docutils literal notranslate"><span class="pre">extractelement</span></code></p></td>
+<td class="text-right"><p>3</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Call</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">call</span></code>, <code class="docutils literal notranslate"><span class="pre">call_intrinsic</span></code></p></td>
+<td class="text-right"><p>2</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Inline asm</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">inline_asm</span></code>, <code class="docutils literal notranslate"><span class="pre">inline_asm_multi</span></code></p></td>
+<td class="text-right"><p>2</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Constants</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">constant</span></code>, <code class="docutils literal notranslate"><span class="pre">zero</span></code>, <code class="docutils literal notranslate"><span class="pre">undef</span></code></p></td>
+<td class="text-right"><p>3</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Symbol</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">func</span></code>, <code class="docutils literal notranslate"><span class="pre">global</span></code>, <code class="docutils literal notranslate"><span class="pre">addressof</span></code></p></td>
+<td class="text-right"><p>3</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Select</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">select</span></code></p></td>
+<td class="text-right"><p>1</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>If you have read LLVM IR before, nothing here will surprise you. The operation
+names are intentionally the same as their LLVM counterparts, prefixed with
+<code class="docutils literal notranslate"><span class="pre">llvm.</span></code> in the IR.</p>
+</section>
+<section id="the-export-engine">
+<h3>The Export Engine<a class="headerlink" href="#the-export-engine" title="連結到這個標頭">#</a></h3>
+<p>The crown jewel of <code class="docutils literal notranslate"><span class="pre">llvm-export</span></code> is its export module
+(<code class="docutils literal notranslate"><span class="pre">crates/llvm-export/src/export/</span></code>) -- the code that converts a pliron IR
+module into valid textual LLVM IR. This is the part cuda-oxide keeps local:
+pliron-llvm only emits real <code class="docutils literal notranslate"><span class="pre">.ll</span></code> via an <code class="docutils literal notranslate"><span class="pre">llvm-sys</span></code> bridge, which cuda-oxide
+avoids. This is not just &quot;print each operation&quot;; several non-trivial
+transformations happen during export:</p>
+<p><strong>Block arguments become PHI nodes.</strong> Pliron IR (MLIR-like) models merge points
+as block arguments -- a function-style calling convention between basic blocks.
+LLVM IR uses PHI nodes instead. The exporter builds a predecessor map from
+branch operands and emits <code class="docutils literal notranslate"><span class="pre">phi</span></code> instructions at the top of each non-entry
+block.</p>
+<p><strong>Value naming.</strong> A pre-pass assigns sequential SSA names (<code class="docutils literal notranslate"><span class="pre">%v0</span></code>, <code class="docutils literal notranslate"><span class="pre">%v1</span></code>, ...)
+to every value. Constants are special-cased: <code class="docutils literal notranslate"><span class="pre">llvm.constant</span></code> results are
+mapped to their literal value (not a <code class="docutils literal notranslate"><span class="pre">%vN</span></code> name), so PHIs can reference
+constants from blocks that appear later in the output.</p>
+<p><strong>NVVM intrinsic name conversion.</strong> Pliron identifiers use underscores; LLVM
+intrinsics use dots. The exporter converts all names starting with <code class="docutils literal notranslate"><span class="pre">llvm_</span></code> by
+replacing underscores with dots: <code class="docutils literal notranslate"><span class="pre">llvm_nvvm_read_ptx_sreg_tid_x</span></code> becomes
+<code class="docutils literal notranslate"><span class="pre">llvm.nvvm.read.ptx.sreg.tid.x</span></code>. This is a mechanical transformation, not a
+lookup table.</p>
+<p><strong>Convergent attribute marking.</strong> Barrier, shuffle, and vote intrinsics must
+be marked <code class="docutils literal notranslate"><span class="pre">convergent</span></code> to prevent LLVM from hoisting them out of control flow.
+The exporter recognizes these by prefix pattern matching on the (dot-form)
+name and appends <code class="docutils literal notranslate"><span class="pre">#0</span></code> to their call sites, emitting <code class="docutils literal notranslate"><span class="pre">attributes</span> <span class="pre">#0</span> <span class="pre">=</span> <span class="pre">{</span> <span class="pre">convergent</span> <span class="pre">}</span></code> at module level.</p>
+<p><strong>Kernel metadata.</strong> Functions marked as kernels get <code class="docutils literal notranslate"><span class="pre">ptx_kernel</span></code> calling
+convention and an <code class="docutils literal notranslate"><span class="pre">!nvvm.annotations</span></code> metadata entry.</p>
+<p>Here is what the exported LLVM IR looks like for a simple vector-add kernel:</p>
+<div class="highlight-llvm notranslate"><div class="highlight"><pre><span></span><span class="k">target</span><span class="w"> </span><span class="k">datalayout</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&quot;e-i64:64-i128:128-v16:16-v32:32-n16:32:64&quot;</span>
+<span class="k">target</span><span class="w"> </span><span class="k">triple</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">&quot;nvptx64-nvidia-cuda&quot;</span>
+
+<span class="k">declare</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@llvm.nvvm.read.ptx.sreg.tid.x</span><span class="p">()</span>
+<span class="k">declare</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@llvm.nvvm.read.ptx.sreg.ntid.x</span><span class="p">()</span>
+<span class="k">declare</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@llvm.nvvm.read.ptx.sreg.ctaid.x</span><span class="p">()</span>
+
+<span class="k">define</span><span class="w"> </span><span class="k">ptx_kernel</span><span class="w"> </span><span class="k">void</span><span class="w"> </span><span class="vg">@vecadd</span><span class="p">(</span><span class="kt">ptr</span><span class="w"> </span><span class="k">addrspace</span><span class="p">(</span><span class="m">1</span><span class="p">)</span><span class="w"> </span><span class="nv">%v0</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="nv">%v1</span><span class="p">,</span>
+<span class="w">                                </span><span class="kt">ptr</span><span class="w"> </span><span class="k">addrspace</span><span class="p">(</span><span class="m">1</span><span class="p">)</span><span class="w"> </span><span class="nv">%v2</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="nv">%v3</span><span class="p">,</span>
+<span class="w">                                </span><span class="kt">ptr</span><span class="w"> </span><span class="k">addrspace</span><span class="p">(</span><span class="m">1</span><span class="p">)</span><span class="w"> </span><span class="nv">%v4</span><span class="p">,</span><span class="w"> </span><span class="kt">i64</span><span class="w"> </span><span class="nv">%v5</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="nl">entry:</span>
+<span class="w">    </span><span class="nv">%v6</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">call</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@llvm.nvvm.read.ptx.sreg.tid.x</span><span class="p">()</span><span class="w"> </span><span class="vg">#0</span>
+<span class="w">    </span><span class="nv">%v7</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">call</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@llvm.nvvm.read.ptx.sreg.ntid.x</span><span class="p">()</span><span class="w"> </span><span class="vg">#0</span>
+<span class="w">    </span><span class="nv">%v8</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">call</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="vg">@llvm.nvvm.read.ptx.sreg.ctaid.x</span><span class="p">()</span><span class="w"> </span><span class="vg">#0</span>
+<span class="w">    </span><span class="nv">%v9</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">mul</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%v8</span><span class="p">,</span><span class="w"> </span><span class="nv">%v7</span>
+<span class="w">    </span><span class="nv">%v10</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="k">add</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="nv">%v9</span><span class="p">,</span><span class="w"> </span><span class="nv">%v6</span>
+<span class="w">    </span><span class="c">; ... bounds check, load, add, store ...</span>
+<span class="w">    </span><span class="k">ret</span><span class="w"> </span><span class="k">void</span>
+<span class="p">}</span>
+
+<span class="nv">!nvvm.annotations</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">!{</span><span class="nv nv-Anonymous">!0</span><span class="p">}</span>
+<span class="nv nv-Anonymous">!0</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">!{</span><span class="kt">ptr</span><span class="w"> </span><span class="vg">@vecadd</span><span class="p">,</span><span class="w"> </span><span class="nv">!&quot;kernel&quot;</span><span class="p">,</span><span class="w"> </span><span class="kt">i32</span><span class="w"> </span><span class="m">1</span><span class="p">}</span>
+<span class="k">attributes</span><span class="w"> </span><span class="vg">#0</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">convergent</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div>
+<p>Notice the slices have been scalarized: each Rust <code class="docutils literal notranslate"><span class="pre">&amp;[f32]</span></code> becomes a
+<code class="docutils literal notranslate"><span class="pre">ptr</span> <span class="pre">addrspace(1)</span></code> and an <code class="docutils literal notranslate"><span class="pre">i64</span></code> length. That happened in the lowering pass;
+by the time the LLVM dialect sees them, they are flat arguments.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="dialect-nvvm-the-gpu-layer">
+<h2>dialect-nvvm -- The GPU Layer<a class="headerlink" href="#dialect-nvvm-the-gpu-layer" title="連結到這個標頭">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">dialect-nvvm</span></code> wraps NVIDIA's GPU intrinsics as typed pliron operations.
+These operations do not form a &quot;level&quot; in the lowering chain -- they are
+inserted during the <code class="docutils literal notranslate"><span class="pre">dialect-mir</span></code> → LLVM dialect lowering pass and coexist
+with LLVM dialect operations in the same function body. At export time,
+they become <code class="docutils literal notranslate"><span class="pre">call</span></code> instructions to <code class="docutils literal notranslate"><span class="pre">&#64;llvm.nvvm.*</span></code> intrinsics.</p>
+<section id="architecture-coverage">
+<h3>Architecture Coverage<a class="headerlink" href="#architecture-coverage" title="連結到這個標頭">#</a></h3>
+<p>The dialect is organized into modules, each targeting a GPU feature set:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Module</p></th>
+<th class="head text-left"><p>Description</p></th>
+<th class="head text-right"><p>Ops</p></th>
+<th class="head text-left"><p>Minimum SM</p></th>
+<th class="head text-left"><p>GPU Family</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">thread</span></code></p></td>
+<td class="text-left"><p>Thread/block indexing, <code class="docutils literal notranslate"><span class="pre">barrier0</span></code>, threadfences</p></td>
+<td class="text-right"><p>18</p></td>
+<td class="text-left"><p>All</p></td>
+<td class="text-left"><p>All GPUs</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">warp</span></code></p></td>
+<td class="text-left"><p>Lane id, shuffle, vote, match</p></td>
+<td class="text-right"><p>18</p></td>
+<td class="text-left"><p>All</p></td>
+<td class="text-left"><p>All GPUs</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">grid</span></code></p></td>
+<td class="text-left"><p>Cooperative <code class="docutils literal notranslate"><span class="pre">grid_sync</span></code></p></td>
+<td class="text-right"><p>1</p></td>
+<td class="text-left"><p>sm_70</p></td>
+<td class="text-left"><p>Volta+</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">debug</span></code></p></td>
+<td class="text-left"><p>Clock, trap, breakpoint, <code class="docutils literal notranslate"><span class="pre">vprintf</span></code></p></td>
+<td class="text-right"><p>6</p></td>
+<td class="text-left"><p>All</p></td>
+<td class="text-left"><p>All GPUs</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">atomic</span></code></p></td>
+<td class="text-left"><p>Atomic load/store/RMW/cmpxchg</p></td>
+<td class="text-right"><p>4</p></td>
+<td class="text-left"><p>sm_70</p></td>
+<td class="text-left"><p>Volta+</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cluster</span></code></p></td>
+<td class="text-left"><p>Thread Block Clusters + DSMEM</p></td>
+<td class="text-right"><p>11</p></td>
+<td class="text-left"><p>sm_90</p></td>
+<td class="text-left"><p>Hopper+</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">mbarrier</span></code></p></td>
+<td class="text-left"><p>Async barriers + fence proxy + nanosleep</p></td>
+<td class="text-right"><p>10</p></td>
+<td class="text-left"><p>sm_90</p></td>
+<td class="text-left"><p>Hopper+</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">tma</span></code></p></td>
+<td class="text-left"><p>Tensor Memory Accelerator (bulk G2S/S2G)</p></td>
+<td class="text-right"><p>15</p></td>
+<td class="text-left"><p>sm_90</p></td>
+<td class="text-left"><p>Hopper+</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">wgmma</span></code></p></td>
+<td class="text-left"><p>Warpgroup Matrix Multiply-Accumulate</p></td>
+<td class="text-right"><p>5</p></td>
+<td class="text-left"><p>sm_90</p></td>
+<td class="text-left"><p>Hopper+</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">stmatrix</span></code></p></td>
+<td class="text-left"><p>Shared memory matrix store + bf16 convert</p></td>
+<td class="text-right"><p>5</p></td>
+<td class="text-left"><p>sm_90</p></td>
+<td class="text-left"><p>Hopper+</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">tcgen05</span></code></p></td>
+<td class="text-left"><p>Tensor Core Gen 5 + TMEM</p></td>
+<td class="text-right"><p>24</p></td>
+<td class="text-left"><p>sm_100</p></td>
+<td class="text-left"><p>Blackwell+</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">clc</span></code></p></td>
+<td class="text-left"><p>Cluster Launch Control</p></td>
+<td class="text-right"><p>6</p></td>
+<td class="text-left"><p>sm_100</p></td>
+<td class="text-left"><p>Blackwell+</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>That is 123 operations total. Most users will only encounter the first three
+modules (thread indexing, warp shuffles, barriers). The rest are for advanced
+GPU programming -- TMA, matrix accelerators, and Blackwell's tensor memory --
+covered in the <a class="reference internal" href="../advanced/tensor-memory-accelerator.html"><span class="std std-doc">Advanced GPU Features</span></a>
+chapters.</p>
+</section>
+<section id="from-rust-to-ptx-an-intrinsic-s-journey">
+<h3>From Rust to PTX: An Intrinsic's Journey<a class="headerlink" href="#from-rust-to-ptx-an-intrinsic-s-journey" title="連結到這個標頭">#</a></h3>
+<p>Each NVVM operation maps through three levels of naming:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Pliron operation</p></th>
+<th class="head text-left"><p>LLVM intrinsic</p></th>
+<th class="head text-left"><p>PTX instruction</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">ReadPtxSregTidXOp</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">llvm.nvvm.read.ptx.sreg.tid.x</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">mov.u32</span> <span class="pre">%r1,</span> <span class="pre">%tid.x</span></code></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">Barrier0Op</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">llvm.nvvm.barrier0</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">bar.sync</span> <span class="pre">0</span></code></p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">ShflSyncBflyI32Op</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">llvm.nvvm.shfl.sync.bfly.i32</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">shfl.sync.bfly.b32</span></code></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">CpAsyncBulkTensorG2sTile2dOp</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">llvm.nvvm.cp.async.bulk.tensor.2d.tile.g2s.im2col.*</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cp.async.bulk.tensor.2d.tile.g2s</span> <span class="pre">...</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The first column is the Rust struct name in <code class="docutils literal notranslate"><span class="pre">dialect-nvvm</span></code>. The second is what
+<code class="docutils literal notranslate"><span class="pre">llvm-export</span></code> emits (after the underscore-to-dot transformation). The third is
+what <code class="docutils literal notranslate"><span class="pre">llc</span></code> produces. You never have to write any of these by hand -- they are
+generated by <code class="docutils literal notranslate"><span class="pre">mir-lower</span></code> when it sees calls to <code class="docutils literal notranslate"><span class="pre">cuda-device</span></code> intrinsic
+functions like <code class="docutils literal notranslate"><span class="pre">thread::index_x()</span></code> or <code class="docutils literal notranslate"><span class="pre">warp::shfl_sync_bfly()</span></code>.</p>
+</section>
+<section id="verification-strategy">
+<h3>Verification Strategy<a class="headerlink" href="#verification-strategy" title="連結到這個標頭">#</a></h3>
+<p>NVVM operations use minimal structural verification: each operation checks
+its operand count and result count, and a handful verify result types (thread
+indexing ops require <code class="docutils literal notranslate"><span class="pre">i32</span></code> results; <code class="docutils literal notranslate"><span class="pre">tcgen05</span></code> loads check exact result counts
+for their 32-register and 4-register variants).</p>
+<p>This is intentional. NVVM operations are machine-generated by <code class="docutils literal notranslate"><span class="pre">mir-lower</span></code> --
+they are never hand-written by users. LLVM's NVPTX backend provides
+comprehensive type validation downstream. Adding full type checking to every
+NVVM operation would double the dialect's code size for zero practical benefit.</p>
+<div class="admonition note">
+<p class="admonition-title">備註</p>
+<p>The GPU architecture requirements (sm_70, sm_90, sm_100) are documented but
+not enforced at the pliron level. Architecture validation happens later, when
+<code class="docutils literal notranslate"><span class="pre">llc</span></code> is invoked with a specific <code class="docutils literal notranslate"><span class="pre">-mcpu=sm_XX</span></code> flag. If you use a Hopper
+intrinsic and target Volta, <code class="docutils literal notranslate"><span class="pre">llc</span></code> will tell you -- loudly.</p>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="how-the-dialects-interact">
+<h2>How the Dialects Interact<a class="headerlink" href="#how-the-dialects-interact" title="連結到這個標頭">#</a></h2>
+<p>Here is the lifecycle of a single Rust operation as it passes through all
+three abstraction levels:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Rust source:   let sum = a + b;        // a, b: f32
+
+dialect-mir:   %sum = mir.add %a, %b : f32
+                ↓  (DialectConversion)
+LLVM dialect:  %v5 = fadd float %v3, %v4
+                ↓  (llvm-export)
+LLVM IR:       %v5 = fadd float %v3, %v4
+                ↓  (llc --mcpu=sm_80)
+PTX:           add.f32 %f3, %f1, %f2;
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">dialect-mir</span></code> → LLVM dialect step is where the interesting work
+happens: <code class="docutils literal notranslate"><span class="pre">mir.add</span></code> on <code class="docutils literal notranslate"><span class="pre">f32</span></code> becomes <code class="docutils literal notranslate"><span class="pre">fadd</span></code> (floating-point add), while
+<code class="docutils literal notranslate"><span class="pre">mir.add</span></code> on <code class="docutils literal notranslate"><span class="pre">i32</span></code> becomes <code class="docutils literal notranslate"><span class="pre">add</span></code> (integer add). Checked operations like
+<code class="docutils literal notranslate"><span class="pre">mir.checked_add</span></code> expand into an <code class="docutils literal notranslate"><span class="pre">llvm.add</span></code>, a constant <code class="docutils literal notranslate"><span class="pre">i1</span> <span class="pre">false</span></code> for the
+overflow flag, and an <code class="docutils literal notranslate"><span class="pre">insertvalue</span></code> into a struct -- the GPU path omits
+overflow detection (since GPU integer arithmetic wraps). The lowering pass
+handles all of these translations.</p>
+<p>For GPU-specific operations, <code class="docutils literal notranslate"><span class="pre">dialect-nvvm</span></code> enters the picture:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Rust source:   let tid = thread::threadIdx_x();
+
+dialect-mir:   %tid = mir.call @cuda_oxide_device_&lt;hash&gt;_thread_index_x()
+                ↓  (DialectConversion, recognizes the intrinsic)
+dialect-nvvm:  %v2 = nvvm.read_ptx_sreg_tid_x : i32
+                ↓  (llvm-export)
+LLVM IR:       %v2 = call i32 @llvm.nvvm.read.ptx.sreg.tid.x() #0
+                ↓  (llc)
+PTX:           mov.u32 %r1, %tid.x;
+</pre></div>
+</div>
+<p>The lowering pass recognizes calls to <code class="docutils literal notranslate"><span class="pre">cuda_device</span></code> intrinsic functions by
+their fully qualified names (FQDNs) and replaces them with the corresponding
+<code class="docutils literal notranslate"><span class="pre">dialect-nvvm</span></code> operations. No generic &quot;function call&quot; machinery is needed --
+the intrinsic becomes a direct hardware instruction.</p>
+<section id="the-full-picture">
+<h3>The Full Picture<a class="headerlink" href="#the-full-picture" title="連結到這個標頭">#</a></h3>
+<p>Putting it all together, a compiled kernel body contains a mix of
+LLVM dialect and <code class="docutils literal notranslate"><span class="pre">dialect-nvvm</span></code> operations:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>llvm.func @vecadd(...) {
+  entry:
+    %tid    = nvvm.read_ptx_sreg_tid_x     // NVVM: thread index
+    %ntid   = nvvm.read_ptx_sreg_ntid_x    // NVVM: block size
+    %ctaid  = nvvm.read_ptx_sreg_ctaid_x   // NVVM: block index
+    %offset = llvm.mul %ctaid, %ntid        // LLVM: integer math
+    %idx    = llvm.add %offset, %tid        // LLVM: integer math
+    %cmp    = llvm.icmp slt %idx, %len      // LLVM: bounds check
+    llvm.cond_br %cmp, bb1, bb2             // LLVM: branch
+  bb1:
+    %p_a    = llvm.gep %a, %idx             // LLVM: pointer arithmetic
+    %val_a  = llvm.load %p_a                // LLVM: memory access
+    %p_b    = llvm.gep %b, %idx
+    %val_b  = llvm.load %p_b
+    %sum    = llvm.fadd %val_a, %val_b      // LLVM: floating-point add
+    %p_c    = llvm.gep %c, %idx
+    llvm.store %sum, %p_c
+    llvm.br bb2
+  bb2:
+    llvm.return void
+}
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">dialect-nvvm</span></code> operations at the top compute the global thread index.
+Everything else is standard LLVM dialect -- loads, stores, arithmetic,
+branches. The export engine serializes all of it into a single <code class="docutils literal notranslate"><span class="pre">.ll</span></code> file,
+and <code class="docutils literal notranslate"><span class="pre">llc</span></code> compiles it to PTX.</p>
+<hr class="docutils" />
+<p>For how these dialects are connected by the lowering pass, see
+<a class="reference internal" href="lowering-pipeline.html"><span class="std std-doc">The Lowering Pipeline</span></a>.</p>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="compiler-optimizations.html"
+       title="上一页">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">上一頁</p>
+        <p class="prev-next-title">Compiler Optimizations</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="lowering-pipeline.html"
+       title="下一页">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">下一頁</p>
+        <p class="prev-next-title">The Lowering Pipeline</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> 当前页面
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-three-dialects-at-a-glance">The Three Dialects at a Glance</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dialect-mir-the-rust-layer">dialect-mir -- The Rust Layer</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#types">Types</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#operations">Operations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-the-ir-looks-like">What the IR Looks Like</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#verification">Verification</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-llvm-dialect-the-llvm-layer">The LLVM Dialect -- The LLVM Layer</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Types</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Operations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-export-engine">The Export Engine</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#dialect-nvvm-the-gpu-layer">dialect-nvvm -- The GPU Layer</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#architecture-coverage">Architecture Coverage</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#from-rust-to-ptx-an-intrinsic-s-journey">From Rust to PTX: An Intrinsic's Journey</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#verification-strategy">Verification Strategy</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-the-dialects-interact">How the Dialects Interact</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-full-picture">The Full Picture</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+    <div class="footer-items__center">
+      
+        <div class="footer-item"><footer class="bd-footer-content">
+  <div class="footer-container" style="padding: 1rem 0 2rem 0; border-top: 1px solid var(--pst-color-border); text-align: left;">
+    
+    <!-- NVIDIA Logo -->
+    <div style="margin-bottom: 1rem;">
+      <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem; filter: brightness(0);"
+           class="only-light">
+      <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem;"
+           class="only-dark pst-js-only">
+    </div>
+    
+    <!-- Footer Links - single line, left aligned -->
+    <div style="font-size: 0.8125rem; margin-bottom: 0.5rem; color: var(--pst-color-text-muted);">
+      <a href="https://www.nvidia.com/en-us/about-nvidia/privacy-policy/" target="_blank" style="color: inherit; text-decoration: none;">Privacy Policy</a> | 
+      <a href="https://www.nvidia.com/en-us/preferences/email-preferences/" target="_blank" style="color: inherit; text-decoration: none;">Your Privacy Choices</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/terms-of-service/" target="_blank" style="color: inherit; text-decoration: none;">Terms of Service</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/accessibility/" target="_blank" style="color: inherit; text-decoration: none;">Accessibility</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/company-policies/" target="_blank" style="color: inherit; text-decoration: none;">Corporate Policies</a> | 
+      <a href="https://www.nvidia.com/en-us/product-security/" target="_blank" style="color: inherit; text-decoration: none;">Product Security</a> | 
+      <a href="https://www.nvidia.com/en-us/contact/" target="_blank" style="color: inherit; text-decoration: none;">Contact</a>
+    </div>
+    
+    <!-- Copyright -->
+    <div style="font-size: 0.8125rem; color: var(--pst-color-text-muted);">
+      Copyright &copy; 2025-2026, NVIDIA.
+    </div>
+    
+  </div>
+</footer></div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

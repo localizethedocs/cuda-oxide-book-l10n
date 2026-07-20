@@ -1,0 +1,1068 @@
+
+<!DOCTYPE html>
+
+
+<html lang="zh-CN" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Project: Async MLP Pipeline &#8212; cuda-oxide</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/nvidia-sphinx-theme.css?v=5d97cc0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=196aea71" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/lightbox.css?v=31fdf494" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../_static/documentation_options.js?v=d786bb5c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/translations.js?v=540d3cec"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'projects/async-mlp-pipeline';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../_static/js/lightbox.js?v=8cf6bc2b"></script>
+    <script src="../_static/js/spa-nav.js?v=9a4d0bbe"></script>
+    <link rel="canonical" href="https://projects.localizethedocs.org/cuda-oxide-book-l10n/projects/async-mlp-pipeline.html" />
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="Shared Memory and Synchronization" href="../advanced/shared-memory-and-synchronization.html" />
+    <link rel="prev" title="Concurrent Execution" href="../async-programming/concurrent-execution.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="zh-CN"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+<script type="text/javascript" src="../ltd-provenance.js"></script>
+<script type="text/javascript" src="../ltd-current.js"></script>
+<script type="text/javascript" src="../../../ltd-config.js"></script>
+<script type="text/javascript" src="../../../ltd-flyout.js"></script>
+
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">跳转至主要内容</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>回到顶部</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="版本警告"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="网页导航">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">cuda-oxide</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="亮色"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="暗色"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>亮色</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>暗色</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="当前页面">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="亮色"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="暗色"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>亮色</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>暗色</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><div class="sidebar-tree">
+    <p class="sidebar-tree-title">
+        Table of Contents
+    </p>
+    <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/hello-gpu.html">Writing Your First Kernel</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Writing GPU Programs</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/execution-model.html">The CUDA Execution Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/kernels-and-device-functions.html">Kernels and Device Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/memory-and-data-movement.html">Memory and Data Movement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/launching-kernels.html">Launching Kernels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/closures-and-generics.html">Closures and Generics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/error-handling-and-debugging.html">Error Handling and Debugging</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Safety on the GPU</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-safety/the-safety-model.html">The Safety Model</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Async GPU Programming</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/the-device-operation-model.html">The DeviceOperation Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/combinators-and-composition.html">Combinators and Composition</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/scheduling-and-streams.html">Scheduling and Streams</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/concurrent-execution.html">Concurrent Execution</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Building a Real Application</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Project: Async MLP Pipeline</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Advanced GPU Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/shared-memory-and-synchronization.html">Shared Memory and Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/warp-level-programming.html">Warp-Level Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/tensor-memory-accelerator.html">Tensor Memory Accelerator (TMA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/matrix-multiply-accelerators.html">Matrix Multiply Accelerators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cluster-programming.html">Cluster Programming</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Inside the Compiler</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/architecture-overview.html">Architecture Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/pliron.html">Pliron -- Pliron IR (MLIR-like)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/rustc-public.html">rustc_public -- Stable MIR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/rustc-codegen-cuda.html">The Code Generator: rustc-codegen-cuda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/mir-importer.html">The MIR Importer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/compiler-optimizations.html">Compiler Optimizations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/mlir-dialects.html">Pliron Dialects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/lowering-pipeline.html">The Lowering Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/adding-new-intrinsics.html">Adding New Intrinsics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/fuzzing-and-differential-testing.html">Fuzzing and Differential Testing</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Appendix</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/building-from-source.html">Building from Source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/api-quick-reference.html">API Quick Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/supported-features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/cuda-cpp-comparison.html">cuda-oxide vs CUDA C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/ecosystem.html">The Rust + GPU Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/glossary.html">Glossary</a></li>
+</ul>
+
+</div></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="初始页面">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Project: Async MLP Pipeline</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="project-async-mlp-pipeline">
+<h1>Project: Async MLP Pipeline<a class="headerlink" href="#project-async-mlp-pipeline" title="链接到此标题。">#</a></h1>
+<p>You have learned how to define kernels, move data, compose operations with
+combinators, and schedule work across streams. Time to put it all together.</p>
+<p>This chapter walks through <code class="docutils literal notranslate"><span class="pre">async_mlp</span></code> — the most complete example in the
+cuda-oxide repository — from the first <code class="docutils literal notranslate"><span class="pre">use</span></code> statement to the final
+<code class="docutils literal notranslate"><span class="pre">[ReLU</span> <span class="pre">OK]</span></code> on stdout. By the end you will have built a multi-kernel GPU
+pipeline that processes four batches concurrently, using every async pattern
+in the toolkit. If you have been reading the chapters sequentially, consider
+this the final boss.</p>
+<div class="admonition seealso">
+<p class="admonition-title">参见</p>
+<p>The <a class="reference internal" href="../async-programming/concurrent-execution.html"><span class="std std-doc">Concurrent Execution</span></a>
+chapter covers the <em>concepts</em> behind concurrent pipelines in depth. This
+chapter focuses on the <em>code</em> — a complete, buildable project you can run,
+modify, and profile.</p>
+</div>
+<hr class="docutils" />
+<section id="what-we-are-building">
+<h2>What we are building<a class="headerlink" href="#what-we-are-building" title="链接到此标题。">#</a></h2>
+<p>A toy <strong>multi-layer perceptron (MLP) forward pass</strong> on the GPU:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>input [64×64]  ──►  GEMM(input, W0)  ──►  hidden [64×64]
+                                              │
+                            MatVec(hidden, W1) ──►  output [64]
+                                                       │
+                                                 ReLU(output) ──►  result [64]
+</pre></div>
+</div>
+<p>Three kernels, four stages (including the final device-to-host copy), four
+batches, four CUDA streams, one shared set of weights, and zero host threads
+sitting around waiting. Here is the big picture:</p>
+<figure class="align-center" id="id1">
+<a class="reference internal image-reference" href="../_images/concurrent-batches.svg"><img alt="../_images/concurrent-batches.svg" src="../_images/concurrent-batches.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">Four MLP forward passes running concurrently. Shared weights are uploaded
+once as <code class="docutils literal notranslate"><span class="pre">Arc&lt;DeviceBox&gt;</span></code> and cloned cheaply into each batch. The round-robin
+scheduler distributes batches across four streams, and the staggered
+pipelines overlap on the GPU timeline.</span><a class="headerlink" href="#id1" title="链接到此图片">#</a></p>
+</figcaption>
+</figure>
+<p>The sequential approach processes one batch at a time — four times the work,
+four times the wait. The concurrent approach overlaps them: if the GPU has
+spare SMs, you finish in roughly the time of a single batch plus a small
+stagger. Not a bad return on a handful of <code class="docutils literal notranslate"><span class="pre">Arc::clone()</span></code> calls.</p>
+</section>
+<hr class="docutils" />
+<section id="project-structure">
+<h2>Project structure<a class="headerlink" href="#project-structure" title="链接到此标题。">#</a></h2>
+<p>The example lives at <code class="docutils literal notranslate"><span class="pre">crates/rustc-codegen-cuda/examples/async_mlp/</span></code> and is a
+standalone Cargo workspace member:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>async_mlp/
+├── Cargo.toml        ← dependencies: cuda-device, cuda-core, cuda-async, tokio
+└── src/
+    └── main.rs       ← kernels + host code, single file
+</pre></div>
+</div>
+<p>Everything — device kernels and host orchestration — lives in one file. The
+<code class="docutils literal notranslate"><span class="pre">#[kernel]</span></code> attribute tells the compiler which functions become PTX; the rest
+compiles as normal Rust. No separate <code class="docutils literal notranslate"><span class="pre">.cu</span></code> files, no header gymnastics, no
+build-system split personality.</p>
+<section id="dependencies">
+<h3>Dependencies<a class="headerlink" href="#dependencies" title="链接到此标题。">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">Cargo.toml</span></code> pulls in exactly the crates we need:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[dependencies]</span>
+<span class="n">cuda-device</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;../../../cuda-device&quot;</span><span class="w"> </span><span class="p">}</span><span class="w">       </span><span class="c1"># #[kernel], DisjointSlice, thread::*</span>
+<span class="n">cuda-core</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;../../../cuda-core&quot;</span><span class="w"> </span><span class="p">}</span><span class="w">      </span><span class="c1"># CudaModule, LaunchConfig</span>
+<span class="n">cuda-async</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;../../../cuda-async&quot;</span><span class="w"> </span><span class="p">}</span><span class="w">       </span><span class="c1"># DeviceOperation, zip!, and_then, spawn</span>
+<span class="n">tokio</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">version</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">features</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;rt&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;macros&quot;</span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">cuda-device</span></code> provides the device-side API (intrinsics, safe mutable slices).
+<code class="docutils literal notranslate"><span class="pre">cuda-core</span></code> handles module loading and launch configuration.
+<code class="docutils literal notranslate"><span class="pre">cuda-async</span></code> provides the <code class="docutils literal notranslate"><span class="pre">DeviceOperation</span></code> graph, combinators, and the
+stream-pool scheduler. <code class="docutils literal notranslate"><span class="pre">tokio</span></code> is the host async runtime that polls the
+futures.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="the-gpu-kernels">
+<h2>The GPU kernels<a class="headerlink" href="#the-gpu-kernels" title="链接到此标题。">#</a></h2>
+<p>These three functions are compiled to PTX by <code class="docutils literal notranslate"><span class="pre">rustc-codegen-cuda</span></code>. They never
+execute on the host — the <code class="docutils literal notranslate"><span class="pre">#[kernel]</span></code> attribute renames each one to
+<code class="docutils literal notranslate"><span class="pre">cuda_oxide_kernel_&lt;hash&gt;_&lt;name&gt;</span></code> so the codegen backend can identify and extract
+them.</p>
+<section id="sgemm-naive-matrix-multiply">
+<h3>sgemm_naive — matrix multiply<a class="headerlink" href="#sgemm-naive-matrix-multiply" title="链接到此标题。">#</a></h3>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::{</span><span class="n">kernel</span><span class="p">,</span><span class="w"> </span><span class="n">thread</span><span class="p">,</span><span class="w"> </span><span class="n">DisjointSlice</span><span class="p">};</span>
+
+<span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::</span><span class="n">thread</span><span class="p">::</span><span class="n">Runtime2DIndex</span><span class="p">;</span>
+
+<span class="cp">#[kernel]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">sgemm_naive</span><span class="p">(</span>
+<span class="w">    </span><span class="n">m</span><span class="p">:</span><span class="w"> </span><span class="kt">u32</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">:</span><span class="w"> </span><span class="kt">u32</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">:</span><span class="w"> </span><span class="kt">u32</span><span class="p">,</span>
+<span class="w">    </span><span class="n">alpha</span><span class="p">:</span><span class="w"> </span><span class="kt">f32</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span><span class="w"> </span><span class="n">b</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span>
+<span class="w">    </span><span class="n">beta</span><span class="p">:</span><span class="w"> </span><span class="kt">f32</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">c</span><span class="p">:</span><span class="w"> </span><span class="nc">DisjointSlice</span><span class="o">&lt;</span><span class="kt">f32</span><span class="p">,</span><span class="w"> </span><span class="n">Runtime2DIndex</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">n_sz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">usize</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">thread</span><span class="p">::</span><span class="n">index_2d_row</span><span class="p">();</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">col</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">thread</span><span class="p">::</span><span class="n">index_2d_col</span><span class="p">();</span>
+
+<span class="w">    </span><span class="c1">// SAFETY: every thread sees the same `n_sz` (same kernel arg).</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nb">Some</span><span class="p">(</span><span class="n">c_idx</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">thread</span><span class="p">::</span><span class="n">index_2d_runtime</span><span class="p">(</span><span class="n">n_sz</span><span class="p">)</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// col &lt; n_sz guaranteed by `Some` -- no manual check needed</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">usize</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="n">k_sz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">usize</span><span class="p">;</span>
+<span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span><span class="k">f32</span><span class="p">;</span>
+<span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="k">usize</span><span class="p">;</span>
+<span class="w">            </span><span class="k">while</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">k_sz</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="n">row</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">k_sz</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">n_sz</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">col</span><span class="p">];</span>
+<span class="w">                </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nb">Some</span><span class="p">(</span><span class="n">c_elem</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">get_mut</span><span class="p">(</span><span class="n">c_idx</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="o">*</span><span class="n">c_elem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">alpha</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">beta</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="o">*</span><span class="n">c_elem</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Each thread computes one element of the output matrix. The 2D thread index
+maps directly to the (row, col) position. <code class="docutils literal notranslate"><span class="pre">DisjointSlice</span></code> checks bounds and
+requires the matching index-space type. The remaining proof is explicit: every
+thread uses the same runtime stride, Z is inactive, and the raw 2D launch shape
+matches the kernel.</p>
+<div class="admonition tip">
+<p class="admonition-title">小技巧</p>
+<p>This is intentionally a <em>naive</em> GEMM — one thread, one element, no shared
+memory tiling, no coalescing tricks. A production GEMM would use the
+techniques from the <a class="reference internal" href="../advanced/shared-memory-and-synchronization.html"><span class="std std-doc">Shared Memory</span></a>
+chapter. But for demonstrating async composition, correctness beats
+performance.</p>
+</div>
+</section>
+<section id="matvec-naive-matrix-vector-product">
+<h3>matvec_naive — matrix-vector product<a class="headerlink" href="#matvec-naive-matrix-vector-product" title="链接到此标题。">#</a></h3>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="cp">#[kernel]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">matvec_naive</span><span class="p">(</span>
+<span class="w">    </span><span class="n">_m</span><span class="p">:</span><span class="w"> </span><span class="kt">u32</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">:</span><span class="w"> </span><span class="kt">u32</span><span class="p">,</span>
+<span class="w">    </span><span class="n">mat</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span><span class="w"> </span><span class="n">vec_in</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span>
+<span class="w">    </span><span class="k">mut</span><span class="w"> </span><span class="n">vec_out</span><span class="p">:</span><span class="w"> </span><span class="nc">DisjointSlice</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">thread</span><span class="p">::</span><span class="n">index_1d</span><span class="p">();</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nb">Some</span><span class="p">(</span><span class="n">out_elem</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vec_out</span><span class="p">.</span><span class="n">get_mut</span><span class="p">(</span><span class="n">row</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">n_sz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">usize</span><span class="p">;</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span><span class="k">f32</span><span class="p">;</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="k">usize</span><span class="p">;</span>
+<span class="w">        </span><span class="k">while</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">n_sz</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">mat</span><span class="p">[</span><span class="n">row</span><span class="p">.</span><span class="n">get</span><span class="p">()</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">n_sz</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">j</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">vec_in</span><span class="p">[</span><span class="n">j</span><span class="p">];</span>
+<span class="w">            </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="o">*</span><span class="n">out_elem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sum</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>One thread per output element, one-dimensional indexing. The <code class="docutils literal notranslate"><span class="pre">_m</span></code> parameter
+is unused but keeps the calling convention consistent with BLAS-style
+interfaces.</p>
+</section>
+<section id="relu-activation">
+<h3>relu — activation<a class="headerlink" href="#relu-activation" title="链接到此标题。">#</a></h3>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="cp">#[kernel]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">relu</span><span class="p">(</span><span class="n">input</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">output</span><span class="p">:</span><span class="w"> </span><span class="nc">DisjointSlice</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">thread</span><span class="p">::</span><span class="n">index_1d</span><span class="p">();</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nb">Some</span><span class="p">(</span><span class="n">out_elem</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">output</span><span class="p">.</span><span class="n">get_mut</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">val</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">input</span><span class="p">[</span><span class="n">idx</span><span class="p">.</span><span class="n">get</span><span class="p">()];</span>
+<span class="w">        </span><span class="o">*</span><span class="n">out_elem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">val</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">0.0</span><span class="k">f32</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">val</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="mf">0.0</span><span class="k">f32</span><span class="w"> </span><span class="p">};</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Elementwise <code class="docutils literal notranslate"><span class="pre">max(0,</span> <span class="pre">x)</span></code>. In the pipeline, <code class="docutils literal notranslate"><span class="pre">input</span></code> and <code class="docutils literal notranslate"><span class="pre">output</span></code> point to the
+same buffer — a perfectly valid in-place pattern since each thread reads and
+writes the same index and the launch is 1D.</p>
+</section>
+<section id="what-to-notice">
+<h3>What to notice<a class="headerlink" href="#what-to-notice" title="链接到此标题。">#</a></h3>
+<p>A few patterns that recur across all three kernels:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Pattern</p></th>
+<th class="head text-left"><p>What it does</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">thread::index_1d()</span></code> / <code class="docutils literal notranslate"><span class="pre">index_2d::&lt;S&gt;()</span></code></p></td>
+<td class="text-left"><p>Computes the global thread index from block/grid dimensions</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">DisjointSlice&lt;f32&gt;</span></code></p></td>
+<td class="text-left"><p>Bounds-checked mutable output; launch geometry completes the uniqueness proof</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">let</span> <span class="pre">Some(elem)</span> <span class="pre">=</span> <span class="pre">slice.get_mut(idx)</span></code></p></td>
+<td class="text-left"><p>Bounds check that silences threads beyond the data size</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">while</span></code> loops instead of <code class="docutils literal notranslate"><span class="pre">for</span></code></p></td>
+<td class="text-left"><p>Stylistic choice — <code class="docutils literal notranslate"><span class="pre">for</span></code> loops with ranges also work on device, but <code class="docutils literal notranslate"><span class="pre">while</span></code> makes the loop bounds explicit</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="bridging-host-and-device">
+<h2>Bridging host and device<a class="headerlink" href="#bridging-host-and-device" title="链接到此标题。">#</a></h2>
+<p>Three helper functions wrap raw CUDA driver calls into <code class="docutils literal notranslate"><span class="pre">DeviceOperation</span></code>
+values. They use <code class="docutils literal notranslate"><span class="pre">with_context</span></code> to receive the scheduler's stream at
+execution time — not at the call site. This is the key insight: you build
+the recipe now, the scheduler picks the stream later.</p>
+<section id="h2d-host-to-device">
+<h3>h2d — host to device<a class="headerlink" href="#h2d-host-to-device" title="链接到此标题。">#</a></h3>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="nf">h2d</span><span class="p">(</span><span class="n">host_data</span><span class="p">:</span><span class="w"> </span><span class="nb">Vec</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nc">impl</span><span class="w"> </span><span class="n">DeviceOperation</span><span class="o">&lt;</span><span class="n">Output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DeviceBox</span><span class="o">&lt;</span><span class="p">[</span><span class="kt">f32</span><span class="p">]</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">device_operation</span><span class="p">::</span><span class="n">with_context</span><span class="p">(</span><span class="k">move</span><span class="w"> </span><span class="o">|</span><span class="n">ctx</span><span class="o">|</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">stream</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ctx</span><span class="p">.</span><span class="n">get_cuda_stream</span><span class="p">();</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">host_data</span><span class="p">.</span><span class="n">len</span><span class="p">();</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">num_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">mem</span><span class="p">::</span><span class="n">size_of</span><span class="p">::</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="w">        </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="n">dptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">malloc_async</span><span class="p">(</span><span class="n">stream</span><span class="p">.</span><span class="n">cu_stream</span><span class="p">(),</span><span class="w"> </span><span class="n">num_bytes</span><span class="p">).</span><span class="n">unwrap</span><span class="p">();</span>
+<span class="w">            </span><span class="n">memcpy_htod_async</span><span class="p">(</span><span class="n">dptr</span><span class="p">,</span><span class="w"> </span><span class="n">host_data</span><span class="p">.</span><span class="n">as_ptr</span><span class="p">(),</span><span class="w"> </span><span class="n">num_bytes</span><span class="p">,</span><span class="w"> </span><span class="n">stream</span><span class="p">.</span><span class="n">cu_stream</span><span class="p">())</span>
+<span class="w">                </span><span class="p">.</span><span class="n">unwrap</span><span class="p">();</span>
+<span class="w">            </span><span class="n">value</span><span class="p">(</span><span class="n">DeviceBox</span><span class="p">::</span><span class="n">from_raw_parts</span><span class="p">(</span><span class="n">dptr</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">ctx</span><span class="p">.</span><span class="n">get_device_id</span><span class="p">()))</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">})</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">host_data</span></code> vector is captured by <code class="docutils literal notranslate"><span class="pre">move</span></code>. The closure runs when the
+scheduler executes the operation — at that point it has a real CUDA stream.
+<code class="docutils literal notranslate"><span class="pre">malloc_async</span></code> and <code class="docutils literal notranslate"><span class="pre">memcpy_htod_async</span></code> are stream-ordered, so the allocation
+and copy are serialized on the scheduler's chosen stream.</p>
+</section>
+<section id="zeros-zero-initialized-device-buffer">
+<h3>zeros — zero-initialized device buffer<a class="headerlink" href="#zeros-zero-initialized-device-buffer" title="链接到此标题。">#</a></h3>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="nf">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">:</span><span class="w"> </span><span class="kt">usize</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nc">impl</span><span class="w"> </span><span class="n">DeviceOperation</span><span class="o">&lt;</span><span class="n">Output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DeviceBox</span><span class="o">&lt;</span><span class="p">[</span><span class="kt">f32</span><span class="p">]</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">device_operation</span><span class="p">::</span><span class="n">with_context</span><span class="p">(</span><span class="k">move</span><span class="w"> </span><span class="o">|</span><span class="n">ctx</span><span class="o">|</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">stream</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ctx</span><span class="p">.</span><span class="n">get_cuda_stream</span><span class="p">();</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">num_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">mem</span><span class="p">::</span><span class="n">size_of</span><span class="p">::</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="w">        </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="n">dptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">malloc_async</span><span class="p">(</span><span class="n">stream</span><span class="p">.</span><span class="n">cu_stream</span><span class="p">(),</span><span class="w"> </span><span class="n">num_bytes</span><span class="p">).</span><span class="n">unwrap</span><span class="p">();</span>
+<span class="w">            </span><span class="n">memset_d8_async</span><span class="p">(</span><span class="n">dptr</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">num_bytes</span><span class="p">,</span><span class="w"> </span><span class="n">stream</span><span class="p">.</span><span class="n">cu_stream</span><span class="p">()).</span><span class="n">unwrap</span><span class="p">();</span>
+<span class="w">            </span><span class="n">value</span><span class="p">(</span><span class="n">DeviceBox</span><span class="p">::</span><span class="n">from_raw_parts</span><span class="p">(</span><span class="n">dptr</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">ctx</span><span class="p">.</span><span class="n">get_device_id</span><span class="p">()))</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">})</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Same pattern as <code class="docutils literal notranslate"><span class="pre">h2d</span></code>, but <code class="docutils literal notranslate"><span class="pre">memset_d8_async</span></code> instead of <code class="docutils literal notranslate"><span class="pre">memcpy</span></code>. The GEMM
+kernel uses <code class="docutils literal notranslate"><span class="pre">beta</span> <span class="pre">=</span> <span class="pre">0.0</span></code> so the initial contents do not matter, but zeroing
+is defensive.</p>
+</section>
+<section id="d2h-device-to-host">
+<h3>d2h — device to host<a class="headerlink" href="#d2h-device-to-host" title="链接到此标题。">#</a></h3>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="nf">d2h</span><span class="p">(</span><span class="n">dev</span><span class="p">:</span><span class="w"> </span><span class="nc">DeviceBox</span><span class="o">&lt;</span><span class="p">[</span><span class="kt">f32</span><span class="p">]</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nc">impl</span><span class="w"> </span><span class="n">DeviceOperation</span><span class="o">&lt;</span><span class="n">Output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">Vec</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">device_operation</span><span class="p">::</span><span class="n">with_context</span><span class="p">(</span><span class="k">move</span><span class="w"> </span><span class="o">|</span><span class="n">ctx</span><span class="o">|</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">stream</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ctx</span><span class="p">.</span><span class="n">get_cuda_stream</span><span class="p">();</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dev</span><span class="p">.</span><span class="n">len</span><span class="p">();</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">num_bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">mem</span><span class="p">::</span><span class="n">size_of</span><span class="p">::</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">();</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">host</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="fm">vec!</span><span class="p">[</span><span class="mf">0.0</span><span class="k">f32</span><span class="p">;</span><span class="w"> </span><span class="n">n</span><span class="p">];</span>
+<span class="w">        </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">memcpy_dtoh_async</span><span class="p">(</span>
+<span class="w">                </span><span class="n">host</span><span class="p">.</span><span class="n">as_mut_ptr</span><span class="p">(),</span><span class="w"> </span><span class="n">dev</span><span class="p">.</span><span class="n">cu_deviceptr</span><span class="p">(),</span>
+<span class="w">                </span><span class="n">num_bytes</span><span class="p">,</span><span class="w"> </span><span class="n">stream</span><span class="p">.</span><span class="n">cu_stream</span><span class="p">(),</span>
+<span class="w">            </span><span class="p">).</span><span class="n">unwrap</span><span class="p">();</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">dev</span><span class="p">;</span>
+<span class="w">        </span><span class="n">value</span><span class="p">(</span><span class="n">host</span><span class="p">)</span>
+<span class="w">    </span><span class="p">})</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">let</span> <span class="pre">_</span> <span class="pre">=</span> <span class="pre">&amp;dev;</span></code> line looks like a no-op, but it keeps <code class="docutils literal notranslate"><span class="pre">dev</span></code> alive in the
+closure until the stream synchronizes. Without it, <code class="docutils literal notranslate"><span class="pre">dev</span></code> would be dropped
+after the <code class="docutils literal notranslate"><span class="pre">memcpy_dtoh_async</span></code> call but before the stream finishes the copy —
+a classic use-after-free on the device side.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="composing-the-pipeline">
+<h2>Composing the pipeline<a class="headerlink" href="#composing-the-pipeline" title="链接到此标题。">#</a></h2>
+<p>Each batch is a single <code class="docutils literal notranslate"><span class="pre">DeviceOperation</span></code> built from combinators. No GPU
+work happens when you assemble it — it is a lazy description of future work.
+Here is how the pieces fit together:</p>
+<figure class="align-center" id="id2">
+<a class="reference internal image-reference" href="../_images/combinator-dataflow.svg"><img alt="../_images/combinator-dataflow.svg" src="../_images/combinator-dataflow.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">The combinator pipeline for a single batch. <code class="docutils literal notranslate"><span class="pre">zip!</span></code> allocates three buffers
+in parallel. The <code class="docutils literal notranslate"><span class="pre">and_then</span></code> chain sequences GEMM → MatVec → ReLU → D2H,
+threading device handles through each stage via <code class="docutils literal notranslate"><span class="pre">value()</span></code>.</span><a class="headerlink" href="#id2" title="链接到此图片">#</a></p>
+</figcaption>
+</figure>
+<section id="step-1-initialize-the-runtime">
+<h3>Step 1: Initialize the runtime<a class="headerlink" href="#step-1-initialize-the-runtime" title="链接到此标题。">#</a></h3>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">const</span><span class="w"> </span><span class="n">DIM</span><span class="p">:</span><span class="w"> </span><span class="kt">usize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">64</span><span class="p">;</span>
+<span class="k">const</span><span class="w"> </span><span class="n">BLOCK</span><span class="p">:</span><span class="w"> </span><span class="kt">u32</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">16</span><span class="p">;</span>
+
+<span class="cp">#[tokio::main]</span>
+<span class="k">async</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nb">Result</span><span class="o">&lt;</span><span class="p">(),</span><span class="w"> </span><span class="nb">Box</span><span class="o">&lt;</span><span class="k">dyn</span><span class="w"> </span><span class="n">std</span><span class="p">::</span><span class="n">error</span><span class="p">::</span><span class="n">Error</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">init_device_contexts</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">module</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">kernels</span><span class="p">::</span><span class="n">load_async</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">init_device_contexts(0,</span> <span class="pre">1)</span></code> sets device 0 as the default and initializes
+the device context map (capacity 1). The round-robin stream pool is created
+lazily on first use. The embedded module compiled from our <code class="docutils literal notranslate"><span class="pre">#[kernel]</span></code>
+functions is loaded once and shared by the typed module handle.</p>
+</section>
+<section id="step-2-upload-shared-weights">
+<h3>Step 2: Upload shared weights<a class="headerlink" href="#step-2-upload-shared-weights" title="链接到此标题。">#</a></h3>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">w0_host</span><span class="p">:</span><span class="w"> </span><span class="nb">Vec</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mi">0</span><span class="o">..</span><span class="n">DIM</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">DIM</span><span class="p">)</span>
+<span class="w">        </span><span class="p">.</span><span class="n">map</span><span class="p">(</span><span class="o">|</span><span class="n">i</span><span class="o">|</span><span class="w"> </span><span class="p">((</span><span class="n">i</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">7</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">f32</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">3.0</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">0.01</span><span class="p">)</span>
+<span class="w">        </span><span class="p">.</span><span class="n">collect</span><span class="p">();</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">w1_host</span><span class="p">:</span><span class="w"> </span><span class="nb">Vec</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mi">0</span><span class="o">..</span><span class="n">DIM</span><span class="p">)</span>
+<span class="w">        </span><span class="p">.</span><span class="n">map</span><span class="p">(</span><span class="o">|</span><span class="n">i</span><span class="o">|</span><span class="w"> </span><span class="p">((</span><span class="n">i</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">5</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">f32</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">2.0</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">0.01</span><span class="p">)</span>
+<span class="w">        </span><span class="p">.</span><span class="n">collect</span><span class="p">();</span>
+
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="p">(</span><span class="n">w0</span><span class="p">,</span><span class="w"> </span><span class="n">w1</span><span class="p">):</span><span class="w"> </span><span class="p">(</span><span class="n">Arc</span><span class="o">&lt;</span><span class="n">DeviceBox</span><span class="o">&lt;</span><span class="p">[</span><span class="kt">f32</span><span class="p">]</span><span class="o">&gt;&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">Arc</span><span class="o">&lt;</span><span class="n">DeviceBox</span><span class="o">&lt;</span><span class="p">[</span><span class="kt">f32</span><span class="p">]</span><span class="o">&gt;&gt;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span>
+<span class="w">        </span><span class="n">zip</span><span class="o">!</span><span class="p">(</span><span class="n">h2d</span><span class="p">(</span><span class="n">w0_host</span><span class="p">).</span><span class="n">arc</span><span class="p">(),</span><span class="w"> </span><span class="n">h2d</span><span class="p">(</span><span class="n">w1_host</span><span class="p">).</span><span class="n">arc</span><span class="p">()).</span><span class="k">await</span><span class="o">?</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Two independent uploads, bundled with <code class="docutils literal notranslate"><span class="pre">zip!</span></code> so they can share a stream.
+<code class="docutils literal notranslate"><span class="pre">.arc()</span></code> wraps each result in <code class="docutils literal notranslate"><span class="pre">Arc</span></code> — a reference-counted pointer that costs
+roughly one nanosecond to clone. Four batches, four clones, zero device
+copies.</p>
+</section>
+<section id="step-3-build-the-per-batch-pipeline">
+<h3>Step 3: Build the per-batch pipeline<a class="headerlink" href="#step-3-build-the-per-batch-pipeline" title="链接到此标题。">#</a></h3>
+<p>This is where the magic lives. For each batch, we build a four-stage chain:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="k">use</span><span class="w"> </span><span class="n">cuda_async</span><span class="p">::</span><span class="n">launch</span><span class="p">::{</span><span class="n">AsyncKernelLaunchBuilder</span><span class="p">,</span><span class="w"> </span><span class="n">OwnedAsyncKernelLaunch</span><span class="p">};</span>
+
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">pipeline</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">zip</span><span class="o">!</span><span class="p">(</span><span class="n">h2d</span><span class="p">(</span><span class="n">batch_data</span><span class="p">),</span><span class="w"> </span><span class="n">zeros</span><span class="p">(</span><span class="n">DIM</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">DIM</span><span class="p">),</span><span class="w"> </span><span class="n">zeros</span><span class="p">(</span><span class="n">DIM</span><span class="p">))</span>
+<span class="w">        </span><span class="p">.</span><span class="n">and_then</span><span class="p">(</span><span class="k">move</span><span class="w"> </span><span class="o">|</span><span class="p">(</span><span class="n">input</span><span class="p">,</span><span class="w"> </span><span class="n">hidden</span><span class="p">,</span><span class="w"> </span><span class="n">output</span><span class="p">)</span><span class="o">|</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">// Stage 1: GEMM — hidden = input @ W0</span>
+<span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="n">func</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">module</span><span class="p">.</span><span class="n">load_function</span><span class="p">(</span><span class="s">&quot;sgemm_naive&quot;</span><span class="p">).</span><span class="n">unwrap</span><span class="p">();</span>
+<span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">builder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AsyncKernelLaunchBuilder</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="n">Arc</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="n">func</span><span class="p">));</span>
+<span class="w">            </span><span class="n">builder</span><span class="p">.</span><span class="n">push_args</span><span class="p">((</span>
+<span class="w">                </span><span class="n">DIM</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">u32</span><span class="p">,</span><span class="w"> </span><span class="n">DIM</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">u32</span><span class="p">,</span><span class="w"> </span><span class="n">DIM</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">u32</span><span class="p">,</span>
+<span class="w">                </span><span class="mf">1.0</span><span class="k">f32</span><span class="p">,</span>
+<span class="w">                </span><span class="n">input</span><span class="p">.</span><span class="n">cu_deviceptr</span><span class="p">(),</span><span class="w"> </span><span class="n">input</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">u64</span><span class="p">,</span>
+<span class="w">                </span><span class="n">w0</span><span class="p">.</span><span class="n">cu_deviceptr</span><span class="p">(),</span><span class="w"> </span><span class="n">w0</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">u64</span><span class="p">,</span>
+<span class="w">                </span><span class="mf">0.0</span><span class="k">f32</span><span class="p">,</span>
+<span class="w">                </span><span class="n">hidden</span><span class="p">.</span><span class="n">cu_deviceptr</span><span class="p">(),</span><span class="w"> </span><span class="n">hidden</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">u64</span><span class="p">,</span>
+<span class="w">            </span><span class="p">));</span>
+<span class="w">            </span><span class="c1">// SAFETY: packet/config match sgemm_naive, the scheduler uses the</span>
+<span class="w">            </span><span class="c1">// module&#39;s context, and the owned wrapper retains its allocations.</span>
+<span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="n">launch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">builder</span><span class="p">.</span><span class="n">finalize_unchecked</span><span class="p">(</span><span class="n">gemm_cfg</span><span class="p">)</span><span class="w"> </span><span class="p">};</span>
+<span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="n">launch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OwnedAsyncKernelLaunch</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="n">launch</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">input</span><span class="p">,</span><span class="w"> </span><span class="n">w0</span><span class="p">,</span><span class="w"> </span><span class="n">hidden</span><span class="p">));</span>
+<span class="w">            </span><span class="n">launch</span><span class="p">.</span><span class="n">and_then</span><span class="p">(</span><span class="k">move</span><span class="w"> </span><span class="o">|</span><span class="p">(</span><span class="n">_input</span><span class="p">,</span><span class="w"> </span><span class="n">_w0</span><span class="p">,</span><span class="w"> </span><span class="n">hidden</span><span class="p">)</span><span class="o">|</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">value</span><span class="p">((</span><span class="n">hidden</span><span class="p">,</span><span class="w"> </span><span class="n">output</span><span class="p">,</span><span class="w"> </span><span class="n">w1</span><span class="p">,</span><span class="w"> </span><span class="n">module</span><span class="p">))</span>
+<span class="w">            </span><span class="p">})</span>
+<span class="w">        </span><span class="p">})</span>
+<span class="w">        </span><span class="p">.</span><span class="n">and_then</span><span class="p">(</span><span class="k">move</span><span class="w"> </span><span class="o">|</span><span class="p">(</span><span class="n">hidden</span><span class="p">,</span><span class="w"> </span><span class="n">output</span><span class="p">,</span><span class="w"> </span><span class="n">w1</span><span class="p">,</span><span class="w"> </span><span class="n">module</span><span class="p">)</span><span class="o">|</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">// Stage 2: MatVec — output = hidden @ W1</span>
+<span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="n">func</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">module</span><span class="p">.</span><span class="n">load_function</span><span class="p">(</span><span class="s">&quot;matvec_naive&quot;</span><span class="p">).</span><span class="n">unwrap</span><span class="p">();</span>
+<span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">builder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AsyncKernelLaunchBuilder</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="n">Arc</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="n">func</span><span class="p">));</span>
+<span class="w">            </span><span class="n">builder</span><span class="p">.</span><span class="n">push_args</span><span class="p">((</span>
+<span class="w">                </span><span class="n">DIM</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">u32</span><span class="p">,</span><span class="w"> </span><span class="n">DIM</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">u32</span><span class="p">,</span>
+<span class="w">                </span><span class="n">hidden</span><span class="p">.</span><span class="n">cu_deviceptr</span><span class="p">(),</span><span class="w"> </span><span class="n">hidden</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">u64</span><span class="p">,</span>
+<span class="w">                </span><span class="n">w1</span><span class="p">.</span><span class="n">cu_deviceptr</span><span class="p">(),</span><span class="w"> </span><span class="n">w1</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">u64</span><span class="p">,</span>
+<span class="w">                </span><span class="n">output</span><span class="p">.</span><span class="n">cu_deviceptr</span><span class="p">(),</span><span class="w"> </span><span class="n">output</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">u64</span><span class="p">,</span>
+<span class="w">            </span><span class="p">));</span>
+<span class="w">            </span><span class="c1">// SAFETY: packet/config match matvec_naive, the scheduler uses the</span>
+<span class="w">            </span><span class="c1">// module&#39;s context, and the owned wrapper retains its allocations.</span>
+<span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="n">launch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">builder</span><span class="p">.</span><span class="n">finalize_unchecked</span><span class="p">(</span><span class="n">matvec_cfg</span><span class="p">)</span><span class="w"> </span><span class="p">};</span>
+<span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="n">launch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OwnedAsyncKernelLaunch</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="n">launch</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">hidden</span><span class="p">,</span><span class="w"> </span><span class="n">w1</span><span class="p">,</span><span class="w"> </span><span class="n">output</span><span class="p">));</span>
+<span class="w">            </span><span class="n">launch</span><span class="p">.</span><span class="n">and_then</span><span class="p">(</span><span class="k">move</span><span class="w"> </span><span class="o">|</span><span class="p">(</span><span class="n">_hidden</span><span class="p">,</span><span class="w"> </span><span class="n">_w1</span><span class="p">,</span><span class="w"> </span><span class="n">output</span><span class="p">)</span><span class="o">|</span><span class="w"> </span><span class="n">value</span><span class="p">((</span><span class="n">output</span><span class="p">,</span><span class="w"> </span><span class="n">module</span><span class="p">)))</span>
+<span class="w">        </span><span class="p">})</span>
+<span class="w">        </span><span class="p">.</span><span class="n">and_then</span><span class="p">(</span><span class="k">move</span><span class="w"> </span><span class="o">|</span><span class="p">(</span><span class="n">output</span><span class="p">,</span><span class="w"> </span><span class="n">module</span><span class="p">)</span><span class="o">|</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">// Stage 3: ReLU — result = max(0, output)</span>
+<span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="n">func</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">module</span><span class="p">.</span><span class="n">load_function</span><span class="p">(</span><span class="s">&quot;relu&quot;</span><span class="p">).</span><span class="n">unwrap</span><span class="p">();</span>
+<span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="n">relu_out</span><span class="p">:</span><span class="w"> </span><span class="nc">DeviceBox</span><span class="o">&lt;</span><span class="p">[</span><span class="kt">f32</span><span class="p">]</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">output</span><span class="p">;</span>
+<span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">builder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AsyncKernelLaunchBuilder</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="n">Arc</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="n">func</span><span class="p">));</span>
+<span class="w">            </span><span class="n">builder</span><span class="p">.</span><span class="n">push_args</span><span class="p">((</span>
+<span class="w">                </span><span class="n">relu_out</span><span class="p">.</span><span class="n">cu_deviceptr</span><span class="p">(),</span><span class="w"> </span><span class="n">relu_out</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">u64</span><span class="p">,</span>
+<span class="w">                </span><span class="n">relu_out</span><span class="p">.</span><span class="n">cu_deviceptr</span><span class="p">(),</span><span class="w"> </span><span class="n">relu_out</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">u64</span><span class="p">,</span>
+<span class="w">            </span><span class="p">));</span>
+<span class="w">            </span><span class="c1">// SAFETY: packet/config match relu, the scheduler uses the module&#39;s</span>
+<span class="w">            </span><span class="c1">// context, and the owned wrapper retains output.</span>
+<span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="n">launch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">builder</span><span class="p">.</span><span class="n">finalize_unchecked</span><span class="p">(</span><span class="n">relu_cfg</span><span class="p">)</span><span class="w"> </span><span class="p">};</span>
+<span class="w">            </span><span class="n">OwnedAsyncKernelLaunch</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="n">launch</span><span class="p">,</span><span class="w"> </span><span class="n">relu_out</span><span class="p">)</span>
+<span class="w">        </span><span class="p">})</span>
+<span class="w">        </span><span class="p">.</span><span class="n">and_then</span><span class="p">(</span><span class="n">d2h</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>A few things are worth slowing down for:</p>
+<p><strong>The <code class="docutils literal notranslate"><span class="pre">value()</span></code> baton.</strong> Each <code class="docutils literal notranslate"><span class="pre">and_then</span></code> closure consumes the previous
+stage's output and returns a <code class="docutils literal notranslate"><span class="pre">DeviceOperation</span></code>. Kernel launches return <code class="docutils literal notranslate"><span class="pre">()</span></code>,
+so you need <code class="docutils literal notranslate"><span class="pre">value()</span></code> to carry forward the device handles the next stage
+needs. Think of it as a relay baton — the kernel runs, the baton passes.</p>
+<p><strong>Type annotations.</strong> The deeply nested generics from <code class="docutils literal notranslate"><span class="pre">zip!</span></code> + <code class="docutils literal notranslate"><span class="pre">and_then</span></code>
+chains exceed Rust's type inference. You will need explicit annotations on
+closure parameters:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="p">.</span><span class="n">and_then</span><span class="p">(</span><span class="k">move</span><span class="w"> </span><span class="o">|</span><span class="p">(</span><span class="n">hidden</span><span class="p">,</span><span class="w"> </span><span class="n">output</span><span class="p">,</span><span class="w"> </span><span class="n">w1</span><span class="p">,</span><span class="w"> </span><span class="n">module</span><span class="p">):</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">DeviceBox</span><span class="o">&lt;</span><span class="p">[</span><span class="kt">f32</span><span class="p">]</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">DeviceBox</span><span class="o">&lt;</span><span class="p">[</span><span class="kt">f32</span><span class="p">]</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">Arc</span><span class="o">&lt;</span><span class="n">DeviceBox</span><span class="o">&lt;</span><span class="p">[</span><span class="kt">f32</span><span class="p">]</span><span class="o">&gt;&gt;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">Arc</span><span class="o">&lt;</span><span class="n">CudaModule</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="p">)</span><span class="o">|</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">..</span><span class="p">.</span><span class="w"> </span><span class="p">})</span>
+</pre></div>
+</div>
+<p>This is the one ergonomic rough edge. The <code class="docutils literal notranslate"><span class="pre">Zippable</span></code> trait import is also
+required for <code class="docutils literal notranslate"><span class="pre">zip!</span></code> to work.</p>
+<p><strong>In-place ReLU.</strong> Stage 3 passes <code class="docutils literal notranslate"><span class="pre">relu_out</span></code> as both <code class="docutils literal notranslate"><span class="pre">input</span></code> and <code class="docutils literal notranslate"><span class="pre">output</span></code>
+to the kernel. Since each thread reads <code class="docutils literal notranslate"><span class="pre">input[idx]</span></code> and writes <code class="docutils literal notranslate"><span class="pre">output[idx]</span></code>
+at the same index, this is safe — no thread reads another's write.</p>
+<p><strong>Raw launch boundary.</strong> The builder is inert. <code class="docutils literal notranslate"><span class="pre">finalize_unchecked</span></code> is where
+the raw packet and geometry become runnable, so each call has a local safety
+proof. <code class="docutils literal notranslate"><span class="pre">OwnedAsyncKernelLaunch</span></code> keeps its buffers alive. Prefer generated
+owned-async methods with <code class="docutils literal notranslate"><span class="pre">PreparedLaunch&lt;K&gt;</span></code> when the kernel declares a launch
+contract.</p>
+</section>
+<section id="step-4-spawn-and-collect">
+<h3>Step 4: Spawn and collect<a class="headerlink" href="#step-4-spawn-and-collect" title="链接到此标题。">#</a></h3>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="n">handles</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">tokio</span><span class="p">::</span><span class="n">spawn</span><span class="p">(</span><span class="n">pipeline</span><span class="p">.</span><span class="n">into_future</span><span class="p">()));</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">.into_future()</span></code> converts the lazy <code class="docutils literal notranslate"><span class="pre">DeviceOperation</span></code> into a <code class="docutils literal notranslate"><span class="pre">DeviceFuture</span></code>.
+At this point the scheduling policy picks a stream (batch 0 → stream 0,
+batch 1 → stream 1, round-robin). <code class="docutils literal notranslate"><span class="pre">tokio::spawn</span></code> hands the future to the
+Tokio runtime.</p>
+<p>On the first poll, the pipeline's <code class="docutils literal notranslate"><span class="pre">execute()</span></code> submits all GPU work to the
+assigned stream and registers a <code class="docutils literal notranslate"><span class="pre">cuLaunchHostFunc</span></code> callback. The future
+returns <code class="docutils literal notranslate"><span class="pre">Poll::Pending</span></code>. When the GPU finishes, the callback wakes the task.
+No host thread spins.</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">handle</span><span class="p">)</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">handles</span><span class="p">.</span><span class="n">into_iter</span><span class="p">().</span><span class="n">enumerate</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">result</span><span class="p">:</span><span class="w"> </span><span class="nb">Vec</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">handle</span><span class="p">.</span><span class="k">await</span><span class="p">.</span><span class="n">expect</span><span class="p">(</span><span class="s">&quot;Tokio task panicked&quot;</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">all_non_negative</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">result</span><span class="p">.</span><span class="n">iter</span><span class="p">().</span><span class="n">all</span><span class="p">(</span><span class="o">|&amp;</span><span class="n">v</span><span class="o">|</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mf">0.0</span><span class="p">);</span>
+<span class="w">        </span><span class="fm">println!</span><span class="p">(</span><span class="s">&quot;Batch {}: {} elements, first 8 = {:?}{}&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="p">.</span><span class="n">len</span><span class="p">(),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">result</span><span class="p">[</span><span class="o">..</span><span class="mf">8.</span><span class="n">min</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">len</span><span class="p">())],</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="n">all_non_negative</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s">&quot; [ReLU OK]&quot;</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s">&quot; [ReLU FAILED]&quot;</span><span class="w"> </span><span class="p">}</span>
+<span class="w">        </span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+</pre></div>
+</div>
+<p>The ReLU sanity check is not deep learning validation — it just confirms
+that the activation function ran. Every output should be non-negative. If
+you see <code class="docutils literal notranslate"><span class="pre">[ReLU</span> <span class="pre">FAILED]</span></code>, something upstream is very wrong.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="build-run-verify">
+<h2>Build, run, verify<a class="headerlink" href="#build-run-verify" title="链接到此标题。">#</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cargo<span class="w"> </span>oxide<span class="w"> </span>run<span class="w"> </span>async_mlp
+</pre></div>
+</div>
+<p>Expected output:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>=== Async MLP Pipeline ===
+
+Allocating model weights...
+  W0: 64x64 on device (Arc refcount=1)
+  W1: 64 on device (Arc refcount=1)
+
+Launched 4 batches concurrently, awaiting results...
+
+Batch 0: 64 elements, first 8 = [0.0020799995, 0.0, ...] [ReLU OK]
+Batch 1: 64 elements, first 8 = [0.0, 0.0, ...] [ReLU OK]
+Batch 2: 64 elements, first 8 = [0.0, 0.00108, ...] [ReLU OK]
+Batch 3: 64 elements, first 8 = [0.00244, 0.0025, ...] [ReLU OK]
+
+SUCCESS: All batches completed.
+</pre></div>
+</div>
+<p>The Arc refcounts start at 1 (one reference each for <code class="docutils literal notranslate"><span class="pre">w0</span></code> and <code class="docutils literal notranslate"><span class="pre">w1</span></code>). During
+batch processing they temporarily rise to 5 (original + four clones) and
+drop back as batches complete. If you add more batches, the refcounts scale
+accordingly — no copies, no reallocation.</p>
+<section id="profiling-with-nsight-systems">
+<h3>Profiling with Nsight Systems<a class="headerlink" href="#profiling-with-nsight-systems" title="链接到此标题。">#</a></h3>
+<p>To see the stream overlap in action:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nsys<span class="w"> </span>profile<span class="w"> </span>--trace<span class="o">=</span>cuda<span class="w"> </span>cargo<span class="w"> </span>oxide<span class="w"> </span>run<span class="w"> </span>async_mlp
+nsys-ui<span class="w"> </span>report.nsys-rep
+</pre></div>
+</div>
+<p>In the timeline view, look for four parallel rows of kernel blocks — one per
+stream. If kernels are serialized on one stream, the round-robin scheduler
+is not being used (likely <code class="docutils literal notranslate"><span class="pre">init_device_contexts</span></code> was not called, or only one
+stream was configured).</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="what-makes-this-real">
+<h2>What makes this &quot;real&quot;<a class="headerlink" href="#what-makes-this-real" title="链接到此标题。">#</a></h2>
+<p>This is still a toy — 64×64 matrices, fake weights, three kernels. But the
+<em>structure</em> is the same as production GPU pipelines:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Production pattern</p></th>
+<th class="head text-left"><p>async_mlp equivalent</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>Model weights loaded once, shared across requests</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">zip!(h2d(w0).arc(),</span> <span class="pre">h2d(w1).arc())</span></code></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Per-request inference pipeline</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">and_then</span></code> chain: GEMM → MatVec → ReLU → D2H</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Concurrent request processing</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">tokio::spawn(pipeline.into_future())</span></code> per batch</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Stream-based GPU scheduling</p></td>
+<td class="text-left"><p>Round-robin <code class="docutils literal notranslate"><span class="pre">init_device_contexts(0,</span> <span class="pre">1)</span></code></p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Non-blocking host</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">.await</span></code> on join handles, not <code class="docutils literal notranslate"><span class="pre">.sync()</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Scale the matrices from 64 to 4096, replace the naive kernels with tiled
+shared-memory versions (see <a class="reference internal" href="../advanced/shared-memory-and-synchronization.html"><span class="std std-doc">Shared Memory</span></a>),
+add more layers, and you have the skeleton of a real inference server.</p>
+</section>
+<hr class="docutils" />
+<section id="extending-the-example">
+<h2>Extending the example<a class="headerlink" href="#extending-the-example" title="链接到此标题。">#</a></h2>
+<p>A few ideas for taking this further:</p>
+<p><strong>Add a softmax layer.</strong> Write a <code class="docutils literal notranslate"><span class="pre">#[kernel]</span></code> that computes the
+<a class="reference external" href="https://en.wikipedia.org/wiki/Softmax_function">numerically stable softmax</a>
+across the 64-element output vector. Chain it with another <code class="docutils literal notranslate"><span class="pre">.and_then</span></code> after
+ReLU.</p>
+<p><strong>Profile at larger dimensions.</strong> Change <code class="docutils literal notranslate"><span class="pre">DIM</span></code> to 512 or 1024. Watch the
+GEMM dominate the timeline. Then replace <code class="docutils literal notranslate"><span class="pre">sgemm_naive</span></code> with a tiled version
+using <code class="docutils literal notranslate"><span class="pre">SharedArray</span></code> and observe the speedup.</p>
+<p><strong>Add error recovery.</strong> Replace <code class="docutils literal notranslate"><span class="pre">.unwrap()</span></code> in the kernel launch closures
+with proper <code class="docutils literal notranslate"><span class="pre">Result</span></code> propagation. Use the three-arm <code class="docutils literal notranslate"><span class="pre">match</span></code> pattern from
+the <a class="reference internal" href="../async-programming/concurrent-execution.html#concurrent-error-handling"><span class="std std-ref">Concurrent Execution</span></a>
+chapter to handle GPU errors and task panics independently.</p>
+<p><strong>Multi-device.</strong> Pass <code class="docutils literal notranslate"><span class="pre">init_device_contexts(0,</span> <span class="pre">2)</span></code> to manage two GPUs.
+Build a batch splitter that routes even batches to GPU 0 and odd batches to
+GPU 1.</p>
+<div class="admonition seealso">
+<p class="admonition-title">参见</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../async-programming/the-device-operation-model.html"><span class="std std-doc">The DeviceOperation Model</span></a> — how lazy GPU graphs work</p></li>
+<li><p><a class="reference internal" href="../async-programming/combinators-and-composition.html"><span class="std std-doc">Combinators and Composition</span></a> — <code class="docutils literal notranslate"><span class="pre">and_then</span></code>, <code class="docutils literal notranslate"><span class="pre">zip!</span></code>, <code class="docutils literal notranslate"><span class="pre">value()</span></code>, <code class="docutils literal notranslate"><span class="pre">.arc()</span></code> in detail</p></li>
+<li><p><a class="reference internal" href="../async-programming/scheduling-and-streams.html"><span class="std std-doc">Scheduling and Streams</span></a> — round-robin, stream pools, scheduling policies</p></li>
+<li><p><a class="reference internal" href="../async-programming/concurrent-execution.html"><span class="std std-doc">Concurrent Execution</span></a> — the theory behind everything in this chapter</p></li>
+</ul>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../async-programming/concurrent-execution.html"
+       title="上一页">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">上一页</p>
+        <p class="prev-next-title">Concurrent Execution</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../advanced/shared-memory-and-synchronization.html"
+       title="下一页">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">下一页</p>
+        <p class="prev-next-title">Shared Memory and Synchronization</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> 当前页面
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-we-are-building">What we are building</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#project-structure">Project structure</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dependencies">Dependencies</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-gpu-kernels">The GPU kernels</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sgemm-naive-matrix-multiply">sgemm_naive — matrix multiply</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#matvec-naive-matrix-vector-product">matvec_naive — matrix-vector product</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#relu-activation">relu — activation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-to-notice">What to notice</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bridging-host-and-device">Bridging host and device</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#h2d-host-to-device">h2d — host to device</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#zeros-zero-initialized-device-buffer">zeros — zero-initialized device buffer</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#d2h-device-to-host">d2h — device to host</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#composing-the-pipeline">Composing the pipeline</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#step-1-initialize-the-runtime">Step 1: Initialize the runtime</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#step-2-upload-shared-weights">Step 2: Upload shared weights</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#step-3-build-the-per-batch-pipeline">Step 3: Build the per-batch pipeline</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#step-4-spawn-and-collect">Step 4: Spawn and collect</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#build-run-verify">Build, run, verify</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#profiling-with-nsight-systems">Profiling with Nsight Systems</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-makes-this-real">What makes this "real"</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#extending-the-example">Extending the example</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+    <div class="footer-items__center">
+      
+        <div class="footer-item"><footer class="bd-footer-content">
+  <div class="footer-container" style="padding: 1rem 0 2rem 0; border-top: 1px solid var(--pst-color-border); text-align: left;">
+    
+    <!-- NVIDIA Logo -->
+    <div style="margin-bottom: 1rem;">
+      <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem; filter: brightness(0);"
+           class="only-light">
+      <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem;"
+           class="only-dark pst-js-only">
+    </div>
+    
+    <!-- Footer Links - single line, left aligned -->
+    <div style="font-size: 0.8125rem; margin-bottom: 0.5rem; color: var(--pst-color-text-muted);">
+      <a href="https://www.nvidia.com/en-us/about-nvidia/privacy-policy/" target="_blank" style="color: inherit; text-decoration: none;">Privacy Policy</a> | 
+      <a href="https://www.nvidia.com/en-us/preferences/email-preferences/" target="_blank" style="color: inherit; text-decoration: none;">Your Privacy Choices</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/terms-of-service/" target="_blank" style="color: inherit; text-decoration: none;">Terms of Service</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/accessibility/" target="_blank" style="color: inherit; text-decoration: none;">Accessibility</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/company-policies/" target="_blank" style="color: inherit; text-decoration: none;">Corporate Policies</a> | 
+      <a href="https://www.nvidia.com/en-us/product-security/" target="_blank" style="color: inherit; text-decoration: none;">Product Security</a> | 
+      <a href="https://www.nvidia.com/en-us/contact/" target="_blank" style="color: inherit; text-decoration: none;">Contact</a>
+    </div>
+    
+    <!-- Copyright -->
+    <div style="font-size: 0.8125rem; color: var(--pst-color-text-muted);">
+      Copyright &copy; 2025-2026, NVIDIA.
+    </div>
+    
+  </div>
+</footer></div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

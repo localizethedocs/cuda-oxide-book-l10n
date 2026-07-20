@@ -1,0 +1,893 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en-US" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Matrix Multiply Accelerators &#8212; cuda-oxide</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/nvidia-sphinx-theme.css?v=5d97cc0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=196aea71" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/lightbox.css?v=31fdf494" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../_static/documentation_options.js?v=66d1f95f"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'advanced/matrix-multiply-accelerators';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../_static/js/lightbox.js?v=8cf6bc2b"></script>
+    <script src="../_static/js/spa-nav.js?v=9a4d0bbe"></script>
+    <link rel="canonical" href="https://projects.localizethedocs.org/cuda-oxide-book-l10n/advanced/matrix-multiply-accelerators.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Cluster Programming" href="cluster-programming.html" />
+    <link rel="prev" title="Tensor Memory Accelerator (TMA)" href="tensor-memory-accelerator.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en-US"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+<script type="text/javascript" src="../ltd-provenance.js"></script>
+<script type="text/javascript" src="../ltd-current.js"></script>
+<script type="text/javascript" src="../../../ltd-config.js"></script>
+<script type="text/javascript" src="../../../ltd-flyout.js"></script>
+
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">cuda-oxide</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><div class="sidebar-tree">
+    <p class="sidebar-tree-title">
+        Table of Contents
+    </p>
+    <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/hello-gpu.html">Writing Your First Kernel</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Writing GPU Programs</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/execution-model.html">The CUDA Execution Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/kernels-and-device-functions.html">Kernels and Device Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/memory-and-data-movement.html">Memory and Data Movement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/launching-kernels.html">Launching Kernels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/closures-and-generics.html">Closures and Generics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/error-handling-and-debugging.html">Error Handling and Debugging</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Safety on the GPU</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-safety/the-safety-model.html">The Safety Model</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Async GPU Programming</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/the-device-operation-model.html">The DeviceOperation Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/combinators-and-composition.html">Combinators and Composition</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/scheduling-and-streams.html">Scheduling and Streams</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/concurrent-execution.html">Concurrent Execution</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Building a Real Application</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../projects/async-mlp-pipeline.html">Project: Async MLP Pipeline</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Advanced GPU Features</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="shared-memory-and-synchronization.html">Shared Memory and Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="warp-level-programming.html">Warp-Level Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tensor-memory-accelerator.html">Tensor Memory Accelerator (TMA)</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Matrix Multiply Accelerators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cluster-programming.html">Cluster Programming</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Inside the Compiler</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/architecture-overview.html">Architecture Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/pliron.html">Pliron – Pliron IR (MLIR-like)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/rustc-public.html">rustc_public – Stable MIR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/rustc-codegen-cuda.html">The Code Generator: rustc-codegen-cuda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/mir-importer.html">The MIR Importer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/compiler-optimizations.html">Compiler Optimizations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/mlir-dialects.html">Pliron Dialects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/lowering-pipeline.html">The Lowering Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/adding-new-intrinsics.html">Adding New Intrinsics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/fuzzing-and-differential-testing.html">Fuzzing and Differential Testing</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Appendix</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/building-from-source.html">Building from Source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/api-quick-reference.html">API Quick Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/supported-features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/cuda-cpp-comparison.html">cuda-oxide vs CUDA C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/ecosystem.html">The Rust + GPU Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/glossary.html">Glossary</a></li>
+</ul>
+
+</div></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Matrix Multiply Accelerators</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="matrix-multiply-accelerators">
+<h1>Matrix Multiply Accelerators<a class="headerlink" href="#matrix-multiply-accelerators" title="Link to this heading">#</a></h1>
+<p>Modern NVIDIA GPUs include dedicated hardware for matrix multiply-accumulate
+(MMA) operations — commonly called <strong>tensor cores</strong>. These units compute
+<code class="docutils literal notranslate"><span class="pre">D</span> <span class="pre">=</span> <span class="pre">A</span> <span class="pre">×</span> <span class="pre">B</span> <span class="pre">+</span> <span class="pre">C</span></code> on small matrix tiles at throughputs far beyond what the
+standard floating-point ALUs can achieve. A Hopper H100 delivers over 1000
+TFLOPS of FP16 MMA, while the same chip’s scalar FP16 throughput is roughly
+200 TFLOPS. If your workload involves matrix multiplication — and most
+deep learning, HPC, and signal processing workloads do — tensor cores are
+where the performance lives.</p>
+<p>cuda-oxide provides access to two generations of matrix accelerators:
+<strong>WGMMA</strong> on Hopper (SM 90) and <strong>tcgen05</strong> on Blackwell (SM 100). This
+chapter covers both, their programming models, and how they connect to the
+TMA and barrier machinery from the previous chapters.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference external" href="https://docs.nvidia.com/cuda/cuda-programming-guide/#warpgroup-level-matrix-operations">CUDA Programming Guide — Warpgroup Level Matrix Operations</a>
+for the hardware specification of WGMMA shapes, element types, and
+synchronization requirements.</p>
+</div>
+<hr class="docutils" />
+<section id="the-big-picture">
+<h2>The big picture<a class="headerlink" href="#the-big-picture" title="Link to this heading">#</a></h2>
+<figure class="align-center" id="id1">
+<a class="reference internal image-reference" href="../_images/tensor-core-datapath.svg"><img alt="../_images/tensor-core-datapath.svg" src="../_images/tensor-core-datapath.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">Data paths for Hopper WGMMA and Blackwell tcgen05. Both read operands from
+shared memory via descriptors. WGMMA accumulates into per-thread registers
+(warpgroup-collective). tcgen05 accumulates into dedicated Tensor Memory
+(TMEM), issued by a single thread.</span><a class="headerlink" href="#id1" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>The evolution across generations follows a clear trend: operands move closer
+to the compute units, the issuing scope widens, and the programmer writes
+fewer instructions for larger tiles. cuda-oxide tracks this evolution with
+generation-specific APIs rather than a one-size-fits-all abstraction.</p>
+</section>
+<hr class="docutils" />
+<section id="wgmma-hopper-sm-90">
+<h2>WGMMA — Hopper (SM 90)<a class="headerlink" href="#wgmma-hopper-sm-90" title="Link to this heading">#</a></h2>
+<p>WGMMA (<strong>W</strong>arp<strong>G</strong>roup <strong>M</strong>atrix <strong>M</strong>ultiply-<strong>A</strong>ccumulate) is a
+<strong>warpgroup-collective</strong> operation: 4 warps (128 threads) cooperate to
+compute a matrix tile. Operands A and B are read from shared memory via
+SMEM descriptors, and the result accumulates into per-thread registers.</p>
+<section id="the-programming-model">
+<h3>The programming model<a class="headerlink" href="#the-programming-model" title="Link to this heading">#</a></h3>
+<ol class="arabic simple">
+<li><p><strong>TMA loads</strong> tiles of A and B into shared memory (see
+<a class="reference internal" href="tensor-memory-accelerator.html"><span class="std std-doc">Tensor Memory Accelerator</span></a>).</p></li>
+<li><p><strong>SMEM descriptors</strong> encode the base address, stride, and swizzle mode
+for each operand.</p></li>
+<li><p><strong>WGMMA instructions</strong> consume the descriptors and produce the
+accumulator update. The instruction is async — it commits to a barrier.</p></li>
+<li><p><strong>Barrier wait</strong> ensures the MMA has completed before reading the
+accumulator.</p></li>
+</ol>
+</section>
+<section id="supported-shapes">
+<h3>Supported shapes<a class="headerlink" href="#supported-shapes" title="Link to this heading">#</a></h3>
+<p>WGMMA always has M=64 (rows), with N and K depending on the element type:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Element type</p></th>
+<th class="head text-left"><p>K</p></th>
+<th class="head text-left"><p>N options</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>f16, bf16</p></td>
+<td class="text-left"><p>16</p></td>
+<td class="text-left"><p>64, 128, 256</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>tf32</p></td>
+<td class="text-left"><p>8</p></td>
+<td class="text-left"><p>64, 128, 256</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Each instruction computes a 64×N×K tile. For larger K dimensions, you issue
+multiple WGMMA instructions in a loop, accumulating into the same register
+tile.</p>
+</section>
+<section id="cuda-oxide-api-sketch">
+<h3>cuda-oxide API sketch<a class="headerlink" href="#cuda-oxide-api-sketch" title="Link to this heading">#</a></h3>
+<p>cuda-oxide exposes WGMMA through low-level intrinsics that map directly to
+the hardware instructions. A typical usage pattern:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::</span><span class="n">wgmma</span><span class="p">::{</span>
+<span class="w">    </span><span class="n">make_smem_desc</span><span class="p">,</span><span class="w"> </span><span class="n">wgmma_fence</span><span class="p">,</span><span class="w"> </span><span class="n">wgmma_commit_group</span><span class="p">,</span><span class="w"> </span><span class="n">wgmma_wait_group</span><span class="p">,</span>
+<span class="w">    </span><span class="n">wgmma_mma_m64n64k16_f32_f16</span><span class="p">,</span>
+<span class="p">};</span>
+
+<span class="c1">// After TMA has loaded A and B tiles into shared memory...</span>
+
+<span class="c1">// Build SMEM descriptors for the loaded tiles</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">a_desc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">make_smem_desc</span><span class="p">(</span><span class="n">tile_a_ptr</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="o">*</span><span class="k">const</span><span class="w"> </span><span class="kt">u8</span><span class="p">)</span><span class="w"> </span><span class="p">};</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">b_desc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">make_smem_desc</span><span class="p">(</span><span class="n">tile_b_ptr</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="o">*</span><span class="k">const</span><span class="w"> </span><span class="kt">u8</span><span class="p">)</span><span class="w"> </span><span class="p">};</span>
+
+<span class="c1">// Accumulator (4 warps × 8 floats per row = 64×64 tile)</span>
+<span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">acc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[[</span><span class="mf">0.0</span><span class="k">f32</span><span class="p">;</span><span class="w"> </span><span class="mi">8</span><span class="p">];</span><span class="w"> </span><span class="mi">4</span><span class="p">];</span>
+
+<span class="c1">// Fence + issue WGMMA — all 128 threads in the warpgroup participate</span>
+<span class="k">unsafe</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">wgmma_fence</span><span class="p">();</span>
+<span class="w">    </span><span class="n">wgmma_mma_m64n64k16_f32_f16</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">acc</span><span class="p">,</span><span class="w"> </span><span class="n">a_desc</span><span class="p">,</span><span class="w"> </span><span class="n">b_desc</span><span class="p">);</span>
+<span class="w">    </span><span class="n">wgmma_commit_group</span><span class="p">();</span>
+<span class="w">    </span><span class="n">wgmma_wait_group</span><span class="p">::</span><span class="o">&lt;</span><span class="mi">0</span><span class="o">&gt;</span><span class="p">();</span><span class="w"> </span><span class="c1">// wait for all outstanding groups</span>
+<span class="p">}</span>
+
+<span class="c1">// Accumulator in `acc` is now valid — store, transform, or pass to next stage</span>
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>WGMMA is often paired with a <strong>multi-stage pipeline</strong>: while the tensor
+cores process tile <em>k</em>, TMA loads tile <em>k+1</em> into a second shared memory
+buffer. The barriers for TMA and MMA are separate, enabling full overlap
+of data movement and computation.</p>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="tcgen05-blackwell-sm-100">
+<h2>tcgen05 — Blackwell (SM 100)<a class="headerlink" href="#tcgen05-blackwell-sm-100" title="Link to this heading">#</a></h2>
+<p>Blackwell introduces a fundamentally different matrix accelerator:
+<strong>tcgen05</strong>. The key innovations are:</p>
+<ol class="arabic simple">
+<li><p><strong>Single-thread issue.</strong> Instead of a warpgroup-collective instruction,
+one thread issues the MMA. The hardware distributes work internally.</p></li>
+<li><p><strong>Tensor Memory (TMEM).</strong> A dedicated on-chip memory for accumulators,
+separate from the register file. TMEM is larger and has different
+access characteristics than registers.</p></li>
+<li><p><strong>Larger tiles.</strong> tcgen05 supports shapes up to 256×256, vs WGMMA’s
+64×256.</p></li>
+</ol>
+<section id="tmem-tensor-memory">
+<h3>TMEM — Tensor Memory<a class="headerlink" href="#tmem-tensor-memory" title="Link to this heading">#</a></h3>
+<p>TMEM is a new tier in the memory hierarchy, sitting alongside the register
+file but dedicated to matrix accumulation. It must be explicitly allocated
+and deallocated:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::</span><span class="n">tcgen05</span><span class="p">::{</span><span class="n">TmemGuard</span><span class="p">,</span><span class="w"> </span><span class="n">TmemUninit</span><span class="p">,</span><span class="w"> </span><span class="n">TmemReady</span><span class="p">};</span>
+<span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::</span><span class="n">SharedArray</span><span class="p">;</span>
+
+<span class="k">static</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">TMEM_ADDR</span><span class="p">:</span><span class="w"> </span><span class="nc">SharedArray</span><span class="o">&lt;</span><span class="kt">u32</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SharedArray</span><span class="p">::</span><span class="n">UNINIT</span><span class="p">;</span>
+
+<span class="c1">// Allocate TMEM (warp-collective)</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">tmem</span><span class="p">:</span><span class="w"> </span><span class="nc">TmemGuard</span><span class="o">&lt;</span><span class="n">TmemReady</span><span class="p">,</span><span class="w"> </span><span class="mi">128</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">TmemGuard</span><span class="p">::</span><span class="o">&lt;</span><span class="n">TmemUninit</span><span class="p">,</span><span class="w"> </span><span class="mi">128</span><span class="o">&gt;</span><span class="p">::</span><span class="n">from_static</span><span class="p">(</span><span class="n">TMEM_ADDR</span><span class="p">.</span><span class="n">as_mut_ptr</span><span class="p">())</span>
+<span class="w">        </span><span class="p">.</span><span class="n">alloc</span><span class="p">()</span>
+<span class="p">};</span>
+
+<span class="c1">// ... use tmem for MMA ...</span>
+
+<span class="c1">// Deallocate (warp-collective, required before kernel exit)</span>
+<span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">tmem</span><span class="p">.</span><span class="n">dealloc</span><span class="p">();</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">TmemGuard</span></code> uses typestates: <code class="docutils literal notranslate"><span class="pre">TmemUninit</span></code> → <code class="docutils literal notranslate"><span class="pre">alloc()</span></code> → <code class="docutils literal notranslate"><span class="pre">TmemReady</span></code> →
+<code class="docutils literal notranslate"><span class="pre">dealloc()</span></code> → <code class="docutils literal notranslate"><span class="pre">TmemDeallocated</span></code>. The type system prevents using TMEM before
+allocation or forgetting to deallocate — the latter would leak hardware
+resources and fault.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">N_COLS</span></code> const parameter determines the TMEM tile width. Common
+configurations:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p><code class="docutils literal notranslate"><span class="pre">N_COLS</span></code></p></th>
+<th class="head text-left"><p>TMEM per warp</p></th>
+<th class="head text-left"><p>Use case</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>64</p></td>
+<td class="text-left"><p>Smallest allocation</p></td>
+<td class="text-left"><p>Narrow tiles</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>128</p></td>
+<td class="text-left"><p>Default</p></td>
+<td class="text-left"><p>Standard GEMM tiles</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>256</p></td>
+<td class="text-left"><p>Maximum</p></td>
+<td class="text-left"><p>Wide tiles, higher throughput</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="instruction-and-smem-descriptors">
+<h3>Instruction and SMEM descriptors<a class="headerlink" href="#instruction-and-smem-descriptors" title="Link to this heading">#</a></h3>
+<p>tcgen05 uses two descriptors per MMA instruction:</p>
+<p><strong>Instruction descriptor</strong> — encodes the MMA configuration:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::</span><span class="n">tcgen05</span><span class="p">::{</span>
+<span class="w">    </span><span class="n">Tcgen05InstructionDescriptor</span><span class="p">,</span>
+<span class="w">    </span><span class="n">Tcgen05ElementType</span><span class="p">,</span>
+<span class="w">    </span><span class="n">Tcgen05MmaShape</span><span class="p">,</span>
+<span class="p">};</span>
+
+<span class="kd">let</span><span class="w"> </span><span class="n">idesc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Tcgen05InstructionDescriptor</span><span class="p">::</span><span class="n">builder</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="n">shape</span><span class="p">(</span><span class="n">Tcgen05MmaShape</span><span class="p">::</span><span class="n">M128_N128</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="n">a_type</span><span class="p">(</span><span class="n">Tcgen05ElementType</span><span class="p">::</span><span class="n">F16</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="n">b_type</span><span class="p">(</span><span class="n">Tcgen05ElementType</span><span class="p">::</span><span class="n">F16</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="n">build</span><span class="p">();</span>
+</pre></div>
+</div>
+<p><strong>SMEM descriptor</strong> — points to the operand tile in shared memory:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::</span><span class="n">tcgen05</span><span class="p">::{</span><span class="n">Tcgen05SmemDescriptor</span><span class="p">,</span><span class="w"> </span><span class="n">Tcgen05SwizzleMode</span><span class="p">};</span>
+
+<span class="kd">let</span><span class="w"> </span><span class="n">a_desc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Tcgen05SmemDescriptor</span><span class="p">::</span><span class="n">for_k_major</span><span class="p">(</span>
+<span class="w">    </span><span class="n">smem_a_addr</span><span class="p">,</span>
+<span class="w">    </span><span class="n">m</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">,</span>
+<span class="w">    </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="c1">// bytes per element (f16)</span>
+<span class="w">    </span><span class="n">Tcgen05SwizzleMode</span><span class="p">::</span><span class="n">Swizzle128B</span><span class="p">,</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+</section>
+<section id="issuing-mma">
+<h3>Issuing MMA<a class="headerlink" href="#issuing-mma" title="Link to this heading">#</a></h3>
+<p>One thread issues the MMA instruction, then all threads wait on a
+barrier:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::</span><span class="n">tcgen05</span><span class="p">::{</span><span class="n">tcgen05_mma_f16</span><span class="p">,</span><span class="w"> </span><span class="n">tcgen05_commit</span><span class="p">};</span>
+
+<span class="k">if</span><span class="w"> </span><span class="n">thread</span><span class="p">::</span><span class="n">threadIdx_x</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">tcgen05_mma_f16</span><span class="p">(</span>
+<span class="w">            </span><span class="n">tmem</span><span class="p">.</span><span class="n">raw_address</span><span class="p">(),</span>
+<span class="w">            </span><span class="n">a_desc</span><span class="p">.</span><span class="n">raw</span><span class="p">(),</span>
+<span class="w">            </span><span class="n">b_desc</span><span class="p">.</span><span class="n">raw</span><span class="p">(),</span>
+<span class="w">            </span><span class="n">idesc</span><span class="p">.</span><span class="n">raw</span><span class="p">(),</span>
+<span class="w">            </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="c1">// enable accumulation into D</span>
+<span class="w">        </span><span class="p">);</span>
+<span class="w">        </span><span class="n">tcgen05_commit</span><span class="p">(</span><span class="n">mma_barrier_ptr</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// All threads wait for MMA completion</span>
+<span class="n">mma_barrier</span><span class="p">.</span><span class="n">wait</span><span class="p">(</span><span class="n">token</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+<section id="epilog-reading-results-from-tmem">
+<h3>Epilog — reading results from TMEM<a class="headerlink" href="#epilog-reading-results-from-tmem" title="Link to this heading">#</a></h3>
+<p>After the MMA loop, the accumulator lives in TMEM. To move it to shared
+memory (for a subsequent TMA store to global), you load from TMEM into
+registers and then use <code class="docutils literal notranslate"><span class="pre">stmatrix</span></code> to write to shared memory:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::</span><span class="n">tcgen05</span><span class="p">::{</span>
+<span class="w">    </span><span class="n">cvt_f32x2_bf16x2</span><span class="p">,</span>
+<span class="w">    </span><span class="n">tcgen05_ld_16x256b_pure</span><span class="p">,</span>
+<span class="w">    </span><span class="n">tcgen05_load_wait</span><span class="p">,</span>
+<span class="w">    </span><span class="n">stmatrix_m8n8_x2</span><span class="p">,</span>
+<span class="w">    </span><span class="n">TmemF32x4</span><span class="p">,</span>
+<span class="p">};</span>
+
+<span class="k">unsafe</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Load a 16×256-bit slice from TMEM into registers</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">regs</span><span class="p">:</span><span class="w"> </span><span class="nc">TmemF32x4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tcgen05_ld_16x256b_pure</span><span class="p">(</span><span class="n">tmem</span><span class="p">.</span><span class="n">raw_address</span><span class="p">());</span>
+<span class="w">    </span><span class="n">tcgen05_load_wait</span><span class="p">();</span>
+
+<span class="w">    </span><span class="c1">// Convert four f32 accumulators into two registers of packed bf16 values.</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">packed0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cvt_f32x2_bf16x2</span><span class="p">(</span><span class="n">regs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="w"> </span><span class="n">regs</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">packed1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cvt_f32x2_bf16x2</span><span class="p">(</span><span class="n">regs</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="w"> </span><span class="n">regs</span><span class="p">[</span><span class="mi">3</span><span class="p">]);</span>
+
+<span class="w">    </span><span class="c1">// Store two 8×8 matrices from registers (warp-collective).</span>
+<span class="w">    </span><span class="n">stmatrix_m8n8_x2</span><span class="p">(</span><span class="n">smem_ptr</span><span class="p">,</span><span class="w"> </span><span class="n">packed0</span><span class="p">,</span><span class="w"> </span><span class="n">packed1</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">stmatrix</span></code> is a warp-collective operation — all 32 threads participate,
+each contributing its register slice to form the shared memory tile.</p>
+</section>
+<section id="cta-group-2-cg2">
+<h3>CTA-group-2 (CG2)<a class="headerlink" href="#cta-group-2-cg2" title="Link to this heading">#</a></h3>
+<p>Blackwell also supports <strong>CG2 mode</strong>, where two CTAs (from a cluster) issue
+MMA instructions that are coordinated as a pair. This doubles the effective
+tile width and requires the <code class="docutils literal notranslate"><span class="pre">_cg2</span></code> API variants:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::</span><span class="n">tcgen05</span><span class="p">::{</span><span class="n">tcgen05_alloc_cg2</span><span class="p">,</span><span class="w"> </span><span class="n">tcgen05_mma_f16_cg2</span><span class="p">};</span>
+</pre></div>
+</div>
+<p>CG2 and CG1 (standard) must not be mixed in the same kernel.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>tcgen05 is only available on <strong>Blackwell datacenter</strong> GPUs (SM 100a).
+Consumer Blackwell (SM 120) uses the older <code class="docutils literal notranslate"><span class="pre">mma.sync</span></code> instruction set.
+Check the target architecture before reaching for the tcgen05 API.</p>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="choosing-the-right-accelerator">
+<h2>Choosing the right accelerator<a class="headerlink" href="#choosing-the-right-accelerator" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Feature</p></th>
+<th class="head text-left"><p>WGMMA (Hopper)</p></th>
+<th class="head text-left"><p>tcgen05 (Blackwell DC)</p></th>
+<th class="head text-left"><p>mma.sync (Ampere/consumer)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>Issue model</p></td>
+<td class="text-left"><p>Warpgroup (128 threads)</p></td>
+<td class="text-left"><p>Single thread</p></td>
+<td class="text-left"><p>Warp (32 threads)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Accumulator</p></td>
+<td class="text-left"><p>Registers</p></td>
+<td class="text-left"><p>TMEM (dedicated)</p></td>
+<td class="text-left"><p>Registers</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Max tile (M×N)</p></td>
+<td class="text-left"><p>64×256</p></td>
+<td class="text-left"><p>256×256</p></td>
+<td class="text-left"><p>16×8</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Async execution</p></td>
+<td class="text-left"><p>Yes (commit+barrier)</p></td>
+<td class="text-left"><p>Yes (commit+barrier)</p></td>
+<td class="text-left"><p>Synchronous</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>TMA integration</p></td>
+<td class="text-left"><p>Native</p></td>
+<td class="text-left"><p>Native + multicast CG2</p></td>
+<td class="text-left"><p>Manual loads</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Cluster support</p></td>
+<td class="text-left"><p>Yes</p></td>
+<td class="text-left"><p>Yes + CG2</p></td>
+<td class="text-left"><p>No</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Minimum SM</p></td>
+<td class="text-left"><p>90 (Hopper)</p></td>
+<td class="text-left"><p>100a (Blackwell DC)</p></td>
+<td class="text-left"><p>80 (Ampere)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>For most users, the choice is determined by the target GPU. If you are
+writing a library that targets multiple architectures, you will need
+compile-time feature gates or runtime architecture detection to select the
+right code path.</p>
+</section>
+<hr class="docutils" />
+<section id="the-gemm-progression">
+<h2>The GEMM progression<a class="headerlink" href="#the-gemm-progression" title="Link to this heading">#</a></h2>
+<p>These accelerators do not exist in isolation. A high-performance GEMM kernel
+combines every technique from this chapter and the preceding ones:</p>
+<ol class="arabic simple">
+<li><p><strong>TMA</strong> loads tiles from global to shared memory (no thread loads)</p></li>
+<li><p><strong>Barriers</strong> track TMA completion per stage</p></li>
+<li><p><strong>MMA instructions</strong> (WGMMA or tcgen05) consume tiles from shared memory</p></li>
+<li><p><strong>Multi-stage pipeline</strong> overlaps load of tile <em>k+1</em> with MMA on tile <em>k</em></p></li>
+<li><p><strong>Warp specialization</strong> dedicates some warps to loading, others to MMA</p></li>
+<li><p><strong>Epilog</strong> (tcgen05) loads from TMEM, converts precision, stores via TMA</p></li>
+</ol>
+<p>This is the kernel structure that cuBLAS and CUTLASS use internally. With
+cuda-oxide, you can build this same structure in Rust — using <code class="docutils literal notranslate"><span class="pre">SharedArray</span></code>
+for tiles, <code class="docutils literal notranslate"><span class="pre">ManagedBarrier</span></code> for synchronization, and the MMA APIs for
+compute.</p>
+<p>The <a class="reference external" href="https://github.com/NVlabs/cuda-oxide/tree/main/crates/rustc-codegen-cuda/examples/gemm_sol"><code class="docutils literal notranslate"><span class="pre">gemm_sol</span></code>
+example</a>
+is the worked-out reference. Its 4-stage <code class="docutils literal notranslate"><span class="pre">cta_group::2</span></code> pipeline reaches
+<strong>868 TFLOPS at 4096³ — 57.8 % of <code class="docutils literal notranslate"><span class="pre">cublasLtMatmul</span></code> SoL — on B200 (148 SMs)</strong>.
+Absolute throughput scales with SM count on smaller Blackwell datacenter
+SKUs (e.g., on an 80-SM variant the same kernel runs at ~204 TFLOPS / ~46 %
+SoL — see the per-phase tables in the example’s README for both
+configurations). The example measures the cublasLt baseline live via
+<code class="docutils literal notranslate"><span class="pre">bench/cublaslt_bench</span></code>, so its “% of SoL” column is always relative to the
+host GPU’s cublasLt peak rather than a fixed B200 number.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="shared-memory-and-synchronization.html"><span class="std std-doc">Shared Memory and Synchronization</span></a> —
+tile management for MMA operands</p></li>
+<li><p><a class="reference internal" href="tensor-memory-accelerator.html"><span class="std std-doc">Tensor Memory Accelerator</span></a> — feeding tiles
+to the tensor cores</p></li>
+<li><p><a class="reference internal" href="cluster-programming.html"><span class="std std-doc">Cluster Programming</span></a> — CG2 mode and multicast
+for multi-CTA MMA</p></li>
+</ul>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="tensor-memory-accelerator.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Tensor Memory Accelerator (TMA)</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="cluster-programming.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Cluster Programming</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-big-picture">The big picture</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#wgmma-hopper-sm-90">WGMMA — Hopper (SM 90)</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-programming-model">The programming model</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#supported-shapes">Supported shapes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cuda-oxide-api-sketch">cuda-oxide API sketch</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tcgen05-blackwell-sm-100">tcgen05 — Blackwell (SM 100)</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tmem-tensor-memory">TMEM — Tensor Memory</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#instruction-and-smem-descriptors">Instruction and SMEM descriptors</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#issuing-mma">Issuing MMA</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#epilog-reading-results-from-tmem">Epilog — reading results from TMEM</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cta-group-2-cg2">CTA-group-2 (CG2)</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-the-right-accelerator">Choosing the right accelerator</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-gemm-progression">The GEMM progression</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+    <div class="footer-items__center">
+      
+        <div class="footer-item"><footer class="bd-footer-content">
+  <div class="footer-container" style="padding: 1rem 0 2rem 0; border-top: 1px solid var(--pst-color-border); text-align: left;">
+    
+    <!-- NVIDIA Logo -->
+    <div style="margin-bottom: 1rem;">
+      <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem; filter: brightness(0);"
+           class="only-light">
+      <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem;"
+           class="only-dark pst-js-only">
+    </div>
+    
+    <!-- Footer Links - single line, left aligned -->
+    <div style="font-size: 0.8125rem; margin-bottom: 0.5rem; color: var(--pst-color-text-muted);">
+      <a href="https://www.nvidia.com/en-us/about-nvidia/privacy-policy/" target="_blank" style="color: inherit; text-decoration: none;">Privacy Policy</a> | 
+      <a href="https://www.nvidia.com/en-us/preferences/email-preferences/" target="_blank" style="color: inherit; text-decoration: none;">Your Privacy Choices</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/terms-of-service/" target="_blank" style="color: inherit; text-decoration: none;">Terms of Service</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/accessibility/" target="_blank" style="color: inherit; text-decoration: none;">Accessibility</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/company-policies/" target="_blank" style="color: inherit; text-decoration: none;">Corporate Policies</a> | 
+      <a href="https://www.nvidia.com/en-us/product-security/" target="_blank" style="color: inherit; text-decoration: none;">Product Security</a> | 
+      <a href="https://www.nvidia.com/en-us/contact/" target="_blank" style="color: inherit; text-decoration: none;">Contact</a>
+    </div>
+    
+    <!-- Copyright -->
+    <div style="font-size: 0.8125rem; color: var(--pst-color-text-muted);">
+      Copyright &copy; 2025-2026, NVIDIA.
+    </div>
+    
+  </div>
+</footer></div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

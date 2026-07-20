@@ -1,0 +1,983 @@
+
+<!DOCTYPE html>
+
+
+<html lang="zh-TW" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>The Code Generator: rustc-codegen-cuda &#8212; cuda-oxide</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/nvidia-sphinx-theme.css?v=5d97cc0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=196aea71" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/lightbox.css?v=31fdf494" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../_static/documentation_options.js?v=a7999bab"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/translations.js?v=cbf116e0"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'compiler/rustc-codegen-cuda';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../_static/js/lightbox.js?v=8cf6bc2b"></script>
+    <script src="../_static/js/spa-nav.js?v=9a4d0bbe"></script>
+    <link rel="canonical" href="https://projects.localizethedocs.org/cuda-oxide-book-l10n/compiler/rustc-codegen-cuda.html" />
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜尋" href="../search.html" />
+    <link rel="next" title="The MIR Importer" href="mir-importer.html" />
+    <link rel="prev" title="rustc_public -- Stable MIR" href="rustc-public.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="zh-TW"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+<script type="text/javascript" src="../ltd-provenance.js"></script>
+<script type="text/javascript" src="../ltd-current.js"></script>
+<script type="text/javascript" src="../../../ltd-config.js"></script>
+<script type="text/javascript" src="../../../ltd-flyout.js"></script>
+
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">跳转至主要内容</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>回到顶部</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="版本警告"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="网页导航">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">cuda-oxide</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜尋" aria-label="搜尋" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="亮色"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="暗色"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>亮色</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>暗色</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="当前页面">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜尋" aria-label="搜尋" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="亮色"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="暗色"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>亮色</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>暗色</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><div class="sidebar-tree">
+    <p class="sidebar-tree-title">
+        Table of Contents
+    </p>
+    <p aria-level="2" class="caption" role="heading"><span class="caption-text">開始使用</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/hello-gpu.html">Writing Your First Kernel</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">編寫 GPU 程式</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/execution-model.html">The CUDA Execution Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/kernels-and-device-functions.html">Kernels and Device Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/memory-and-data-movement.html">Memory and Data Movement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/launching-kernels.html">Launching Kernels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/closures-and-generics.html">Closures and Generics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/error-handling-and-debugging.html">Error Handling and Debugging</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Safety on the GPU</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-safety/the-safety-model.html">The Safety Model</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">異步 GPU 程式設計</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/the-device-operation-model.html">The DeviceOperation Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/combinators-and-composition.html">Combinators and Composition</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/scheduling-and-streams.html">Scheduling and Streams</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/concurrent-execution.html">Concurrent Execution</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Building a Real Application</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../projects/async-mlp-pipeline.html">Project: Async MLP Pipeline</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Advanced GPU Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/shared-memory-and-synchronization.html">Shared Memory and Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/warp-level-programming.html">Warp-Level Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/tensor-memory-accelerator.html">張量記憶體加速器（TMA）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/matrix-multiply-accelerators.html">Matrix Multiply Accelerators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cluster-programming.html">Cluster Programming</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Inside the Compiler</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="architecture-overview.html">Architecture Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pliron.html">Pliron -- Pliron IR (MLIR-like)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rustc-public.html">rustc_public -- Stable MIR</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">The Code Generator: rustc-codegen-cuda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mir-importer.html">The MIR Importer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compiler-optimizations.html">Compiler Optimizations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mlir-dialects.html">Pliron Dialects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lowering-pipeline.html">The Lowering Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="adding-new-intrinsics.html">Adding New Intrinsics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fuzzing-and-differential-testing.html">Fuzzing and Differential Testing</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">附錄</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/building-from-source.html">Building from Source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/api-quick-reference.html">API Quick Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/supported-features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/cuda-cpp-comparison.html">cuda-oxide vs CUDA C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/ecosystem.html">The Rust + GPU Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/glossary.html">Glossary</a></li>
+</ul>
+
+</div></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="初始页面">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">The Code Generator: rustc-codegen-cuda</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="the-code-generator-rustc-codegen-cuda">
+<h1>The Code Generator: rustc-codegen-cuda<a class="headerlink" href="#the-code-generator-rustc-codegen-cuda" title="連結到這個標頭">#</a></h1>
+<p>Every Rust program eventually reaches the codegen backend -- the part of the
+compiler that turns optimized MIR into machine code. Normally, that backend is
+LLVM. cuda-oxide swaps in its own backend, <code class="docutils literal notranslate"><span class="pre">rustc-codegen-cuda</span></code>, which
+intercepts this process to extract device code and route it through the
+cuda-oxide pipeline before handing everything else back to LLVM as if nothing
+happened.</p>
+<p>This page explains how that backend loads, what it does when rustc calls it,
+and how it finds every function that belongs on the GPU.</p>
+<hr class="docutils" />
+<section id="how-rustc-loads-a-custom-backend">
+<h2>How rustc Loads a Custom Backend<a class="headerlink" href="#how-rustc-loads-a-custom-backend" title="連結到這個標頭">#</a></h2>
+<p>rustc has a flag most people never see:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rustc<span class="w"> </span>-Z<span class="w"> </span>codegen-backend<span class="o">=</span>path/to/libfoo.so
+</pre></div>
+</div>
+<p>When you pass this flag, rustc does the following:</p>
+<ol class="arabic simple">
+<li><p>Calls <code class="docutils literal notranslate"><span class="pre">dlopen</span></code> on the shared library.</p></li>
+<li><p>Calls <code class="docutils literal notranslate"><span class="pre">dlsym(&quot;__rustc_codegen_backend&quot;)</span></code> to find the entry point.</p></li>
+<li><p>Expects that function to return a <code class="docutils literal notranslate"><span class="pre">Box&lt;dyn</span> <span class="pre">CodegenBackend&gt;</span></code>.</p></li>
+</ol>
+<p>That's it. No plugin registry, no config files, no handshake protocol. One
+symbol, one trait object, and you own the codegen pipeline.</p>
+<p>cuda-oxide provides this entry point:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="cp">#[unsafe(no_mangle)]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">__rustc_codegen_backend</span><span class="p">()</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nb">Box</span><span class="o">&lt;</span><span class="k">dyn</span><span class="w"> </span><span class="n">CodegenBackend</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CudaCodegenConfig</span><span class="p">::</span><span class="n">from_env</span><span class="p">();</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">llvm_backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rustc_codegen_llvm</span><span class="p">::</span><span class="n">LlvmCodegenBackend</span><span class="p">::</span><span class="n">new</span><span class="p">();</span>
+<span class="w">    </span><span class="nb">Box</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="n">CudaCodegenBackend</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">config</span><span class="p">,</span><span class="w"> </span><span class="n">llvm_backend</span><span class="w"> </span><span class="p">})</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Two things happen here. First, <code class="docutils literal notranslate"><span class="pre">CudaCodegenConfig::from_env()</span></code> reads
+environment variables (<code class="docutils literal notranslate"><span class="pre">CUDA_OXIDE_VERBOSE</span></code>, <code class="docutils literal notranslate"><span class="pre">CUDA_OXIDE_DUMP_MIR</span></code>, and
+friends -- see <a class="reference internal" href="#rustc-codegen-environment-variables"><span class="std std-ref">Environment Variables</span></a> below) to
+configure the backend's behavior. Second, it creates the standard LLVM backend
+and stores it inside the <code class="docutils literal notranslate"><span class="pre">CudaCodegenBackend</span></code>. This is the wrapping pattern
+that makes the whole architecture work: cuda-oxide does not <em>replace</em> the LLVM
+backend, it <em>wraps</em> it.</p>
+<div class="admonition note">
+<p class="admonition-title">備註</p>
+<p><code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">oxide</span> <span class="pre">build</span></code> sets the <code class="docutils literal notranslate"><span class="pre">-Z</span> <span class="pre">codegen-backend</span></code> flag for you. You never need
+to type the <code class="docutils literal notranslate"><span class="pre">dlopen</span></code> incantation yourself unless you enjoy that sort of thing.</p>
+</div>
+</section>
+<hr class="docutils" />
+<section id="the-intercept-codegen-crate">
+<h2>The Intercept: codegen_crate()<a class="headerlink" href="#the-intercept-codegen-crate" title="連結到這個標頭">#</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">CodegenBackend</span></code> trait has several methods, but the one that matters is
+<code class="docutils literal notranslate"><span class="pre">codegen_crate(tcx)</span></code>. This is where rustc hands over the entire typed,
+borrow-checked, monomorphized crate and says &quot;make this into machine code.&quot;</p>
+<p>When rustc calls <code class="docutils literal notranslate"><span class="pre">CudaCodegenBackend::codegen_crate(tcx)</span></code>, here is what
+happens:</p>
+<section id="step-1-collect-monomorphized-items">
+<h3>Step 1: Collect Monomorphized Items<a class="headerlink" href="#step-1-collect-monomorphized-items" title="連結到這個標頭">#</a></h3>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="p">(</span><span class="n">items</span><span class="p">,</span><span class="w"> </span><span class="n">cgus</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tcx</span><span class="p">.</span><span class="n">collect_and_partition_mono_items</span><span class="p">(());</span>
+</pre></div>
+</div>
+<p>This gives us every monomorphized function in the crate, grouped into
+<strong>codegen units</strong> (CGUs). A CGU is rustc's unit of parallel code generation --
+think of it as a bucket of functions that will become one object file.</p>
+</section>
+<section id="step-2-scan-for-device-entry-points">
+<h3>Step 2: Scan for Device Entry Points<a class="headerlink" href="#step-2-scan-for-device-entry-points" title="連結到這個標頭">#</a></h3>
+<p>The backend iterates over every function in every CGU and checks for the magic
+name prefixes:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">cuda_oxide_kernel_&lt;hash&gt;_</span></code> -- set by <code class="docutils literal notranslate"><span class="pre">#[kernel]</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cuda_oxide_device_&lt;hash&gt;_</span></code> -- set by <code class="docutils literal notranslate"><span class="pre">#[device]</span></code></p></li>
+</ul>
+<p>These prefixes are how the proc macros communicate with the backend. There is
+no special attribute metadata, no side channel -- just a name that stands out
+in a crowd. The exact prefix strings (and the helpers that match and strip
+them) live in the workspace-internal <code class="docutils literal notranslate"><span class="pre">reserved-oxide-symbols</span></code> crate; both the
+macro side and the collector side import from there so the contract stays in
+one place. The 8-hex-char <code class="docutils literal notranslate"><span class="pre">&lt;hash&gt;</span></code> makes accidental collisions effectively
+impossible: nobody writes <code class="docutils literal notranslate"><span class="pre">cuda_oxide_kernel_246e25db_foo</span></code> by accident.</p>
+</section>
+<section id="step-3-if-device-code-found-build-and-compile">
+<h3>Step 3: If Device Code Found, Build and Compile<a class="headerlink" href="#step-3-if-device-code-found-build-and-compile" title="連結到這個標頭">#</a></h3>
+<p>If any kernel or device function is found, two things happen in sequence:</p>
+<p><strong>a) Collect the device call graph.</strong>
+<code class="docutils literal notranslate"><span class="pre">collector::collect_device_functions()</span></code> performs a breadth-first walk from
+every kernel entry point, discovering all functions that transitively get
+called from device code. More on this in <a class="reference internal" href="#rustc-codegen-device-function-collection"><span class="std std-ref">Device Function Collection</span></a>.</p>
+<p><strong>b) Generate device code.</strong>
+<code class="docutils literal notranslate"><span class="pre">device_codegen::generate_device_code()</span></code> bridges the collected functions to
+stable MIR and runs the full cuda-oxide pipeline (<code class="docutils literal notranslate"><span class="pre">dialect-mir</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">mem2reg</span></code> -&gt;
+annotated loop unroll -&gt; LLVM dialect -&gt; <code class="docutils literal notranslate"><span class="pre">.ll</span></code> -&gt; PTX).</p>
+</section>
+<section id="step-4-always-compile-host-code">
+<h3>Step 4: Always Compile Host Code<a class="headerlink" href="#step-4-always-compile-host-code" title="連結到這個標頭">#</a></h3>
+<p>Regardless of whether device code was found:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="p">.</span><span class="n">llvm_backend</span><span class="p">.</span><span class="n">codegen_crate</span><span class="p">(</span><span class="n">tcx</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The wrapped LLVM backend compiles all the host code -- <code class="docutils literal notranslate"><span class="pre">main()</span></code>, your CLI
+parser, your async runtime, everything. The device pipeline is a side quest;
+the host pipeline always runs.</p>
+</section>
+<section id="the-other-trait-methods">
+<h3>The Other Trait Methods<a class="headerlink" href="#the-other-trait-methods" title="連結到這個標頭">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">CodegenBackend</span></code> trait also requires <code class="docutils literal notranslate"><span class="pre">join_codegen()</span></code> and <code class="docutils literal notranslate"><span class="pre">link()</span></code>. These
+handle waiting for parallel codegen threads and invoking the linker,
+respectively. In cuda-oxide, both are pure delegation:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="nf">join_codegen</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">ongoing</span><span class="p">:</span><span class="w"> </span><span class="nb">Box</span><span class="o">&lt;</span><span class="k">dyn</span><span class="w"> </span><span class="n">Any</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">sess</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="nc">Session</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="o">..</span><span class="p">.</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="bp">self</span><span class="p">.</span><span class="n">llvm_backend</span><span class="p">.</span><span class="n">join_codegen</span><span class="p">(</span><span class="n">ongoing</span><span class="p">,</span><span class="w"> </span><span class="n">sess</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="k">fn</span><span class="w"> </span><span class="nf">link</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">sess</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="nc">Session</span><span class="p">,</span><span class="w"> </span><span class="n">codegen</span><span class="p">:</span><span class="w"> </span><span class="o">..</span><span class="p">.,</span><span class="w"> </span><span class="n">outputs</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="nc">OutputFilenames</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="o">..</span><span class="p">.</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="bp">self</span><span class="p">.</span><span class="n">llvm_backend</span><span class="p">.</span><span class="n">link</span><span class="p">(</span><span class="n">sess</span><span class="p">,</span><span class="w"> </span><span class="n">codegen</span><span class="p">,</span><span class="w"> </span><span class="n">outputs</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>No interception, no modification. The LLVM backend handles linking exactly as
+it normally would.</p>
+<div class="admonition note">
+<p class="admonition-title">備註</p>
+<p>For most crates in the dependency tree -- <code class="docutils literal notranslate"><span class="pre">core</span></code>, <code class="docutils literal notranslate"><span class="pre">cuda-core</span></code>, random
+utility crates -- no kernels are found and the backend just delegates to LLVM.
+The device pipeline only activates for the crate that actually contains a
+<code class="docutils literal notranslate"><span class="pre">#[kernel]</span></code> function. For a typical project, that means one crate out of
+dozens triggers device compilation.</p>
+</div>
+<hr class="docutils" />
+</section>
+</section>
+<section id="device-function-collection">
+<span id="rustc-codegen-device-function-collection"></span><h2>Device Function Collection<a class="headerlink" href="#device-function-collection" title="連結到這個標頭">#</a></h2>
+<p>Finding kernel entry points is the easy part. The hard part is figuring out
+<em>everything else</em> those kernels call. A kernel might call a helper, which calls
+a <code class="docutils literal notranslate"><span class="pre">cuda-device</span></code> intrinsic, which calls a <code class="docutils literal notranslate"><span class="pre">core</span></code> math function -- and all of
+those need to end up in the PTX.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">collector</span></code> module handles this with a breadth-first traversal of the MIR
+call graph.</p>
+<section id="the-worklist-algorithm">
+<h3>The Worklist Algorithm<a class="headerlink" href="#the-worklist-algorithm" title="連結到這個標頭">#</a></h3>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>worklist = [all kernel entry points]
+visited  = {}
+collected = []
+
+while worklist is not empty:
+    fn = worklist.pop()
+    if fn in visited: continue
+    visited.add(fn)
+
+    mir = tcx.instance_mir(fn)
+    collected.push(fn)
+
+    for basic_block in mir:
+        for terminator in [Call, Drop]:
+            callee = resolve_callee(terminator)
+            if should_collect(callee):
+                worklist.push(callee)
+</pre></div>
+</div>
+<p>For each function, the collector retrieves its MIR via <code class="docutils literal notranslate"><span class="pre">tcx.instance_mir()</span></code>,
+then scans every basic block's terminator. <code class="docutils literal notranslate"><span class="pre">Call</span></code> and <code class="docutils literal notranslate"><span class="pre">Drop</span></code> terminators
+reference callees, which get added to the worklist if they pass the crate
+filtering rules.</p>
+<p>The output is a <code class="docutils literal notranslate"><span class="pre">Vec&lt;CollectedFunction&gt;</span></code>, where each entry carries:</p>
+<ul class="simple">
+<li><p>The monomorphized <code class="docutils literal notranslate"><span class="pre">Instance</span></code> (the fully resolved, generic-free function).</p></li>
+<li><p>An <code class="docutils literal notranslate"><span class="pre">is_kernel</span></code> flag (for marking GPU entry points in the PTX metadata).</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">export_name</span></code> (the symbol name visible in the final PTX).</p></li>
+</ul>
+</section>
+<section id="export-names-and-fqdn-alignment">
+<h3>Export Names and FQDN Alignment<a class="headerlink" href="#export-names-and-fqdn-alignment" title="連結到這個標頭">#</a></h3>
+<p>The collector must produce export names that match what the MIR translator
+generates for call targets. Both sides use <strong>fully qualified domain names
+(FQDNs)</strong> -- for example, <code class="docutils literal notranslate"><span class="pre">helper_fn::cuda_oxide_device_&lt;hash&gt;_vecadd_device</span></code> rather
+than bare <code class="docutils literal notranslate"><span class="pre">vecadd_device</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">rustc_public</span></code> API's <code class="docutils literal notranslate"><span class="pre">CrateDef::name()</span></code> returns FQDNs including the crate
+name. On the collector side, <code class="docutils literal notranslate"><span class="pre">def_path_str()</span></code> omits the crate name for local
+items, so a small helper (<code class="docutils literal notranslate"><span class="pre">fqdn()</span></code>) prepends it for local definitions to
+produce the same string.</p>
+<p>During lowering, <code class="docutils literal notranslate"><span class="pre">::</span></code> is converted to <code class="docutils literal notranslate"><span class="pre">__</span></code> on both the definition and call
+sides, producing valid LLVM/PTX identifiers (e.g., <code class="docutils literal notranslate"><span class="pre">helper_fn__vecadd_device</span></code>).</p>
+<p>For generic or complex names (angle brackets, closures), the mangled symbol
+name is used instead -- this is unique and already a valid identifier.</p>
+<p>Kernel entry points follow a separate path: <code class="docutils literal notranslate"><span class="pre">compute_kernel_export_name</span></code>
+takes the <code class="docutils literal notranslate"><span class="pre">#[kernel]</span></code> macro's base name and, for generic and closure-
+generic instantiations, appends <code class="docutils literal notranslate"><span class="pre">_TID_&lt;hex32&gt;</span></code> where <code class="docutils literal notranslate"><span class="pre">&lt;hex32&gt;</span></code> is
+rustc's 128-bit type-id hash of the concrete generated kernel function item.
+That <code class="docutils literal notranslate"><span class="pre">FnDef</span></code> contains ordered type and const arguments. The host launcher
+computes the same hash through the <code class="docutils literal notranslate"><span class="pre">core::intrinsics::type_id</span></code> intrinsic
+(wrapped by <code class="docutils literal notranslate"><span class="pre">cuda_host::type_id_u128_of_val</span></code>), so both sides agree
+byte-for-byte within one unified build. Non-generic kernels keep their bare
+base name.</p>
+<div class="admonition note">
+<p class="admonition-title">備註</p>
+<p>This FQDN alignment strategy will be replaced by pliron's <code class="docutils literal notranslate"><span class="pre">Legaliser</span></code> when
+the framework is upgraded. The <code class="docutils literal notranslate"><span class="pre">Legaliser</span></code> provides systematic name
+sanitization with collision detection, making manual <code class="docutils literal notranslate"><span class="pre">::</span></code> to <code class="docutils literal notranslate"><span class="pre">__</span></code> replacement
+unnecessary.</p>
+</div>
+</section>
+<section id="crate-filtering-rules">
+<h3>Crate Filtering Rules<a class="headerlink" href="#crate-filtering-rules" title="連結到這個標頭">#</a></h3>
+<p>Not every function in the dependency tree belongs on a GPU. The collector
+enforces rules about which crates are allowed in device code:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Crate</p></th>
+<th class="head text-left"><p>Status</p></th>
+<th class="head text-left"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>Local crate</p></td>
+<td class="text-left"><p>Allowed</p></td>
+<td class="text-left"><p>Your kernel code</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cuda_device</span></code></p></td>
+<td class="text-left"><p>Allowed</p></td>
+<td class="text-left"><p>GPU intrinsics (stubs filtered -- see below)</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">core</span></code></p></td>
+<td class="text-left"><p>Allowed</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">no_std</span></code> standard library</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Other <code class="docutils literal notranslate"><span class="pre">no_std</span></code> crates</p></td>
+<td class="text-left"><p>Allowed</p></td>
+<td class="text-left"><p>Any crate in the dependency tree</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">std</span></code></p></td>
+<td class="text-left"><p><strong>Forbidden</strong></p></td>
+<td class="text-left"><p>Compile-time error</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">alloc</span></code></p></td>
+<td class="text-left"><p>Allowed (if GPU allocator)</p></td>
+<td class="text-left"><p>Experimental</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The rule is simple: if a crate could conceivably run on a GPU (no OS
+dependencies, no file I/O, no networking), it is allowed. If it drags in
+<code class="docutils literal notranslate"><span class="pre">std</span></code>, it is not.</p>
+</section>
+<section id="error-messages">
+<h3>Error Messages<a class="headerlink" href="#error-messages" title="連結到這個標頭">#</a></h3>
+<p>When someone accidentally tries to use <code class="docutils literal notranslate"><span class="pre">std</span></code> in device code -- perhaps a
+stray <code class="docutils literal notranslate"><span class="pre">println!</span></code> left over from debugging -- the collector produces a clear
+error instead of letting the build fail with an inscrutable PTX assembler
+message three stages later:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>CUDA-OXIDE: FORBIDDEN CRATE IN DEVICE CODE
+Device code calls: std::io::_print
+From crate: &#39;std&#39;
+Only these crates are allowed in device code:
+  - Local crate (your kernel code)
+  - cuda_device (GPU intrinsics)
+  - core (no_std standard library)
+</pre></div>
+</div>
+<p>This is one of the advantages of catching the problem at the call graph level
+rather than hoping LLVM will produce a useful diagnostic. (It won't.)</p>
+</section>
+<section id="intrinsic-stub-filtering">
+<h3>Intrinsic Stub Filtering<a class="headerlink" href="#intrinsic-stub-filtering" title="連結到這個標頭">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">cuda_device</span></code> contains functions like <code class="docutils literal notranslate"><span class="pre">threadIdx_x()</span></code> whose bodies are just
+<code class="docutils literal notranslate"><span class="pre">unreachable!()</span></code>. These are stubs -- placeholders that exist so rustc can
+type-check device code, but they are never meant to be compiled as real
+functions. They get replaced by <code class="docutils literal notranslate"><span class="pre">dialect-nvvm</span></code> operations later in the
+pipeline (for instance, <code class="docutils literal notranslate"><span class="pre">threadIdx_x()</span></code> becomes <code class="docutils literal notranslate"><span class="pre">nvvm.read_ptx_sreg_tid_x</span></code>).</p>
+<p>The collector recognizes these stubs -- they come from <code class="docutils literal notranslate"><span class="pre">cuda_device</span></code> and have no
+meaningful MIR beyond a single <code class="docutils literal notranslate"><span class="pre">unreachable</span></code> terminator -- and skips them. If
+you are wondering &quot;but if the body is <code class="docutils literal notranslate"><span class="pre">unreachable!()</span></code>, won't that panic at
+runtime?&quot;: no, because <code class="docutils literal notranslate"><span class="pre">mir-importer</span></code> replaces calls to these functions with
+the corresponding GPU hardware instructions before any code generation
+happens. The stub body never executes.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="cross-crate-device-compilation">
+<h2>Cross-Crate Device Compilation<a class="headerlink" href="#cross-crate-device-compilation" title="連結到這個標頭">#</a></h2>
+<p>Here is a question that sounds simple until you think about it: when you call
+<code class="docutils literal notranslate"><span class="pre">cuda_device::thread::index_1d()</span></code> from a kernel, how does the compiler get that
+function's MIR? Your crate does not have its source code. <code class="docutils literal notranslate"><span class="pre">cuda_device</span></code> was
+compiled hours ago, possibly by a different machine.</p>
+<p>The answer lies in how rustc stores metadata.</p>
+<section id="the-rlib-flow">
+<h3>The .rlib Flow<a class="headerlink" href="#the-rlib-flow" title="連結到這個標頭">#</a></h3>
+<p>When rustc compiles <code class="docutils literal notranslate"><span class="pre">cuda_device</span></code>, there are no <code class="docutils literal notranslate"><span class="pre">#[kernel]</span></code> functions in that
+crate. The cuda-oxide backend finds nothing to intercept and delegates
+entirely to LLVM. The output is a standard <code class="docutils literal notranslate"><span class="pre">.rlib</span></code> archive containing:</p>
+<ul class="simple">
+<li><p><strong>Compiled machine code</strong> -- the host-side object file.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">.rmeta</span></code> metadata blob</strong> -- type information, trait impls, and crucially,
+<strong>serialized optimized MIR</strong> for certain functions.</p></li>
+</ul>
+<p>Later, when you compile your <code class="docutils literal notranslate"><span class="pre">vecadd</span></code> crate, the collector finds a kernel
+entry point and starts the BFS walk. It encounters a call to
+<code class="docutils literal notranslate"><span class="pre">cuda_device::thread::index_1d()</span></code>. At this point, <code class="docutils literal notranslate"><span class="pre">tcx.instance_mir()</span></code> reaches
+into <code class="docutils literal notranslate"><span class="pre">cuda_device</span></code>'s <code class="docutils literal notranslate"><span class="pre">.rmeta</span></code> blob and retrieves the function's MIR -- fully
+optimized, monomorphized, ready to translate.</p>
+<figure class="align-center" id="id1">
+<a class="reference internal image-reference" href="../_images/cross-crate-rlib.svg"><img alt="../_images/cross-crate-rlib.svg" src="../_images/cross-crate-rlib.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">Cross-crate device compilation. Phase 1 compiles cuda_device into an .rlib with
+serialized MIR in its .rmeta blob. Phase 2 compiles vecadd -- the collector
+finds a kernel, BFS walks into cuda_device, reads the MIR from .rmeta, and
+compiles everything to PTX.</span><a class="headerlink" href="#id1" title="連結到這個圖片">#</a></p>
+</figcaption>
+</figure>
+<p>Device code from dependency crates is compiled to PTX <strong>lazily</strong> -- only when
+a kernel in your crate transitively references it. If you never call a
+function, it never ends up in the PTX, even if it exists in the dependency.</p>
+</section>
+<section id="which-functions-get-their-mir-encoded-in-rmeta">
+<h3>Which Functions Get Their MIR Encoded in .rmeta?<a class="headerlink" href="#which-functions-get-their-mir-encoded-in-rmeta" title="連結到這個標頭">#</a></h3>
+<p>Not every function's MIR survives into the <code class="docutils literal notranslate"><span class="pre">.rmeta</span></code> blob. rustc has rules
+about what gets serialized:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Category</p></th>
+<th class="head text-left"><p>Why it's serialized</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>Generic functions</p></td>
+<td class="text-left"><p>Must be monomorphized downstream -- the MIR is the &quot;template&quot;</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">#[inline]</span></code> functions</p></td>
+<td class="text-left"><p>Explicitly requested for cross-crate inlining</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">#[inline(always)]</span></code> functions</p></td>
+<td class="text-left"><p>Same, but more insistent about it</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Small leaf functions</p></td>
+<td class="text-left"><p>Heuristic: no calls, few statements -- cheap to inline</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Most <code class="docutils literal notranslate"><span class="pre">cuda_device</span></code> functions fall into at least one of these categories. GPU
+intrinsics are small. Helper functions are <code class="docutils literal notranslate"><span class="pre">#[inline]</span></code>. Generic functions over
+element types are, well, generic. The result is that virtually all device-side
+library code has its MIR available for cross-crate compilation.</p>
+<div class="admonition note">
+<p class="admonition-title">備註</p>
+<p>This is not a cuda-oxide feature -- it is standard rustc behavior, designed
+to support cross-crate inlining and generic instantiation. cuda-oxide just
+happens to benefit enormously from it, since the same mechanism that lets
+rustc inline a <code class="docutils literal notranslate"><span class="pre">Vec::push</span></code> call across crates also lets us compile a
+<code class="docutils literal notranslate"><span class="pre">cuda_device::thread::index_1d()</span></code> call to PTX.</p>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="the-bridge-to-stable-mir">
+<h2>The Bridge to Stable MIR<a class="headerlink" href="#the-bridge-to-stable-mir" title="連結到這個標頭">#</a></h2>
+<p>After the collector finishes, we have a <code class="docutils literal notranslate"><span class="pre">Vec&lt;CollectedFunction&gt;</span></code> containing
+every device function as an internal rustc <code class="docutils literal notranslate"><span class="pre">Instance</span></code>. But <code class="docutils literal notranslate"><span class="pre">mir-importer</span></code> does
+not speak rustc internals -- it works with the stable MIR API provided by
+<code class="docutils literal notranslate"><span class="pre">rustc_public</span></code>. We need a bridge.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">device_codegen</span></code> module handles the translation:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="n">rustc_internal</span><span class="p">::</span><span class="n">run</span><span class="p">(</span><span class="n">tcx</span><span class="p">,</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">stable_instances</span><span class="p">:</span><span class="w"> </span><span class="nb">Vec</span><span class="o">&lt;</span><span class="n">_</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">collected</span>
+<span class="w">        </span><span class="p">.</span><span class="n">iter</span><span class="p">()</span>
+<span class="w">        </span><span class="p">.</span><span class="n">map</span><span class="p">(</span><span class="o">|</span><span class="n">f</span><span class="o">|</span><span class="w"> </span><span class="n">rustc_internal</span><span class="p">::</span><span class="n">stable</span><span class="p">(</span><span class="n">f</span><span class="p">.</span><span class="n">instance</span><span class="p">))</span>
+<span class="w">        </span><span class="p">.</span><span class="n">collect</span><span class="p">();</span>
+<span class="w">    </span><span class="n">mir_importer</span><span class="p">::</span><span class="n">run_pipeline</span><span class="p">(</span><span class="o">&amp;</span><span class="n">stable_instances</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">config</span><span class="p">)</span>
+<span class="p">})</span>
+</pre></div>
+</div>
+<p>Two things are happening here:</p>
+<ol class="arabic simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">rustc_internal::run(tcx,</span> <span class="pre">||</span> <span class="pre">{</span> <span class="pre">...</span> <span class="pre">})</span></code></strong> sets up the thread-local context
+that <code class="docutils literal notranslate"><span class="pre">rustc_public</span></code> requires. Inside this closure, stable MIR queries work.
+Outside it, they would panic -- the stable API needs access to the compiler
+session, and this function provides it.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">rustc_internal::stable(f.instance)</span></code></strong> converts each internal
+<code class="docutils literal notranslate"><span class="pre">rustc_middle::ty::Instance</span></code> to its stable equivalent,
+<code class="docutils literal notranslate"><span class="pre">stable_mir::mir::mono::Instance</span></code>. This is a one-way conversion -- internal
+types can become stable types, but not the other way around.</p></li>
+</ol>
+<p>Once the conversion is done, <code class="docutils literal notranslate"><span class="pre">mir_importer::run_pipeline()</span></code> takes over. It
+reads the stable MIR for each instance, translates it into pliron's MIR
+dialect, and runs the full lowering pipeline through to PTX. That process is
+covered in <a class="reference internal" href="mir-importer.html"><span class="std std-doc">The MIR Importer</span></a>.</p>
+<hr class="docutils" />
+</section>
+<section id="environment-variables">
+<span id="rustc-codegen-environment-variables"></span><h2>Environment Variables<a class="headerlink" href="#environment-variables" title="連結到這個標頭">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">CudaCodegenConfig::from_env()</span></code> reads the following environment variables to
+control the backend's behavior. All are optional -- the defaults produce a
+quiet, production-oriented build.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Variable</p></th>
+<th class="head text-left"><p>Effect</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">CUDA_OXIDE_VERBOSE</span></code></p></td>
+<td class="text-left"><p>Print compilation progress (which kernels were found, pipeline stages, timing)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">CUDA_OXIDE_DUMP_MIR</span></code></p></td>
+<td class="text-left"><p>Dump the <code class="docutils literal notranslate"><span class="pre">dialect-mir</span></code> module to stderr after import (and after <code class="docutils literal notranslate"><span class="pre">mem2reg</span></code>)</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">CUDA_OXIDE_DUMP_LLVM</span></code></p></td>
+<td class="text-left"><p>Dump the LLVM dialect module to stderr after lowering</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">CUDA_OXIDE_PTX_DIR</span></code></p></td>
+<td class="text-left"><p>Override the output directory for <code class="docutils literal notranslate"><span class="pre">.ptx</span></code> files (default: next to the host binary)</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">CUDA_OXIDE_TARGET</span></code></p></td>
+<td class="text-left"><p>Override the GPU target architecture (e.g., <code class="docutils literal notranslate"><span class="pre">sm_90a</span></code> for Hopper)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">CUDA_OXIDE_SHOW_RUSTC_MIR</span></code></p></td>
+<td class="text-left"><p>Dump the raw rustc MIR before translation to pliron (useful for debugging import bugs)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>These are intentionally environment variables rather than command-line flags.
+The codegen backend receives very limited information from rustc's argument
+parser -- environment variables are the simplest way to pass configuration
+without fighting the compiler driver's flag plumbing.</p>
+<p><code class="docutils literal notranslate"><span class="pre">CUDA_OXIDE_TARGET</span></code> sits in the middle of a precedence chain that
+<code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">oxide</span></code> honours: explicit <code class="docutils literal notranslate"><span class="pre">--arch</span></code> wins, then <code class="docutils literal notranslate"><span class="pre">CUDA_OXIDE_TARGET</span></code>,
+then <code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">oxide</span> <span class="pre">run</span></code>'s host-CC auto-detect (only for <code class="docutils literal notranslate"><span class="pre">run</span></code>, not <code class="docutils literal notranslate"><span class="pre">build</span></code>
+or <code class="docutils literal notranslate"><span class="pre">pipeline</span></code>), and finally the backend's feature-based default.</p>
+<div class="admonition note">
+<p class="admonition-title">備註</p>
+<p><code class="docutils literal notranslate"><span class="pre">CUDA_OXIDE_VERBOSE=1</span> <span class="pre">cargo</span> <span class="pre">oxide</span> <span class="pre">build</span></code> is your best friend when debugging
+the compiler. It shows exactly which functions were collected, which crates
+they came from, and how long each pipeline stage took.</p>
+</div>
+</section>
+<hr class="docutils" />
+<section id="putting-it-all-together">
+<h2>Putting It All Together<a class="headerlink" href="#putting-it-all-together" title="連結到這個標頭">#</a></h2>
+<p>Here is the complete flow from <code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">oxide</span> <span class="pre">build</span></code> to a <code class="docutils literal notranslate"><span class="pre">.ptx</span></code> file, as seen
+from the codegen backend:</p>
+<figure class="align-center" id="id2">
+<a class="reference internal image-reference" href="../_images/codegen-flow.svg"><img alt="../_images/codegen-flow.svg" src="../_images/codegen-flow.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">The complete codegen backend flow. When codegen_crate is called, CGUs are
+scanned for kernel/device symbols. If found, the collector does a BFS walk, the
+device codegen bridge converts to stable MIR, and mir_importer produces PTX. The
+LLVM host backend always runs regardless.</span><a class="headerlink" href="#id2" title="連結到這個圖片">#</a></p>
+</figcaption>
+</figure>
+<p>The beauty of the wrapping pattern is that cuda-oxide is invisible to the rest
+of the compilation pipeline. The linker sees normal object files. The build
+system sees normal artifacts. The only evidence that anything unusual happened
+is a <code class="docutils literal notranslate"><span class="pre">.ptx</span></code> file sitting next to the host binary, ready to be loaded by the
+CUDA driver at runtime.</p>
+</section>
+<hr class="docutils" />
+<section id="where-to-go-next">
+<h2>Where to Go Next<a class="headerlink" href="#where-to-go-next" title="連結到這個標頭">#</a></h2>
+<p>With device functions collected and stable MIR in hand, the next stage is
+translation -- covered in <a class="reference internal" href="mir-importer.html"><span class="std std-doc">The MIR Importer</span></a>.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="rustc-public.html"
+       title="上一页">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">上一頁</p>
+        <p class="prev-next-title">rustc_public -- Stable MIR</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="mir-importer.html"
+       title="下一页">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">下一頁</p>
+        <p class="prev-next-title">The MIR Importer</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> 当前页面
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-rustc-loads-a-custom-backend">How rustc Loads a Custom Backend</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-intercept-codegen-crate">The Intercept: codegen_crate()</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#step-1-collect-monomorphized-items">Step 1: Collect Monomorphized Items</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#step-2-scan-for-device-entry-points">Step 2: Scan for Device Entry Points</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#step-3-if-device-code-found-build-and-compile">Step 3: If Device Code Found, Build and Compile</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#step-4-always-compile-host-code">Step 4: Always Compile Host Code</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-other-trait-methods">The Other Trait Methods</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#device-function-collection">Device Function Collection</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-worklist-algorithm">The Worklist Algorithm</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#export-names-and-fqdn-alignment">Export Names and FQDN Alignment</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#crate-filtering-rules">Crate Filtering Rules</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#error-messages">Error Messages</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#intrinsic-stub-filtering">Intrinsic Stub Filtering</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cross-crate-device-compilation">Cross-Crate Device Compilation</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-rlib-flow">The .rlib Flow</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#which-functions-get-their-mir-encoded-in-rmeta">Which Functions Get Their MIR Encoded in .rmeta?</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-bridge-to-stable-mir">The Bridge to Stable MIR</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#environment-variables">Environment Variables</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#putting-it-all-together">Putting It All Together</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#where-to-go-next">Where to Go Next</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+    <div class="footer-items__center">
+      
+        <div class="footer-item"><footer class="bd-footer-content">
+  <div class="footer-container" style="padding: 1rem 0 2rem 0; border-top: 1px solid var(--pst-color-border); text-align: left;">
+    
+    <!-- NVIDIA Logo -->
+    <div style="margin-bottom: 1rem;">
+      <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem; filter: brightness(0);"
+           class="only-light">
+      <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem;"
+           class="only-dark pst-js-only">
+    </div>
+    
+    <!-- Footer Links - single line, left aligned -->
+    <div style="font-size: 0.8125rem; margin-bottom: 0.5rem; color: var(--pst-color-text-muted);">
+      <a href="https://www.nvidia.com/en-us/about-nvidia/privacy-policy/" target="_blank" style="color: inherit; text-decoration: none;">Privacy Policy</a> | 
+      <a href="https://www.nvidia.com/en-us/preferences/email-preferences/" target="_blank" style="color: inherit; text-decoration: none;">Your Privacy Choices</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/terms-of-service/" target="_blank" style="color: inherit; text-decoration: none;">Terms of Service</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/accessibility/" target="_blank" style="color: inherit; text-decoration: none;">Accessibility</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/company-policies/" target="_blank" style="color: inherit; text-decoration: none;">Corporate Policies</a> | 
+      <a href="https://www.nvidia.com/en-us/product-security/" target="_blank" style="color: inherit; text-decoration: none;">Product Security</a> | 
+      <a href="https://www.nvidia.com/en-us/contact/" target="_blank" style="color: inherit; text-decoration: none;">Contact</a>
+    </div>
+    
+    <!-- Copyright -->
+    <div style="font-size: 0.8125rem; color: var(--pst-color-text-muted);">
+      Copyright &copy; 2025-2026, NVIDIA.
+    </div>
+    
+  </div>
+</footer></div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

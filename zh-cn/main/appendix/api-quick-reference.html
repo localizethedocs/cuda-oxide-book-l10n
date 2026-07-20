@@ -1,0 +1,1249 @@
+
+<!DOCTYPE html>
+
+
+<html lang="zh-CN" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>API Quick Reference &#8212; cuda-oxide</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/nvidia-sphinx-theme.css?v=5d97cc0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=196aea71" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/lightbox.css?v=31fdf494" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../_static/documentation_options.js?v=d786bb5c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/translations.js?v=540d3cec"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'appendix/api-quick-reference';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../_static/js/lightbox.js?v=8cf6bc2b"></script>
+    <script src="../_static/js/spa-nav.js?v=9a4d0bbe"></script>
+    <link rel="canonical" href="https://projects.localizethedocs.org/cuda-oxide-book-l10n/appendix/api-quick-reference.html" />
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="Supported Features" href="supported-features.html" />
+    <link rel="prev" title="Building from Source" href="building-from-source.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="zh-CN"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+<script type="text/javascript" src="../ltd-provenance.js"></script>
+<script type="text/javascript" src="../ltd-current.js"></script>
+<script type="text/javascript" src="../../../ltd-config.js"></script>
+<script type="text/javascript" src="../../../ltd-flyout.js"></script>
+
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">跳转至主要内容</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>回到顶部</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="版本警告"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="网页导航">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">cuda-oxide</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="亮色"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="暗色"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>亮色</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>暗色</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="当前页面">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="亮色"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="暗色"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>亮色</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>暗色</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><div class="sidebar-tree">
+    <p class="sidebar-tree-title">
+        Table of Contents
+    </p>
+    <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/hello-gpu.html">Writing Your First Kernel</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Writing GPU Programs</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/execution-model.html">The CUDA Execution Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/kernels-and-device-functions.html">Kernels and Device Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/memory-and-data-movement.html">Memory and Data Movement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/launching-kernels.html">Launching Kernels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/closures-and-generics.html">Closures and Generics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/error-handling-and-debugging.html">Error Handling and Debugging</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Safety on the GPU</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-safety/the-safety-model.html">The Safety Model</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Async GPU Programming</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/the-device-operation-model.html">The DeviceOperation Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/combinators-and-composition.html">Combinators and Composition</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/scheduling-and-streams.html">Scheduling and Streams</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/concurrent-execution.html">Concurrent Execution</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Building a Real Application</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../projects/async-mlp-pipeline.html">Project: Async MLP Pipeline</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Advanced GPU Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/shared-memory-and-synchronization.html">Shared Memory and Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/warp-level-programming.html">Warp-Level Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/tensor-memory-accelerator.html">Tensor Memory Accelerator (TMA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/matrix-multiply-accelerators.html">Matrix Multiply Accelerators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cluster-programming.html">Cluster Programming</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Inside the Compiler</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/architecture-overview.html">Architecture Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/pliron.html">Pliron -- Pliron IR (MLIR-like)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/rustc-public.html">rustc_public -- Stable MIR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/rustc-codegen-cuda.html">The Code Generator: rustc-codegen-cuda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/mir-importer.html">The MIR Importer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/compiler-optimizations.html">Compiler Optimizations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/mlir-dialects.html">Pliron Dialects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/lowering-pipeline.html">The Lowering Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/adding-new-intrinsics.html">Adding New Intrinsics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/fuzzing-and-differential-testing.html">Fuzzing and Differential Testing</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Appendix</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="building-from-source.html">Building from Source</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API Quick Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="supported-features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cuda-cpp-comparison.html">cuda-oxide vs CUDA C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ecosystem.html">The Rust + GPU Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+</ul>
+
+</div></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="初始页面">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">API Quick Reference</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="api-quick-reference">
+<h1>API Quick Reference<a class="headerlink" href="#api-quick-reference" title="链接到此标题。">#</a></h1>
+<p>This appendix is a condensed reference for the cuda-oxide device and host APIs.
+For full documentation, run <code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">doc</span> <span class="pre">--no-deps</span> <span class="pre">--open</span></code> from the workspace
+root.</p>
+<hr class="docutils" />
+<section id="attributes-and-macros">
+<h2>Attributes and Macros<a class="headerlink" href="#attributes-and-macros" title="链接到此标题。">#</a></h2>
+<section id="kernel-and-device-attributes">
+<h3>Kernel and Device Attributes<a class="headerlink" href="#kernel-and-device-attributes" title="链接到此标题。">#</a></h3>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::{</span><span class="n">kernel</span><span class="p">,</span><span class="w"> </span><span class="n">device</span><span class="p">,</span><span class="w"> </span><span class="n">launch_bounds</span><span class="p">,</span><span class="w"> </span><span class="n">cluster_launch</span><span class="p">,</span><span class="w"> </span><span class="n">cooperative_launch</span><span class="p">};</span>
+
+<span class="cp">#[kernel]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">vecadd</span><span class="p">(</span><span class="n">a</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span><span class="w"> </span><span class="n">b</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">c</span><span class="p">:</span><span class="w"> </span><span class="nc">DisjointSlice</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="cm">/* ... */</span><span class="w"> </span><span class="p">}</span>
+
+<span class="cp">#[kernel]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">unrolled</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">data</span><span class="p">:</span><span class="w"> </span><span class="nc">DisjointSlice</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="cp">#[unroll(4)]</span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">16</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="cm">/* ... */</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="cp">#[kernel]</span>
+<span class="cp">#[launch_bounds(256, 2)]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">tuned_kernel</span><span class="p">(</span><span class="n">data</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="nc">mut</span><span class="w"> </span><span class="p">[</span><span class="kt">f32</span><span class="p">])</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="cm">/* ... */</span><span class="w"> </span><span class="p">}</span>
+
+<span class="cp">#[kernel]</span>
+<span class="cp">#[cluster_launch(4, 1, 1)]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">cluster_kernel</span><span class="p">(</span><span class="n">data</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="nc">mut</span><span class="w"> </span><span class="p">[</span><span class="kt">f32</span><span class="p">])</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="cm">/* ... */</span><span class="w"> </span><span class="p">}</span>
+
+<span class="cp">#[kernel]</span>
+<span class="cp">#[cooperative_launch]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">grid_sync_kernel</span><span class="p">(</span><span class="n">data</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="nc">mut</span><span class="w"> </span><span class="p">[</span><span class="kt">f32</span><span class="p">])</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="cm">/* ... */</span><span class="w"> </span><span class="p">}</span>
+
+<span class="cp">#[device]</span>
+<span class="k">fn</span><span class="w"> </span><span class="nf">helper</span><span class="p">(</span><span class="n">x</span><span class="p">:</span><span class="w"> </span><span class="kt">f32</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="kt">f32</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Attribute</p></th>
+<th class="head text-left"><p>Purpose</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">#[kernel]</span></code></p></td>
+<td class="text-left"><p>Mark a function as a GPU kernel entry point (<code class="docutils literal notranslate"><span class="pre">.entry</span></code> in PTX)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">#[device]</span></code></p></td>
+<td class="text-left"><p>Mark a helper function or <code class="docutils literal notranslate"><span class="pre">extern</span> <span class="pre">&quot;C&quot;</span></code> block for device compilation</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">#[unroll]</span></code> / <code class="docutils literal notranslate"><span class="pre">#[unroll(N)]</span></code></p></td>
+<td class="text-left"><p>Request full unrolling, or unrolling by a factor <code class="docutils literal notranslate"><span class="pre">N</span> <span class="pre">&gt;=</span> <span class="pre">2</span></code></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">#[launch_bounds(max_threads,</span> <span class="pre">min_blocks)]</span></code></p></td>
+<td class="text-left"><p>Occupancy hints for register allocation</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">#[cluster_launch(x,</span> <span class="pre">y,</span> <span class="pre">z)]</span></code></p></td>
+<td class="text-left"><p>Set compile-time cluster dimensions (Hopper+)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">#[cooperative_launch]</span></code></p></td>
+<td class="text-left"><p>Launch cooperatively via <code class="docutils literal notranslate"><span class="pre">#[cuda_module]</span></code> (enables <code class="docutils literal notranslate"><span class="pre">grid::sync()</span></code>)</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">#[convergent]</span></code></p></td>
+<td class="text-left"><p>Mark as convergent (barrier semantics)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">#[pure]</span></code></p></td>
+<td class="text-left"><p>Mark as side-effect free</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">#[readonly]</span></code></p></td>
+<td class="text-left"><p>Mark as read-only</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Use these annotations only on an explicit counted <code class="docutils literal notranslate"><span class="pre">while</span></code> loop inside a
+<code class="docutils literal notranslate"><span class="pre">#[kernel]</span></code> or <code class="docutils literal notranslate"><span class="pre">#[device]</span></code> function. Range-based <code class="docutils literal notranslate"><span class="pre">for</span></code> loops are not yet
+recognized by the unroll pass. Nested loops and multiple <code class="docutils literal notranslate"><span class="pre">continue</span></code> paths are
+supported. Full <code class="docutils literal notranslate"><span class="pre">#[unroll]</span></code> preserves <code class="docutils literal notranslate"><span class="pre">break</span></code> paths and multiple exit targets.</p>
+<p>Partial <code class="docutils literal notranslate"><span class="pre">#[unroll(N)]</span></code> requires a positive step, a <code class="docutils literal notranslate"><span class="pre">&lt;</span></code> or <code class="docutils literal notranslate"><span class="pre">&lt;=</span></code> test, an
+unchanging limit, and no exit besides the normal header test. Other requests
+warn and are not unrolled.</p>
+<p>One annotation may create at most 1,024 body copies, 8,192 cloned basic blocks,
+and 65,536 cloned operations. Larger requests warn and are not unrolled.</p>
+</section>
+<section id="debug-and-ptx-macros">
+<h3>Debug and PTX Macros<a class="headerlink" href="#debug-and-ptx-macros" title="链接到此标题。">#</a></h3>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::{</span><span class="n">gpu_printf</span><span class="p">,</span><span class="w"> </span><span class="n">gpu_assert</span><span class="p">,</span><span class="w"> </span><span class="n">ptx_asm</span><span class="p">};</span>
+
+<span class="n">gpu_printf</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;thread %d: val = %f</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">idx</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">i32</span><span class="p">,</span><span class="w"> </span><span class="n">val</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">f64</span><span class="p">);</span>
+<span class="n">gpu_assert</span><span class="o">!</span><span class="p">(</span><span class="n">val</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mf">0.0</span><span class="p">);</span>
+
+<span class="kd">let</span><span class="w"> </span><span class="n">y</span><span class="p">:</span><span class="w"> </span><span class="kt">u32</span><span class="p">;</span>
+<span class="k">unsafe</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">ptx_asm</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;add.u32 %0, %1, %1;&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">out</span><span class="p">(</span><span class="s">&quot;=r&quot;</span><span class="p">)</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="k">in</span><span class="p">(</span><span class="s">&quot;r&quot;</span><span class="p">)</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">options</span><span class="p">(</span><span class="n">register_only</span><span class="p">));</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Macro</p></th>
+<th class="head text-left"><p>Purpose</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">gpu_printf!(fmt,</span> <span class="pre">args...)</span></code></p></td>
+<td class="text-left"><p>Device-side formatted output (lowers to <code class="docutils literal notranslate"><span class="pre">vprintf</span></code>)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">gpu_assert!(condition)</span></code></p></td>
+<td class="text-left"><p>Runtime assertion; calls <code class="docutils literal notranslate"><span class="pre">trap()</span></code> on failure</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">ptx_asm!(...)</span></code></p></td>
+<td class="text-left"><p>Unsafe CUDA inline PTX</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="thread-identification">
+<h2>Thread Identification<a class="headerlink" href="#thread-identification" title="链接到此标题。">#</a></h2>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::</span><span class="n">thread</span><span class="p">;</span>
+
+<span class="kd">let</span><span class="w"> </span><span class="n">idx</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="n">thread</span><span class="p">::</span><span class="n">index_1d</span><span class="p">();</span><span class="w">                            </span><span class="c1">// ThreadIndex&lt;&#39;_, Index1D&gt;</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">idx2d</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="n">thread</span><span class="p">::</span><span class="n">index_2d</span><span class="p">::</span><span class="o">&lt;</span><span class="mi">128</span><span class="o">&gt;</span><span class="p">();</span><span class="w">                     </span><span class="c1">// Option&lt;ThreadIndex&lt;&#39;_, Index2D&lt;128&gt;&gt;&gt;</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">idx2d_r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">thread</span><span class="p">::</span><span class="n">index_2d_runtime</span><span class="p">(</span><span class="n">stride</span><span class="p">)</span><span class="w"> </span><span class="p">};</span><span class="w">   </span><span class="c1">// Option&lt;ThreadIndex&lt;&#39;_, Runtime2DIndex&gt;&gt;</span>
+
+<span class="kd">let</span><span class="w"> </span><span class="n">tid_x</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">thread</span><span class="p">::</span><span class="n">threadIdx_x</span><span class="p">();</span><span class="w">    </span><span class="c1">// u32</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">bid_x</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">thread</span><span class="p">::</span><span class="n">blockIdx_x</span><span class="p">();</span><span class="w">     </span><span class="c1">// u32</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">bdim_x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">thread</span><span class="p">::</span><span class="n">blockDim_x</span><span class="p">();</span><span class="w">     </span><span class="c1">// u32</span>
+</pre></div>
+</div>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Function</p></th>
+<th class="head text-left"><p>Returns</p></th>
+<th class="head text-left"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">thread::index_1d()</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">ThreadIndex&lt;'_,</span> <span class="pre">Index1D&gt;</span></code></p></td>
+<td class="text-left"><p>Unique linear index (1D grids)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">thread::index_2d::&lt;S&gt;()</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">Option&lt;ThreadIndex&lt;'_,</span> <span class="pre">Index2D&lt;S&gt;&gt;&gt;</span></code></p></td>
+<td class="text-left"><p>Const-stride 2D index; mismatched strides are a type error</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">unsafe</span> <span class="pre">thread::index_2d_runtime(s)</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">Option&lt;ThreadIndex&lt;'_,</span> <span class="pre">Runtime2DIndex&gt;&gt;</span></code></p></td>
+<td class="text-left"><p>Runtime-stride 2D index; caller asserts <code class="docutils literal notranslate"><span class="pre">s</span></code> is uniform</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">thread::index_2d_row()</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">usize</span></code></p></td>
+<td class="text-left"><p>2D row index</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">thread::index_2d_col()</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">usize</span></code></p></td>
+<td class="text-left"><p>2D column index</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">thread::threadIdx_{x,y,z}()</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">u32</span></code></p></td>
+<td class="text-left"><p>Thread index within block</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">thread::blockIdx_{x,y,z}()</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">u32</span></code></p></td>
+<td class="text-left"><p>Block index within grid</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">thread::blockDim_{x,y,z}()</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">u32</span></code></p></td>
+<td class="text-left"><p>Block dimensions</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">thread::index_2d::&lt;S&gt;()</span></code> and <code class="docutils literal notranslate"><span class="pre">thread::index_2d_runtime(s)</span></code> return <code class="docutils literal notranslate"><span class="pre">None</span></code>
+when the computed column exceeds the stride — use it to skip the
+right-edge tail in non-aligned 2D kernels.</p>
+<p><code class="docutils literal notranslate"><span class="pre">index_2d::&lt;S&gt;</span></code> is the safe const-stride form; the const generic encodes the
+stride in the witness type so threads cannot use different strides.
+Dimensionality remains a host-side obligation: <code class="docutils literal notranslate"><span class="pre">index_1d</span></code> requires inactive
+Y/Z dimensions, and 2D indices require inactive Z. A matching
+<code class="docutils literal notranslate"><span class="pre">PreparedLaunch&lt;K&gt;</span></code> proves this; a raw launch is unsafe. <code class="docutils literal notranslate"><span class="pre">index_2d_runtime</span></code> is the escape hatch for
+launches whose stride is only known at runtime; the caller takes on the
+&quot;every thread used the same stride&quot; obligation by writing <code class="docutils literal notranslate"><span class="pre">unsafe</span></code>. Full
+discussion in <a class="reference internal" href="../gpu-safety/the-safety-model.html"><span class="std std-doc">The Safety Model</span></a>.</p>
+</section>
+<hr class="docutils" />
+<section id="safe-parallel-writes-disjointslice">
+<h2>Safe Parallel Writes — DisjointSlice<a class="headerlink" href="#safe-parallel-writes-disjointslice" title="链接到此标题。">#</a></h2>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::{</span><span class="n">DisjointSlice</span><span class="p">,</span><span class="w"> </span><span class="n">kernel</span><span class="p">};</span>
+
+<span class="cp">#[kernel]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">vecadd</span><span class="p">(</span><span class="n">a</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span><span class="w"> </span><span class="n">b</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">c</span><span class="p">:</span><span class="w"> </span><span class="nc">DisjointSlice</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nb">Some</span><span class="p">((</span><span class="n">c_elem</span><span class="p">,</span><span class="w"> </span><span class="n">idx</span><span class="p">))</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">get_mut_indexed</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">idx</span><span class="p">.</span><span class="n">get</span><span class="p">();</span>
+<span class="w">        </span><span class="o">*</span><span class="n">c_elem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Method</p></th>
+<th class="head text-left"><p>Signature</p></th>
+<th class="head text-left"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">get_mut_indexed</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">()</span> <span class="pre">-&gt;</span> <span class="pre">Option&lt;(&amp;mut</span> <span class="pre">T,</span> <span class="pre">ThreadIndex&lt;'_,</span> <span class="pre">IS&gt;)&gt;</span></code></p></td>
+<td class="text-left"><p>One-call form: mints the witness and resolves it. Index1D / Index2D.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">get_mut</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">(ThreadIndex&lt;'_,</span> <span class="pre">IS&gt;)</span> <span class="pre">-&gt;</span> <span class="pre">Option&lt;&amp;mut</span> <span class="pre">T&gt;</span></code></p></td>
+<td class="text-left"><p>Bounds-checked mutable access from an explicit witness</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">get_unchecked_mut</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">(usize)</span> <span class="pre">-&gt;</span> <span class="pre">&amp;mut</span> <span class="pre">T</span></code></p></td>
+<td class="text-left"><p>Unsafe, unchecked access</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">len</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">()</span> <span class="pre">-&gt;</span> <span class="pre">usize</span></code></p></td>
+<td class="text-left"><p>Number of elements</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">get_mut_indexed</span></code> is gated on <code class="docutils literal notranslate"><span class="pre">IndexSpace:</span> <span class="pre">IndexFormula</span></code> (impl'd by
+<code class="docutils literal notranslate"><span class="pre">Index1D</span></code> and <code class="docutils literal notranslate"><span class="pre">Index2D&lt;S&gt;</span></code>). For <code class="docutils literal notranslate"><span class="pre">Runtime2DIndex</span></code> slices, use the
+explicit <code class="docutils literal notranslate"><span class="pre">unsafe</span> <span class="pre">{</span> <span class="pre">thread::index_2d_runtime(s)</span> <span class="pre">}</span></code> + <code class="docutils literal notranslate"><span class="pre">get_mut(idx)</span></code> pair.</p>
+</section>
+<hr class="docutils" />
+<section id="shared-memory">
+<h2>Shared Memory<a class="headerlink" href="#shared-memory" title="链接到此标题。">#</a></h2>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::{</span><span class="n">SharedArray</span><span class="p">,</span><span class="w"> </span><span class="n">DynamicSharedArray</span><span class="p">,</span><span class="w"> </span><span class="n">thread</span><span class="p">};</span>
+
+<span class="cp">#[kernel]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">tiled</span><span class="p">(</span><span class="n">data</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">out</span><span class="p">:</span><span class="w"> </span><span class="nc">DisjointSlice</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">TILE</span><span class="p">:</span><span class="w"> </span><span class="nc">SharedArray</span><span class="o">&lt;</span><span class="kt">f32</span><span class="p">,</span><span class="w"> </span><span class="mi">256</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SharedArray</span><span class="p">::</span><span class="n">UNINIT</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">tid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">thread</span><span class="p">::</span><span class="n">threadIdx_x</span><span class="p">()</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">usize</span><span class="p">;</span>
+<span class="w">    </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">TILE</span><span class="p">[</span><span class="n">tid</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">data</span><span class="p">[</span><span class="n">thread</span><span class="p">::</span><span class="n">index_1d</span><span class="p">().</span><span class="n">get</span><span class="p">()];</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="n">thread</span><span class="p">::</span><span class="n">sync_threads</span><span class="p">();</span>
+<span class="w">    </span><span class="c1">// ... read from TILE ...</span>
+<span class="p">}</span>
+
+<span class="cp">#[kernel]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">dynamic</span><span class="p">(</span><span class="n">data</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">])</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">static</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">BUF</span><span class="p">:</span><span class="w"> </span><span class="nc">DynamicSharedArray</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DynamicSharedArray</span><span class="p">::</span><span class="n">UNINIT</span><span class="p">;</span>
+<span class="w">    </span><span class="c1">// Size set at launch via LaunchConfig::shared_mem_bytes</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Type</p></th>
+<th class="head text-left"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">SharedArray&lt;T,</span> <span class="pre">N&gt;</span></code></p></td>
+<td class="text-left"><p>Compile-time sized, block-scoped shared memory</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">SharedArray&lt;T,</span> <span class="pre">N,</span> <span class="pre">128&gt;</span></code></p></td>
+<td class="text-left"><p>With 128-byte alignment (required for TMA destinations)</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">DynamicSharedArray&lt;T&gt;</span></code></p></td>
+<td class="text-left"><p>Runtime-sized shared memory (set via <code class="docutils literal notranslate"><span class="pre">LaunchConfig</span></code>)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Both are <code class="docutils literal notranslate"><span class="pre">!Sync</span></code> — concurrent access requires explicit barriers.</p>
+</section>
+<hr class="docutils" />
+<section id="synchronization">
+<h2>Synchronization<a class="headerlink" href="#synchronization" title="链接到此标题。">#</a></h2>
+<section id="block-level">
+<h3>Block-Level<a class="headerlink" href="#block-level" title="链接到此标题。">#</a></h3>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="n">thread</span><span class="p">::</span><span class="n">sync_threads</span><span class="p">();</span><span class="w">   </span><span class="c1">// __syncthreads() equivalent</span>
+</pre></div>
+</div>
+</section>
+<section id="managed-barriers-hopper">
+<h3>Managed Barriers (Hopper+)<a class="headerlink" href="#managed-barriers-hopper" title="链接到此标题。">#</a></h3>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::{</span><span class="n">ManagedBarrier</span><span class="p">,</span><span class="w"> </span><span class="n">TmaBarrierHandle</span><span class="p">,</span><span class="w"> </span><span class="n">Uninit</span><span class="p">,</span><span class="w"> </span><span class="n">Ready</span><span class="p">};</span>
+
+<span class="c1">// Typestate lifecycle: Uninit → Ready → Invalidated</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">bar</span><span class="p">:</span><span class="w"> </span><span class="nc">TmaBarrierHandle</span><span class="o">&lt;</span><span class="n">Uninit</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TmaBarrierHandle</span><span class="p">::</span><span class="n">from_static</span><span class="p">(</span><span class="n">ptr</span><span class="p">);</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">bar</span><span class="p">:</span><span class="w"> </span><span class="nc">TmaBarrierHandle</span><span class="o">&lt;</span><span class="n">Ready</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">bar</span><span class="p">.</span><span class="n">init</span><span class="p">(</span><span class="n">thread_count</span><span class="p">)</span><span class="w"> </span><span class="p">};</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">bar</span><span class="p">.</span><span class="n">arrive</span><span class="p">();</span>
+<span class="n">bar</span><span class="p">.</span><span class="n">wait</span><span class="p">(</span><span class="n">token</span><span class="p">);</span>
+<span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">bar</span><span class="p">.</span><span class="n">inval</span><span class="p">()</span><span class="w"> </span><span class="p">};</span>
+</pre></div>
+</div>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Operation</p></th>
+<th class="head text-left"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">.init(count)</span></code></p></td>
+<td class="text-left"><p>Initialize barrier with expected arrival count</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">.arrive()</span></code></p></td>
+<td class="text-left"><p>Signal arrival, returns <code class="docutils literal notranslate"><span class="pre">BarrierToken</span></code></p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">.arrive_expect_tx(bytes)</span></code></p></td>
+<td class="text-left"><p>Arrive and set expected TX byte count (for TMA)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">.wait(token)</span></code></p></td>
+<td class="text-left"><p>Block until all arrivals + TX complete</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">.inval()</span></code></p></td>
+<td class="text-left"><p>Invalidate barrier (cleanup)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="warp-primitives">
+<h2>Warp Primitives<a class="headerlink" href="#warp-primitives" title="链接到此标题。">#</a></h2>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::</span><span class="n">warp</span><span class="p">;</span>
+
+<span class="kd">let</span><span class="w"> </span><span class="n">lane</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">lane_id</span><span class="p">();</span><span class="w">      </span><span class="c1">// 0–31</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">wid</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">warp_id</span><span class="p">();</span>
+
+<span class="c1">// Shuffle</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">partner</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">shuffle_xor_f32</span><span class="p">(</span><span class="n">val</span><span class="p">,</span><span class="w"> </span><span class="n">mask</span><span class="p">);</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">from_above</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">shuffle_down_f32</span><span class="p">(</span><span class="n">val</span><span class="p">,</span><span class="w"> </span><span class="n">delta</span><span class="p">);</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">from_below</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">shuffle_up_f32</span><span class="p">(</span><span class="n">val</span><span class="p">,</span><span class="w"> </span><span class="n">delta</span><span class="p">);</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">from_lane</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">shuffle_f32</span><span class="p">(</span><span class="n">val</span><span class="p">,</span><span class="w"> </span><span class="n">src_lane</span><span class="p">);</span>
+
+<span class="c1">// i32 variants</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">partner_i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">shuffle_xor_i32</span><span class="p">(</span><span class="n">val</span><span class="p">,</span><span class="w"> </span><span class="n">mask</span><span class="p">);</span>
+
+<span class="c1">// Vote</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">all_true</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">all</span><span class="p">(</span><span class="n">predicate</span><span class="p">);</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">any_true</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">any</span><span class="p">(</span><span class="n">predicate</span><span class="p">);</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">mask</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">ballot</span><span class="p">(</span><span class="n">predicate</span><span class="p">);</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">count</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">popc</span><span class="p">(</span><span class="n">mask</span><span class="p">);</span>
+</pre></div>
+</div>
+<section id="shuffle-operations">
+<h3>Shuffle Operations<a class="headerlink" href="#shuffle-operations" title="链接到此标题。">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Function</p></th>
+<th class="head text-left"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">shuffle_xor_{f32,i32}(val,</span> <span class="pre">mask)</span></code></p></td>
+<td class="text-left"><p>Exchange with lane <code class="docutils literal notranslate"><span class="pre">id</span> <span class="pre">^</span> <span class="pre">mask</span></code></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">shuffle_down_{f32,i32}(val,</span> <span class="pre">delta)</span></code></p></td>
+<td class="text-left"><p>Read from lane <code class="docutils literal notranslate"><span class="pre">id</span> <span class="pre">+</span> <span class="pre">delta</span></code></p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">shuffle_up_{f32,i32}(val,</span> <span class="pre">delta)</span></code></p></td>
+<td class="text-left"><p>Read from lane <code class="docutils literal notranslate"><span class="pre">id</span> <span class="pre">-</span> <span class="pre">delta</span></code></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">shuffle_{f32,i32}(val,</span> <span class="pre">src)</span></code></p></td>
+<td class="text-left"><p>Read from specific lane</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="vote-operations">
+<h3>Vote Operations<a class="headerlink" href="#vote-operations" title="链接到此标题。">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Function</p></th>
+<th class="head text-left"><p>Returns</p></th>
+<th class="head text-left"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">all(pred)</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">bool</span></code></p></td>
+<td class="text-left"><p>True if predicate holds for all lanes</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">any(pred)</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">bool</span></code></p></td>
+<td class="text-left"><p>True if predicate holds for any lane</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">ballot(pred)</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">u32</span></code></p></td>
+<td class="text-left"><p>Bitmask of lanes where predicate is true</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">popc(mask)</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">u32</span></code></p></td>
+<td class="text-left"><p>Population count of set bits</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="atomics">
+<h2>Atomics<a class="headerlink" href="#atomics" title="链接到此标题。">#</a></h2>
+<section id="scoped-gpu-atomics">
+<h3>Scoped GPU Atomics<a class="headerlink" href="#scoped-gpu-atomics" title="链接到此标题。">#</a></h3>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::</span><span class="n">atomic</span><span class="p">::{</span><span class="n">DeviceAtomicU32</span><span class="p">,</span><span class="w"> </span><span class="n">AtomicOrdering</span><span class="p">};</span>
+
+<span class="k">static</span><span class="w"> </span><span class="n">COUNTER</span><span class="p">:</span><span class="w"> </span><span class="nc">DeviceAtomicU32</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DeviceAtomicU32</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+
+<span class="c1">// In kernel:</span>
+<span class="n">COUNTER</span><span class="p">.</span><span class="n">fetch_add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">AtomicOrdering</span><span class="p">::</span><span class="n">Relaxed</span><span class="p">);</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">old</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">COUNTER</span><span class="p">.</span><span class="n">load</span><span class="p">(</span><span class="n">AtomicOrdering</span><span class="p">::</span><span class="n">Acquire</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Scope</p></th>
+<th class="head text-left"><p>Types</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">DeviceAtomic{U32,I32,U64,I64,F32,F64}</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">.gpu</span></code> scope</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">BlockAtomic{U32,I32,U64,I64,F32,F64}</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">.cta</span></code> scope</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">SystemAtomic{U32,I32,U64,I64,F32,F64}</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">.sys</span></code> scope (CPU-GPU shared)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">core::sync::atomic</span></code> types (<code class="docutils literal notranslate"><span class="pre">AtomicU32</span></code>, <code class="docutils literal notranslate"><span class="pre">AtomicBool</span></code>, etc.) also compile to
+GPU code, defaulting to system scope.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="tma-tensor-memory-accelerator-hopper">
+<h2>TMA — Tensor Memory Accelerator (Hopper+)<a class="headerlink" href="#tma-tensor-memory-accelerator-hopper" title="链接到此标题。">#</a></h2>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::</span><span class="n">tma</span><span class="p">::</span><span class="n">TmaDescriptor</span><span class="p">;</span>
+<span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::</span><span class="n">tma</span><span class="p">::{</span><span class="n">cp_async_bulk_tensor_2d_g2s</span><span class="p">,</span><span class="w"> </span><span class="n">cp_async_bulk_commit_group</span><span class="p">};</span>
+
+<span class="c1">// Host: build descriptor (128 bytes, opaque)</span>
+<span class="c1">// Device: issue async bulk copy</span>
+<span class="n">cp_async_bulk_tensor_2d_g2s</span><span class="p">(</span><span class="n">smem_ptr</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">desc</span><span class="p">,</span><span class="w"> </span><span class="n">coord_x</span><span class="p">,</span><span class="w"> </span><span class="n">coord_y</span><span class="p">,</span><span class="w"> </span><span class="n">barrier_ptr</span><span class="p">);</span>
+<span class="n">cp_async_bulk_commit_group</span><span class="p">();</span>
+</pre></div>
+</div>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Function</p></th>
+<th class="head text-left"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cp_async_bulk_tensor_{1..5}d_g2s(...)</span></code></p></td>
+<td class="text-left"><p>Global → shared async bulk copy</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cp_async_bulk_tensor_{1..5}d_s2g(...)</span></code></p></td>
+<td class="text-left"><p>Shared → global async bulk copy</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cp_async_bulk_tensor_2d_g2s_multicast(...)</span></code></p></td>
+<td class="text-left"><p>Multicast to all CTAs in cluster</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cp_async_bulk_commit_group()</span></code></p></td>
+<td class="text-left"><p>Commit outstanding copies</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cp_async_bulk_wait_group(n)</span></code></p></td>
+<td class="text-left"><p>Wait until ≤ n groups remain</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<hr class="docutils" />
+<section id="cluster-programming-hopper">
+<h2>Cluster Programming (Hopper+)<a class="headerlink" href="#cluster-programming-hopper" title="链接到此标题。">#</a></h2>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::</span><span class="n">cluster</span><span class="p">;</span>
+
+<span class="kd">let</span><span class="w"> </span><span class="n">rank</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cluster</span><span class="p">::</span><span class="n">block_rank</span><span class="p">();</span><span class="w">        </span><span class="c1">// This block&#39;s rank in the cluster</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cluster</span><span class="p">::</span><span class="n">cluster_size</span><span class="p">();</span><span class="w">      </span><span class="c1">// Number of blocks in cluster</span>
+<span class="n">cluster</span><span class="p">::</span><span class="n">cluster_sync</span><span class="p">();</span><span class="w">                 </span><span class="c1">// Barrier across all cluster blocks</span>
+
+<span class="c1">// Distributed Shared Memory</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">remote_ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cluster</span><span class="p">::</span><span class="n">map_shared_rank</span><span class="p">(</span><span class="n">local_ptr</span><span class="p">,</span><span class="w"> </span><span class="n">target_rank</span><span class="p">);</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">val</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cluster</span><span class="p">::</span><span class="n">dsmem_read_u32</span><span class="p">(</span><span class="n">remote_ptr</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="tensor-cores-wgmma-hopper-sm-90">
+<h2>Tensor Cores — WGMMA (Hopper, SM 90)<a class="headerlink" href="#tensor-cores-wgmma-hopper-sm-90" title="链接到此标题。">#</a></h2>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::</span><span class="n">wgmma</span><span class="p">;</span>
+
+<span class="n">wgmma</span><span class="p">::</span><span class="n">wgmma_fence</span><span class="p">();</span>
+<span class="n">wgmma</span><span class="p">::</span><span class="n">wgmma_commit_group</span><span class="p">();</span>
+<span class="n">wgmma</span><span class="p">::</span><span class="n">wgmma_wait_group</span><span class="p">::</span><span class="o">&lt;</span><span class="mi">0</span><span class="o">&gt;</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>Warpgroup MMA: 4 warps (128 threads) issue matrix multiply-accumulate from
+shared memory. Operands described by SMEM descriptors; accumulator in registers.</p>
+</section>
+<hr class="docutils" />
+<section id="tensor-cores-tcgen05-blackwell-sm-100">
+<h2>Tensor Cores — tcgen05 (Blackwell, SM 100+)<a class="headerlink" href="#tensor-cores-tcgen05-blackwell-sm-100" title="链接到此标题。">#</a></h2>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::</span><span class="n">tcgen05</span><span class="p">::{</span><span class="n">TmemGuard</span><span class="p">,</span><span class="w"> </span><span class="n">TmemUninit</span><span class="p">,</span><span class="w"> </span><span class="n">TmemReady</span><span class="p">};</span>
+<span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::</span><span class="n">SharedArray</span><span class="p">;</span>
+
+<span class="k">static</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">TMEM_SLOT</span><span class="p">:</span><span class="w"> </span><span class="nc">SharedArray</span><span class="o">&lt;</span><span class="kt">u32</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SharedArray</span><span class="p">::</span><span class="n">UNINIT</span><span class="p">;</span>
+
+<span class="kd">let</span><span class="w"> </span><span class="n">guard</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">TmemGuard</span><span class="p">::</span><span class="o">&lt;</span><span class="n">TmemUninit</span><span class="p">,</span><span class="w"> </span><span class="mi">512</span><span class="o">&gt;</span><span class="p">::</span><span class="n">from_static</span><span class="p">(</span><span class="o">&amp;</span><span class="n">raw</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">TMEM_SLOT</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="o">*</span><span class="k">mut</span><span class="w"> </span><span class="kt">u32</span><span class="p">);</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">guard</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">guard</span><span class="p">.</span><span class="n">alloc</span><span class="p">()</span><span class="w"> </span><span class="p">};</span><span class="w">   </span><span class="c1">// TmemUninit → TmemReady</span>
+<span class="c1">// ... issue MMA, read results via guard.address() ...</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">_guard</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">guard</span><span class="p">.</span><span class="n">dealloc</span><span class="p">()</span><span class="w"> </span><span class="p">};</span><span class="w"> </span><span class="c1">// TmemReady → TmemDeallocated</span>
+</pre></div>
+</div>
+<p>Single-thread MMA issue into dedicated Tensor Memory (TMEM). <code class="docutils literal notranslate"><span class="pre">TmemGuard</span></code>
+manages TMEM lifetime with typestate: <code class="docutils literal notranslate"><span class="pre">TmemUninit</span> <span class="pre">→</span> <span class="pre">TmemReady</span> <span class="pre">→</span> <span class="pre">TmemDeallocated</span></code>.
+N_COLS must be a power of 2 in the range [32, 512].</p>
+</section>
+<hr class="docutils" />
+<section id="host-side-kernel-launch">
+<h2>Host-Side: Kernel Launch<a class="headerlink" href="#host-side-kernel-launch" title="链接到此标题。">#</a></h2>
+<section id="typed-synchronous">
+<h3>Typed Synchronous<a class="headerlink" href="#typed-synchronous" title="链接到此标题。">#</a></h3>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_core</span><span class="p">::{</span><span class="n">CudaContext</span><span class="p">,</span><span class="w"> </span><span class="n">DeviceBuffer</span><span class="p">,</span><span class="w"> </span><span class="n">LaunchConfig</span><span class="p">};</span>
+
+<span class="kd">let</span><span class="w"> </span><span class="n">ctx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CudaContext</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="mi">0</span><span class="p">).</span><span class="n">unwrap</span><span class="p">();</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">stream</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ctx</span><span class="p">.</span><span class="n">default_stream</span><span class="p">();</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">module</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">kernels</span><span class="p">::</span><span class="n">load</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ctx</span><span class="p">).</span><span class="n">unwrap</span><span class="p">();</span>
+
+<span class="kd">let</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DeviceBuffer</span><span class="p">::</span><span class="n">from_host</span><span class="p">(</span><span class="o">&amp;</span><span class="n">stream</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">a_host</span><span class="p">).</span><span class="n">unwrap</span><span class="p">();</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DeviceBuffer</span><span class="p">::</span><span class="n">from_host</span><span class="p">(</span><span class="o">&amp;</span><span class="n">stream</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">b_host</span><span class="p">).</span><span class="n">unwrap</span><span class="p">();</span>
+<span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DeviceBuffer</span><span class="p">::</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">::</span><span class="n">zeroed</span><span class="p">(</span><span class="o">&amp;</span><span class="n">stream</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">).</span><span class="n">unwrap</span><span class="p">();</span>
+
+<span class="c1">// SAFETY: this is a 1D launch and all buffers contain n elements.</span>
+<span class="k">unsafe</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">module</span><span class="p">.</span><span class="n">vecadd</span><span class="p">(</span><span class="o">&amp;</span><span class="n">stream</span><span class="p">,</span><span class="w"> </span><span class="n">LaunchConfig</span><span class="p">::</span><span class="n">for_num_elems</span><span class="p">(</span><span class="n">n</span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">output</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="p">.</span><span class="n">unwrap</span><span class="p">();</span>
+</pre></div>
+</div>
+</section>
+<section id="typed-async">
+<h3>Typed Async<a class="headerlink" href="#typed-async" title="链接到此标题。">#</a></h3>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_async</span><span class="p">::</span><span class="n">device_operation</span><span class="p">::</span><span class="n">DeviceOperation</span><span class="p">;</span>
+
+<span class="kd">let</span><span class="w"> </span><span class="n">module</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">kernels</span><span class="p">::</span><span class="n">load_async</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+<span class="c1">// SAFETY: this is 1D, buffers contain n elements, and module/scheduler share a context.</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">op</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">module</span><span class="p">.</span><span class="n">vecadd_async</span><span class="p">(</span><span class="n">LaunchConfig</span><span class="p">::</span><span class="n">for_num_elems</span><span class="p">(</span><span class="n">n</span><span class="p">),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">output</span><span class="p">)</span>
+<span class="p">}</span><span class="o">?</span><span class="p">;</span>
+
+<span class="n">op</span><span class="p">.</span><span class="n">sync</span><span class="p">()</span><span class="o">?</span><span class="p">;</span><span class="w">       </span><span class="c1">// blocking</span>
+<span class="c1">// or: op.await?;  // async with tokio</span>
+</pre></div>
+</div>
+<p>Raw generated calls are unsafe because <code class="docutils literal notranslate"><span class="pre">LaunchConfig</span></code> is not tied to a kernel.
+A kernel with <code class="docutils literal notranslate"><span class="pre">#[launch_contract]</span></code> instead uses <code class="docutils literal notranslate"><span class="pre">LaunchConfig1D/2D/3D</span></code> to create
+a checked <code class="docutils literal notranslate"><span class="pre">PreparedLaunch&lt;K&gt;</span></code>, then launches safely. <code class="docutils literal notranslate"><span class="pre">cuda_launch!</span></code> and
+<code class="docutils literal notranslate"><span class="pre">cuda_launch_async!</span></code> remain unsafe lower-level APIs for explicit module loading
+and custom launch code.</p>
+</section>
+<section id="launchconfig">
+<h3>LaunchConfig<a class="headerlink" href="#launchconfig" title="链接到此标题。">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Method</p></th>
+<th class="head text-left"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">LaunchConfig::for_num_elems(n)</span></code></p></td>
+<td class="text-left"><p>Auto-configure grid/block for <code class="docutils literal notranslate"><span class="pre">n</span></code> elements</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">LaunchConfig</span> <span class="pre">{</span> <span class="pre">grid_dim,</span> <span class="pre">block_dim,</span> <span class="pre">shared_mem_bytes</span> <span class="pre">}</span></code></p></td>
+<td class="text-left"><p>Direct struct construction</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="debug-facilities">
+<h2>Debug Facilities<a class="headerlink" href="#debug-facilities" title="链接到此标题。">#</a></h2>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::</span><span class="n">debug</span><span class="p">;</span>
+
+<span class="kd">let</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">debug</span><span class="p">::</span><span class="n">clock64</span><span class="p">();</span><span class="w">       </span><span class="c1">// Cycle counter</span>
+<span class="n">debug</span><span class="p">::</span><span class="n">trap</span><span class="p">();</span><span class="w">                  </span><span class="c1">// Abort kernel</span>
+<span class="n">debug</span><span class="p">::</span><span class="n">breakpoint</span><span class="p">();</span><span class="w">            </span><span class="c1">// cuda-gdb breakpoint</span>
+<span class="n">cuda_device</span><span class="p">::</span><span class="n">barrier</span><span class="p">::</span><span class="n">nanosleep</span><span class="p">(</span><span class="mi">1000</span><span class="p">);</span><span class="w"> </span><span class="c1">// Sleep ~1μs</span>
+<span class="n">debug</span><span class="p">::</span><span class="n">prof_trigger</span><span class="p">::</span><span class="o">&lt;</span><span class="mi">7</span><span class="o">&gt;</span><span class="p">();</span><span class="w">     </span><span class="c1">// Nsight profiler trigger</span>
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="quick-reference-tables">
+<h2>Quick Reference Tables<a class="headerlink" href="#quick-reference-tables" title="链接到此标题。">#</a></h2>
+<section id="cuda-device-modules">
+<h3>cuda-device Modules<a class="headerlink" href="#cuda-device-modules" title="链接到此标题。">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Module</p></th>
+<th class="head text-left"><p>Description</p></th>
+<th class="head text-left"><p>Min SM</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">thread</span></code></p></td>
+<td class="text-left"><p>Thread/block IDs, <code class="docutils literal notranslate"><span class="pre">index_1d</span></code>, <code class="docutils literal notranslate"><span class="pre">sync_threads</span></code></p></td>
+<td class="text-left"><p>All</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">disjoint</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">DisjointSlice&lt;T&gt;</span></code> — typed writes completed by a launch proof</p></td>
+<td class="text-left"><p>All</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">shared</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">SharedArray&lt;T,</span> <span class="pre">N&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">DynamicSharedArray&lt;T&gt;</span></code></p></td>
+<td class="text-left"><p>All</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">warp</span></code></p></td>
+<td class="text-left"><p>Shuffle, vote, match, lane/warp ID</p></td>
+<td class="text-left"><p>All</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">atomic</span></code></p></td>
+<td class="text-left"><p>Scoped atomics (device/block/system)</p></td>
+<td class="text-left"><p>sm_70+</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">debug</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">clock64</span></code>, <code class="docutils literal notranslate"><span class="pre">trap</span></code>, <code class="docutils literal notranslate"><span class="pre">breakpoint</span></code>, <code class="docutils literal notranslate"><span class="pre">gpu_printf!</span></code></p></td>
+<td class="text-left"><p>All</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">fence</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">threadfence_block</span></code> / <code class="docutils literal notranslate"><span class="pre">threadfence</span></code> / <code class="docutils literal notranslate"><span class="pre">threadfence_system</span></code></p></td>
+<td class="text-left"><p>All</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">grid</span></code></p></td>
+<td class="text-left"><p>Grid-scoped <code class="docutils literal notranslate"><span class="pre">sync</span></code> (cooperative kernel launches)</p></td>
+<td class="text-left"><p>sm_70+</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cooperative_groups</span></code></p></td>
+<td class="text-left"><p>Typed handles, warp/block reductions and scans</p></td>
+<td class="text-left"><p>All</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">barrier</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">ManagedBarrier</span></code> — async mbarrier for TMA/MMA</p></td>
+<td class="text-left"><p>sm_90+</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cluster</span></code></p></td>
+<td class="text-left"><p>Thread block clusters, DSMEM</p></td>
+<td class="text-left"><p>sm_90+</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">tma</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">TmaDescriptor</span></code>, bulk tensor copies (1D–5D)</p></td>
+<td class="text-left"><p>sm_90+</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">wgmma</span></code></p></td>
+<td class="text-left"><p>Warpgroup MMA (fence/commit/wait)</p></td>
+<td class="text-left"><p>sm_90</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">tcgen05</span></code></p></td>
+<td class="text-left"><p>5th-gen tensor cores, TMEM, <code class="docutils literal notranslate"><span class="pre">TmemGuard</span></code></p></td>
+<td class="text-left"><p>sm_100+</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cusimd</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">CuSimd&lt;T,</span> <span class="pre">N&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">Float2</span></code>/<code class="docutils literal notranslate"><span class="pre">Float4</span></code></p></td>
+<td class="text-left"><p>All</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">clc</span></code></p></td>
+<td class="text-left"><p>Cluster Launch Control</p></td>
+<td class="text-left"><p>sm_100+</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="crate-map">
+<h3>Crate Map<a class="headerlink" href="#crate-map" title="链接到此标题。">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Crate</p></th>
+<th class="head text-left"><p>Role</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cuda-device</span></code></p></td>
+<td class="text-left"><p>Device intrinsics and types (<code class="docutils literal notranslate"><span class="pre">#![no_std]</span></code>)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cuda-macros</span></code></p></td>
+<td class="text-left"><p>Proc macros (<code class="docutils literal notranslate"><span class="pre">#[kernel]</span></code>, <code class="docutils literal notranslate"><span class="pre">#[device]</span></code>, <code class="docutils literal notranslate"><span class="pre">gpu_printf!</span></code>, <code class="docutils literal notranslate"><span class="pre">ptx_asm!</span></code>)</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cuda-host</span></code></p></td>
+<td class="text-left"><p>Typed module loading plus low-level launch helpers</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cuda-core</span></code></p></td>
+<td class="text-left"><p>Safe RAII wrappers (<code class="docutils literal notranslate"><span class="pre">CudaContext</span></code>, <code class="docutils literal notranslate"><span class="pre">CudaStream</span></code>, <code class="docutils literal notranslate"><span class="pre">DeviceBuffer&lt;T&gt;</span></code>)</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cuda-async</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">DeviceOperation</span></code>, <code class="docutils literal notranslate"><span class="pre">DeviceFuture</span></code>, <code class="docutils literal notranslate"><span class="pre">DeviceBox&lt;T&gt;</span></code></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cuda-bindings</span></code></p></td>
+<td class="text-left"><p>Raw <code class="docutils literal notranslate"><span class="pre">bindgen</span></code> FFI to <code class="docutils literal notranslate"><span class="pre">cuda.h</span></code></p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cargo-oxide</span></code></p></td>
+<td class="text-left"><p>Cargo subcommand (<code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">oxide</span> <span class="pre">run</span></code>, <code class="docutils literal notranslate"><span class="pre">build</span></code>, <code class="docutils literal notranslate"><span class="pre">sanitize</span></code>, <code class="docutils literal notranslate"><span class="pre">debug</span></code>)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="building-from-source.html"
+       title="上一页">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">上一页</p>
+        <p class="prev-next-title">Building from Source</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="supported-features.html"
+       title="下一页">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">下一页</p>
+        <p class="prev-next-title">Supported Features</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> 当前页面
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#attributes-and-macros">Attributes and Macros</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#kernel-and-device-attributes">Kernel and Device Attributes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#debug-and-ptx-macros">Debug and PTX Macros</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#thread-identification">Thread Identification</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#safe-parallel-writes-disjointslice">Safe Parallel Writes — DisjointSlice</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#shared-memory">Shared Memory</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#synchronization">Synchronization</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#block-level">Block-Level</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#managed-barriers-hopper">Managed Barriers (Hopper+)</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#warp-primitives">Warp Primitives</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#shuffle-operations">Shuffle Operations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#vote-operations">Vote Operations</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#atomics">Atomics</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#scoped-gpu-atomics">Scoped GPU Atomics</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tma-tensor-memory-accelerator-hopper">TMA — Tensor Memory Accelerator (Hopper+)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cluster-programming-hopper">Cluster Programming (Hopper+)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tensor-cores-wgmma-hopper-sm-90">Tensor Cores — WGMMA (Hopper, SM 90)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tensor-cores-tcgen05-blackwell-sm-100">Tensor Cores — tcgen05 (Blackwell, SM 100+)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#host-side-kernel-launch">Host-Side: Kernel Launch</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#typed-synchronous">Typed Synchronous</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#typed-async">Typed Async</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#launchconfig">LaunchConfig</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#debug-facilities">Debug Facilities</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#quick-reference-tables">Quick Reference Tables</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cuda-device-modules">cuda-device Modules</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#crate-map">Crate Map</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+    <div class="footer-items__center">
+      
+        <div class="footer-item"><footer class="bd-footer-content">
+  <div class="footer-container" style="padding: 1rem 0 2rem 0; border-top: 1px solid var(--pst-color-border); text-align: left;">
+    
+    <!-- NVIDIA Logo -->
+    <div style="margin-bottom: 1rem;">
+      <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem; filter: brightness(0);"
+           class="only-light">
+      <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem;"
+           class="only-dark pst-js-only">
+    </div>
+    
+    <!-- Footer Links - single line, left aligned -->
+    <div style="font-size: 0.8125rem; margin-bottom: 0.5rem; color: var(--pst-color-text-muted);">
+      <a href="https://www.nvidia.com/en-us/about-nvidia/privacy-policy/" target="_blank" style="color: inherit; text-decoration: none;">Privacy Policy</a> | 
+      <a href="https://www.nvidia.com/en-us/preferences/email-preferences/" target="_blank" style="color: inherit; text-decoration: none;">Your Privacy Choices</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/terms-of-service/" target="_blank" style="color: inherit; text-decoration: none;">Terms of Service</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/accessibility/" target="_blank" style="color: inherit; text-decoration: none;">Accessibility</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/company-policies/" target="_blank" style="color: inherit; text-decoration: none;">Corporate Policies</a> | 
+      <a href="https://www.nvidia.com/en-us/product-security/" target="_blank" style="color: inherit; text-decoration: none;">Product Security</a> | 
+      <a href="https://www.nvidia.com/en-us/contact/" target="_blank" style="color: inherit; text-decoration: none;">Contact</a>
+    </div>
+    
+    <!-- Copyright -->
+    <div style="font-size: 0.8125rem; color: var(--pst-color-text-muted);">
+      Copyright &copy; 2025-2026, NVIDIA.
+    </div>
+    
+  </div>
+</footer></div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>
