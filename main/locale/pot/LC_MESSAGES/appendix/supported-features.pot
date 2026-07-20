@@ -8,10 +8,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-16 12:33+0000\n"
+"POT-Creation-Date: 2026-07-20 10:41+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -599,6 +600,17 @@ msgid ""
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
+msgid "Proof-carrying static views"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"A checked `u32` thread index proves one complete element or tile, then "
+"`at_const` accesses compile-time positions without another runtime bounds "
+"check."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
 msgid "`PreparedLaunch<K>`"
 msgstr ""
 
@@ -618,7 +630,7 @@ msgid ""
 "transitions are compile errors."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:118
+#: ../../../appendix/supported-features.md:119
 msgid "Runtime Library: Atomics"
 msgstr ""
 
@@ -657,7 +669,7 @@ msgstr ""
 msgid "Standard library atomic types lowered to PTX `atom.sys` instructions."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:127
+#: ../../../appendix/supported-features.md:128
 msgid "Runtime Library: Shared Memory"
 msgstr ""
 
@@ -691,7 +703,7 @@ msgid ""
 "`map_shared_rank()` for address mapping. sm_90+."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:135
+#: ../../../appendix/supported-features.md:136
 msgid "Runtime Library: Thread and Synchronization"
 msgstr ""
 
@@ -741,7 +753,7 @@ msgstr ""
 msgid "`fence_proxy_async_shared_cta()` for TMA visibility, `nanosleep(ns)`."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:145
+#: ../../../appendix/supported-features.md:146
 msgid "Runtime Library: Warp"
 msgstr ""
 
@@ -770,7 +782,7 @@ msgstr ""
 msgid "`lane_id()` (0–31), `warp_id()`. Direct register reads."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:153
+#: ../../../appendix/supported-features.md:154
 msgid "Runtime Library: Cooperative Groups"
 msgstr ""
 
@@ -843,7 +855,7 @@ msgid ""
 "grid-wide barriers."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:165
+#: ../../../appendix/supported-features.md:166
 msgid "Runtime Library: Debug"
 msgstr ""
 
@@ -873,7 +885,7 @@ msgid ""
 "`clock()`, `clock64()`, `trap()`, `breakpoint()`, `prof_trigger::<N>()`."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:173
+#: ../../../appendix/supported-features.md:174
 msgid "Runtime Library: Kernel Launch"
 msgstr ""
 
@@ -930,7 +942,7 @@ msgstr ""
 msgid "Compile-time cluster dimensions. Emits `.reqnctapercluster` in PTX."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:184
+#: ../../../appendix/supported-features.md:185
 msgid "Runtime Library: TMA"
 msgstr ""
 
@@ -961,7 +973,7 @@ msgid ""
 "completion tracking."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:194
+#: ../../../appendix/supported-features.md:195
 msgid "Not Yet Implemented"
 msgstr ""
 
