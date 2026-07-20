@@ -1,0 +1,188 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025-2026, NVIDIA Corporation
+# This file is distributed under the same license as the cuda-oxide package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: cuda-oxide \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-16 12:33+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: es_ES\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../../index.md:105
+msgid "Getting Started"
+msgstr ""
+
+#: ../../../index.md:114
+msgid "Writing GPU Programs"
+msgstr ""
+
+#: ../../../index.md:127
+msgid "Safety on the GPU"
+msgstr ""
+
+#: ../../../index.md:135
+msgid "Async GPU Programming"
+msgstr ""
+
+#: ../../../index.md:146
+msgid "Building a Real Application"
+msgstr ""
+
+#: ../../../index.md:154
+msgid "Advanced GPU Features"
+msgstr ""
+
+#: ../../../index.md:166
+msgid "Inside the Compiler"
+msgstr ""
+
+#: ../../../index.md:183
+msgid "Appendix"
+msgstr ""
+
+#: ../../../index.md:1
+msgid "The cuda-oxide Book"
+msgstr ""
+
+#: ../../../index.md:3
+msgid "cuda-oxide logo"
+msgstr ""
+
+#: ../../../index.md:10
+msgid ""
+"**cuda-oxide** is an experimental Rust-to-CUDA compiler that lets you write "
+"(SIMT) GPU kernels in safe(ish), idiomatic Rust. It compiles standard Rust "
+"code directly to PTX — no DSLs, no foreign language bindings, just Rust."
+msgstr ""
+
+#: ../../../index.md:13
+msgid ""
+"This book assumes familiarity with the Rust programming language, including "
+"ownership, traits, and generics. Later chapters on async GPU programming "
+"also assume working knowledge of `async`/`.await` and runtimes like tokio."
+msgstr ""
+
+#: ../../../index.md:15
+msgid ""
+"For a refresher, see [The Rust Programming Language](https://doc.rust-lang."
+"org/book/), [Rust by Example](https://doc.rust-lang.org/rust-by-example/), "
+"or the [Async Book](https://rust-lang.github.io/async-book/)."
+msgstr ""
+
+#: ../../../index.md:20
+msgid "Project Status"
+msgstr ""
+
+#: ../../../index.md:22
+msgid ""
+"The v0.1.0 release is an early-stage alpha: **expect bugs, incomplete "
+"features, and API breakage** as we work to improve it. We hope you'll try it "
+"and help shape its direction by sharing feedback on your experience."
+msgstr ""
+
+#: ../../../index.md:26
+msgid "🚀 Quick start"
+msgstr ""
+
+#: ../../../index.md:28
+msgid ""
+"use cuda_device::{cuda_module, kernel, thread, DisjointSlice};\n"
+"use cuda_core::{CudaContext, DeviceBuffer, LaunchConfig};\n"
+"\n"
+"#[cuda_module]\n"
+"mod kernels {\n"
+"    use super::*;\n"
+"\n"
+"    #[kernel]\n"
+"    fn vecadd(a: &[f32], b: &[f32], mut c: DisjointSlice<f32>) {\n"
+"        let idx = thread::index_1d();\n"
+"        let i = idx.get();\n"
+"        if let Some(c_elem) = c.get_mut(idx) {\n"
+"            *c_elem = a[i] + b[i];\n"
+"        }\n"
+"    }\n"
+"}\n"
+"\n"
+"fn main() {\n"
+"    let ctx = CudaContext::new(0).unwrap();\n"
+"    let stream = ctx.default_stream();\n"
+"    let module = kernels::load(&ctx).unwrap();\n"
+"\n"
+"    let a = DeviceBuffer::from_host(&stream, &[1.0f32; 1024]).unwrap();\n"
+"    let b = DeviceBuffer::from_host(&stream, &[2.0f32; 1024]).unwrap();\n"
+"    let mut c = DeviceBuffer::<f32>::zeroed(&stream, 1024).unwrap();\n"
+"\n"
+"    // SAFETY: this is a 1D launch and all three buffers contain 1024 "
+"elements.\n"
+"    unsafe {\n"
+"        module.vecadd(&stream, LaunchConfig::for_num_elems(1024), &a, &b, "
+"&mut c)\n"
+"    }\n"
+"    .unwrap();\n"
+"\n"
+"    let result = c.to_host_vec(&stream).unwrap();\n"
+"    assert_eq!(result[0], 3.0);\n"
+"}\n"
+msgstr ""
+
+#: ../../../index.md:66
+msgid ""
+"Build and run with `cargo oxide run vecadd` upon installing the "
+"[prerequisites](getting-started/installation.md)."
+msgstr ""
+
+#: ../../../index.md:69
+msgid ""
+"`#[cuda_module]` embeds the generated device artifact into the host binary "
+"and generates a typed `kernels::load` function plus one launch method per "
+"kernel. Kernel arguments are type-checked. A raw `LaunchConfig` call is "
+"still unsafe because the configuration does not prove the kernel's indexing "
+"shape or resource requirements. A declared launch contract provides the safe "
+"`PreparedLaunch` path described in [Launching Kernels](gpu-programming/"
+"launching-kernels.md). The lower-level `load_kernel_module` and unsafe "
+"`cuda_launch!` APIs remain available when you need to load a specific "
+"sidecar artifact or build custom launch code."
+msgstr ""
+
+#: ../../../index.md:82
+msgid "Why cuda-oxide?"
+msgstr ""
+
+#: ../../../index.md:88
+msgid "🦀  Rust on the GPU"
+msgstr ""
+
+#: ../../../index.md:89
+msgid ""
+"Write GPU kernels with Rust's type system and ownership model. Safety is a "
+"first-class goal, but GPUs have subtleties — read about [the safety model]"
+"(gpu-safety/the-safety-model.md)."
+msgstr ""
+
+#: ../../../index.md:94
+msgid "💎  A SIMT Compiler"
+msgstr ""
+
+#: ../../../index.md:95
+msgid ""
+"Not a DSL. A custom rustc codegen backend that compiles pure Rust to PTX."
+msgstr ""
+
+#: ../../../index.md:99
+msgid "⚡  Async Execution"
+msgstr ""
+
+#: ../../../index.md:100
+msgid ""
+"Compose GPU work as lazy `DeviceOperation` graphs. Schedule across stream "
+"pools. Await results with `.await`."
+msgstr ""
