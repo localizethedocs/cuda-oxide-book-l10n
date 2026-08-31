@@ -1,0 +1,214 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025-2026, NVIDIA Corporation
+# This file is distributed under the same license as the cuda-oxide package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: cuda-oxide \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-31 15:39+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../../async-programming/overlapping-transfers-and-compute.md:1
+msgid "Overlapping Transfers and Compute"
+msgstr ""
+
+#: ../../../async-programming/overlapping-transfers-and-compute.md:3
+msgid ""
+"Pageable host memory is convenient, but CUDA may stage it through internal "
+"page-locked memory before a DMA transfer. That extra staging work limits "
+"asynchronous copies. `PinnedHostBuffer<T>` gives CUDA a stable host address "
+"for direct transfer. True copy/compute overlap also requires asynchronous "
+"copies on non-default streams."
+msgstr ""
+
+#: ../../../async-programming/overlapping-transfers-and-compute.md:9
+msgid "Run the complete demo with:"
+msgstr ""
+
+#: ../../../async-programming/overlapping-transfers-and-compute.md:11
+msgid "cargo oxide run pinned_overlap\n"
+msgstr ""
+
+#: ../../../async-programming/overlapping-transfers-and-compute.md:15
+msgid ""
+"The example uses a cheap in-place increment kernel, so its timing is "
+"dominated by data movement rather than computation."
+msgstr ""
+
+#: ../../../async-programming/overlapping-transfers-and-compute.md:18
+msgid "Choosing a copy API"
+msgstr ""
+
+#: ../../../async-programming/overlapping-transfers-and-compute.md:20
+msgid ""
+"The safe helper synchronizes the stream before returning. Use it when the "
+"host does not need to do other work while the copy is in flight:"
+msgstr ""
+
+#: ../../../async-programming/overlapping-transfers-and-compute.md:23
+msgid ""
+"device.copy_to_pinned_host(&stream, &mut host)?;\n"
+"// `host` is safe to read because the helper synchronized `stream`.\n"
+msgstr ""
+
+#: ../../../async-programming/overlapping-transfers-and-compute.md:28
+msgid ""
+"The async helper returns before the copy finishes. The caller owns the "
+"synchronization and the buffer lifetime:"
+msgstr ""
+
+#: ../../../async-programming/overlapping-transfers-and-compute.md:31
+msgid ""
+"// SAFETY: `host` and `device` stay alive and are not reused until `done` "
+"fires.\n"
+"unsafe { device.copy_to_pinned_host_async(&stream, &mut host)? };\n"
+"let done = stream.record_event(None)?;\n"
+msgstr ""
+
+#: ../../../async-programming/overlapping-transfers-and-compute.md:37
+msgid ""
+"The caller must keep both buffers alive, must not read or mutate an in-"
+"flight host buffer, and must wait for the stream work before dropping or "
+"reusing it. The same rule applies to `copy_from_pinned_host_async`. Pre-"
+"allocate device buffers and refill them; `from_pinned_host` still performs a "
+"synchronous device allocation before enqueuing its copy."
+msgstr ""
+
+#: ../../../async-programming/overlapping-transfers-and-compute.md:43
+msgid "Rotating pinned staging buffers"
+msgstr ""
+
+#: ../../../async-programming/overlapping-transfers-and-compute.md:45
+msgid ""
+"Operations stay ordered within one stream, while independent streams can "
+"make progress concurrently on hardware that supports concurrent copy and "
+"compute:"
+msgstr ""
+
+#: ../../../async-programming/overlapping-transfers-and-compute.md:48
+msgid ""
+"stream 0: upload 0 -> kernel 0 -> download 0 -> upload 3 -> kernel 3\n"
+"stream 1: upload 1 -> kernel 1 -> download 1 -> upload 4 -> kernel 4\n"
+"stream 2: upload 2 -> kernel 2 -> download 2 -> upload 5 -> kernel 5\n"
+msgstr ""
+
+#: ../../../async-programming/overlapping-transfers-and-compute.md:54
+msgid ""
+"The example gives each stream a persistent `DeviceBuffer`, a pinned staging "
+"buffer, and a completion event. Upload, kernel, and download are already "
+"ordered by the stream, so the event is only needed to protect host-side slot "
+"reuse. Before reusing a slot, the host waits for its event, copies out the "
+"completed result, and then refills the staging buffer. The final stream join "
+"drains all work before CUDA-owned memory is dropped."
+msgstr ""
+
+#: ../../../async-programming/overlapping-transfers-and-compute.md:61
+msgid ""
+"The core enqueue sequence inside the example's loop is shown below; "
+"surrounding setup and result handling are omitted:"
+msgstr ""
+
+#: ../../../async-programming/overlapping-transfers-and-compute.md:64
+msgid ""
+"// SAFETY: the slot buffers stay alive and are not reused until completion.\n"
+"unsafe {\n"
+"    devices[slot].copy_from_pinned_host_async(&streams[slot], "
+"&stagers[slot])?;\n"
+"    module.increment(&streams[slot], config, &mut devices[slot])?;\n"
+"    devices[slot].copy_to_pinned_host_async(&streams[slot], &mut "
+"stagers[slot])?;\n"
+"}\n"
+"completions[slot] = Some(streams[slot].record_event(None)?);\n"
+msgstr ""
+
+#: ../../../async-programming/overlapping-transfers-and-compute.md:74
+msgid ""
+"The complete setup, slot-reuse wait, and final drain are in the "
+"[`run_overlapped` implementation](https://github.com/NVlabs/cuda-oxide/blob/"
+"main/crates/rustc-codegen-cuda/examples/pinned_overlap/src/main.rs)."
+msgstr ""
+
+#: ../../../async-programming/overlapping-transfers-and-compute.md:77
+msgid "Measured impact"
+msgstr ""
+
+#: ../../../async-programming/overlapping-transfers-and-compute.md:79
+msgid ""
+"The bandwidth benchmark warms up three times, records ten CUDA-event "
+"samples, and reports their median. The pipeline benchmark measures host wall "
+"time for eight 32 MiB chunks. The serialized path allocates and synchronizes "
+"a pageable device buffer for each chunk. The overlapped path pre-allocates "
+"three device buffers and pinned staging buffers, then includes host staging "
+"copies, event waits, and result copies in its wall time. The result is "
+"therefore an end-to-end path comparison, not a pure copy-engine measurement."
+msgstr ""
+
+#: ../../../async-programming/overlapping-transfers-and-compute.md:87
+msgid "On the reference RTX 4090 (`sm_89`) run:"
+msgstr ""
+
+#: ../../../async-programming/overlapping-transfers-and-compute.md:0
+msgid "Pipeline"
+msgstr ""
+
+#: ../../../async-programming/overlapping-transfers-and-compute.md:0
+msgid "Time"
+msgstr ""
+
+#: ../../../async-programming/overlapping-transfers-and-compute.md:0
+msgid "Serialized pageable"
+msgstr ""
+
+#: ../../../async-programming/overlapping-transfers-and-compute.md:0
+msgid "174.996 ms"
+msgstr ""
+
+#: ../../../async-programming/overlapping-transfers-and-compute.md:0
+msgid "Overlapped pinned"
+msgstr ""
+
+#: ../../../async-programming/overlapping-transfers-and-compute.md:0
+msgid "99.332 ms"
+msgstr ""
+
+#: ../../../async-programming/overlapping-transfers-and-compute.md:0
+msgid "Speedup"
+msgstr ""
+
+#: ../../../async-programming/overlapping-transfers-and-compute.md:0
+msgid "1.76x"
+msgstr ""
+
+#: ../../../async-programming/overlapping-transfers-and-compute.md:95
+msgid ""
+"The full transfer table is in the [example README](https://github.com/NVlabs/"
+"cuda-oxide/tree/main/crates/rustc-codegen-cuda/examples/pinned_overlap). "
+"Results vary with the GPU, PCIe topology, driver, and system load."
+msgstr ""
+
+#: ../../../async-programming/overlapping-transfers-and-compute.md:98
+msgid "Practical tradeoffs"
+msgstr ""
+
+#: ../../../async-programming/overlapping-transfers-and-compute.md:100
+msgid ""
+"Pinning consumes limited host memory, and copying pageable input into a "
+"staging buffer is not free. Reuse a small ring of buffers and profile the "
+"copy engines before increasing the number of streams."
+msgstr ""
+
+#: ../../../async-programming/overlapping-transfers-and-compute.md:104
+msgid ""
+"For the lower-level stream model, see [Scheduling and Streams](scheduling-"
+"and-streams.md). For the complete runnable implementation, see the "
+"[`pinned_overlap` example](https://github.com/NVlabs/cuda-oxide/tree/main/"
+"crates/rustc-codegen-cuda/examples/pinned_overlap)."
+msgstr ""

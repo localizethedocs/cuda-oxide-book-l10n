@@ -8,10 +8,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-16 12:33+0000\n"
+"POT-Creation-Date: 2026-08-31 15:39+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -124,49 +125,50 @@ msgstr ""
 
 #: ../../../compiler/mir-importer.md:68
 msgid ""
-"Calls `translate_function()` to produce a pliron module containing the "
-"`dialect-mir` representation (using `mir.alloca` slots for locals)."
+"Calls `translator::body::translate_body()` to produce the function's "
+"`dialect-mir` representation (using `mir.alloca` slots for locals), then "
+"appends it to the one `builtin.module` the whole run shares."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:70
+#: ../../../compiler/mir-importer.md:71
 msgid ""
 "Runs pliron's verifier on the module to catch structural errors early -- "
 "mismatched types, missing operands, broken dominance -- before they turn "
 "into cryptic LLVM failures downstream."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:73
+#: ../../../compiler/mir-importer.md:74
 msgid ""
 "Runs `pliron::opts::mem2reg` to promote the alloca slots back into SSA "
 "values within `dialect-mir`."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:75
+#: ../../../compiler/mir-importer.md:76
 msgid ""
 "Runs [compiler optimizations](compiler-optimizations.md), currently "
 "unrolling supported loops carrying `#[unroll]` or `#[unroll(N)]` requests."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:77
+#: ../../../compiler/mir-importer.md:78
 msgid ""
 "Runs `lower_mir_to_llvm` (from the `mir-lower` crate) to lower every "
 "`dialect-mir` operation into its LLVM dialect equivalent via "
 "`DialectConversion`."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:80
+#: ../../../compiler/mir-importer.md:81
 msgid ""
 "For NVVM builds, runs `nvvm-transforms` with the dialect selected for the "
 "target GPU. Ordinary PTX builds skip this step."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:82
+#: ../../../compiler/mir-importer.md:83
 msgid ""
 "Exports the LLVM dialect module to a textual `.ll` string and compiles it "
 "with `llc`, or with libNVVM and nvJitLink for NVVM output."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:85
+#: ../../../compiler/mir-importer.md:86
 msgid ""
 "If any step fails, the pipeline stops and returns a typed error (`NoBody`, "
 "`Translation`, `Verification`, `Lowering`, `Export`, or `PtxGeneration`) "
@@ -174,11 +176,11 @@ msgid ""
 "mysterious empty output files."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:92
+#: ../../../compiler/mir-importer.md:93
 msgid "Translation Architecture"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:94
+#: ../../../compiler/mir-importer.md:95
 msgid ""
 "The `translator/` directory is where Stable MIR becomes pliron IR. Each "
 "module handles one level of MIR structure, and they compose neatly:"
@@ -249,14 +251,14 @@ msgstr ""
 msgid "MIR local → alloca slot mapping (`ValueMap`) + slot addrspace inference"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:107
+#: ../../../compiler/mir-importer.md:108
 msgid "The call flow follows MIR's structure top-down:"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:109
+#: ../../../compiler/mir-importer.md:110
 msgid ""
-"translate_function()\n"
-"  └─ body::translate_body()\n"
+"pipeline::run_pipeline()\n"
+"  └─ body::translate_body()               // once per collected function\n"
 "       ├─ emit_entry_allocas()            // one mir.alloca per non-ZST "
 "local\n"
 "       │     └─ SlotAddrSpaceMap::analyze // pointer slot addrspace "
@@ -268,7 +270,7 @@ msgid ""
 "                  └─ terminator::translate_terminator()\n"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:121
+#: ../../../compiler/mir-importer.md:122
 msgid ""
 "`translate_body()` sets up the function's signature, creates pliron blocks "
 "corresponding to MIR basic blocks, sanitizes the function name (converting "
@@ -280,7 +282,7 @@ msgid ""
 "statements and terminators one by one."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:130
+#: ../../../compiler/mir-importer.md:131
 msgid ""
 "`translate_statement()` handles the flat operations within a block -- "
 "assignments, storage live/dead markers, and discriminant writes. When an "
@@ -290,31 +292,31 @@ msgid ""
 "arithmetic, and the other dozen-odd things Rust compiles to."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:137
+#: ../../../compiler/mir-importer.md:138
 msgid ""
 "`translate_terminator()` handles the block-ending operations: `Goto`, "
 "`SwitchInt`, `Call`, `Return`, `Assert`, `Drop`, and `Unreachable`. This is "
 "also where intrinsic dispatch lives -- but that gets its own section below."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:143
+#: ../../../compiler/mir-importer.md:144
 msgid "The SSA Challenge (and how we defer it)"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:145
+#: ../../../compiler/mir-importer.md:146
 msgid ""
 "This is the trickiest part of the translation, and it deserves careful "
 "explanation."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:148
+#: ../../../compiler/mir-importer.md:149
 msgid ""
 "Rust MIR is *not* in strict SSA form. Locals (variables) are named storage "
 "locations that any block can read or write. If `_3` is assigned in `bb0`, it "
 "can be freely used in `bb1`, `bb5`, or anywhere else -- MIR does not care."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:152
+#: ../../../compiler/mir-importer.md:153
 msgid ""
 "Pliron IR (MLIR-like) ultimately expects **strict SSA**: a value must "
 "dominate every use, and if a value needs to flow from one block to another, "
@@ -322,11 +324,11 @@ msgid ""
 "across blocks and grab a local."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:157
+#: ../../../compiler/mir-importer.md:158
 msgid "We resolve this tension in two phases:"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:159
+#: ../../../compiler/mir-importer.md:160
 msgid ""
 "**Importer: alloca + load/store.** The `mir-importer` deliberately does "
 "*not* construct SSA directly. Every non-ZST MIR local is backed by a single "
@@ -338,7 +340,7 @@ msgid ""
 "arguments."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:168
+#: ../../../compiler/mir-importer.md:169
 msgid ""
 "**`pliron::opts::mem2reg`: slots → SSA.** After the `dialect-mir` module "
 "verifies, `pipeline.rs` runs pliron's built-in `mem2reg` pass. It promotes "
@@ -350,25 +352,25 @@ msgid ""
 "`alloca`s."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:177
+#: ../../../compiler/mir-importer.md:178
 msgid ""
 "Here is the problem in miniature. Given MIR where `_1` is written in `bb0` "
 "and read in `bb1`:"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:180
+#: ../../../compiler/mir-importer.md:181
 msgid ""
 "// Rust MIR\n"
 "bb0: { _1 = 42_i32; goto -> bb1; }\n"
 "bb1: { _0 = _1;     return; }\n"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:186
+#: ../../../compiler/mir-importer.md:187
 msgid ""
 "The importer first emits this alloca-based `dialect-mir` (before `mem2reg`):"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:188
+#: ../../../compiler/mir-importer.md:189
 msgid ""
 "^bb0:\n"
 "  %s1 = mir.alloca           : !mir.ptr<i32>\n"
@@ -380,14 +382,14 @@ msgid ""
 "  mir.return %r : i32\n"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:199
+#: ../../../compiler/mir-importer.md:200
 msgid ""
 "After `pliron::opts::mem2reg` has promoted `%s1`, the same function becomes "
 "SSA-form `dialect-mir`, with block arguments appearing only where they are "
 "actually needed to merge reaching definitions:"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:203
+#: ../../../compiler/mir-importer.md:204
 msgid ""
 "^bb0:\n"
 "  %c = mir.constant 42_i32 : i32\n"
@@ -396,14 +398,14 @@ msgid ""
 "  mir.return %r : i32\n"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:211
+#: ../../../compiler/mir-importer.md:212
 msgid ""
 "(Functions with a single-predecessor successor, like the example above, end "
 "up with a single block argument; joins with multiple reaching definitions "
 "are where `mem2reg` introduces the nontrivial phi-style arguments.)"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:215
+#: ../../../compiler/mir-importer.md:216
 msgid ""
 "The upshot: the importer never runs a liveness analysis and never threads "
 "values across blocks. All \"which value is live where?\" reasoning is "
@@ -413,11 +415,11 @@ msgid ""
 "reference."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:223
+#: ../../../compiler/mir-importer.md:224
 msgid "Type Translation"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:225
+#: ../../../compiler/mir-importer.md:226
 msgid ""
 "The `types` module converts Rust types (as seen through `rustc_public`) into "
 "`dialect-mir` types. Most mappings are straightforward, but a few deserve "
@@ -544,16 +546,16 @@ msgstr ""
 msgid "Discriminant + variants"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:241
+#: ../../../compiler/mir-importer.md:242
 msgid "Dynamic struct layout"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:243
+#: ../../../compiler/mir-importer.md:244
 msgid ""
 "Here is a subtlety that saves users a real headache. Consider this struct:"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:245
+#: ../../../compiler/mir-importer.md:246
 msgid ""
 "struct Extreme {\n"
 "    a: u8,\n"
@@ -561,11 +563,11 @@ msgid ""
 "}\n"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:252
+#: ../../../compiler/mir-importer.md:253
 msgid "Rust's layout algorithm may reorder fields for alignment:"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:254
+#: ../../../compiler/mir-importer.md:255
 msgid ""
 "User writes:      struct Extreme { a: u8, b: i128 }\n"
 "rustc may layout: [b: i128 @ offset 0][a: u8 @ offset 16]\n"
@@ -573,7 +575,7 @@ msgid ""
 "LLVM struct:      { i128, i8, [15 x i8] }   // explicit padding\n"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:261
+#: ../../../compiler/mir-importer.md:262
 msgid ""
 "cuda-oxide queries rustc for the exact byte offset of every field and builds "
 "the struct type with explicit padding bytes. The `MirStructType` stores a "
@@ -582,7 +584,7 @@ msgid ""
 "as `[N x i8]` arrays between fields."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:267
+#: ../../../compiler/mir-importer.md:268
 msgid ""
 "The practical upshot: **`#[repr(C)]` is not required** for types shared "
 "between host and device code. cuda-oxide matches rustc's layout "
@@ -591,11 +593,11 @@ msgid ""
 "to remember, one less footgun to step on."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:275
+#: ../../../compiler/mir-importer.md:276
 msgid "Intrinsic Dispatch"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:277
+#: ../../../compiler/mir-importer.md:278
 msgid ""
 "When the translator encounters a `Call` terminator, it does not immediately "
 "emit a `mir.call` operation. First, it checks whether the callee is a *known "
@@ -603,27 +605,42 @@ msgid ""
 "hardware instruction rather than a function with a body."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:282
+#: ../../../compiler/mir-importer.md:283
 msgid ""
 "The `try_dispatch_intrinsic()` function matches on the **fully qualified "
 "domain name (FQDN)** of the callee, obtained from `CrateDef::name()`:"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:285
+#: ../../../compiler/mir-importer.md:286
 msgid ""
 "match name {\n"
-"    \"cuda_device::thread::threadIdx_x\" => "
-"emit_nvvm_intrinsic(ReadPtxSregTidXOp),\n"
-"    \"cuda_device::warp::shuffle_xor\"   => "
-"emit_warp_shuffle_i32(ShflSyncBflyI32Op),\n"
-"    \"cuda_device::sync::syncthreads\"   => "
-"emit_nvvm_intrinsic(Barrier0Op),\n"
+"    // condensed; the real arms also match re-export and ABI-alias paths\n"
+"    \"cuda_device::thread::threadIdx_x\"  => "
+"emit_generated_nvvm_intrinsic(ReadPtxSregTidXOp),\n"
+"    \"cuda_device::thread::sync_threads\" => { /* builds a Barrier0Op in "
+"place */ }\n"
 "    // ... 100+ intrinsics\n"
 "    _ => translate_as_normal_call()\n"
 "}\n"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:295
+#: ../../../compiler/mir-importer.md:296
+msgid ""
+"Most arms are not written out by hand. Anything described by `intrinsics/"
+"catalog.json` has its arm generated into a per-family module under `crates/"
+"mir-importer/src/translator/terminator/intrinsics/generated/`. Both arms "
+"above are of that kind, and so are the warp shuffles: the matched strings "
+"are the masked `_sync` forms (`shuffle_xor_sync`, `shuffle_xor_f32_sync`, "
+"`shuffle_xor_u64_sync`, and the `shuffle_up_*`/`shuffle_down_*` families). "
+"The bare `warp::shuffle_xor` is never a match string. It is an "
+"`#[inline(always)]` wrapper in `crates/cuda-device/src/warp.rs` that "
+"supplies the full-warp mask (`u32::MAX`) and calls `shuffle_xor_sync`, so "
+"the dispatcher only ever intercepts the `_sync` call. The hand-written arms "
+"in `terminator/mod.rs` and the `intrinsics/` modules beside the generated "
+"file hold the cases the catalog does not describe."
+msgstr ""
+
+#: ../../../compiler/mir-importer.md:310
 msgid ""
 "The full FQDN (e.g. `cuda_device::thread::threadIdx_x`, not just "
 "`threadIdx_x`) is used for matching to avoid ambiguity between identically-"
@@ -632,7 +649,7 @@ msgid ""
 "matching names, and the lowering layer converts `::` to `__` on both sides."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:301
+#: ../../../compiler/mir-importer.md:316
 msgid ""
 "If the function is a recognized intrinsic, the translator emits the "
 "corresponding `dialect-nvvm` operation directly -- no function body, no call "
@@ -641,7 +658,7 @@ msgid ""
 "instructions all go through this path."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:307
+#: ../../../compiler/mir-importer.md:322
 msgid ""
 "If the function is *not* an intrinsic, it falls through to the normal path: "
 "emit a `mir.call` operation that references the callee by symbol name. The "
@@ -649,7 +666,7 @@ msgid ""
 "function list too), so everything links up."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:313
+#: ../../../compiler/mir-importer.md:328
 msgid ""
 "The intrinsic dispatch table is the main extension point for adding new GPU "
 "operations to cuda-oxide. If NVIDIA ships a new instruction and you want to "
@@ -658,21 +675,21 @@ msgid ""
 "for a step-by-step guide."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:322
+#: ../../../compiler/mir-importer.md:337
 msgid "Handling Unwind Paths"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:324
+#: ../../../compiler/mir-importer.md:339
 msgid ""
 "MIR models Rust's panic semantics faithfully. Every function call has two "
 "possible successors -- a return target and an unwind target:"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:327
+#: ../../../compiler/mir-importer.md:342
 msgid "_2 = mul(_1, _3) -> [return: bb1, unwind: bb2]\n"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:331
+#: ../../../compiler/mir-importer.md:346
 msgid ""
 "On a CPU, the unwind path matters: it runs destructors, unwinds the stack, "
 "and either catches the panic or aborts the process. On a GPU, the CUDA "
@@ -685,7 +702,7 @@ msgid ""
 "that work."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:340
+#: ../../../compiler/mir-importer.md:355
 msgid ""
 "For now, cuda-oxide treats **all unwind paths as unreachable**. If a panic "
 "would occur at runtime -- say, an integer overflow in debug mode or an "
@@ -694,14 +711,25 @@ msgid ""
 "the flag."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:346
+#: ../../../compiler/mir-importer.md:361
 msgid ""
 "In practice, the translator simply ignores the unwind target in every `Call` "
 "and `Assert` terminator, generating only the return-path branch. The unwind "
 "blocks are never translated. They vanish, like they were never there."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:350
+#: ../../../compiler/mir-importer.md:365
+msgid ""
+"The panic *message* vanishes with them. A block whose terminator is a "
+"diverging call into `core::panicking` lowers to `nvvm.trap` + `mir."
+"unreachable` and nothing else -- its statements exist only to build what "
+"that dropped call would have consumed (the message `&str`, the `format_args!"
+"` pieces), and the block has no successor, so nothing they write can ever be "
+"read. Skipping them is also what makes a message-carrying panic compilable "
+"in the first place: a materialized `&str` constant has no device lowering."
+msgstr ""
+
+#: ../../../compiler/mir-importer.md:373
 msgid ""
 "This is not as scary as it sounds. Rust's borrow checker and type system "
 "prevent most of the bugs that would cause panics. And for the ones that slip "
@@ -710,17 +738,17 @@ msgid ""
 "\"recover\" from a logic error mid-kernel."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:358
+#: ../../../compiler/mir-importer.md:381
 msgid "Putting It All Together"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:360
+#: ../../../compiler/mir-importer.md:383
 msgid ""
 "Let's trace a simple kernel through the full pipeline to see how all the "
 "pieces connect. Here is a vector addition kernel:"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:363
+#: ../../../compiler/mir-importer.md:386
 msgid ""
 "#[kernel]\n"
 "pub fn vecadd(a: &[f32], b: &[f32], mut c: DisjointSlice<f32>) {\n"
@@ -731,7 +759,7 @@ msgid ""
 "}\n"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:373
+#: ../../../compiler/mir-importer.md:396
 msgid ""
 "After `mir-importer` translates the Stable MIR into `dialect-mir` (and "
 "`pliron::opts::mem2reg` has promoted the alloca slots back into SSA), the "
@@ -739,7 +767,7 @@ msgid ""
 "clarity):"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:378
+#: ../../../compiler/mir-importer.md:401
 msgid ""
 "mir.func @vecadd(%a: mir.slice<f32>, %b: mir.slice<f32>,\n"
 "                 %c: mir.disjoint_slice<f32>) {\n"
@@ -761,24 +789,24 @@ msgid ""
 "}\n"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:399
+#: ../../../compiler/mir-importer.md:422
 msgid "A few things to notice:"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:401
+#: ../../../compiler/mir-importer.md:424
 msgid ""
 "**`thread::index_1d()`** was dispatched as an intrinsic and became `nvvm."
 "read_ptx_sreg_tid_x` -- a direct GPU register read, not a function call."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:404
+#: ../../../compiler/mir-importer.md:427
 msgid ""
 "**`DisjointSlice::get_mut()`** turned into a bounds check (`mir.lt`) and a "
 "conditional branch. The `if let Some` pattern in Rust became explicit "
 "control flow."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:407
+#: ../../../compiler/mir-importer.md:430
 msgid ""
 "**Block arguments** are absent here. Remember that `mir-importer` itself "
 "emits *every* branch terminator with zero operands and every non-entry block "
@@ -791,57 +819,57 @@ msgid ""
 "after `mem2reg`, which is pliron's spelling of phi nodes."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:417
+#: ../../../compiler/mir-importer.md:440
 msgid ""
 "**No unwind paths.** The original MIR had unwind targets on every operation "
 "that could panic. They are gone."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:420
+#: ../../../compiler/mir-importer.md:443
 msgid "From here, the pipeline takes over:"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:422
+#: ../../../compiler/mir-importer.md:445
 msgid ""
 "**Verify** -- pliron checks that every operation's types match, every "
 "block's arguments are correct, and dominance holds."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:424
+#: ../../../compiler/mir-importer.md:447
 msgid ""
 "**Optimize** -- `mir-transforms` rewrites supported annotated loops and "
 "cleans up the control flow it changes."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:426
+#: ../../../compiler/mir-importer.md:449
 msgid ""
 "**Lower** -- `lower_mir_to_llvm` transforms `mir.add` into `llvm.fadd`, `mir."
 "load` into `llvm.load`, `mir.slice` into an LLVM struct of pointer and "
 "length, and so on."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:429
+#: ../../../compiler/mir-importer.md:452
 msgid ""
 "**Prepare NVVM IR when needed** -- `nvvm-transforms` converts operations to "
 "the LLVM form accepted by the selected libNVVM target. Ordinary PTX builds "
 "skip this step."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:432
+#: ../../../compiler/mir-importer.md:455
 msgid ""
 "**Export** -- the LLVM dialect is printed as a textual `.ll` file with the "
 "appropriate `!nvvm.annotations` metadata marking `vecadd` as a kernel entry "
 "point."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:435
+#: ../../../compiler/mir-importer.md:458
 msgid ""
 "**Compile** -- LLVM's NVPTX backend normally compiles the `.ll` to `.ptx`. "
 "NVVM builds instead use libNVVM and nvJitLink. The result is written next to "
 "the host binary."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:439
+#: ../../../compiler/mir-importer.md:462
 msgid ""
 "`dialect-mir` captures Rust semantics faithfully. Before lowering it, cuda-"
 "oxide can perform targeted, behavior-preserving rewrites. The first is "

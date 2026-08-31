@@ -8,10 +8,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-16 12:33+0000\n"
+"POT-Creation-Date: 2026-08-31 15:39+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -22,28 +23,31 @@ msgstr ""
 
 #: ../../../compiler/adding-new-intrinsics.md:3
 msgid ""
-"So you want to teach cuda-oxide a new GPU trick. Maybe NVIDIA just shipped a "
-"new instruction, or you need an existing PTX operation that nobody has wired "
-"up yet. Good news: the process is mechanical. Five crates, five steps, and "
-"roughly thirty minutes once you have done it before."
+"cuda-oxide has two intrinsic contribution paths. Most device intrinsics are "
+"**catalog-generated**: contributors edit reviewed catalog inputs and let "
+"`cuda-intrinsics-gen` produce the API, dialect, importer, lowering, target, "
+"reference, and probe surfaces together. Operations with bespoke verification "
+"or lowering that the catalog cannot express remain hand-written."
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:8
+#: ../../../compiler/adding-new-intrinsics.md:9
 msgid ""
-"This chapter walks through the full pipeline using two real examples -- one "
-"trivially simple, one with a few twists -- so you can see exactly what "
-"happens at each stage."
+"Start with [Catalog-Generated Intrinsics](catalog-generated-intrinsics.md) "
+"unless you have established that the existing catalog model cannot represent "
+"the operation. This chapter documents the compiler stages and the hand-"
+"written path, using generated intrinsics as concrete examples of the "
+"representations that flow through those stages."
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:14
+#: ../../../compiler/adding-new-intrinsics.md:17
 msgid "The Five-Stage Pipeline"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:16
+#: ../../../compiler/adding-new-intrinsics.md:19
 msgid "Every GPU intrinsic follows the same path through the compiler:"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:18
+#: ../../../compiler/adding-new-intrinsics.md:21
 msgid ""
 "cuda-device          User writes:  thread::threadIdx_x()\n"
 "    │\n"
@@ -60,7 +64,7 @@ msgid ""
 "llvm-export        Exports textual LLVM IR  →  llc turns it into PTX\n"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:34
+#: ../../../compiler/adding-new-intrinsics.md:37
 msgid "At the `mir-lower` stage you pick one of two strategies:"
 msgstr ""
 
@@ -101,31 +105,31 @@ msgstr ""
 msgid "`trap`, `wgmma`, `tcgen05`, `mbarrier`"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:41
+#: ../../../compiler/adding-new-intrinsics.md:44
 msgid "Both strategies are demonstrated below."
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:45
+#: ../../../compiler/adding-new-intrinsics.md:48
 msgid "Example 1: `threadIdx_x` (the Simple Case)"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:47
+#: ../../../compiler/adding-new-intrinsics.md:50
 msgid ""
 "`threadIdx_x()` is the \"Hello, World\" of GPU intrinsics: zero arguments, "
 "one `u32` result, maps directly to a single LLVM NVVM intrinsic. If you can "
 "follow this example, you can add any simple intrinsic."
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:51
-#: ../../../compiler/adding-new-intrinsics.md:227
+#: ../../../compiler/adding-new-intrinsics.md:54
+#: ../../../compiler/adding-new-intrinsics.md:278
 msgid "Stage 1 -- Declare in `cuda-device`"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:53
+#: ../../../compiler/adding-new-intrinsics.md:56
 msgid "**File:** `crates/cuda-device/src/thread.rs`"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:55
+#: ../../../compiler/adding-new-intrinsics.md:58
 msgid ""
 "#[inline(never)]\n"
 "pub fn threadIdx_x() -> u32 {\n"
@@ -133,18 +137,18 @@ msgid ""
 "}\n"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:62
+#: ../../../compiler/adding-new-intrinsics.md:65
 msgid "Two rules that might look odd until you understand the trick:"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:64
+#: ../../../compiler/adding-new-intrinsics.md:67
 msgid ""
 "**`#[inline(never)]`** keeps the function visible as a distinct call in MIR. "
 "If rustc inlined it, the compiler would see `unreachable!()` instead of a "
 "call it can intercept. That would be... less than helpful."
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:68
+#: ../../../compiler/adding-new-intrinsics.md:71
 msgid ""
 "**The body is `unreachable!()`** because this function never actually runs. "
 "The compiler replaces the entire call with a `dialect-nvvm` operation before "
@@ -152,22 +156,56 @@ msgid ""
 "compiler, please insert a GPU instruction here\" note."
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:74
+#: ../../../compiler/adding-new-intrinsics.md:77
 msgid ""
 "Document what LLVM IR or PTX the intrinsic maps to in a comment above the "
 "function. Future you (or future contributors) will thank present you."
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:78
-#: ../../../compiler/adding-new-intrinsics.md:242
+#: ../../../compiler/adding-new-intrinsics.md:81
+#: ../../../compiler/adding-new-intrinsics.md:302
 msgid "Stage 2 -- Define the `dialect-nvvm` Op"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:80
-msgid "**File:** `crates/dialect-nvvm/src/ops/thread.rs`"
+#: ../../../compiler/adding-new-intrinsics.md:83
+msgid ""
+"**File:** one of the hand-written op modules in `crates/dialect-nvvm/src/ops/"
+"` -- `asm.rs`, `atomic.rs`, `cluster.rs`, `debug.rs`, `grid.rs`, `memory."
+"rs`, or `wgmma.rs`."
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:82
+#: ../../../compiler/adding-new-intrinsics.md:88
+msgid ""
+"Two kinds of op live in `dialect-nvvm`, and only one of them is written by "
+"hand."
+msgstr ""
+
+#: ../../../compiler/adding-new-intrinsics.md:91
+msgid ""
+"Anything described by `intrinsics/catalog.json` is **generated** by `cuda-"
+"intrinsics-gen` into `crates/dialect-nvvm/src/ops/generated/`, where every "
+"file opens with `// @generated by cuda-intrinsics-gen ... DO NOT EDIT.` The "
+"op used as the example just below is one of them: `tid.x` is a catalog "
+"intrinsic and its op lives in `ops/generated/sreg.rs` today. Adding an op "
+"there by hand is undone by the next generator run."
+msgstr ""
+
+#: ../../../compiler/adding-new-intrinsics.md:98
+msgid ""
+"For the contributor workflow that owns those generated files, including "
+"overlays, the append-only ABI ledger, regeneration, evidence, and local CI "
+"gates, see [Catalog-Generated Intrinsics](catalog-generated-intrinsics.md)."
+msgstr ""
+
+#: ../../../compiler/adding-new-intrinsics.md:102
+msgid ""
+"The modules named above are the hand-written ones -- ops with bespoke "
+"verification or lowering that the catalog does not describe. The code in "
+"this section shows the shape an op takes either way; write it yourself only "
+"for that second kind."
+msgstr ""
+
+#: ../../../compiler/adding-new-intrinsics.md:108
 msgid ""
 "#[pliron_op(name = \"nvvm.read_ptx_sreg_tid_x\", dialect = \"nvvm\", "
 "format)]\n"
@@ -187,141 +225,171 @@ msgid ""
 "}\n"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:100
+#: ../../../compiler/adding-new-intrinsics.md:126
 msgid "Then register it so pliron knows the op exists:"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:102
+#: ../../../compiler/adding-new-intrinsics.md:128
 msgid ""
 "pub(super) fn register(ctx: &mut Context) {\n"
 "    ReadPtxSregTidXOp::register(ctx, ReadPtxSregTidXOp::parser_fn);\n"
 "}\n"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:108
+#: ../../../compiler/adding-new-intrinsics.md:134
 msgid ""
 "The `Verify` trait catches structural bugs early. If something accidentally "
 "creates this op with two operands, verification fails with a clear message "
 "instead of producing garbage PTX three stages later."
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:112
-#: ../../../compiler/adding-new-intrinsics.md:266
+#: ../../../compiler/adding-new-intrinsics.md:138
+#: ../../../compiler/adding-new-intrinsics.md:337
 msgid "Stage 3 -- Recognize in `mir-importer`"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:114
-#: ../../../compiler/adding-new-intrinsics.md:268
-msgid "**File:** `crates/mir-importer/src/translator/terminator/mod.rs`"
+#: ../../../compiler/adding-new-intrinsics.md:140
+#: ../../../compiler/adding-new-intrinsics.md:339
+msgid ""
+"**File:** the intrinsic's family module under `crates/mir-importer/src/"
+"translator/terminator/intrinsics/generated/`"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:116
+#: ../../../compiler/adding-new-intrinsics.md:143
 msgid ""
 "When the translator processes MIR, every function call passes through "
-"`try_dispatch_intrinsic()`. The callee's fully qualified domain name (FQDN) "
-"comes from `CrateDef::name()` via `extract_func_info()`, producing paths "
-"like `cuda_device::thread::threadIdx_x`. The match checks this FQDN:"
+"`try_dispatch_intrinsic()` in `terminator/mod.rs`. The callee's fully "
+"qualified domain name (FQDN) comes from `CrateDef::name()` via "
+"`extract_func_info()`, producing paths like `cuda_device::thread::"
+"threadIdx_x`. For a catalog intrinsic like `tid.x`, "
+"`try_dispatch_intrinsic()` defers to the generated dispatcher, whose match "
+"arm checks the FQDN:"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:121
+#: ../../../compiler/adding-new-intrinsics.md:151
 msgid ""
-"match name {\n"
-"    \"cuda_device::threadIdx_x\" | \"cuda_device::thread::threadIdx_x\" => "
-"{\n"
-"        Ok(Some(helpers::emit_nvvm_intrinsic(\n"
-"            ctx,\n"
-"            ReadPtxSregTidXOp::get_concrete_op_info(),\n"
-"            destination, target, block_ptr, prev_op,\n"
-"            value_map, block_map, loc,\n"
-"        )?))\n"
-"    }\n"
-"    // ... hundreds of other intrinsics ...\n"
+"\"cuda_intrinsics::__cuda_oxide_intrinsic_abi_v1::i0001\"\n"
+"| \"cuda_device::thread::threadIdx_x\"\n"
+"| \"cuda_device::threadIdx_x\" => {\n"
+"    require_arity(name, args.len(), 0, &loc)?;\n"
+"    Ok(Some(helpers::emit_generated_nvvm_intrinsic(\n"
+"        ctx,\n"
+"        ReadPtxSregTidXOp::get_concrete_op_info(),\n"
+"        \"v1:i0001\",\n"
+"        destination, target, block_ptr, prev_op,\n"
+"        value_map, block_map, loc,\n"
+"    )?))\n"
 "}\n"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:135
+#: ../../../compiler/adding-new-intrinsics.md:166
 msgid ""
-"We match both the re-exported name (`cuda_device::threadIdx_x`) and the full "
-"module path (`cuda_device::thread::threadIdx_x`) so both work regardless of "
-"how the user imports the function. The FQDN is used as-is for matching -- no "
-"`::` to `__` conversion happens before the intrinsic check."
+"The arm matches the full module path (`cuda_device::thread::threadIdx_x`), "
+"the re-exported name (`cuda_device::threadIdx_x`), and a versioned ABI "
+"alias, so the call is intercepted regardless of how the user imports the "
+"function. The FQDN is used as-is for matching -- no `::` to `__` conversion "
+"happens before the intrinsic check."
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:140
+#: ../../../compiler/adding-new-intrinsics.md:172
 msgid ""
-"The `emit_nvvm_intrinsic()` helper is a generic function that works for "
-"*any* zero-argument, single-result NVVM intrinsic. It creates the operation, "
-"stores the result in the value map, and emits a branch to the next basic "
-"block. For simple intrinsics, you never need to write a custom emitter."
+"The `emit_generated_nvvm_intrinsic()` helper works for *any* zero-argument, "
+"single-result NVVM intrinsic. It creates the operation, tags it with its "
+"catalog ABI marker, stores the result in the value map, and emits a branch "
+"to the next basic block. You never write this arm yourself: once the "
+"reviewed overlay, ABI, and evidence inputs resolve into `intrinsics/catalog."
+"json`, `cuda-intrinsics-gen` emits it. Hand-written arms in `terminator/mod."
+"rs` exist only for what the catalog cannot describe."
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:145
-#: ../../../compiler/adding-new-intrinsics.md:308
+#: ../../../compiler/adding-new-intrinsics.md:180
+#: ../../../compiler/adding-new-intrinsics.md:385
 msgid "Stage 4 -- Lower to the LLVM dialect"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:147
-msgid "**File:** `crates/mir-lower/src/convert/intrinsics/basic.rs`"
+#: ../../../compiler/adding-new-intrinsics.md:182
+msgid ""
+"**File:** the intrinsic's family module under `crates/mir-lower/src/convert/"
+"generated_intrinsics/`"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:149
+#: ../../../compiler/adding-new-intrinsics.md:184
 msgid ""
-"The op implements the `MirToLlvmConversion` op interface. In `convert/"
-"interface_impls.rs`, the impl dispatches to a converter function:"
+"The op implements the `MirToLlvmConversion` op interface. For a catalog "
+"intrinsic the impl is generated alongside a shared converter:"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:152
+#: ../../../compiler/adding-new-intrinsics.md:187
 msgid ""
+"#[op_interface_impl]\n"
 "impl MirToLlvmConversion for ReadPtxSregTidXOp {\n"
-"    fn rewrite(ctx, rewriter, op, operands_info) -> Result<()> {\n"
-"        basic::convert_read_tid_x(ctx, rewriter, op, operands_info)\n"
+"    fn convert(\n"
+"        &self,\n"
+"        ctx: &mut Context,\n"
+"        rewriter: &mut DialectConversionRewriter,\n"
+"        _operands_info: &OperandsInfo,\n"
+"    ) -> Result<()> {\n"
+"        convert_zero_operand_scalar_direct(\n"
+"            ctx,\n"
+"            rewriter,\n"
+"            self.get_operation(),\n"
+"            32,\n"
+"            \"llvm_nvvm_read_ptx_sreg_tid_x\",\n"
+"        )\n"
 "    }\n"
 "}\n"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:160
-msgid "Then `basic::convert_read_tid_x` emits the LLVM intrinsic call:"
+#: ../../../compiler/adding-new-intrinsics.md:207
+msgid "The shared converter emits the LLVM intrinsic call:"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:162
+#: ../../../compiler/adding-new-intrinsics.md:209
 msgid ""
-"pub fn convert_read_tid_x(\n"
+"fn convert_zero_operand_scalar_direct(\n"
 "    ctx: &mut Context,\n"
 "    rewriter: &mut DialectConversionRewriter,\n"
 "    op: Ptr<Operation>,\n"
-"    _operands_info: &OperandsInfo,\n"
+"    width: u32,\n"
+"    intrinsic_name: &str,\n"
 ") -> Result<()> {\n"
-"    let intrinsic_name = \"llvm_nvvm_read_ptx_sreg_tid_x\";\n"
-"    let i32_ty = IntegerType::get(ctx, 32, Signedness::Signless);\n"
-"    let func_ty = FuncType::get(ctx, i32_ty.into(), vec![], false);\n"
-"\n"
-"    let call_op = call_intrinsic(ctx, rewriter, intrinsic_name, func_ty, vec!"
-"[])?;\n"
-"    rewriter.replace_operation_with_values(ctx, op, vec![result]);\n"
+"    let result_ty = IntegerType::get(ctx, width, Signedness::Signless);\n"
+"    let function_ty = llvm_types::FuncType::get(ctx, result_ty.into(), vec!"
+"[], false);\n"
+"    let call = call_intrinsic(ctx, rewriter, op, intrinsic_name, "
+"function_ty, vec![])?;\n"
+"    rewriter.replace_operation(ctx, op, call);\n"
 "    Ok(())\n"
 "}\n"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:180
+#: ../../../compiler/adding-new-intrinsics.md:225
+msgid ""
+"Hand-written conversions for non-catalog ops follow the same pattern from "
+"`convert/interface_impls.rs`, delegating into the `convert/intrinsics/` "
+"modules."
+msgstr ""
+
+#: ../../../compiler/adding-new-intrinsics.md:230
 msgid ""
 "LLVM intrinsic names use dots (`llvm.nvvm.read.ptx.sreg.tid.x`), but pliron "
 "identifiers cannot contain dots. Internally we use underscores "
 "(`llvm_nvvm_read_ptx_sreg_tid_x`). The export stage converts them back."
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:185
+#: ../../../compiler/adding-new-intrinsics.md:235
 msgid "Stage 5 -- Export (Nothing to Change)"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:187
+#: ../../../compiler/adding-new-intrinsics.md:237
 msgid "**File:** `crates/llvm-export/src/export/` (the export module)"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:189
+#: ../../../compiler/adding-new-intrinsics.md:239
 msgid "The `CallOp` exporter already handles the underscore-to-dot conversion:"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:191
+#: ../../../compiler/adding-new-intrinsics.md:241
 msgid ""
 "let fixed_name = if name.starts_with(\"llvm_nvvm\") {\n"
 "    name.replace('_', \".\")\n"
@@ -330,206 +398,263 @@ msgid ""
 "};\n"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:199
+#: ../../../compiler/adding-new-intrinsics.md:249
 msgid ""
 "Since `threadIdx_x` is *not* convergent (it is a per-thread register read, "
 "not a collective operation), there is nothing to add to "
 "`is_convergent_intrinsic()`."
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:203
-#: ../../../compiler/adding-new-intrinsics.md:367
+#: ../../../compiler/adding-new-intrinsics.md:253
+#: ../../../compiler/adding-new-intrinsics.md:469
 msgid "**Final output:**"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:205
+#: ../../../compiler/adding-new-intrinsics.md:255
 msgid ""
 "declare i32 @llvm.nvvm.read.ptx.sreg.tid.x()\n"
 "%v5 = call i32 @llvm.nvvm.read.ptx.sreg.tid.x()\n"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:210
-#: ../../../compiler/adding-new-intrinsics.md:378
+#: ../../../compiler/adding-new-intrinsics.md:260
+#: ../../../compiler/adding-new-intrinsics.md:480
 msgid "After `llc`:"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:212
+#: ../../../compiler/adding-new-intrinsics.md:262
 msgid "mov.u32  %r1, %tid.x;\n"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:216
+#: ../../../compiler/adding-new-intrinsics.md:266
 msgid "Five stages, one PTX instruction. Not bad."
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:220
+#: ../../../compiler/adding-new-intrinsics.md:270
 msgid "Example 2: `shuffle_xor` (the Complex Case)"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:222
+#: ../../../compiler/adding-new-intrinsics.md:272
 msgid ""
-"Warp shuffles are more interesting. The user passes two arguments, but the "
-"underlying LLVM intrinsic expects *four*. The compiler quietly fills in the "
-"extras. The operation is also **convergent**, meaning LLVM must not move, "
+"Warp shuffles are more interesting. The user's shorthand passes two "
+"arguments, but the underlying LLVM intrinsic expects *four*. One extra (the "
+"member mask) is filled in at the source level, the other (the clamp) by the "
+"lowering. The operation is also **convergent**, meaning LLVM must not move, "
 "duplicate, or speculate it across control flow."
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:229
+#: ../../../compiler/adding-new-intrinsics.md:280
 msgid "**File:** `crates/cuda-device/src/warp.rs`"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:231
+#: ../../../compiler/adding-new-intrinsics.md:282
 msgid ""
 "#[inline(never)]\n"
+"pub fn shuffle_xor_sync(mask: u32, var: u32, lane_mask: u32) -> u32 {\n"
+"    let _ = (mask, var, lane_mask);\n"
+"    unreachable!(\"shuffle_xor_sync called outside CUDA kernel context\")\n"
+"}\n"
+"\n"
+"#[inline(always)]\n"
 "pub fn shuffle_xor(var: u32, lane_mask: u32) -> u32 {\n"
-"    let _ = (var, lane_mask);\n"
-"    unreachable!(\"shuffle_xor called outside CUDA kernel context\")\n"
+"    shuffle_xor_sync(u32::MAX, var, lane_mask)\n"
 "}\n"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:239
+#: ../../../compiler/adding-new-intrinsics.md:295
 msgid ""
-"Same pattern as before. The `let _ = (var, lane_mask);` suppresses unused-"
-"variable warnings -- a small courtesy that costs nothing."
+"The intrinsic stub is the masked `_sync` form, same pattern as before; the "
+"`let _ = (mask, var, lane_mask);` suppresses unused-variable warnings -- a "
+"small courtesy that costs nothing. The bare `shuffle_xor` shorthand is not a "
+"stub at all: it is an `#[inline(always)]` wrapper that supplies the full-"
+"warp mask (`u32::MAX`) and calls the stub. Only the `_sync` name is ever "
+"matched by the compiler; the wrapper is ordinary Rust code."
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:244
-msgid "**File:** `crates/dialect-nvvm/src/ops/warp.rs`"
+#: ../../../compiler/adding-new-intrinsics.md:304
+msgid ""
+"**File:** `crates/dialect-nvvm/src/ops/generated/warp_shuffle.rs`. The warp "
+"shuffles are catalog intrinsics like `tid.x`, so this op is generated rather "
+"than typed out; here is the real definition, condensed:"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:246
+#: ../../../compiler/adding-new-intrinsics.md:308
 msgid ""
-"#[pliron_op(name = \"nvvm.shfl_sync_bfly_i32\", dialect = \"nvvm\", "
-"format)]\n"
+"/// Exchange a 32-bit value with a named XOR partner lane.\n"
+"///\n"
+"/// Operands are `[member_mask, value, lane_or_delta]`.\n"
+"/// Generated lowering inserts the fixed clamp required by the selected "
+"shuffle mode.\n"
+"#[pliron_op(\n"
+"    name = \"nvvm.shfl_sync_bfly_i32\",\n"
+"    format,\n"
+"    interfaces = [NOpdsInterface<3>, NResultsInterface<1>],\n"
+")]\n"
 "pub struct ShflSyncBflyI32Op;\n"
 "\n"
 "impl Verify for ShflSyncBflyI32Op {\n"
 "    fn verify(&self, ctx: &Context) -> Result<(), Error> {\n"
-"        let op = &*self.get_operation().deref(ctx);\n"
-"        if op.get_num_operands() != 2 {\n"
-"            return verify_err!(op.loc(), \"expected 2 operands\");\n"
+"        let op = self.get_operation().deref(ctx);\n"
+"        if op.get_num_operands() != 3 || op.get_num_results() != 1 {\n"
+"            return verify_err!(\n"
+"                op.loc(),\n"
+"                \"nvvm.shfl_sync_bfly_i32 requires exactly [member_mask, "
+"value, lane_or_delta] and one result\"\n"
+"            );\n"
 "        }\n"
-"        if op.get_num_results() != 1 {\n"
-"            return verify_err!(op.loc(), \"expected 1 result\");\n"
-"        }\n"
+"        // ... i32 type checks on all three operands and the result ...\n"
 "        Ok(())\n"
 "    }\n"
 "}\n"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:264
-msgid "Two operands this time (value and lane mask), one result."
+#: ../../../compiler/adding-new-intrinsics.md:335
+msgid ""
+"Three operands this time (member mask, value, and lane mask), one result."
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:270
+#: ../../../compiler/adding-new-intrinsics.md:343
 msgid ""
-"Unlike `threadIdx_x`, this calls a **specialized emitter** because it needs "
-"to handle the user's two arguments:"
+"The warp shuffles are catalog intrinsics, so their dispatch arms *and* their "
+"argument-translating emitters are generated into `generated/warp_shuffle."
+"rs`, next to the ops from Stage 2. Nothing about a shuffle is written by "
+"hand. Hand-written dispatch lives in `try_dispatch_intrinsic()` in "
+"`terminator/mod.rs` and covers what the catalog cannot describe. For "
+"example, `core::intrinsics::typed_swap_nonoverlapping` (the primitive behind "
+"`core::mem::swap`) is matched there and lowered by the hand-written "
+"`emit_typed_swap()` in the same file as a load/load/store/store crossover "
+"over two non-overlapping pointers. No catalog entry could say that."
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:273
+#: ../../../compiler/adding-new-intrinsics.md:354
 msgid ""
-"\"cuda_device::warp::shuffle_xor\" => Ok(Some(\n"
-"    intrinsics::warp::emit_warp_shuffle_i32(\n"
-"        ctx, body,\n"
-"        ShflSyncBflyI32Op::get_concrete_op_info(),\n"
-"        args, destination, target, ...\n"
-"    )?\n"
-")),\n"
+"An intrinsic with arguments translates each of the user's operands before "
+"building the op. Here is the generated arm for `shuffle_xor_sync`, condensed:"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:283
+#: ../../../compiler/adding-new-intrinsics.md:357
 msgid ""
-"**File:** `crates/mir-importer/src/translator/terminator/intrinsics/warp.rs`"
-msgstr ""
-
-#: ../../../compiler/adding-new-intrinsics.md:285
-msgid ""
-"pub fn emit_warp_shuffle_i32(ctx, body, shuffle_opid, args, ...) {\n"
-"    if args.len() != 2 { return error; }\n"
-"\n"
-"    let (val, _) = translate_operand(ctx, body, &args[0], ...);\n"
-"    let (lane_or_mask, _) = translate_operand(ctx, body, &args[1], ...);\n"
-"\n"
-"    let shuffle_op = Operation::new(ctx, shuffle_opid,\n"
-"        vec![u32_type.to_ptr()],          // results: [u32]\n"
-"        vec![val, lane_or_mask],          // operands: [value, mask]\n"
-"        vec![], 0,\n"
-"    );\n"
-"\n"
+"\"cuda_device::warp::shuffle_xor_sync\" => {\n"
+"    require_arity(name, args.len(), 3, &loc)?;\n"
+"    let (member_mask, last_op) =\n"
+"        rvalue::translate_operand(ctx, body, &args[0], /* ... */)?;\n"
+"    let (value, last_op) =\n"
+"        rvalue::translate_operand(ctx, body, &args[1], /* ... */)?;\n"
+"    let (lane_or_delta, last_op) =\n"
+"        rvalue::translate_operand(ctx, body, &args[2], /* ... */)?;\n"
+"    let shuffle = ShflSyncBflyI32Op::build(ctx, member_mask, value, "
+"lane_or_delta);\n"
+"    helpers::set_generated_intrinsic_marker(ctx, shuffle, \"v1:i0051\");\n"
+"    helpers::insert_op(ctx, shuffle, block_ptr, last_op);\n"
+"    let result = shuffle.deref(ctx).get_result(0);\n"
+"    Ok(Some(helpers::emit_store_result_and_goto(\n"
+"        ctx, destination, result, target, /* ... */\n"
+"        \"shuffle_xor_sync call without target block\",\n"
+"    )?))\n"
 "}\n"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:301
+#: ../../../compiler/adding-new-intrinsics.md:377
 msgid ""
-"The emitter translates the user's MIR operands into pliron values -- "
-"typically the results of `mir.load`s from each operand's alloca slot, or "
-"`mir.constant`s for literal arguments -- and wires them into the NVVM "
-"operation. (These are not SSA values yet; `pliron::opts::mem2reg` will "
-"collapse the load/store chains once translation is complete.) For intrinsics "
-"with different argument patterns, you write a similar custom emitter."
+"The arm translates the user's MIR operands into pliron values -- typically "
+"the results of `mir.load`s from each operand's alloca slot, or `mir."
+"constant`s for literal arguments -- and wires them into the NVVM operation. "
+"(These are not SSA values yet; `pliron::opts::mem2reg` will collapse the "
+"load/store chains once translation is complete.) For a catalog intrinsic you "
+"never write any of this: `cuda-intrinsics-gen` derives it from the resolved "
+"generated catalog."
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:310
+#: ../../../compiler/adding-new-intrinsics.md:387
 msgid "**File:** `crates/mir-lower/src/convert/intrinsics/warp.rs`"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:312
+#: ../../../compiler/adding-new-intrinsics.md:389
 msgid ""
-"Here is where it gets interesting. The LLVM intrinsic for butterfly shuffle "
-"takes **four** arguments, not two:"
+"Here is where the fourth argument appears. The `dialect-nvvm` op carries "
+"three operands; the LLVM intrinsic for butterfly shuffle takes **four**:"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:315
+#: ../../../compiler/adding-new-intrinsics.md:392
 msgid ""
-"User's API:     shuffle_xor(value, lane_mask)            →  2 args\n"
-"LLVM intrinsic: shfl.sync.bfly.i32(mask, value, lane_mask, clamp) →  4 args\n"
-"                                    ^^^^                   ^^^^^\n"
-"                                    always -1              always 31\n"
+"User's shorthand: shuffle_xor(value, lane_mask)                     →  2 "
+"args\n"
+"Intrinsic stub:   shuffle_xor_sync(mask, value, lane_mask)          →  3 "
+"args\n"
+"                                   ^^^^\n"
+"                                   u32::MAX from the Stage 1 wrapper\n"
+"LLVM intrinsic:   shfl.sync.bfly.i32(mask, value, lane_mask, clamp) →  4 "
+"args\n"
+"                                                             ^^^^^\n"
+"                                                             always 31\n"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:322
-msgid "The converter adds the compiler-supplied constants:"
+#: ../../../compiler/adding-new-intrinsics.md:402
+msgid ""
+"The converter forwards the three operands and adds only the clamp constant:"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:324
+#: ../../../compiler/adding-new-intrinsics.md:404
 msgid ""
-"fn convert_shuffle_i32(op, ctx, intrinsic_name, clamp: i32) {\n"
-"    let operands = get_operands(op, ctx)?;\n"
-"    let (val, lane_or_delta) = (operands[0], operands[1]);\n"
+"pub(crate) fn convert_shuffle_i32(\n"
+"    ctx: &mut Context,\n"
+"    rewriter: &mut DialectConversionRewriter,\n"
+"    op: Ptr<Operation>,\n"
+"    _operands_info: &OperandsInfo,\n"
+"    intrinsic_name: &str,\n"
+"    clamp: i32,\n"
+") -> Result<()> {\n"
+"    let i32_ty = IntegerType::get(ctx, 32, Signedness::Signless);\n"
 "\n"
-"    let mask_val  = create_i32_const(ctx, -1);   // all 32 lanes "
-"participate\n"
-"    let clamp_val = create_i32_const(ctx, clamp); // full warp width\n"
+"    let operands: Vec<_> = op.deref(ctx).operands().collect();\n"
+"    if operands.len() != 3 {\n"
+"        return pliron::input_err_noloc!(\n"
+"            \"Warp shuffle i32 requires 3 operands [mask, value, "
+"lane_or_delta]\"\n"
+"        );\n"
+"    }\n"
+"    let (mask, val, lane_or_delta) = (operands[0], operands[1], "
+"operands[2]);\n"
 "\n"
-"    let func_ty = FuncType::get(ctx.ctx, i32_ty.into(),\n"
-"        vec![i32_ty, i32_ty, i32_ty, i32_ty], false);\n"
+"    let clamp_val = create_i32_const(ctx, rewriter, clamp);\n"
 "\n"
-"    let call_op = call_intrinsic(ctx, intrinsic_name, func_ty,\n"
-"        vec![mask_val, val, lane_or_delta, clamp_val]);\n"
+"    let func_ty = llvm_types::FuncType::get(\n"
+"        ctx,\n"
+"        i32_ty.into(),\n"
+"        vec![i32_ty.into(), i32_ty.into(), i32_ty.into(), i32_ty.into()],\n"
+"        false,\n"
+"    );\n"
 "\n"
-"    map_result(op, call_op, ctx);\n"
+"    let call_op = call_intrinsic(\n"
+"        ctx, rewriter, op, intrinsic_name, func_ty,\n"
+"        vec![mask, val, lane_or_delta, clamp_val],\n"
+"    )?;\n"
+"    rewriter.replace_operation(ctx, op, call_op);\n"
+"    Ok(())\n"
 "}\n"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:342
+#: ../../../compiler/adding-new-intrinsics.md:441
 msgid ""
-"The mask value of `-1` (all bits set) means all 32 lanes in the warp "
-"participate. The clamp value of `31` means the shuffle wraps at the full "
-"warp width. These are the right defaults for almost every use case, and "
-"exposing them to the user would just be noise."
+"The mask is an ordinary operand here, not a converter-made constant: the "
+"Stage 1 wrapper baked in `u32::MAX` (all 32 lanes participate), and the "
+"masked `_sync` forms let the user pass any mask at all. The clamp value of "
+"`31`, supplied per shuffle mode by the generated `MirToLlvmConversion` impl "
+"that calls this converter, means the shuffle spans the full warp width. It "
+"is a fixed property of the instruction mode, and exposing it to the user "
+"would just be noise."
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:347
+#: ../../../compiler/adding-new-intrinsics.md:449
 msgid "Stage 5 -- Export (Add Convergent)"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:349
+#: ../../../compiler/adding-new-intrinsics.md:451
 msgid ""
 "Warp shuffles are **convergent** -- LLVM must not reorder them relative to "
 "control flow. The export step checks `is_convergent_intrinsic()`:"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:352
+#: ../../../compiler/adding-new-intrinsics.md:454
 msgid ""
 "fn is_convergent_intrinsic(name: &str) -> bool {\n"
 "    name == \"llvm.nvvm.barrier0\"\n"
@@ -541,14 +666,14 @@ msgid ""
 "}\n"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:363
+#: ../../../compiler/adding-new-intrinsics.md:465
 msgid ""
 "If your new intrinsic is convergent, add it here. If you forget, LLVM might "
 "hoist it out of an `if` block, and your warp-level code will produce wrong "
 "results or deadlock. Not great."
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:369
+#: ../../../compiler/adding-new-intrinsics.md:471
 msgid ""
 "declare i32 @llvm.nvvm.shfl.sync.bfly.i32(i32, i32, i32, i32)\n"
 "\n"
@@ -558,22 +683,22 @@ msgid ""
 "attributes #0 = { convergent }\n"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:380
+#: ../../../compiler/adding-new-intrinsics.md:482
 msgid "shfl.sync.bfly.b32  %r3, %r1, %r2, 31;\n"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:386
+#: ../../../compiler/adding-new-intrinsics.md:488
 msgid "The Inline PTX Path"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:388
+#: ../../../compiler/adding-new-intrinsics.md:490
 msgid ""
 "Some operations do not have LLVM intrinsics. For those, we emit inline PTX "
 "assembly directly. The helper `inline_asm_convergent()` handles the "
 "boilerplate:"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:391
+#: ../../../compiler/adding-new-intrinsics.md:493
 msgid ""
 "// wgmma fence: no inputs, no outputs, just a side effect\n"
 "inline_asm_convergent(\n"
@@ -588,74 +713,74 @@ msgid ""
 ");\n"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:405
+#: ../../../compiler/adding-new-intrinsics.md:507
 msgid "The constraint string follows LLVM inline assembly syntax:"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:179
+#: ../../../compiler/adding-new-intrinsics.md:342
 msgid "Constraint"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:179
+#: ../../../compiler/adding-new-intrinsics.md:342
 msgid "Meaning"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:179
+#: ../../../compiler/adding-new-intrinsics.md:342
 msgid "`=l`"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:179
+#: ../../../compiler/adding-new-intrinsics.md:342
 msgid "Output: 64-bit register"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:179
+#: ../../../compiler/adding-new-intrinsics.md:342
 msgid "`=r`"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:179
+#: ../../../compiler/adding-new-intrinsics.md:342
 msgid "Output: 32-bit register"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:179
+#: ../../../compiler/adding-new-intrinsics.md:342
 msgid "`r`"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:179
+#: ../../../compiler/adding-new-intrinsics.md:342
 msgid "Input: 32-bit register"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:179
+#: ../../../compiler/adding-new-intrinsics.md:342
 msgid "`l`"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:179
+#: ../../../compiler/adding-new-intrinsics.md:342
 msgid "Input: 64-bit register"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:179
+#: ../../../compiler/adding-new-intrinsics.md:342
 msgid "(empty)"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:179
+#: ../../../compiler/adding-new-intrinsics.md:342
 msgid "No inputs or outputs (side-effect only)"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:415
+#: ../../../compiler/adding-new-intrinsics.md:517
 msgid ""
 "The `sideeffect convergent` markers on the inline assembly tell LLVM to "
 "leave it alone -- do not move it, do not delete it, do not duplicate it."
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:420
+#: ../../../compiler/adding-new-intrinsics.md:522
 msgid "End-to-End: The Full Journey"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:422
+#: ../../../compiler/adding-new-intrinsics.md:524
 msgid ""
 "Here is every representation `threadIdx_x` passes through, top to bottom:"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:424
+#: ../../../compiler/adding-new-intrinsics.md:526
 msgid ""
 "Rust:         thread::threadIdx_x()\n"
 "MIR:          _3 = threadIdx_x() -> bb1\n"
@@ -665,169 +790,181 @@ msgid ""
 "PTX:          mov.u32 %r1, %tid.x;\n"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:433
-msgid "And `shuffle_xor`:"
+#: ../../../compiler/adding-new-intrinsics.md:535
+msgid "And `shuffle_xor_sync`, the stub behind the `shuffle_xor` shorthand:"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:435
+#: ../../../compiler/adding-new-intrinsics.md:537
 msgid ""
-"Rust:         warp::shuffle_xor(val, mask)\n"
-"MIR:          _5 = shuffle_xor(_3, _4) -> bb2\n"
-"Pliron MIR:   %v = nvvm.shfl_sync_bfly_i32 %val, %mask : i32\n"
+"Rust:         warp::shuffle_xor_sync(u32::MAX, val, lane)\n"
+"MIR:          _5 = shuffle_xor_sync(const u32::MAX, _3, _4) -> bb2\n"
+"Pliron MIR:   %v = nvvm.shfl_sync_bfly_i32 %mask, %val, %lane : u32\n"
 "Pliron LLVM:  %v = call i32 @llvm_nvvm_shfl_sync_bfly_i32(i32 -1, %val, "
-"%mask, i32 31)\n"
+"%lane, i32 31)\n"
 "LLVM IR:      %v8 = call i32 @llvm.nvvm.shfl.sync.bfly.i32(i32 -1, %v3, %v4, "
 "i32 31) #0\n"
 "PTX:          shfl.sync.bfly.b32 %r3, %r1, %r2, 31;\n"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:444
+#: ../../../compiler/adding-new-intrinsics.md:546
 msgid ""
 "Six representations. One Rust function call becomes one PTX instruction. The "
 "intermediate steps exist so that each transformation is small, verifiable, "
 "and independently testable."
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:450
+#: ../../../compiler/adding-new-intrinsics.md:552
 msgid "Quick-Reference Checklist"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:452
-msgid "Every file you need to touch, in order:"
+#: ../../../compiler/adding-new-intrinsics.md:554
+msgid ""
+"For a hand-written intrinsic (one `intrinsics/catalog.json` cannot "
+"describe), every file you need to touch, in order:"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:454
+#: ../../../compiler/adding-new-intrinsics.md:557
 msgid ""
 "**`cuda-device/src/<module>.rs`** -- `pub fn` with `#[inline(never)]` and "
 "`unreachable!()` body. This is the user-facing API."
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:457
+#: ../../../compiler/adding-new-intrinsics.md:560
 msgid ""
 "**`dialect-nvvm/src/ops/<module>.rs`** -- `#[pliron_op(name = \"nvvm."
 "<name>\", ...)]` struct, `Verify` impl (check operand/result counts), "
 "`register()` call."
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:460
+#: ../../../compiler/adding-new-intrinsics.md:563
 msgid ""
 "**`mir-importer/src/translator/terminator/mod.rs`** -- `match` arm in "
-"`try_dispatch_intrinsic()`. Use `helpers::emit_nvvm_intrinsic()` for zero-"
-"arg intrinsics, or write a custom emitter for anything with arguments."
+"`try_dispatch_intrinsic()`, modelled on the hand-written `typed_swap` arm. "
+"Zero-operand intrinsics are catalog territory: the generated dispatcher "
+"emits them through `helpers::emit_generated_nvvm_intrinsic()`, which also "
+"stamps the ABI marker a hand-written arm would have to stamp itself."
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:464
+#: ../../../compiler/adding-new-intrinsics.md:569
 msgid ""
 "**`mir-lower/src/convert/interface_impls.rs`** -- `MirToLlvmConversion` impl "
 "for the new op, dispatching to the converter function."
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:467
+#: ../../../compiler/adding-new-intrinsics.md:572
 msgid ""
 "**`mir-lower/src/convert/intrinsics/<module>.rs`** -- conversion logic. Use "
 "`call_intrinsic()` for LLVM intrinsics, or `inline_asm_convergent()` for "
 "inline PTX."
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:471
+#: ../../../compiler/adding-new-intrinsics.md:576
 msgid ""
 "**`llvm-export/src/export/`** -- *only if convergent*: add to "
 "`is_convergent_intrinsic()`."
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:476
+#: ../../../compiler/adding-new-intrinsics.md:579
+msgid ""
+"For a catalog intrinsic, steps 2 through 4 are not yours to write. Extend "
+"the appropriate `intrinsics/overlay/*.toml` family, append the ABI entry in "
+"`intrinsics/abi-v1.toml`, add evidence only when the route requires it, and "
+"regenerate. `intrinsics/catalog.json` is generated and must not be edited by "
+"hand. See [Catalog-Generated Intrinsics](catalog-generated-intrinsics.md) "
+"for the complete workflow."
+msgstr ""
+
+#: ../../../compiler/adding-new-intrinsics.md:588
 msgid "Side-by-Side Comparison"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:179
+#: ../../../compiler/adding-new-intrinsics.md:342
 msgid "Stage"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:179
+#: ../../../compiler/adding-new-intrinsics.md:342
 msgid "`threadIdx_x` (simple)"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:179
-msgid "`shuffle_xor` (complex)"
+#: ../../../compiler/adding-new-intrinsics.md:342
+msgid "`shuffle_xor_sync` (complex)"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:179
+#: ../../../compiler/adding-new-intrinsics.md:342
 msgid "cuda-device"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:179
+#: ../../../compiler/adding-new-intrinsics.md:342
 msgid "`fn() -> u32`"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:179
-msgid "`fn(u32, u32) -> u32`"
+#: ../../../compiler/adding-new-intrinsics.md:342
+msgid "`fn(u32, u32, u32) -> u32`"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:179
+#: ../../../compiler/adding-new-intrinsics.md:342
 msgid "dialect-nvvm"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:179
+#: ../../../compiler/adding-new-intrinsics.md:342
 msgid "0 operands, 1 result"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:179
-msgid "2 operands, 1 result"
+#: ../../../compiler/adding-new-intrinsics.md:342
+msgid "3 operands, 1 result"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:179
+#: ../../../compiler/adding-new-intrinsics.md:342
 msgid "mir-importer"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:179
-msgid "Generic helper"
+#: ../../../compiler/adding-new-intrinsics.md:342
+msgid "Generated arm, generic helper"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:179
-msgid "Custom emitter"
+#: ../../../compiler/adding-new-intrinsics.md:342
+msgid "Generated arm, operand translation"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:179
+#: ../../../compiler/adding-new-intrinsics.md:342
 msgid "mir-lower"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:179
+#: ../../../compiler/adding-new-intrinsics.md:342
 msgid "`call @intrinsic()`"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:179
+#: ../../../compiler/adding-new-intrinsics.md:342
 msgid "`call @intrinsic(4 args)`"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:179
+#: ../../../compiler/adding-new-intrinsics.md:342
 msgid "Convergent?"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:179
+#: ../../../compiler/adding-new-intrinsics.md:342
 msgid "No"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:179
+#: ../../../compiler/adding-new-intrinsics.md:342
 msgid "Yes (`#0`)"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:179
+#: ../../../compiler/adding-new-intrinsics.md:342
 msgid "PTX"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:179
+#: ../../../compiler/adding-new-intrinsics.md:342
 msgid "`mov.u32 %r1, %tid.x`"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:179
+#: ../../../compiler/adding-new-intrinsics.md:342
 msgid "`shfl.sync.bfly.b32 ...`"
 msgstr ""
 
-#: ../../../compiler/adding-new-intrinsics.md:489
+#: ../../../compiler/adding-new-intrinsics.md:601
 msgid ""
-"That is the entire process. Five files, each with a clear and narrow "
-"responsibility. The pattern is mechanical enough that adding a new intrinsic "
-"should take about thirty minutes once you have done it once -- most of that "
-"time spent reading the PTX ISA spec to figure out exactly what instruction "
-"you want."
+"That is the hand-written pipeline end to end. For the majority catalog-"
+"generated path, use the overlay, ABI, evidence, generation, and validation "
+"workflow in [Catalog-Generated Intrinsics](catalog-generated-intrinsics.md)."
 msgstr ""

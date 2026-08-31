@@ -8,10 +8,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-16 12:33+0000\n"
+"POT-Creation-Date: 2026-08-31 15:39+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -89,6 +90,26 @@ msgid ""
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
+msgid "Packed Layouts (`#[repr(packed)]`)"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "**Partial**"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Field addresses formed through a pointer (`addr_of!((*p).field)`) use "
+"rustc's exact byte offsets, so `read_unaligned`/`write_unaligned` round-"
+"trips work, including `packed(N)`. Byte-faithful packed structs can also use "
+"packed LLVM storage for by-value construction/load/store and `[Packed; N]` "
+"element addressing. Recursively promotable packed constant arrays use the "
+"immutable-device-global path when the selected natural or packed LLVM "
+"representation reproduces rustc's field offsets and stored size exactly. "
+"Overlapping or otherwise non-representable layouts remain rejected."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
 msgid "Pointer Distance (`offset_from`)"
 msgstr ""
 
@@ -125,7 +146,7 @@ msgid ""
 "length width."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:24
+#: ../../../appendix/supported-features.md:25
 msgid "Compiler: Type System"
 msgstr ""
 
@@ -192,15 +213,103 @@ msgid ""
 "device calls."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:35
+#: ../../../appendix/supported-features.md:36
 msgid ""
-"Array value constants are limited to primitive leaves (integers, `f16`, "
-"`f32`, `f64`) and nested arrays of those. Arrays whose elements are structs "
-"or other ADTs are not yet materialized as constants; they need layout-aware "
-"field decoding rather than the primitive byte-slicing rule."
+"Array value constants support primitive leaves (integers, `f16`, `f32`, "
+"`f64`), nested arrays, and tuples recursively composed of supported scalar, "
+"enum, tuple, and zero-sized fields. Tuple element strides and field offsets "
+"come from rustc layout, including internal and trailing padding; direct "
+"tuple value constants use the same layout-aware decoder. Struct constants "
+"(direct and promoted-by-reference) also read every field at its rustc layout "
+"offset, so padded, reordered, `#[repr(C)]`, and nested shapes decode "
+"correctly, and a struct's stored size is its padded size, which fixes the "
+"element stride for arrays of padded structs inside constants. Pointer-free "
+"initialized union constants are materialized from rustc's evaluated storage "
+"image without guessing an active field: initialized bytes are preserved, "
+"uninitialized inactive bytes remain `undef`, and the byte image is "
+"transmuted into the layout-exact union type. This includes direct unions, "
+"unions nested in tuple or struct constants, runtime-indexed `[U; N]`, and "
+"`MaybeUninit<T>` constants. Bare arrays whose elements are recursively "
+"promotable structs use the same immutable-device-global path as scalar and "
+"tuple tables, avoiding a per-thread local table copy for read-only uses. "
+"This promotion also admits supported thin pointer/reference leaves. Their "
+"evaluated byte image remains byte-exact while pointer slots are preserved as "
+"symbolic device-global relocations, including non-zero byte addends into "
+"referenced device statics. Relocation targets are materialized explicitly, "
+"and promoted-global deduplication includes relocation identity as well as "
+"type and bytes so byte-identical tables that point at different statics "
+"cannot alias."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:40
+#: ../../../appendix/supported-features.md:60
+msgid ""
+"Pointer-to-array constants such as `const R: &[Struct; N] = &TABLE` use the "
+"same promoted immutable global when every element is recursively promotable "
+"and the converted storage size matches rustc's layout. When the outer "
+"pointer selects a subrange of a backing allocation, relocation source "
+"offsets inside that range are rebased into the promoted initializer while "
+"preserving their target and addend. Unsupported bare array constants retain "
+"the existing element-wise fallback where available; pointer-to-array "
+"constants continue to fail closed when no correct fallback exists. Zero-byte "
+"over-aligned struct leaves (for example, `repr(align(N))` ZSTs) remain on "
+"the existing alignment-sensitive value path instead of this promotion path. "
+"Promotion includes `repr(packed)` and `repr(packed(N))` structs when "
+"lowering can reproduce their recorded field offsets with an exact packed "
+"LLVM struct; the value and reference forms deduplicate to the same immutable "
+"initializer. Overlapping or otherwise non-representable struct layouts "
+"remain outside immutable promotion and keep the existing fail-closed "
+"behavior."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:76
+msgid ""
+"Thin pointer fields in array, tuple, and struct **const** values that do not "
+"take the immutable-table promotion path are materialized via "
+"`MirGlobalAllocOp` per field, including non-zero byte addends into a static "
+"(see `struct_constant_provenance`, `tuple_constant_provenance`, "
+"`tuple_array_provenance`). The `array_constants` regression also covers a "
+"promoted pointer-bearing tuple table with both a zero-addend static "
+"reference and a non-zero static-subobject addend, and verifies that "
+"optimized code does not retain a per-thread table depot."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:85
+msgid ""
+"Slice fat-pointer fields in aggregate constants are also supported when "
+"their data pointer relocates to a device static and the pointee is a same-"
+"element array-to-slice view. Their literal `usize` length metadata is "
+"decoded independently, including non-zero static byte addends and nested "
+"aggregate field offsets. Thin-pointer-only union constants preserve the same "
+"relocation provenance, including non-zero addends, by reconstructing one "
+"typed pointer carrier instead of transmuting placeholder bytes. Compatible "
+"`SharedRef` alternatives must have the same translated pointee type; "
+"`UniqueRef` union constants remain rejected. Raw-pointer alternatives may "
+"differ only in pointee view while retaining the same raw kind, mutability, "
+"and address space. Relocation-free pointer/integer unions whose storage is "
+"exactly one fully initialized, naturally aligned pointer word, whose pointer "
+"alternatives are generic raw pointers of one kind, and whose integer "
+"alternatives are full-width may instead use rustc's evaluated byte image. "
+"The importer transmutes that image only to the integer field and inserts the "
+"field into the union, so no inactive pointer alternative is materialized. "
+"Relocation-bearing pointer/integer unions, fat or nested pointer storage in "
+"unions, over-aligned/padded pointer unions, unsupported fat-pointer "
+"metadata, and pointer-to-array union constants (`&[U; N]`) remain rejected. "
+"Top-level thin-pointer-only device-global union initializers may preserve "
+"one full-width relocation at byte zero; mixed pointer/integer device-global "
+"initializers remain rejected."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:108
+msgid ""
+"Enum constants preserve payload relocations to device statics, including non-"
+"zero byte addends. This includes niche-encoded `Option<&T>` and direct-"
+"tagged enum layouts, both for direct thin-reference payloads and for "
+"pointers nested inside tuple, struct, or array payload fields. Relocation-"
+"carrying enum constants can also be nested inside tuple, struct, and array "
+"constants. Anonymous promoted allocations remain unsupported."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:115
 msgid "Compiler: Closures"
 msgstr ""
 
@@ -245,7 +354,7 @@ msgid ""
 "device functions."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:49
+#: ../../../appendix/supported-features.md:124
 msgid "Compiler: Control Flow"
 msgstr ""
 
@@ -298,10 +407,6 @@ msgid "Loop Unroll Annotations"
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
-msgid "**Partial**"
-msgstr ""
-
-#: ../../../appendix/supported-features.md:0
 msgid ""
 "`#[unroll]` and `#[unroll(N)]` request unrolling of explicit counted `while` "
 "loops. Nested loops and multiple `continue` paths work; full unrolling "
@@ -311,7 +416,22 @@ msgid ""
 "blocks, and 65,536 cloned operations."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:60
+#: ../../../appendix/supported-features.md:0
+msgid "Monomorphization-Dead Branches"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Branches that become dead after generic specialization (e.g. the const-false "
+"arm of `if M::ENABLED`) are ignored by symbol collection, panic checks, and "
+"pointer address-space inference, so panic-only hooks in dead arms compile. "
+"Only switches rustc itself folds are pruned: a constant discriminant operand "
+"or a direct single-assignment constant. Multi-step constant copy chains keep "
+"both arms, matching rustc's host monomorphization; this is deliberate, not a "
+"general constant-propagation pass."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:136
 msgid "Compiler: Arithmetic and Casting"
 msgstr ""
 
@@ -345,7 +465,7 @@ msgid ""
 "per `u32`. sm_80+."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:68
+#: ../../../appendix/supported-features.md:144
 msgid "Compiler: Interop"
 msgstr ""
 
@@ -406,7 +526,7 @@ msgid ""
 "at the binary crate use site."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:78
+#: ../../../appendix/supported-features.md:154
 msgid "Compiler: Functions"
 msgstr ""
 
@@ -451,7 +571,7 @@ msgid ""
 "PTX module."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:87
+#: ../../../appendix/supported-features.md:163
 msgid "Compiler: Compilation Pipeline"
 msgstr ""
 
@@ -519,6 +639,28 @@ msgid ""
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
+msgid "PTX Inspect"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"`cargo oxide inspect <example>` builds and prints generated PTX without the "
+"full pipeline dump."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Local Clean"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"`cargo oxide clean` removes project-local `target/` directories and "
+"generated device artifacts (`.ptx`, `.ll`, `.opt.ll`, `.ltoir`, `.cubin`, `."
+"target`, `.options`, `.cubin.target`), never the shared `~/.cargo/cuda-oxide/"
+"` cache."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
 msgid "Compute Sanitizer Wrapper"
 msgstr ""
 
@@ -547,11 +689,24 @@ msgstr ""
 msgid ""
 "`CUDA_OXIDE_DEBUG=full` is a `-G`-style build (optimization off, locals kept "
 "in memory) so `info args`/`info locals` show real values for scalars, "
-"pointers/references, and structs/tuples/arrays with their fields. Enums, ABI-"
-"split bare slices, closures, and projections (`x.0`) are not yet described."
+"pointers/references, structs/tuples/arrays, closure environments, and Rust "
+"enums with direct-tag or niche layouts, including active variants and "
+"payload fields. Static source projections through struct/tuple fields, fixed-"
+"array constant indices, and enum downcast payload fields are described with "
+"address-offset DWARF expressions. A single dereference through a thin "
+"pointer/reference, optionally followed by static field projections, is also "
+"described with DWARF dereference/address-offset expressions. rustc scalar-"
+"replacement fragments backed by whole MIR locals are carried as "
+"`DW_OP_LLVM_fragment` through both `dbg.declare` and salvaged `dbg.value` "
+"records. Full-debug currently still disables rustc MIR optimization, so "
+"ordinary `full` builds rarely produce those fragments until that "
+"compatibility guard is removed. ABI-split bare slices, dereference-plus-"
+"index and dereference-downcast chains, repeated dereferences, runtime "
+"indices, subslices, and non-field composite-fragment projections are not yet "
+"described."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:101
+#: ../../../appendix/supported-features.md:179
 msgid "Compiler: Inline PTX"
 msgstr ""
 
@@ -561,18 +716,21 @@ msgstr ""
 
 #: ../../../appendix/supported-features.md:0
 msgid ""
-"CUDA inline PTX with `%0` operands, `in`, zero or one `out`, up to 16 "
-"inputs, CUDA register constraints `h`, `r`, `l`, `q`, `f`, and `d`, "
-"immediate integer constraint `n`, `clobber(\"memory\")`, and "
-"`options(register_only)` for pure register snippets. By default, snippets "
-"are treated as side-effecting and stay inside their current control flow. "
-"Use `options(register_only, may_diverge)` only for pure snippets that are "
-"safe to move across divergent control flow; **never** use it for `.sync` "
-"instructions or collectives. Multiple outputs, read-write operands, and the "
-"`\"C\"` constraint are not implemented yet."
+"CUDA inline PTX with `%0` operands, `in`, `out`, and `inout`; up to 16 "
+"output operands across `out` with `=`-prefixed constraints and `inout` with "
+"`+`-prefixed constraints; up to 16 explicit inputs; CUDA register "
+"constraints `h`, `r`, `l`, `q`, `f`, and `d`; immediate integer constraint "
+"`n`; compile-time string constraint `C`; `clobber(\"memory\")`; and "
+"`options(register_only)` for pure register snippets. With multiple output "
+"operands, the macro writes tuple results back in declaration order. By "
+"default, snippets are treated as side-effecting and stay inside their "
+"current control flow. Use `options(register_only, may_diverge)` only for "
+"pure snippets that are safe to move across divergent control flow; **never** "
+"use it for `.sync` instructions or collectives. More than 16 output operands "
+"are not implemented yet."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:109
+#: ../../../appendix/supported-features.md:187
 msgid "Runtime Library: Safety"
 msgstr ""
 
@@ -599,6 +757,17 @@ msgid ""
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
+msgid "Proof-carrying static views"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"A checked `u32` thread index proves one complete element or tile, then "
+"`at_const` accesses compile-time positions without another runtime bounds "
+"check."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
 msgid "`PreparedLaunch<K>`"
 msgstr ""
 
@@ -618,7 +787,7 @@ msgid ""
 "transitions are compile errors."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:118
+#: ../../../appendix/supported-features.md:197
 msgid "Runtime Library: Atomics"
 msgstr ""
 
@@ -628,7 +797,8 @@ msgstr ""
 
 #: ../../../appendix/supported-features.md:0
 msgid ""
-"`DeviceAtomic{U32,I32,U64,I64,F32,F64}` with `.gpu` scope. All 5 orderings."
+"`DeviceAtomic{U32,I32,U64,I64,F16,F32,F64}` with `.gpu` scope. All 5 "
+"orderings."
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
@@ -636,7 +806,7 @@ msgid "Block-Scope Atomics"
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
-msgid "`BlockAtomic{U32,I32,U64,I64,F32,F64}` with `.cta` scope."
+msgid "`BlockAtomic{U32,I32,U64,I64,F16,F32,F64}` with `.cta` scope."
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
@@ -645,7 +815,7 @@ msgstr ""
 
 #: ../../../appendix/supported-features.md:0
 msgid ""
-"`SystemAtomic{U32,I32,U64,I64,F32,F64}` with `.sys` scope. For CPU-GPU "
+"`SystemAtomic{U32,I32,U64,I64,F16,F32,F64}` with `.sys` scope. For CPU-GPU "
 "shared data."
 msgstr ""
 
@@ -657,7 +827,7 @@ msgstr ""
 msgid "Standard library atomic types lowered to PTX `atom.sys` instructions."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:127
+#: ../../../appendix/supported-features.md:206
 msgid "Runtime Library: Shared Memory"
 msgstr ""
 
@@ -691,7 +861,7 @@ msgid ""
 "`map_shared_rank()` for address mapping. sm_90+."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:135
+#: ../../../appendix/supported-features.md:214
 msgid "Runtime Library: Thread and Synchronization"
 msgstr ""
 
@@ -703,8 +873,8 @@ msgstr ""
 msgid ""
 "`threadIdx`, `blockIdx`, `blockDim`, `gridDim`. Index witnesses are layout-"
 "typed; their uniqueness also depends on matching launch dimensionality. "
-"`index_2d_runtime(s)` adds a caller-proved stride. See [The Safety Model](../"
-"gpu-safety/the-safety-model.md)."
+"`index_2d_runtime(&slice)` resolves against the slice's own row width, bound "
+"once by the host. See [The Safety Model](../gpu-safety/the-safety-model.md)."
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
@@ -741,7 +911,7 @@ msgstr ""
 msgid "`fence_proxy_async_shared_cta()` for TMA visibility, `nanosleep(ns)`."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:145
+#: ../../../appendix/supported-features.md:224
 msgid "Runtime Library: Warp"
 msgstr ""
 
@@ -751,7 +921,8 @@ msgstr ""
 
 #: ../../../appendix/supported-features.md:0
 msgid ""
-"`shuffle`, `shuffle_xor`, `shuffle_down`, `shuffle_up` for `i32` and `f32`."
+"`shuffle`, `shuffle_xor`, `shuffle_down`, `shuffle_up`. Unsuffixed forms "
+"take `u32`; `_f32`, `_u64`, `_f64` variants and a `_sync` form of each."
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
@@ -770,7 +941,19 @@ msgstr ""
 msgid "`lane_id()` (0–31), `warp_id()`. Direct register reads."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:153
+#: ../../../appendix/supported-features.md:0
+msgid "Warp Reduction (`redux.sync`)"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"One-instruction full-warp reduction. Integers on sm_80+: `redux_sync_add`, "
+"`_min_{u32,i32}`, `_max_{u32,i32}`, `_and`, `_or`, `_xor`. `f32` min/max "
+"with optional `.abs` and `.NaN` on `sm_100a`/`sm_100f`/`sm_103a`/`sm_103f`. "
+"No `f64` form."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:233
 msgid "Runtime Library: Cooperative Groups"
 msgstr ""
 
@@ -808,7 +991,7 @@ msgstr ""
 
 #: ../../../appendix/supported-features.md:0
 msgid ""
-"`ballot`, `all`, `any`, `shfl`, `shfl_xor`, `shfl_down`, `shfl_up` (`i32` "
+"`ballot`, `all`, `any`, `shfl`, `shfl_xor`, `shfl_down`, `shfl_up` (`u32` "
 "and `f32`); `match_any` / `match_all` (`i32` and `i64`); `active_mask`."
 msgstr ""
 
@@ -843,7 +1026,7 @@ msgid ""
 "grid-wide barriers."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:165
+#: ../../../appendix/supported-features.md:245
 msgid "Runtime Library: Debug"
 msgstr ""
 
@@ -861,7 +1044,10 @@ msgid "`gpu_assert!` Macro"
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
-msgid "Runtime GPU assertion. Calls `trap()` if condition is false."
+msgid ""
+"The no-message form calls `trap()` on failure. The string-literal message "
+"form calls CUDA's device-side `__assertfail`, reports message and call-site "
+"metadata, and surfaces `CUDA_ERROR_ASSERT`."
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
@@ -873,7 +1059,7 @@ msgid ""
 "`clock()`, `clock64()`, `trap()`, `breakpoint()`, `prof_trigger::<N>()`."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:173
+#: ../../../appendix/supported-features.md:253
 msgid "Runtime Library: Kernel Launch"
 msgstr ""
 
@@ -930,7 +1116,7 @@ msgstr ""
 msgid "Compile-time cluster dimensions. Emits `.reqnctapercluster` in PTX."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:184
+#: ../../../appendix/supported-features.md:264
 msgid "Runtime Library: TMA"
 msgstr ""
 
@@ -961,7 +1147,78 @@ msgid ""
 "completion tracking."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:194
+#: ../../../appendix/supported-features.md:274
+msgid "Runtime Library: Matrix and Tensor Cores"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Warp-Level MMA (`wmma`)"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Register-only `mma.sync` shapes, `movmatrix`, and warp-cooperative "
+"`ldmatrix` loads."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Sparse MMA"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Structured-sparsity `mma.sp` shapes alongside the dense ones, in the same "
+"`wmma` module."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Warpgroup MMA (`wgmma`)"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Hopper `sm_90a`: fence/commit/wait pipeline, shared-memory descriptors, and "
+"`m64n64k16` MMA with `bf16`/`f16` inputs and `f32` accumulate. Gap: the "
+"lowering covers specific proven loop patterns (`bf16` works in straight-line "
+"code, counted K-loops, and partial-wait pipelines; `f16` in straight-line "
+"code only), and `tf32` calls are rejected pending [#1076](https://github.com/"
+"NVlabs/cuda-oxide/issues/1076)."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Tensor Core Gen 5 (`tcgen05`)"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Blackwell sm_100+: TMEM alloc/dealloc, MMA, `stmatrix`, CTA-pair (cg2) "
+"variants."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Accumulator Fragment Algebra (`mma_frag`)"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Index algebra for the `m16n8k16` accumulator, so a lane can address its own "
+"slots of the `[f32; 4]` fragment."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "FP8 / FP6 / FP4 Formats"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Conversions (`convert::cvt_*` for `e4m3`/`e5m2`) and the matrix path (FP8 "
+"`mma.sync` shapes, the `mxf8f6f4` shapes, tcgen05 descriptors) ship; the "
+"`mma_mxf8f6f4` example compiles them. Gap: no *arithmetic* on these formats. "
+"There's no add/mul/min/max the way `f16` and `bf16` have, so values are "
+"carried as packed bit patterns and converted before use."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:287
 msgid "Not Yet Implemented"
 msgstr ""
 
@@ -981,14 +1238,6 @@ msgstr ""
 msgid ""
 "Use `ptx_asm!` for CUDA inline PTX. Direct lowering of Rust MIR `InlineAsm` "
 "is not implemented."
-msgstr ""
-
-#: ../../../appendix/supported-features.md:0
-msgid "FP8 / MX Data Types"
-msgstr ""
-
-#: ../../../appendix/supported-features.md:0
-msgid "Roadmap item for Blackwell. No architectural limitation."
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0

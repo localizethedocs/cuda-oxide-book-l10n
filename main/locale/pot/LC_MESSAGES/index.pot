@@ -8,43 +8,44 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-16 12:33+0000\n"
+"POT-Creation-Date: 2026-08-31 15:39+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../../../index.md:105
+#: ../../../index.md:111
 msgid "Getting Started"
 msgstr ""
 
-#: ../../../index.md:114
+#: ../../../index.md:120
 msgid "Writing GPU Programs"
 msgstr ""
 
-#: ../../../index.md:127
+#: ../../../index.md:135
 msgid "Safety on the GPU"
 msgstr ""
 
-#: ../../../index.md:135
+#: ../../../index.md:144
 msgid "Async GPU Programming"
 msgstr ""
 
-#: ../../../index.md:146
+#: ../../../index.md:156
 msgid "Building a Real Application"
 msgstr ""
 
-#: ../../../index.md:154
+#: ../../../index.md:164
 msgid "Advanced GPU Features"
 msgstr ""
 
-#: ../../../index.md:166
+#: ../../../index.md:176
 msgid "Inside the Compiler"
 msgstr ""
 
-#: ../../../index.md:183
+#: ../../../index.md:194
 msgid "Appendix"
 msgstr ""
 
@@ -94,15 +95,19 @@ msgstr ""
 
 #: ../../../index.md:28
 msgid ""
-"use cuda_device::{cuda_module, kernel, thread, DisjointSlice};\n"
-"use cuda_core::{CudaContext, DeviceBuffer, LaunchConfig};\n"
+"use cuda_device::{kernel, launch_bounds, launch_contract, thread, "
+"DisjointSlice};\n"
+"use cuda_host::cuda_module;\n"
+"use cuda_core::{CudaContext, DeviceBuffer, LaunchConfig1D};\n"
 "\n"
 "#[cuda_module]\n"
 "mod kernels {\n"
 "    use super::*;\n"
 "\n"
 "    #[kernel]\n"
-"    fn vecadd(a: &[f32], b: &[f32], mut c: DisjointSlice<f32>) {\n"
+"    #[launch_bounds(256)]\n"
+"    #[launch_contract(domain = 1, block = (256, 1, 1))]\n"
+"    pub fn vecadd(a: &[f32], b: &[f32], mut c: DisjointSlice<f32>) {\n"
 "        let idx = thread::index_1d();\n"
 "        let i = idx.get();\n"
 "        if let Some(c_elem) = c.get_mut(idx) {\n"
@@ -114,73 +119,76 @@ msgid ""
 "fn main() {\n"
 "    let ctx = CudaContext::new(0).unwrap();\n"
 "    let stream = ctx.default_stream();\n"
-"    let module = kernels::load(&ctx).unwrap();\n"
+"\n"
+"    // SAFETY: this package owns the embedded device bundle for `kernels`.\n"
+"    let module = unsafe { kernels::load(&ctx).unwrap() };\n"
 "\n"
 "    let a = DeviceBuffer::from_host(&stream, &[1.0f32; 1024]).unwrap();\n"
 "    let b = DeviceBuffer::from_host(&stream, &[2.0f32; 1024]).unwrap();\n"
 "    let mut c = DeviceBuffer::<f32>::zeroed(&stream, 1024).unwrap();\n"
 "\n"
-"    // SAFETY: this is a 1D launch and all three buffers contain 1024 "
-"elements.\n"
-"    unsafe {\n"
-"        module.vecadd(&stream, LaunchConfig::for_num_elems(1024), &a, &b, "
-"&mut c)\n"
-"    }\n"
-"    .unwrap();\n"
+"    let prepared = module\n"
+"        .prepare_vecadd(LaunchConfig1D::new(1024u32.div_ceil(256), 256, 0))\n"
+"        .unwrap();\n"
+"    module\n"
+"        .vecadd(&stream, &prepared, &a, &b, &mut c)\n"
+"        .unwrap();\n"
 "\n"
 "    let result = c.to_host_vec(&stream).unwrap();\n"
 "    assert_eq!(result[0], 3.0);\n"
 "}\n"
 msgstr ""
 
-#: ../../../index.md:66
+#: ../../../index.md:72
 msgid ""
 "Build and run with `cargo oxide run vecadd` upon installing the "
-"[prerequisites](getting-started/installation.md)."
+"[prerequisites](getting-started/installation.md). The same launch-contract "
+"pattern is what `cargo oxide new` scaffolds; see [Writing Your First Kernel]"
+"(getting-started/hello-gpu.md)."
 msgstr ""
 
-#: ../../../index.md:69
+#: ../../../index.md:75
 msgid ""
 "`#[cuda_module]` embeds the generated device artifact into the host binary "
 "and generates a typed `kernels::load` function plus one launch method per "
-"kernel. Kernel arguments are type-checked. A raw `LaunchConfig` call is "
-"still unsafe because the configuration does not prove the kernel's indexing "
-"shape or resource requirements. A declared launch contract provides the safe "
-"`PreparedLaunch` path described in [Launching Kernels](gpu-programming/"
-"launching-kernels.md). The lower-level `load_kernel_module` and unsafe "
-"`cuda_launch!` APIs remain available when you need to load a specific "
-"sidecar artifact or build custom launch code."
-msgstr ""
-
-#: ../../../index.md:82
-msgid "Why cuda-oxide?"
+"kernel. Kernel arguments are type-checked. A declared `#[launch_contract]` "
+"unlocks the safe `PreparedLaunch` path (`prepare_*` + typed launch) "
+"described in [Launching Kernels](gpu-programming/launching-kernels.md). A "
+"raw `LaunchConfig` call remains available as an unsafe escape hatch when you "
+"need a one-off geometry that the contract does not cover. The lower-level "
+"`load_kernel_module` and unsafe `cuda_launch!` APIs remain available when "
+"you need to load a specific sidecar artifact or build custom launch code."
 msgstr ""
 
 #: ../../../index.md:88
+msgid "Why cuda-oxide?"
+msgstr ""
+
+#: ../../../index.md:94
 msgid "🦀  Rust on the GPU"
 msgstr ""
 
-#: ../../../index.md:89
+#: ../../../index.md:95
 msgid ""
 "Write GPU kernels with Rust's type system and ownership model. Safety is a "
 "first-class goal, but GPUs have subtleties — read about [the safety model]"
 "(gpu-safety/the-safety-model.md)."
 msgstr ""
 
-#: ../../../index.md:94
+#: ../../../index.md:100
 msgid "💎  A SIMT Compiler"
 msgstr ""
 
-#: ../../../index.md:95
+#: ../../../index.md:101
 msgid ""
 "Not a DSL. A custom rustc codegen backend that compiles pure Rust to PTX."
 msgstr ""
 
-#: ../../../index.md:99
+#: ../../../index.md:105
 msgid "⚡  Async Execution"
 msgstr ""
 
-#: ../../../index.md:100
+#: ../../../index.md:106
 msgid ""
 "Compose GPU work as lazy `DeviceOperation` graphs. Schedule across stream "
 "pools. Await results with `.await`."

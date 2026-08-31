@@ -1,0 +1,631 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025-2026, NVIDIA Corporation
+# This file is distributed under the same license as the cuda-oxide package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: cuda-oxide \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-31 15:39+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../../compiler/catalog-generated-intrinsics.md:1
+msgid "Catalog-Generated Intrinsics"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:3
+msgid ""
+"Most cuda-oxide device intrinsics are not implemented by editing compiler "
+"stages independently. They are described as reviewed catalog inputs and "
+"`cuda-intrinsics-gen` generates the repetitive API, dialect, importer, "
+"lowering, target, reference, and probe surfaces from that contract."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:8
+msgid ""
+"Use this workflow when the intrinsic fits the generated catalog model. For "
+"an operation that requires bespoke verification or lowering that the catalog "
+"cannot express, use [Adding New Intrinsics](adding-new-intrinsics.md) "
+"instead."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:14
+msgid "Choose the Right Path First"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:16
+msgid ""
+"Before editing anything, find the nearest existing intrinsic with the same "
+"semantic and lowering shape."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:19
+msgid ""
+"Does an existing catalog family model the intrinsic?\n"
+"    |\n"
+"    +-- yes -> extend that overlay family and the ABI ledger\n"
+"    |\n"
+"    +-- no  -> determine whether the generator needs a new family/shape\n"
+"               or whether the operation is genuinely hand-written\n"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:28
+msgid ""
+"An LLVM declaration by itself is not enough to admit an intrinsic. The "
+"catalog also records cuda-oxide policy such as its Rust API, safety and "
+"effects, expected PTX form, target requirements, ABI identity, and lowering "
+"evidence."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:32
+msgid ""
+"The normal contribution path is therefore to extend an existing reviewed "
+"family, not to edit generated Rust files or `intrinsics/catalog.json` "
+"directly."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:37
+msgid "Sources of Truth"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:39
+msgid ""
+"The generated intrinsic pipeline is assembled from reviewed inputs and "
+"resolved into a generated catalog:"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:42
+msgid ""
+"intrinsics/upstream.lock -> intrinsics/imported.json ----\\\n"
+"intrinsics/overlay.toml -> intrinsics/overlay/*.toml -----+\n"
+"intrinsics/abi-v1.toml -----------------------------------+--> resolve\n"
+"intrinsics/evidence/*.json -------------------------------/       |\n"
+"                                                                  v\n"
+"                                                     intrinsics/catalog."
+"json\n"
+"                                                            GENERATED\n"
+"                                                                  |\n"
+"                                                                  v\n"
+"                                                        generated outputs\n"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:55
+msgid "Their roles are different:"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:0
+msgid "File / artifact"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:0
+msgid "Role"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:0
+msgid "`intrinsics/upstream.lock`"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:0
+msgid "Pins the LLVM source/extraction identity used by the imported facts."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:0
+msgid "`intrinsics/imported.json`"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:0
+msgid ""
+"Records what the pinned LLVM/NVPTX source declares. Normal intrinsic "
+"additions consume this committed file; they do not rerun extraction."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:0
+msgid "`intrinsics/overlay.toml`"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:0
+msgid "Explicitly indexes the admitted overlay shards."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:0
+msgid "`intrinsics/overlay/*.toml`"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:0
+msgid "Records cuda-oxide policy for reviewed intrinsic families."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:0
+msgid "`intrinsics/abi-v1.toml`"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:0
+msgid "Append-only stable intrinsic ABI ledger."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:0
+msgid "`intrinsics/evidence/*.json`"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:0
+msgid "Records reviewed lowering evidence when the route requires it."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:0
+msgid "`intrinsics/catalog.json`"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:0
+msgid "Resolved generated plan. Do not edit it by hand."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:67
+msgid ""
+"Generated sources and probe/reference outputs carry a `DO NOT EDIT` marker. "
+"Change their source inputs and regenerate instead."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:70
+msgid "Catalog Metadata"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:72
+msgid ""
+"The overlay manifest carries version and backend metadata for the resolved "
+"catalog. These values describe the catalog contract; they are not per-"
+"intrinsic knobs."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:76
+msgid ""
+"There are two distinct `schema` numbers in play, one per side of the "
+"generator:"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:79
+msgid ""
+"intrinsics/overlay.toml   schema = 44   (overlay input format)\n"
+"        | cuda-intrinsics-gen\n"
+"        v\n"
+"intrinsics/catalog.json   \"schema\": 46  (serialized catalog format)\n"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:86
+msgid ""
+"`schema` (in `overlay.toml`) identifies the overlay **input** format the "
+"generator accepts (`OVERLAY_SCHEMA` in `crates/cuda-intrinsics-gen/src/"
+"resolve/overlay.rs`); the resolver rejects a mismatched manifest. It is not "
+"the catalog format version."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:90
+msgid "`catalog_version` identifies the reviewed catalog contract."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:91
+msgid ""
+"`intrinsic_abi` identifies the intrinsic ABI generation whose stable entries "
+"are recorded in `intrinsics/abi-v1.toml`."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:93
+msgid ""
+"`backend_profile` selects the reviewed backend profile used while resolving "
+"lowering evidence."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:96
+msgid ""
+"Contributors normally change these values only as part of a deliberate "
+"catalog, ABI, or backend-profile transition. Do not synthesize or edit "
+"corresponding metadata directly in generated `intrinsics/catalog.json`."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:100
+msgid "catalog.json Header Fields"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:102
+msgid ""
+"The generated catalog stamps its own header at resolve time. For reference, "
+"since the file is generated and otherwise undocumented:"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:105
+msgid ""
+"`schema`: version of the **serialized catalog** format (`CATALOG_SCHEMA` in "
+"the same `resolve/overlay.rs`). Distinct from the overlay's `schema`; see "
+"the sketch above."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:108
+msgid ""
+"`catalog_version`: the reviewed catalog contract, copied from `overlay.toml`."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:110
+msgid ""
+"`intrinsic_abi`: the ABI generation, copied from `overlay.toml`; its stable "
+"entries live in `intrinsics/abi-v1.toml`."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:112
+msgid ""
+"`generator_version`: the `cuda-intrinsics-gen` crate version that produced "
+"the catalog (its Cargo package version). The same value appears in the "
+"`@generated by cuda-intrinsics-gen <version>` banner of every generated file."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:119
+msgid "The Normal Workflow: Extend an Existing Family"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:121
+msgid "1. Find the nearest sibling"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:123
+msgid ""
+"Start in `intrinsics/overlay/`, not in generated Rust code and not by "
+"scrolling `intrinsics/imported.json`."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:126
+msgid ""
+"Find an existing entry with the same family and lowering shape, then use the "
+"imported LLVM facts only for the fields that must agree with upstream."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:129
+msgid "For example:"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:131
+msgid ""
+"grep -R 'id = \"<nearest-sibling>\"' intrinsics/overlay\n"
+"rg '<llvm-or-record-name>' intrinsics/imported.json\n"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:136
+msgid ""
+"Prefer copying a proven sibling over constructing an entry from scratch. The "
+"resolver is intentionally fail-closed, but matching the established family "
+"shape keeps the review small and makes unexpected generated diffs easier to "
+"spot."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:141
+msgid "2. Add or extend the overlay entry"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:143
+msgid "Edit the appropriate file under:"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:145
+msgid "intrinsics/overlay/<family>.toml\n"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:149
+msgid ""
+"The overlay is the hand-edited policy input. Do not edit the corresponding "
+"operation under `crates/dialect-nvvm/src/ops/generated/`, the generated "
+"importer dispatch, generated lowering tables, or `intrinsics/catalog.json`."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:153
+msgid ""
+"If the contribution requires a **new overlay shard**, also add that shard to "
+"the sorted `shards` list in:"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:156
+msgid "intrinsics/overlay.toml\n"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:160
+msgid ""
+"`generate` and `check` reconcile the index with the overlay directory and "
+"reject an unindexed shard."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:163
+msgid "3. Append the ABI ledger entry"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:165
+msgid "Add the new stable identity at the end of:"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:167
+msgid "intrinsics/abi-v1.toml\n"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:171
+msgid ""
+"The ledger is append-only. Existing entries must not be reordered, deleted, "
+"renumbered, or repurposed. The catalog identity, operation key, and raw Rust "
+"signature must agree with the overlay entry."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:175
+msgid ""
+"Treat the ABI ID as a merge-time resource. If another intrinsic PR lands "
+"first, rebase onto the latest `main`, append after the new ledger tail, and "
+"regenerate. Do not preserve an obsolete numeric range merely because the "
+"branch used it earlier."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:180
+msgid "4. Handle lowering evidence only when needed"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:182
+msgid ""
+"If the new intrinsic uses an already-reviewed lowering/evidence shape, "
+"follow the existing sibling contract. A normal catalog addition does not "
+"necessarily need a new evidence file."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:186
+msgid ""
+"If the backend route is new and needs candidate evidence, use an explicit "
+"candidate probe:"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:189
+msgid ""
+"HOST=\"$(rustc -vV | sed -n 's/^host: //p')\"\n"
+"LLC=\"$(rustc --print sysroot)/lib/rustlib/$HOST/bin/llc\"\n"
+"\n"
+"cargo run -p cuda-intrinsics-gen -- probe --candidate \\\n"
+"  --intrinsic <catalog-id> \\\n"
+"  --llc \"$LLC\" \\\n"
+"  --gpu-target <sm-target> \\\n"
+"  --ptx-feature <ptx-feature> \\\n"
+"  --ptxas <path-to-ptxas>\n"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:201
+msgid ""
+"On a system where terminal assembly is deliberately unavailable, replace `--"
+"ptxas <path-to-ptxas>` with the explicit `--skip-terminal` flag. Candidate "
+"mode requires one of those choices; it does not silently fall back."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:205
+msgid ""
+"Review candidate output before promoting any evidence into the committed "
+"contract."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:208
+msgid "5. Regenerate"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:210
+msgid "Run:"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:212
+msgid "cargo run -p cuda-intrinsics-gen -- generate\n"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:216
+msgid "Then inspect the working tree and diff before running broader checks:"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:218
+msgid ""
+"git status --short\n"
+"git diff --stat\n"
+"git diff -- intrinsics crates/cuda-intrinsics crates/cuda-device \\\n"
+"  crates/dialect-nvvm crates/mir-importer crates/mir-lower \\\n"
+"  crates/cuda-oxide-codegen crates/rustc-codegen-cuda\n"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:226
+msgid ""
+"Check `git status --short` as well: newly created overlay or evidence files "
+"are untracked until staged and therefore do not appear in `git diff`."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:229
+msgid ""
+"For an addition that fits an existing family, generated changes should "
+"follow the sibling pattern. Unexpected unrelated changes are a reason to "
+"stop and recheck the overlay, ledger, evidence, or branch base."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:235
+msgid "Validate Before Pushing"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:237
+msgid ""
+"The repository provides one local entry point for the generated-intrinsics "
+"CI contract:"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:240
+msgid "just check-intrinsics upstream/main\n"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:244
+msgid "Use the actual PR base if it is not `upstream/main`."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:246
+msgid ""
+"That recipe mirrors the generated-intrinsics CI job and currently covers the "
+"three load-bearing checks:"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:249
+msgid ""
+"cuda-intrinsics-gen check\n"
+"cuda-intrinsics-gen probe --all --skip-terminal --per-target\n"
+"cuda-intrinsics-gen check-abi-history --base-ref <base>\n"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:255
+msgid ""
+"Use `just check-intrinsics ...` as the normal contributor interface rather "
+"than copying the underlying commands into scripts. The recipe can evolve "
+"when the CI contract gains additional coverage."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:259
+msgid "Two environment requirements the gates carry with them:"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:261
+msgid ""
+"`check-abi-history` walks git history back to the base ref, so it needs a "
+"full clone. CI checks out with `fetch-depth: 0`; a shallow local clone can "
+"fail to resolve the base."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:264
+msgid ""
+"The generator shells out to `rustfmt` when it writes generated sources. That "
+"is why `rust-toolchain.toml` pins the `rustfmt` component; no extra install "
+"is needed on a normal checkout."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:268
+msgid "For a focused probe while developing one intrinsic, you can also run:"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:270
+msgid ""
+"cargo run -p cuda-intrinsics-gen -- probe \\\n"
+"  --intrinsic <catalog-id> \\\n"
+"  --skip-terminal\n"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:276
+msgid ""
+"Finally, run the normal checks required by the files you changed. For "
+"changes that also update the book:"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:279
+msgid ""
+"just book\n"
+"bash scripts/check-book-api-names.sh\n"
+"git diff --check\n"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:287
+msgid "When the Existing Catalog Cannot Express It"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:289
+msgid ""
+"A missing sibling is a design signal. If the intrinsic requires a lowering "
+"shape, operand adapter, result contract, or family structure the generator "
+"does not model, the change is no longer a small catalog admission."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:293
+msgid "A new generated shape typically involves generator code such as:"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:295
+msgid ""
+"crates/cuda-intrinsics-gen/src/model/\n"
+"crates/cuda-intrinsics-gen/src/resolve/\n"
+"crates/cuda-intrinsics-gen/src/render/\n"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:301
+msgid ""
+"and may also require real compiler lowering changes under `crates/mir-lower/"
+"` or `crates/dialect-nvvm/`."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:304
+msgid ""
+"Keep that work separate from routine catalog admission when possible. The "
+"ABI ledger and generated-intrinsics validation contract still apply."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:307
+msgid ""
+"If the operation instead needs bespoke verification or lowering by design "
+"and should remain outside the catalog, follow the hand-written workflow in "
+"[Adding New Intrinsics](adding-new-intrinsics.md)."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:313
+msgid "Extraction Is Not Part of a Normal Addition"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:315
+msgid ""
+"The `extract` command refreshes imported LLVM facts. It is for an LLVM "
+"source or pin update, not for adding an intrinsic that already exists in the "
+"committed `intrinsics/imported.json`."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:319
+msgid ""
+"Normal additions consume the committed imported facts. This keeps routine "
+"intrinsic work independent of an LLVM checkout and makes the reviewed "
+"overlay, ABI ledger, and evidence the explicit cuda-oxide policy layer."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:325
+msgid "What Not to Edit by Hand"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:327
+msgid "For a catalog-generated intrinsic, do not directly edit:"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:329
+msgid "`intrinsics/catalog.json`;"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:330
+msgid "generated files under `crates/cuda-intrinsics/src/generated/`;"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:331
+msgid "generated files under `crates/cuda-device/src/generated/`;"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:332
+msgid "generated files under `crates/dialect-nvvm/src/ops/generated/`;"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:333
+msgid "generated intrinsic dispatch in `mir-importer`;"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:334
+msgid "generated intrinsic conversion tables in `mir-lower`;"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:335
+msgid "generated target/collector metadata;"
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:336
+msgid "generated probe/reference outputs."
+msgstr ""
+
+#: ../../../compiler/catalog-generated-intrinsics.md:338
+msgid ""
+"If regeneration overwrites a hand edit, the edit was made at the wrong "
+"layer. The source of truth is the reviewed catalog input, ABI, evidence, or "
+"generator logic that owns that output."
+msgstr ""

@@ -8,10 +8,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-16 12:33+0000\n"
+"POT-Creation-Date: 2026-08-31 15:39+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -248,7 +249,7 @@ msgid "Auto-discovered"
 msgstr ""
 
 #: ../../../gpu-programming/kernels-and-device-functions.md:9
-#: ../../../gpu-programming/kernels-and-device-functions.md:232
+#: ../../../gpu-programming/kernels-and-device-functions.md:296
 msgid "PTX directive"
 msgstr ""
 
@@ -273,8 +274,8 @@ msgid "Yes, via typed module"
 msgstr ""
 
 #: ../../../gpu-programming/kernels-and-device-functions.md:9
-#: ../../../gpu-programming/kernels-and-device-functions.md:232
-#: ../../../gpu-programming/kernels-and-device-functions.md:262
+#: ../../../gpu-programming/kernels-and-device-functions.md:296
+#: ../../../gpu-programming/kernels-and-device-functions.md:382
 msgid "No"
 msgstr ""
 
@@ -287,8 +288,8 @@ msgid "No (must be `()`)"
 msgstr ""
 
 #: ../../../gpu-programming/kernels-and-device-functions.md:9
-#: ../../../gpu-programming/kernels-and-device-functions.md:232
-#: ../../../gpu-programming/kernels-and-device-functions.md:262
+#: ../../../gpu-programming/kernels-and-device-functions.md:296
+#: ../../../gpu-programming/kernels-and-device-functions.md:382
 msgid "Yes"
 msgstr ""
 
@@ -488,37 +489,116 @@ msgstr ""
 msgid "Use generics (monomorphized)"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:9
-msgid "`panic!` with message"
-msgstr ""
-
-#: ../../../gpu-programming/kernels-and-device-functions.md:9
-msgid "Formatting + allocation"
-msgstr ""
-
-#: ../../../gpu-programming/kernels-and-device-functions.md:9
-msgid "Use `gpu_assert!` or `debug::trap()`"
-msgstr ""
-
-#: ../../../gpu-programming/kernels-and-device-functions.md:162
+#: ../../../gpu-programming/kernels-and-device-functions.md:161
 msgid ""
 "If you accidentally use an unsupported feature, the compiler will produce a "
 "clear error: `\"CUDA-OXIDE: FORBIDDEN CRATE IN DEVICE CODE\"` with a list of "
 "allowed crates (`core`, `alloc`, `cuda_device`, and your local crate)."
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:169
+#: ../../../gpu-programming/kernels-and-device-functions.md:166
+msgid "Conditional compilation"
+msgstr ""
+
+#: ../../../gpu-programming/kernels-and-device-functions.md:168
+msgid ""
+"`#[cfg(...)]` works in device code exactly as it does anywhere else in Rust. "
+"What is missing is anything to gate *on*: the compiler supplies no target-"
+"derived `cfg`, so a kernel has no way to ask which architecture it is being "
+"compiled for. Arch requirements live in doc comments and are enforced by the "
+"caller, which is why an example that needs `redux.sync` checks `ctx."
+"compute_capability()` on the host and skips rather than specializing the "
+"kernel."
+msgstr ""
+
+#: ../../../gpu-programming/kernels-and-device-functions.md:176
+msgid ""
+"`--device-cfg NAME` is how you supply one yourself. It is repeatable, and "
+"each occurrence becomes a `--cfg NAME` in the build's rustflags:"
+msgstr ""
+
+#: ../../../gpu-programming/kernels-and-device-functions.md:179
+msgid ""
+"# From the crate directory, not with an example name -- see below.\n"
+"cargo oxide build --device-cfg ampere_up\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernels-and-device-functions.md:184
+msgid ""
+"// One instruction where the target allows it, a shuffle tree everywhere "
+"else.\n"
+"#[cfg(ampere_up)]\n"
+"let total = warp::redux_sync_add(u32::MAX, value);\n"
+"\n"
+"#[cfg(not(ampere_up))]\n"
+"let total = {\n"
+"    let mut acc = value;\n"
+"    let mut offset = 16;\n"
+"    while offset > 0 {\n"
+"        acc = acc.wrapping_add(warp::shuffle_xor(acc, offset));\n"
+"        offset /= 2;\n"
+"    }\n"
+"    acc\n"
+"};\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernels-and-device-functions.md:201
+msgid "Four things are worth knowing before reaching for it."
+msgstr ""
+
+#: ../../../gpu-programming/kernels-and-device-functions.md:203
+msgid ""
+"**It is not limited to device code.** The flag travels as a rustflag, so "
+"every crate cargo compiles for that build sees the `cfg`, host code included."
+msgstr ""
+
+#: ../../../gpu-programming/kernels-and-device-functions.md:206
+msgid ""
+"**It switches `build` into passthrough mode.** Passing it means `build` no "
+"longer takes an example name, so `cargo oxide build my_example --device-cfg "
+"ampere_up` is rejected; run it from the crate's own directory instead. "
+"(`test` is passthrough already, flag or no flag.) If the gate can live in "
+"the crate's manifest, an ordinary Cargo feature (`#[cfg(feature = "
+"\"ampere_up\")]`) does the same job without giving up example-name "
+"invocations; `--device-cfg` earns its keep when you need a `cfg` injected "
+"without touching any Cargo.toml."
+msgstr ""
+
+#: ../../../gpu-programming/kernels-and-device-functions.md:215
+msgid ""
+"**rustc warns about an undeclared `cfg` name.** The `unexpected_cfgs` lint "
+"checks every `#[cfg(...)]` against the declared set, and an injected `--cfg "
+"ampere_up` is not in it, so each use prints an `unexpected cfg condition "
+"name` warning. Declare it in the kernel crate's manifest to silence them:"
+msgstr ""
+
+#: ../../../gpu-programming/kernels-and-device-functions.md:221
+msgid ""
+"[lints.rust]\n"
+"unexpected_cfgs = { level = \"warn\", check-cfg = [\"cfg(ampere_up)\"] }\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernels-and-device-functions.md:226
+msgid ""
+"**Nothing ties it to `--arch`.** If the `cfg` name stands for an "
+"architecture, you are the one keeping the two in step -- passing `--device-"
+"cfg ampere_up` without the matching `--arch` will happily build the "
+"specialized path for whatever target was selected, and PTX that the "
+"assembler then rejects."
+msgstr ""
+
+#: ../../../gpu-programming/kernels-and-device-functions.md:233
 msgid "Loop unrolling"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:171
+#: ../../../gpu-programming/kernels-and-device-functions.md:235
 msgid ""
 "Inside a `#[kernel]` or `#[device]` function, put `#[unroll]` directly on a "
 "loop whose trip count is known at compile time. This requests that the "
 "compiler remove the loop and lay out copies of its body:"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:175
+#: ../../../gpu-programming/kernels-and-device-functions.md:239
 msgid ""
 "#[kernel]\n"
 "pub fn sum_four(mut out: DisjointSlice<u32>) {\n"
@@ -536,13 +616,13 @@ msgid ""
 "}\n"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:192
+#: ../../../gpu-programming/kernels-and-device-functions.md:256
 msgid ""
 "The pass currently recognizes explicit counted `while` loops. Range-based "
 "`for` loops are not yet recognized."
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:195
+#: ../../../gpu-programming/kernels-and-device-functions.md:259
 msgid ""
 "Use `#[unroll(N)]`, where `N >= 2`, when the trip count is only known at "
 "runtime. The loop then does `N` iterations' work per trip. A small remainder "
@@ -550,7 +630,7 @@ msgid ""
 "by `N`:"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:199
+#: ../../../gpu-programming/kernels-and-device-functions.md:263
 msgid ""
 "let mut i = 0;\n"
 "#[unroll(4)]\n"
@@ -560,27 +640,27 @@ msgid ""
 "}\n"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:208
+#: ../../../gpu-programming/kernels-and-device-functions.md:272
 msgid ""
 "An annotated loop may contain other loops. Only the loop carrying the "
 "annotation is unrolled; each inner loop is copied intact and remains a loop. "
 "Add a separate annotation to an inner loop if you want to unroll it too."
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:212
+#: ../../../gpu-programming/kernels-and-device-functions.md:276
 msgid ""
 "Loops with several `continue` paths are supported. Full `#[unroll]` also "
 "preserves `break` paths and loops with more than one exit target."
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:215
+#: ../../../gpu-programming/kernels-and-device-functions.md:279
 msgid ""
 "Partial `#[unroll(N)]` currently requires the loop condition to be the only "
 "exit. If the loop has a `break` or another exit, the compiler warns and does "
 "not unroll that loop."
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:219
+#: ../../../gpu-programming/kernels-and-device-functions.md:283
 msgid ""
 "Partial unrolling also requires a counted-up loop: the counter must have a "
 "positive step, use `<` or `<=`, and compare against a limit that does not "
@@ -588,7 +668,7 @@ msgid ""
 "requests."
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:223
+#: ../../../gpu-programming/kernels-and-device-functions.md:287
 msgid ""
 "To keep generated code bounded, one annotation may create at most 1,024 body "
 "copies, 8,192 cloned basic blocks, and 65,536 cloned operations. A larger "
@@ -596,32 +676,32 @@ msgid ""
 "unrolling because they keep loop variables in memory instead of SSA form."
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:228
+#: ../../../gpu-programming/kernels-and-device-functions.md:292
 msgid ""
 "Unrolling trades larger generated code for fewer branches and more "
 "optimization opportunities. Use it for small or performance-critical loops, "
 "and measure the result."
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:233
+#: ../../../gpu-programming/kernels-and-device-functions.md:297
 msgid ""
 "For how the compiler analyzes and rewrites annotated loops, including the "
 "stage-index peephole, see [Compiler Optimizations](../compiler/compiler-"
 "optimizations.md)."
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:237
+#: ../../../gpu-programming/kernels-and-device-functions.md:301
 msgid "`#[launch_bounds]` -- occupancy hints"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:239
+#: ../../../gpu-programming/kernels-and-device-functions.md:303
 msgid ""
 "The `#[launch_bounds]` attribute tells the compiler how many threads you "
 "intend to launch per block. This lets the PTX assembler make better register "
 "allocation decisions and can improve occupancy:"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:243
+#: ../../../gpu-programming/kernels-and-device-functions.md:307
 msgid ""
 "#[kernel]\n"
 "#[launch_bounds(256, 2)]\n"
@@ -630,148 +710,228 @@ msgid ""
 "}\n"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:232
+#: ../../../gpu-programming/kernels-and-device-functions.md:296
 msgid "Parameter"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:232
+#: ../../../gpu-programming/kernels-and-device-functions.md:296
 msgid "Required"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:232
+#: ../../../gpu-programming/kernels-and-device-functions.md:296
 msgid "Description"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:232
+#: ../../../gpu-programming/kernels-and-device-functions.md:296
 msgid "`max_threads`"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:232
+#: ../../../gpu-programming/kernels-and-device-functions.md:296
 msgid "`.maxntid`"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:232
+#: ../../../gpu-programming/kernels-and-device-functions.md:296
 msgid "Maximum threads per block"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:232
+#: ../../../gpu-programming/kernels-and-device-functions.md:296
 msgid "`min_blocks`"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:232
+#: ../../../gpu-programming/kernels-and-device-functions.md:296
 msgid "`.minnctapersm`"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:232
+#: ../../../gpu-programming/kernels-and-device-functions.md:296
 msgid "Minimum concurrent blocks per SM"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:256
+#: ../../../gpu-programming/kernels-and-device-functions.md:320
 msgid "The generated PTX includes these directives:"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:258
+#: ../../../gpu-programming/kernels-and-device-functions.md:322
 msgid ".entry optimized_kernel .maxntid 256, 1, 1 .minnctapersm 2 { ... }\n"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:263
+#: ../../../gpu-programming/kernels-and-device-functions.md:326
+msgid ""
+"`.maxntid` bounds the product `x * y * z`, so a 256-thread bound admits "
+"`(256, 1, 1)`, `(16, 16, 1)` and `(4, 8, 8)` alike. Add "
+"`#[launch_contract(block = (x, y, z))]` when one exact shape is required. "
+"That emits `.reqntid` in place of `.maxntid`, which the driver enforces per "
+"axis:"
+msgstr ""
+
+#: ../../../gpu-programming/kernels-and-device-functions.md:331
+msgid ".entry exact_kernel .reqntid 256, 1, 1 .minnctapersm 2 { ... }\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernels-and-device-functions.md:335
+msgid ""
+"The two directives are mutually exclusive; ptxas rejects an entry declaring "
+"both, so a contracted kernel emits `.reqntid` alone. `.minnctapersm` is an "
+"occupancy hint and composes with either."
+msgstr ""
+
+#: ../../../gpu-programming/kernels-and-device-functions.md:340
 msgid "`#[launch_bounds]` must appear **after** `#[kernel]`:"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:265
+#: ../../../gpu-programming/kernels-and-device-functions.md:342
 msgid ""
 "#[kernel]\n"
 "#[launch_bounds(256, 2)]   // correct\n"
 "pub fn my_kernel(...) { }\n"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:273
+#: ../../../gpu-programming/kernels-and-device-functions.md:350
+msgid "When the bound forces spills"
+msgstr ""
+
+#: ../../../gpu-programming/kernels-and-device-functions.md:352
+msgid ""
+"A launch bound is ultimately a cap on registers per thread: promising ptxas "
+"more resident threads leaves each of them fewer registers to work with. If "
+"the kernel needs more than the cap allows, ptxas does not fail -- it "
+"**spills** the excess to local memory, and the occupancy the bound bought is "
+"then paid for again on every access to a spilled value."
+msgstr ""
+
+#: ../../../gpu-programming/kernels-and-device-functions.md:358
+msgid ""
+"That is easy to miss, because the build succeeds. cuda-oxide warns instead, "
+"at the kernel's definition span:"
+msgstr ""
+
+#: ../../../gpu-programming/kernels-and-device-functions.md:361
+msgid ""
+"warning: kernel `cuda_oxide_kernel_a1b2c3d4_my_kernel` compiled with\n"
+"         `#[launch_bounds(256, 2)]` and spills registers\n"
+"  = note: ptxas reports 96 bytes spill stores and 96 bytes spill loads\n"
+"  = note: ptxas allocated 40 registers per thread\n"
+"  = help: relax `min_blocks_per_sm` or reduce register pressure\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernels-and-device-functions.md:369
+msgid ""
+"(Byte counts and register totals are whatever ptxas reported for your "
+"kernel.) Only kernels carrying `#[launch_bounds]` are checked -- without a "
+"bound there is no promise for ptxas to satisfy at the expense of registers. "
+"The warning can only fire in builds that materialize a native cubin (`--"
+"materialize-cubin`, or any build that embeds a cubin): a plain PTX build "
+"never runs ptxas, so there is no resource report to inspect."
+msgstr ""
+
+#: ../../../gpu-programming/kernels-and-device-functions.md:376
+msgid ""
+"The usual responses are to raise `max_threads`, drop or relax `min_blocks`, "
+"or cut register pressure in the kernel itself. Spilling is not automatically "
+"wrong: a kernel can be faster spilling a little at high occupancy than not "
+"spilling at low occupancy. The warning exists because that is a trade worth "
+"making deliberately rather than by accident."
+msgstr ""
+
+#: ../../../gpu-programming/kernels-and-device-functions.md:383
+msgid ""
+"`#[allow(...)]` does **not** silence these. They are raw span diagnostics "
+"rather than lints, so the suppression attribute does not apply to them. The "
+"escape hatch is an environment variable, meant for builds that measured the "
+"spill and accepted it:"
+msgstr ""
+
+#: ../../../gpu-programming/kernels-and-device-functions.md:388
+msgid ""
+"CUDA_OXIDE_NO_SPILL_WARN=1 cargo oxide build my_kernels --materialize-cubin\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernels-and-device-functions.md:394
 msgid "The collector -- how device code is discovered"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:275
+#: ../../../gpu-programming/kernels-and-device-functions.md:396
 msgid ""
 "When you build with `cargo oxide`, the `rustc-codegen-cuda` backend runs a "
 "**collector** pass that determines which functions to compile for the GPU:"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:278
+#: ../../../gpu-programming/kernels-and-device-functions.md:399
 msgid ""
 "Scan all compilation units for functions in the reserved "
 "`cuda_oxide_kernel_<hash>_` namespace (generated by `#[kernel]`)."
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:280
+#: ../../../gpu-programming/kernels-and-device-functions.md:401
 msgid ""
 "For each kernel, **traverse the call graph** and collect all transitively "
 "reachable functions."
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:282
+#: ../../../gpu-programming/kernels-and-device-functions.md:403
 msgid "**Filter** each callee against the allowed-crate list:"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:262
+#: ../../../gpu-programming/kernels-and-device-functions.md:382
 msgid "Crate"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:262
+#: ../../../gpu-programming/kernels-and-device-functions.md:382
 msgid "Allowed"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:262
+#: ../../../gpu-programming/kernels-and-device-functions.md:382
 msgid "Why"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:262
+#: ../../../gpu-programming/kernels-and-device-functions.md:382
 msgid "Your local crate"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:262
+#: ../../../gpu-programming/kernels-and-device-functions.md:382
 msgid "Your kernel and helper code"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:262
+#: ../../../gpu-programming/kernels-and-device-functions.md:382
 msgid "`cuda_device`"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:262
+#: ../../../gpu-programming/kernels-and-device-functions.md:382
 msgid "GPU intrinsics (threads, warps, shared memory)"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:262
+#: ../../../gpu-programming/kernels-and-device-functions.md:382
 msgid "`core`"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:262
+#: ../../../gpu-programming/kernels-and-device-functions.md:382
 msgid "`no_std` Rust core library"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:262
+#: ../../../gpu-programming/kernels-and-device-functions.md:382
 msgid "`std`"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:262
+#: ../../../gpu-programming/kernels-and-device-functions.md:382
 msgid "Requires OS facilities not available on GPU"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:262
+#: ../../../gpu-programming/kernels-and-device-functions.md:382
 msgid "`alloc`"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:262
+#: ../../../gpu-programming/kernels-and-device-functions.md:382
 msgid ""
 "Passes the collector, but no device-side allocator is wired up yet. Link-"
 "time error today."
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:292
+#: ../../../gpu-programming/kernels-and-device-functions.md:413
 msgid ""
 "If the collector encounters a call into a forbidden crate, it reports a "
 "compile-time error rather than generating broken PTX."
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:299
+#: ../../../gpu-programming/kernels-and-device-functions.md:420
 msgid ""
 "The device code collector: starting from #[kernel] entry points, the "
 "compiler walks the call graph to discover all reachable device functions, "
@@ -780,17 +940,17 @@ msgid ""
 "directives."
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:305
+#: ../../../gpu-programming/kernels-and-device-functions.md:426
 msgid "`no_std` and panic behavior"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:307
+#: ../../../gpu-programming/kernels-and-device-functions.md:428
 msgid ""
 "Device code runs in an implicit `#![no_std]` environment. You do not need to "
 "add this attribute yourself -- the compiler backend handles it."
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:310
+#: ../../../gpu-programming/kernels-and-device-functions.md:431
 msgid ""
 "**Panic behavior:** all unwind paths in MIR are treated as unreachable. If a "
 "panic actually triggers at runtime (e.g., an array bounds check fails), the "
@@ -799,25 +959,28 @@ msgid ""
 "`panic=abort` but does not require any special compiler flags."
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:316
+#: ../../../gpu-programming/kernels-and-device-functions.md:437
 msgid "In practice this means:"
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:318
+#: ../../../gpu-programming/kernels-and-device-functions.md:439
 msgid "`unwrap()` and `expect()` work but will trap the GPU on `None`/`Err`."
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:319
+#: ../../../gpu-programming/kernels-and-device-functions.md:440
 msgid "`assert!` and `debug_assert!` work but trap on failure."
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:320
+#: ../../../gpu-programming/kernels-and-device-functions.md:441
 msgid ""
-"`panic!(\"message\")` is **not** supported (the formatting machinery is "
-"unavailable) -- use `gpu_assert!` or `debug::trap()` instead."
+"`panic!(\"message\")` compiles, and so does `panic!(\"{}\", value)`. The "
+"panic path lowers to a trap and the **message is discarded**: there is no "
+"panic runtime to print it, and the statements that would have built it are "
+"dead once the call is dropped. Reach for `gpu_printf!` before the check when "
+"you need to see the values, or `gpu_assert!` for an explicit check."
 msgstr ""
 
-#: ../../../gpu-programming/kernels-and-device-functions.md:324
+#: ../../../gpu-programming/kernels-and-device-functions.md:448
 msgid ""
 "The [Error Handling and Debugging](error-handling-and-debugging.md) chapter "
 "covers `gpu_printf!`, `gpu_assert!`, and `cargo oxide debug` for diagnosing "

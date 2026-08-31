@@ -8,10 +8,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-16 12:33+0000\n"
+"POT-Creation-Date: 2026-08-31 15:39+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -76,6 +77,16 @@ msgid "Purpose"
 msgstr ""
 
 #: ../../../appendix/api-quick-reference.md:0
+msgid "`#[cuda_module]`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid ""
+"Collect a module's kernels into a typed host module with a `load` and "
+"launchers"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
 msgid "`#[kernel]`"
 msgstr ""
 
@@ -105,6 +116,26 @@ msgstr ""
 
 #: ../../../appendix/api-quick-reference.md:0
 msgid "Occupancy hints for register allocation"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`#[constant]`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid ""
+"Place a `ConstantMemory<T>` static in constant memory, with a host "
+"`set_<name>`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`#[launch_contract(...)]`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid ""
+"Declare the launch shape a kernel requires, unlocking a safe (non-`unsafe`) "
+"launch"
 msgstr ""
 
 #: ../../../appendix/api-quick-reference.md:0
@@ -147,7 +178,7 @@ msgstr ""
 msgid "Mark as read-only"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:54
+#: ../../../appendix/api-quick-reference.md:57
 msgid ""
 "Use these annotations only on an explicit counted `while` loop inside a "
 "`#[kernel]` or `#[device]` function. Range-based `for` loops are not yet "
@@ -156,30 +187,31 @@ msgid ""
 "targets."
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:59
+#: ../../../appendix/api-quick-reference.md:62
 msgid ""
 "Partial `#[unroll(N)]` requires a positive step, a `<` or `<=` test, an "
 "unchanging limit, and no exit besides the normal header test. Other requests "
 "warn and are not unrolled."
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:63
+#: ../../../appendix/api-quick-reference.md:66
 msgid ""
 "One annotation may create at most 1,024 body copies, 8,192 cloned basic "
 "blocks, and 65,536 cloned operations. Larger requests warn and are not "
 "unrolled."
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:66
+#: ../../../appendix/api-quick-reference.md:69
 msgid "Debug and PTX Macros"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:68
+#: ../../../appendix/api-quick-reference.md:71
 msgid ""
 "use cuda_device::{gpu_printf, gpu_assert, ptx_asm};\n"
 "\n"
 "gpu_printf!(\"thread %d: val = %f\\n\", idx as i32, val as f64);\n"
-"gpu_assert!(val >= 0.0);\n"
+"gpu_assert!(val.is_finite());\n"
+"gpu_assert!(val >= 0.0, \"expected non-negative value\");\n"
 "\n"
 "let y: u32;\n"
 "unsafe {\n"
@@ -209,6 +241,14 @@ msgid "Runtime assertion; calls `trap()` on failure"
 msgstr ""
 
 #: ../../../appendix/api-quick-reference.md:0
+msgid "`gpu_assert!(condition, \"message\")`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Runtime assertion with CUDA diagnostic; message must be a literal"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
 msgid "`ptx_asm!(...)`"
 msgstr ""
 
@@ -216,11 +256,332 @@ msgstr ""
 msgid "Unsafe CUDA inline PTX"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:88
+#: ../../../appendix/api-quick-reference.md:91
+msgid ""
+"The message form lowers to CUDA's device-side `__assertfail` system call. "
+"The driver reports the message and call-site metadata, and synchronization "
+"returns `CUDA_ERROR_ASSERT`."
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:97
+msgid "Compile-time policy configuration"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:99
+msgid ""
+"use cuda_device::config::{\n"
+"    Atom, AtomKind, AtomSpec, Block, Cluster, ColumnMajor, Global, Layout,\n"
+"    MemorySpace, Policy, PolicyId, Register, RowMajor, Scope, Shape, "
+"Shape1,\n"
+"    Shape2, Shape3, Shared, TensorMemory, Thread, Tile, TileSpec, Warp,\n"
+"    WarpGroup,\n"
+"};\n"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:108
+msgid ""
+"Policies describe compile-time kernel configurations using zero-sized Rust "
+"types. A generic kernel is monomorphized once for every concrete policy "
+"type; the policy is not passed as a runtime kernel argument."
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:112
+msgid ""
+"trait VectorPolicy: Policy {\n"
+"    type BlockTile: TileSpec;\n"
+"    type ElementAtom: AtomSpec;\n"
+"\n"
+"    const MAX_THREADS: u32;\n"
+"    const MIN_BLOCKS: u32;\n"
+"    const UNROLL: u32;\n"
+"}\n"
+"\n"
+"enum SmallTilePolicy {}\n"
+"\n"
+"impl Policy for SmallTilePolicy {\n"
+"    const ID: PolicyId =\n"
+"        PolicyId::new(0x706f_6c69_6379_5f63, 1);\n"
+"}\n"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "API"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Description"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`Policy`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Minimal base trait for a named compile-time kernel policy"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`PolicyId`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid ""
+"Explicit stable identity containing a project-specific namespace and policy-"
+"local value"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`Shape`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid ""
+"Trait exposing a static shape's rank, extents, and checked element count"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`Shape1<D0>`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "One-dimensional compile-time shape"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`Shape2<D0, D1>`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Two-dimensional compile-time shape"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`Shape3<D0, D1, D2>`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Three-dimensional compile-time shape"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`Tile<S, L, M, Q>`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid ""
+"Metadata-only description combining shape, layout, memory space, and "
+"execution scope"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`TileSpec`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Type-level access to the components of a tile description"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`Atom<K, S, Q>`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid ""
+"Metadata-only description of an operation, logical footprint, and "
+"participating threads"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`AtomKind`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Open marker trait identifying a domain-specific operation"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`AtomSpec`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Type-level access to an atom's operation kind, shape, and scope"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`Layout`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Open trait for memory-order metadata"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`RowMajor`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Layout whose rightmost coordinate is contiguous"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`ColumnMajor`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Layout whose leftmost coordinate is contiguous"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`MemorySpace`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Open trait describing a CUDA storage location"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`Global`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Device global-memory marker"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`Shared`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Per-block shared-memory marker"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`Register`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Thread-local register-storage marker"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`TensorMemory`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Hardware tensor-memory marker"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`Scope`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Open trait describing the threads cooperating on an operation"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`Thread`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Single-thread execution scope"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`Warp`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Single-warp execution scope"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`WarpGroup`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Hardware warpgroup execution scope"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`Block`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Thread-block execution scope"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`Cluster`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Thread-block-cluster execution scope"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:158
+msgid ""
+"`Tile` and `Atom` are descriptions only. They do not allocate storage, "
+"provide pointer access, emit GPU instructions, synchronize threads, or "
+"establish a safety property. A domain-specific policy trait gives those "
+"descriptors meaning and validates supported combinations."
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:163
+msgid ""
+"`PolicyId` values are supplied explicitly by the policy library. They are "
+"not derived from Rust `TypeId`, type names, compiler mangling, or hashes. "
+"Keep an ID stable while the policy's generated behavior remains unchanged "
+"and allocate a new value when that behavior changes."
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:168
+msgid ""
+"Policy-associated constants can currently be used in compile-time "
+"`launch_bounds` and partial-loop `unroll` expressions:"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:171
+msgid ""
+"use cuda_device::{kernel, launch_bounds};\n"
+"\n"
+"#[kernel]\n"
+"#[launch_bounds(P::MAX_THREADS, P::MIN_BLOCKS)]\n"
+"pub unsafe fn transform<P: VectorPolicy>(\n"
+"    input: *const u32,\n"
+"    output: *mut u32,\n"
+"    count: u32,\n"
+") {\n"
+"    let mut lane = 0;\n"
+"\n"
+"    #[unroll(P::UNROLL)]\n"
+"    while lane < count {\n"
+"        // ...\n"
+"        lane += 1;\n"
+"    }\n"
+"}\n"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:191
+msgid ""
+"Generic policy expressions require `#![feature(generic_const_exprs)]`. "
+"`launch_contract` fields, cluster dimensions, and dynamic shared-memory "
+"sizes currently remain literal."
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:195
+msgid ""
+"See the [`policy_config`](https://github.com/NVlabs/cuda-oxide/tree/main/"
+"crates/rustc-codegen-cuda/examples/policy_config) example for two concrete "
+"policies that generate independent PTX specializations and policy-specific "
+"prepared launches."
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:202
 msgid "Thread Identification"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:90
+#: ../../../appendix/api-quick-reference.md:204
 msgid ""
 "use cuda_device::thread;\n"
 "\n"
@@ -228,8 +589,16 @@ msgid ""
 "ThreadIndex<'_, Index1D>\n"
 "let idx2d   = thread::index_2d::<128>();                     // "
 "Option<ThreadIndex<'_, Index2D<128>>>\n"
-"let idx2d_r = unsafe { thread::index_2d_runtime(stride) };   // "
+"let idx2d_r = thread::index_2d_runtime(&out);                // "
 "Option<ThreadIndex<'_, Runtime2DIndex>>\n"
+"//            `out` is the DisjointSlice<T, Runtime2DIndex> the index will "
+"address;\n"
+"//            its row width was bound once by the host via cuda_host::"
+"RowWidth.\n"
+"let idx32   = thread::index_1d_u32(launch_context);          // "
+"ThreadIndex32<'_>\n"
+"let pos32   = thread::coord_2d_u32(launch_context);          // "
+"ThreadCoord2D32<'_>\n"
 "\n"
 "let tid_x  = thread::threadIdx_x();    // u32\n"
 "let bid_x  = thread::blockIdx_x();     // u32\n"
@@ -242,10 +611,6 @@ msgstr ""
 
 #: ../../../appendix/api-quick-reference.md:0
 msgid "Returns"
-msgstr ""
-
-#: ../../../appendix/api-quick-reference.md:0
-msgid "Description"
 msgstr ""
 
 #: ../../../appendix/api-quick-reference.md:0
@@ -273,7 +638,7 @@ msgid "Const-stride 2D index; mismatched strides are a type error"
 msgstr ""
 
 #: ../../../appendix/api-quick-reference.md:0
-msgid "`unsafe thread::index_2d_runtime(s)`"
+msgid "`thread::index_2d_runtime(&slice)`"
 msgstr ""
 
 #: ../../../appendix/api-quick-reference.md:0
@@ -281,7 +646,31 @@ msgid "`Option<ThreadIndex<'_, Runtime2DIndex>>`"
 msgstr ""
 
 #: ../../../appendix/api-quick-reference.md:0
-msgid "Runtime-stride 2D index; caller asserts `s` is uniform"
+msgid "Runtime-width 2D index; row width read from the slice"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`thread::index_1d_u32(launch_context)`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`ThreadIndex32<'_>`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "1-D index as `u32`; requires checked `u32` coordinates"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`thread::coord_2d_u32(launch_context)`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`ThreadCoord2D32<'_>`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "2-D row/column as `u32`; requires checked `u32` coordinates"
 msgstr ""
 
 #: ../../../appendix/api-quick-reference.md:0
@@ -332,31 +721,35 @@ msgstr ""
 msgid "Block dimensions"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:113
+#: ../../../appendix/api-quick-reference.md:233
 msgid ""
-"`thread::index_2d::<S>()` and `thread::index_2d_runtime(s)` return `None` "
-"when the computed column exceeds the stride — use it to skip the right-edge "
-"tail in non-aligned 2D kernels."
+"`thread::index_2d::<S>()` and `thread::index_2d_runtime(&slice)` return "
+"`None` when the computed column exceeds the stride, which skips the right-"
+"edge tail in non-aligned 2D kernels."
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:117
+#: ../../../appendix/api-quick-reference.md:237
 msgid ""
 "`index_2d::<S>` is the safe const-stride form; the const generic encodes the "
 "stride in the witness type so threads cannot use different strides. "
-"Dimensionality remains a host-side obligation: `index_1d` requires inactive "
-"Y/Z dimensions, and 2D indices require inactive Z. A matching "
-"`PreparedLaunch<K>` proves this; a raw launch is unsafe. `index_2d_runtime` "
-"is the escape hatch for launches whose stride is only known at runtime; the "
-"caller takes on the \"every thread used the same stride\" obligation by "
-"writing `unsafe`. Full discussion in [The Safety Model](../gpu-safety/the-"
-"safety-model.md)."
+"`index_1d` requires inactive Y/Z dimensions, and 2D indices require inactive "
+"Z. A matching `PreparedLaunch<K>` proves this without device checks. "
+"Otherwise, the device rejects the wrong rank: `index_1d` creates an invalid "
+"witness and 2D helpers return `None`. A raw launch remains unsafe because "
+"its other memory and launch obligations are unchecked. `index_2d_runtime` "
+"covers launches whose stride is only known at runtime: the row width travels "
+"inside the slice, written once by the host into the launch packet "
+"(`cuda_host::RowWidth`), so there is no `unsafe` and no per-call stride for "
+"threads to disagree about. The witness stores the thread's `(row, col)` "
+"coordinates and the addressed slice resolves them against its own row width. "
+"Full discussion in [The Safety Model](../gpu-safety/the-safety-model.md)."
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:128
+#: ../../../appendix/api-quick-reference.md:253
 msgid "Safe Parallel Writes — DisjointSlice"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:130
+#: ../../../appendix/api-quick-reference.md:255
 msgid ""
 "use cuda_device::{DisjointSlice, kernel};\n"
 "\n"
@@ -425,18 +818,30 @@ msgstr ""
 msgid "Number of elements"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:149
+#: ../../../appendix/api-quick-reference.md:274
 msgid ""
 "`get_mut_indexed` is gated on `IndexSpace: IndexFormula` (impl'd by "
 "`Index1D` and `Index2D<S>`). For `Runtime2DIndex` slices, use the explicit "
-"`unsafe { thread::index_2d_runtime(s) }` + `get_mut(idx)` pair."
+"`thread::index_2d_runtime(&slice)` + `get_mut(idx)` pair; the slice resolves "
+"the witness's coordinates against its own host-bound row width (`slice."
+"row_width()`)."
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:155
+#: ../../../appendix/api-quick-reference.md:280
+msgid ""
+"For fixed-size tiles, use `DisjointSlice<T, LinearTiles<N>>::tile_thread32` "
+"or `DisjointSlice<T, RowMajorTiles<R, C, S>>::tile_2d32`. Each method checks "
+"a complete tile once, then `at_const` accesses known positions without "
+"another runtime bounds check. `S` is the caller-declared logical row width "
+"and must match the buffer layout. See {ref}`Check a tile once <check-a-tile-"
+"once>`."
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:288
 msgid "Shared Memory"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:157
+#: ../../../appendix/api-quick-reference.md:290
 msgid ""
 "use cuda_device::{SharedArray, DynamicSharedArray, thread};\n"
 "\n"
@@ -484,27 +889,27 @@ msgstr ""
 msgid "Runtime-sized shared memory (set via `LaunchConfig`)"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:182
+#: ../../../appendix/api-quick-reference.md:315
 msgid "Both are `!Sync` — concurrent access requires explicit barriers."
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:186
+#: ../../../appendix/api-quick-reference.md:319
 msgid "Synchronization"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:188
+#: ../../../appendix/api-quick-reference.md:321
 msgid "Block-Level"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:190
+#: ../../../appendix/api-quick-reference.md:323
 msgid "thread::sync_threads();   // __syncthreads() equivalent\n"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:194
+#: ../../../appendix/api-quick-reference.md:327
 msgid "Managed Barriers (Hopper+)"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:196
+#: ../../../appendix/api-quick-reference.md:329
 msgid ""
 "use cuda_device::{ManagedBarrier, TmaBarrierHandle, Uninit, Ready};\n"
 "\n"
@@ -560,11 +965,11 @@ msgstr ""
 msgid "Invalidate barrier (cleanup)"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:217
+#: ../../../appendix/api-quick-reference.md:350
 msgid "Warp Primitives"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:219
+#: ../../../appendix/api-quick-reference.md:352
 msgid ""
 "use cuda_device::warp;\n"
 "\n"
@@ -577,22 +982,30 @@ msgid ""
 "let from_below = warp::shuffle_up_f32(val, delta);\n"
 "let from_lane  = warp::shuffle_f32(val, src_lane);\n"
 "\n"
-"// i32 variants\n"
-"let partner_i = warp::shuffle_xor_i32(val, mask);\n"
+"// u32 is the unsuffixed form\n"
+"let partner_u = warp::shuffle_xor(val_u32, mask);\n"
 "\n"
 "// Vote\n"
 "let all_true = warp::all(predicate);\n"
 "let any_true = warp::any(predicate);\n"
 "let mask     = warp::ballot(predicate);\n"
-"let count    = warp::popc(mask);\n"
+"let count    = warp::popc(predicate); // == ballot(predicate).count_ones()\n"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:241
+#: ../../../appendix/api-quick-reference.md:374
 msgid "Shuffle Operations"
 msgstr ""
 
+#: ../../../appendix/api-quick-reference.md:376
+msgid ""
+"The unsuffixed name takes `u32`; `_f32`, `_f64` and `_u64` are the other "
+"widths. Each also has a `_sync` form taking an explicit member mask. There "
+"is no `_i32` variant — reinterpret an `i32` and use the `u32` form, since a "
+"shuffle moves bits and does not interpret them."
+msgstr ""
+
 #: ../../../appendix/api-quick-reference.md:0
-msgid "`shuffle_xor_{f32,i32}(val, mask)`"
+msgid "`shuffle_xor(val, mask)` + `_f32/_f64/_u64`"
 msgstr ""
 
 #: ../../../appendix/api-quick-reference.md:0
@@ -600,7 +1013,7 @@ msgid "Exchange with lane `id ^ mask`"
 msgstr ""
 
 #: ../../../appendix/api-quick-reference.md:0
-msgid "`shuffle_down_{f32,i32}(val, delta)`"
+msgid "`shuffle_down(val, delta)` + `_f32/_f64/_u64`"
 msgstr ""
 
 #: ../../../appendix/api-quick-reference.md:0
@@ -608,7 +1021,7 @@ msgid "Read from lane `id + delta`"
 msgstr ""
 
 #: ../../../appendix/api-quick-reference.md:0
-msgid "`shuffle_up_{f32,i32}(val, delta)`"
+msgid "`shuffle_up(val, delta)` + `_f32/_f64/_u64`"
 msgstr ""
 
 #: ../../../appendix/api-quick-reference.md:0
@@ -616,14 +1029,14 @@ msgid "Read from lane `id - delta`"
 msgstr ""
 
 #: ../../../appendix/api-quick-reference.md:0
-msgid "`shuffle_{f32,i32}(val, src)`"
+msgid "`shuffle(val, src)` + `_f32/_f64/_u64`"
 msgstr ""
 
 #: ../../../appendix/api-quick-reference.md:0
 msgid "Read from specific lane"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:250
+#: ../../../appendix/api-quick-reference.md:388
 msgid "Vote Operations"
 msgstr ""
 
@@ -656,22 +1069,22 @@ msgid "Bitmask of lanes where predicate is true"
 msgstr ""
 
 #: ../../../appendix/api-quick-reference.md:0
-msgid "`popc(mask)`"
+msgid "`popc(pred)`"
 msgstr ""
 
 #: ../../../appendix/api-quick-reference.md:0
-msgid "Population count of set bits"
+msgid "Count of lanes where predicate is true"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:261
+#: ../../../appendix/api-quick-reference.md:399
 msgid "Atomics"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:263
+#: ../../../appendix/api-quick-reference.md:401
 msgid "Scoped GPU Atomics"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:265
+#: ../../../appendix/api-quick-reference.md:403
 msgid ""
 "use cuda_device::atomic::{DeviceAtomicU32, AtomicOrdering};\n"
 "\n"
@@ -691,7 +1104,7 @@ msgid "Types"
 msgstr ""
 
 #: ../../../appendix/api-quick-reference.md:0
-msgid "`DeviceAtomic{U32,I32,U64,I64,F32,F64}`"
+msgid "`DeviceAtomic{U32,I32,U64,I64,F16,F32,F64}`"
 msgstr ""
 
 #: ../../../appendix/api-quick-reference.md:0
@@ -699,7 +1112,7 @@ msgid "`.gpu` scope"
 msgstr ""
 
 #: ../../../appendix/api-quick-reference.md:0
-msgid "`BlockAtomic{U32,I32,U64,I64,F32,F64}`"
+msgid "`BlockAtomic{U32,I32,U64,I64,F16,F32,F64}`"
 msgstr ""
 
 #: ../../../appendix/api-quick-reference.md:0
@@ -707,24 +1120,32 @@ msgid "`.cta` scope"
 msgstr ""
 
 #: ../../../appendix/api-quick-reference.md:0
-msgid "`SystemAtomic{U32,I32,U64,I64,F32,F64}`"
+msgid "`SystemAtomic{U32,I32,U64,I64,F16,F32,F64}`"
 msgstr ""
 
 #: ../../../appendix/api-quick-reference.md:0
 msgid "`.sys` scope (CPU-GPU shared)"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:281
+#: ../../../appendix/api-quick-reference.md:419
+msgid ""
+"Twenty-one types: seven value widths in each of the three scopes. The `F16` "
+"variants take the same surface as `F32`/`F64` -- `load`, `store`, "
+"`fetch_add`, `fetch_sub`, `swap` -- with `fetch_add`/`fetch_sub` lowering to "
+"hardware `atom.add.noftz.f16`."
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:424
 msgid ""
 "`core::sync::atomic` types (`AtomicU32`, `AtomicBool`, etc.) also compile to "
 "GPU code, defaulting to system scope."
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:286
+#: ../../../appendix/api-quick-reference.md:429
 msgid "TMA — Tensor Memory Accelerator (Hopper+)"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:288
+#: ../../../appendix/api-quick-reference.md:431
 msgid ""
 "use cuda_device::tma::TmaDescriptor;\n"
 "use cuda_device::tma::{cp_async_bulk_tensor_2d_g2s, "
@@ -777,11 +1198,11 @@ msgstr ""
 msgid "Wait until ≤ n groups remain"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:308
+#: ../../../appendix/api-quick-reference.md:451
 msgid "Cluster Programming (Hopper+)"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:310
+#: ../../../appendix/api-quick-reference.md:453
 msgid ""
 "use cuda_device::cluster;\n"
 "\n"
@@ -791,16 +1212,28 @@ msgid ""
 "cluster::cluster_sync();                 // Barrier across all cluster "
 "blocks\n"
 "\n"
-"// Distributed Shared Memory\n"
-"let remote_ptr = cluster::map_shared_rank(local_ptr, target_rank);\n"
-"let val = cluster::dsmem_read_u32(remote_ptr);\n"
+"// Distributed Shared Memory. Both are `unsafe fn` and both take the "
+"*local*\n"
+"// pointer plus the target rank; they do the rank mapping themselves, so\n"
+"// never pass a pointer already returned by `map_shared_rank` back in.\n"
+"\n"
+"// `map_shared_rank` returns a real pointer into the target block's shared\n"
+"// memory (cluster-shared address space). Plain reads and writes through it\n"
+"// compile to ld.shared::cluster / st.shared::cluster and just work on "
+"sm_90+.\n"
+"let remote_ptr = unsafe { cluster::map_shared_rank(local_ptr, "
+"target_rank) };\n"
+"let val = unsafe { *remote_ptr };  // ld.shared::cluster\n"
+"\n"
+"// Fixed-width alternative: map and read one u32 in a single call.\n"
+"let val = unsafe { cluster::dsmem_read_u32(local_u32_ptr, target_rank) };\n"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:324
+#: ../../../appendix/api-quick-reference.md:476
 msgid "Tensor Cores — WGMMA (Hopper, SM 90)"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:326
+#: ../../../appendix/api-quick-reference.md:478
 msgid ""
 "use cuda_device::wgmma;\n"
 "\n"
@@ -809,18 +1242,18 @@ msgid ""
 "wgmma::wgmma_wait_group::<0>();\n"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:334
+#: ../../../appendix/api-quick-reference.md:486
 msgid ""
 "Warpgroup MMA: 4 warps (128 threads) issue matrix multiply-accumulate from "
 "shared memory. Operands described by SMEM descriptors; accumulator in "
 "registers."
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:339
+#: ../../../appendix/api-quick-reference.md:491
 msgid "Tensor Cores — tcgen05 (Blackwell, SM 100+)"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:341
+#: ../../../appendix/api-quick-reference.md:493
 msgid ""
 "use cuda_device::tcgen05::{TmemGuard, TmemUninit, TmemReady};\n"
 "use cuda_device::SharedArray;\n"
@@ -834,22 +1267,22 @@ msgid ""
 "let _guard = unsafe { guard.dealloc() }; // TmemReady → TmemDeallocated\n"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:353
+#: ../../../appendix/api-quick-reference.md:505
 msgid ""
 "Single-thread MMA issue into dedicated Tensor Memory (TMEM). `TmemGuard` "
 "manages TMEM lifetime with typestate: `TmemUninit → TmemReady → "
 "TmemDeallocated`. N_COLS must be a power of 2 in the range [32, 512]."
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:359
+#: ../../../appendix/api-quick-reference.md:511
 msgid "Host-Side: Kernel Launch"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:361
+#: ../../../appendix/api-quick-reference.md:513
 msgid "Typed Synchronous"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:363
+#: ../../../appendix/api-quick-reference.md:515
 msgid ""
 "use cuda_core::{CudaContext, DeviceBuffer, LaunchConfig};\n"
 "\n"
@@ -869,11 +1302,11 @@ msgid ""
 ".unwrap();\n"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:381
+#: ../../../appendix/api-quick-reference.md:533
 msgid "Typed Async"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:383
+#: ../../../appendix/api-quick-reference.md:535
 msgid ""
 "use cuda_async::device_operation::DeviceOperation;\n"
 "\n"
@@ -889,7 +1322,7 @@ msgid ""
 "// or: op.await?;  // async with tokio\n"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:396
+#: ../../../appendix/api-quick-reference.md:548
 msgid ""
 "Raw generated calls are unsafe because `LaunchConfig` is not tied to a "
 "kernel. A kernel with `#[launch_contract]` instead uses "
@@ -898,7 +1331,7 @@ msgid ""
 "level APIs for explicit module loading and custom launch code."
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:402
+#: ../../../appendix/api-quick-reference.md:554
 msgid "LaunchConfig"
 msgstr ""
 
@@ -918,26 +1351,220 @@ msgstr ""
 msgid "Direct struct construction"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:411
+#: ../../../appendix/api-quick-reference.md:563
+msgid "Host-Side: Virtual Memory Management"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:565
+msgid "VMM lifecycle"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`vmm::allocation_granularity(device)`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Query the required allocation granularity"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`vmm::align_size(size, granularity)`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Round a size to the required granularity"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`PhysicalAllocation::new(device, size)`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Allocate physical memory"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`VirtualReservation::new(size, alignment)`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Reserve a virtual address range"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`Mapping::new(va, size, &physical, offset)`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Map physical memory into a VA range"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`vmm::set_access(va, size, devices)`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Grant read/write access to selected devices"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:576
+msgid ""
+"Mappings must be dropped before their virtual reservations and physical "
+"allocations."
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:581
+msgid "Host-Side: Peer Access"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`peer::can_access_peer(from, to)`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Query whether the topology supports direct access"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`peer::enable_peer_access(from, to)`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Enable one-directional peer access"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`peer::disable_peer_access(from, to)`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Disable one-directional peer access"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:589
+msgid ""
+"Peer access is directional. Enable both directions when both devices must "
+"initiate accesses."
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:594
+msgid "Host-Side: Kernel Families"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`KernelFamily<Id, Entry, Meta, N>`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Fixed set of ahead-of-time compiled variants"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`KernelVariant<Id, Entry, Meta>`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Stable ID, callable entry, and policy metadata"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`KernelProblem<Variant>`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Validates whether a variant is eligible"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`KernelSelector<Problem, Variant, Id>`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Chooses among already eligible variants"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`KernelSelectionCache<Problem, Id>`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Stores stable selection IDs"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`NoKernelSelectionCache`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Disables caching"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`SelectionMode::Auto`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Uses validated cache results or invokes the selector"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`SelectionMode::Force(id)`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Bypasses cache and selector but still validates eligibility"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`SelectedVariant`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Returns the selected variant and its provenance"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`SelectionSource`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "Reports override, cache, or selector provenance"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:609
+msgid ""
+"`KernelFamily::try_new` rejects empty families, blank family names, and "
+"duplicate variant IDs. The family name and revision form the cache "
+"namespace. Increment the revision whenever variant semantics, membership, "
+"ordering, or selection policy changes."
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:614
+msgid ""
+"See [Kernel Families](../gpu-programming/kernel-families.md) for the "
+"complete selection model and example."
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:619
 msgid "Debug Facilities"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:413
+#: ../../../appendix/api-quick-reference.md:621
 msgid ""
 "use cuda_device::debug;\n"
 "\n"
 "let t = debug::clock64();       // Cycle counter\n"
 "debug::trap();                  // Abort kernel\n"
 "debug::breakpoint();            // cuda-gdb breakpoint\n"
-"cuda_device::barrier::nanosleep(1000); // Sleep ~1μs\n"
+"unsafe { cuda_device::barrier::nanosleep(1000) }; // Sleep ~1μs\n"
 "debug::prof_trigger::<7>();     // Nsight profiler trigger\n"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:425
+#: ../../../appendix/api-quick-reference.md:633
 msgid "Quick Reference Tables"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:427
+#: ../../../appendix/api-quick-reference.md:635
 msgid "cuda-device Modules"
 msgstr ""
 
@@ -959,6 +1586,16 @@ msgstr ""
 
 #: ../../../appendix/api-quick-reference.md:0
 msgid "All"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid "`config`"
+msgstr ""
+
+#: ../../../appendix/api-quick-reference.md:0
+msgid ""
+"Compile-time policies, shapes, tiles, atoms, layouts, memory spaces, and "
+"scopes"
 msgstr ""
 
 #: ../../../appendix/api-quick-reference.md:0
@@ -1097,7 +1734,7 @@ msgstr ""
 msgid "Cluster Launch Control"
 msgstr ""
 
-#: ../../../appendix/api-quick-reference.md:448
+#: ../../../appendix/api-quick-reference.md:657
 msgid "Crate Map"
 msgstr ""
 
@@ -1138,7 +1775,7 @@ msgid "`cuda-core`"
 msgstr ""
 
 #: ../../../appendix/api-quick-reference.md:0
-msgid "Safe RAII wrappers (`CudaContext`, `CudaStream`, `DeviceBuffer<T>`)"
+msgid "Safe RAII wrappers for contexts, streams, buffers, VMM, and P2P"
 msgstr ""
 
 #: ../../../appendix/api-quick-reference.md:0
@@ -1162,5 +1799,7 @@ msgid "`cargo-oxide`"
 msgstr ""
 
 #: ../../../appendix/api-quick-reference.md:0
-msgid "Cargo subcommand (`cargo oxide run`, `build`, `sanitize`, `debug`)"
+msgid ""
+"Cargo subcommand (`cargo oxide run`, `build`, `inspect`, `clean`, "
+"`sanitize`, `debug`)"
 msgstr ""
