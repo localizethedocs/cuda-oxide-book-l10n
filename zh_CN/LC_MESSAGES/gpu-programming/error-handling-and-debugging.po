@@ -1,0 +1,1161 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025-2026, NVIDIA Corporation
+# This file is distributed under the same license as the cuda-oxide package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: cuda-oxide \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-16 12:33+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:1
+msgid "Error Handling and Debugging"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:3
+msgid ""
+"GPU kernels fail differently from CPU code. The CUDA toolchain does not "
+"support exceptions or stack unwinding today, there are no stack traces in "
+"kernel output, and no `println!`. When something goes wrong, the result is "
+"either silent data corruption, a hardware trap, or a cryptic driver error on "
+"the host. This chapter covers cuda-oxide's tools for diagnosing and fixing "
+"kernel problems."
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:10
+msgid "What happens when a kernel goes wrong"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:12
+msgid "GPU errors fall into three categories:"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "Failure mode"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "What you see"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "Example"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "**Silent corruption**"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "Wrong results, no error"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "Race condition, off-by-one index"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "**Hardware trap**"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "`CUDA_ERROR_ILLEGAL_INSTRUCTION` on host"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "`gpu_assert!` failure, panic, OOB access"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "**Launch failure**"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "`DriverError` returned immediately"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "Wrong grid dims, missing module, out of resources"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:20
+msgid ""
+"The CUDA toolchain does not expose an exception mechanism today (the "
+"hardware could support it, but nvcc/ptxas do not wire it up). A trap "
+"instruction kills the kernel and poisons the CUDA context -- subsequent "
+"operations on the same context will fail until you handle or recreate it."
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:25
+msgid "`gpu_printf!` -- printing from the GPU"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:27
+msgid ""
+"`gpu_printf!` lets you print values from device code for quick debugging. It "
+"uses CUDA's built-in `vprintf` mechanism:"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:30
+msgid ""
+"use cuda_device::{kernel, thread, gpu_printf, DisjointSlice};\n"
+"\n"
+"#[kernel]\n"
+"pub fn debug_kernel(data: &[f32], mut out: DisjointSlice<f32>) {\n"
+"    let idx = thread::index_1d();\n"
+"    if idx.get() < 4 {\n"
+"        gpu_printf!(\"Thread {} sees value {}\\n\", idx.get(), data[idx."
+"get()]);\n"
+"    }\n"
+"    if let Some(out_elem) = out.get_mut(idx) {\n"
+"        *out_elem = data[idx.get()] * 2.0;\n"
+"    }\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:45
+msgid "Important details"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:47
+msgid ""
+"**Flush requires sync.** Output is buffered on the GPU and only appears on "
+"the host after a stream or device synchronization (e.g., `to_host_vec` or "
+"`ctx.synchronize()`)."
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:50
+msgid ""
+"**Buffer size.** The default printf buffer is 1 MiB. If many threads print, "
+"output may be truncated. Enlarge with "
+"`cudaDeviceSetLimit(cudaLimitPrintfFifoSize, size)`."
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:53
+msgid ""
+"**Thread ordering.** Output from different threads appears in arbitrary "
+"order."
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:54
+msgid ""
+"**Performance.** Printf serializes across threads -- avoid it in hot paths. "
+"Use it for debugging, not logging."
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:56
+msgid ""
+"**Format conversion.** The macro converts Rust `{}` format specifiers to C "
+"printf equivalents (`%d`, `%f`, etc.) at compile time."
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:59
+msgid "Why not `println!` or `Debug`?"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:61
+msgid ""
+"Standard Rust formatting (`fmt::Display`, `fmt::Debug`, `format!`, `println!"
+"`) requires dynamic dispatch, string allocation, and I/O -- none of which "
+"exist on the GPU. `gpu_printf!` bypasses all of this by lowering directly to "
+"a CUDA `vprintf` call."
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:66
+msgid "`gpu_assert!` and `trap()`"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:68
+msgid ""
+"For fatal error checking on the device, use `gpu_assert!` or `debug::trap()`:"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:70
+msgid ""
+"use cuda_device::{kernel, thread, debug, gpu_assert, DisjointSlice};\n"
+"\n"
+"#[kernel]\n"
+"pub fn checked_kernel(data: &[f32], len: u32, mut out: DisjointSlice<f32>) "
+"{\n"
+"    let idx = thread::index_1d();\n"
+"    gpu_assert!(idx.get() < len as usize);   // traps if false\n"
+"\n"
+"    if let Some(out_elem) = out.get_mut(idx) {\n"
+"        *out_elem = data[idx.get()];\n"
+"    }\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "Intrinsic"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "What it does"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "Host effect"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "`gpu_assert!(condition)`"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "Traps if condition is false"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "`CUDA_ERROR_ILLEGAL_INSTRUCTION`"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "`debug::trap()`"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "Unconditional trap"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "`debug::breakpoint()`"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "Emit `brkpt` instruction"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "Pauses in cuda-gdb; crashes without debugger"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:90
+msgid "The trap-and-check pattern"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:92
+msgid "A common workflow for catching device-side errors:"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:94
+msgid ""
+"// Launch kernel\n"
+"// SAFETY: config matches vecadd's 1D indexing and all buffer bounds.\n"
+"unsafe { module.vecadd(&stream, config, &a, &b, &mut c) }\n"
+"    .expect(\"Launch failed\");\n"
+"\n"
+"// Synchronize and check for traps\n"
+"stream.synchronize().expect(\"Kernel trapped -- check gpu_assert! "
+"conditions\");\n"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:104
+msgid ""
+"If a `gpu_assert!` fires, synchronization returns an error. The error "
+"message doesn't tell you *which* assertion failed, so use `gpu_printf!` "
+"alongside assertions to narrow down the problem."
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:108
+msgid "Host-side error handling"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:110
+msgid "`DriverError`"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:112
+msgid ""
+"The synchronous launch path returns `Result<(), DriverError>`. The "
+"`DriverError` wraps a CUDA driver result code:"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:115
+msgid ""
+"// SAFETY: config matches vecadd's 1D indexing and all buffer bounds.\n"
+"match unsafe { module.vecadd(&stream, config, &a, &b, &mut c) } {\n"
+"    Ok(()) => { /* launched successfully */ }\n"
+"    Err(e) => eprintln!(\"Launch failed: {e}\"),\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:123
+msgid "`DeviceError`"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:125
+msgid ""
+"The async path (`{kernel}_async` / `DeviceOperation`) uses `DeviceError`, "
+"which wraps driver errors alongside context and scheduling failures:"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:128
+msgid ""
+"use cuda_async::error::DeviceError;\n"
+"\n"
+"let result: Result<Vec<f32>, DeviceError> = operation.sync();\n"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:134
+msgid ""
+"`DeviceError` variants include `Driver`, `Context`, `KernelCache`, "
+"`Scheduling`, `Launch`, and `Internal`."
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:137
+msgid "`CudaContext::check_err`"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:139
+msgid ""
+"After a series of operations, call `check_err()` on the context to surface "
+"any asynchronous errors that may have been recorded:"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:142
+msgid "ctx.check_err().expect(\"Asynchronous GPU error detected\");\n"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:146
+msgid "`cargo oxide debug` -- cuda-gdb integration"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:148
+msgid ""
+"`cargo oxide debug` builds your kernel with debug info and launches cuda-gdb:"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:150
+msgid ""
+"cargo oxide debug vecadd          # Standard GDB\n"
+"cargo oxide debug vecadd --tui    # GDB with TUI\n"
+"cargo oxide debug vecadd --cgdb   # cgdb front-end\n"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:156
+msgid ""
+"By default this gives you **source-level debugging**: cuda-gdb can stop in "
+"Rust source files and show a useful backtrace. Local-variable inspection is "
+"a separate, heavier mode that you opt into when you need it."
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:160
+msgid "Debug info modes"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:162
+msgid "cuda-oxide has three device debug modes:"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "Mode"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "How to enable it"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "What you get"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "Cost"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "Off"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "default for normal `build` / `run`"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "Fastest generated PTX, no source mapping"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "none"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "Line tables"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "`cargo oxide debug`, or `CUDA_OXIDE_DEBUG=line-tables`"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "Source breakpoints, stepping, backtraces"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "low"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "Full"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "`CUDA_OXIDE_DEBUG=full cargo oxide debug <example>`"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "Line tables plus basic argument/local inspection"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "higher"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:170
+msgid ""
+"Think of line tables as a map from machine instructions back to source lines:"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:172
+msgid "PTX instruction  ──debug line table──>  src/main.rs:39\n"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:176
+msgid "Full debug adds variable records:"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:178
+msgid ""
+"source local `tid`\n"
+"      |\n"
+"      v\n"
+"LLVM/DWARF says: \"tid lives in this stack slot\"\n"
+"      |\n"
+"      v\n"
+"cuda-gdb can try: print tid\n"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:188
+msgid ""
+"For local variables, the debugger also needs the current instruction to be "
+"inside the same lexical scope as the variable:"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:191
+msgid ""
+"function\n"
+"  └─ if-let block\n"
+"      └─ loop block\n"
+"          └─ current instruction\n"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:198
+msgid ""
+"If you stop too early, such as at kernel launch or at the first helper call, "
+"the variable may honestly print as `<optimized out>` because it has not been "
+"loaded into a register yet. For variable checks, prefer a source line after "
+"the value is used:"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:203
+msgid ""
+"break src/main.rs:412\n"
+"run\n"
+"info args\n"
+"info locals\n"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:210
+msgid ""
+"Seeing one variable as `<optimized out>` is not automatically a compiler "
+"bug; it can mean \"this value has no live machine location at this exact PC."
+"\" Debug info is a map, not a time machine."
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:214
+msgid ""
+"For inlined helper calls, cuda-oxide also keeps the original owner of each "
+"argument. That matters because two different functions can both have an "
+"argument numbered `1`:"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:218
+msgid ""
+"kernel(data) calls helper(self)\n"
+"\n"
+"data -> arg #1 in kernel's debug scope\n"
+"self -> arg #1 in helper's debug scope, with \"inlined at\" the kernel "
+"callsite\n"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:225
+msgid ""
+"Without that scope split, LLVM treats the metadata as contradictory and "
+"drops it. Debug info is fussy like that; it wants the family tree, not just "
+"the surname."
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:229
+msgid ""
+"Use line tables first. They are enough for most \"where did execution go?\" "
+"questions, and they avoid the slower CUDA debug target mode. Use full debug "
+"when you specifically want `print idx`, `print ptr`, or similar local-"
+"variable inspection. Debuggers are allowed to be nosy; they are not always "
+"allowed to be fast."
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:235
+msgid ""
+"The `CUDA_OXIDE_DEBUG` override works with `build`, `run`, `pipeline`, and "
+"`debug`:"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:238
+msgid ""
+"CUDA_OXIDE_DEBUG=line-tables cargo oxide pipeline vecadd\n"
+"CUDA_OXIDE_DEBUG=full cargo oxide debug vecadd\n"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:243
+msgid "Useful aliases:"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "Value"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "Meaning"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "`off`, `none`, `0`"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "no device debug metadata"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "`line-tables`, `line`, `lines`, `1`"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "source line tables only"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "`full`, `2`"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "line tables plus basic variable metadata"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:251
+msgid "Why full debug turns optimization off"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:253
+msgid ""
+"Reliable local inspection and aggressive optimization pull in opposite "
+"directions. An optimized value usually lives in a register only across the "
+"short window where it is used; outside that window the debugger honestly has "
+"nowhere to read it from, so `info locals` shows `<optimized out>`. The only "
+"way to make a variable inspectable for its whole scope is to keep it in "
+"**memory** and describe it with `llvm.dbg.declare`, the way every debug "
+"build does (`gcc -O0`, `rustc` debug, and nvcc `-G`)."
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:261
+msgid "So `CUDA_OXIDE_DEBUG=full` is a `-G`-style build. It automatically:"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:263
+msgid "keeps every source local in its stack slot (skips Pliron `mem2reg`),"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:264
+msgid "skips annotated loop unrolling, which requires `mem2reg`'s SSA form,"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:265
+msgid "skips LLVM `opt -O2`, and"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:266
+msgid "runs `llc` at `-O0`,"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:268
+msgid ""
+"so the locals you see in cuda-gdb are real and stable. You do not need to "
+"set `CUDA_OXIDE_NO_OPT=1` yourself; full mode implies it."
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "Setting"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "`CUDA_OXIDE_DEBUG=off`"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "no device debug metadata; fully optimized PTX"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+#: ../../../gpu-programming/error-handling-and-debugging.md:328
+msgid "`CUDA_OXIDE_DEBUG=line-tables`"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "source lines only; still optimized"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+#: ../../../gpu-programming/error-handling-and-debugging.md:328
+msgid "`CUDA_OXIDE_DEBUG=full`"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:0
+msgid "source lines plus locals/args; optimization off (`-G`)"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:277
+msgid ""
+"Line tables stay on the optimized pipeline because a line map survives "
+"optimization well; locals do not, which is why full mode steps off it."
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:280
+msgid ""
+"The promotion-aware `mir.dbg_value` salvage that Pliron `mem2reg` performs "
+"is the building block for a future *optimized* debug tier (locals through "
+"`opt -O2`, best-effort). It is not what `full` uses today."
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:284
+msgid "What works today"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:286
+msgid "Line-table mode supports:"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:288
+msgid "breakpoints by kernel name, e.g. `break vecadd`"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:289
+msgid "source stepping and backtraces"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:290
+msgid ""
+"helper/inlined source locations from other files, such as stepping from your "
+"kernel into `cuda-device/src/thread.rs`"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:293
+msgid "Full mode (`-G`) supports inspecting:"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:295
+msgid "local variables and arguments rustc exposes through `var_debug_info`"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:296
+msgid "scalar types (`bool`, integers, floats), raw pointers, and references"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:297
+msgid ""
+"structs, tuples, and fixed-size arrays, with their fields shown at the "
+"correct (real-layout) offsets, e.g. `out = DisjointSlice {ptr: 0x..., len: 1}"
+"` and `idx = ThreadIndex {raw: 0}`"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:301
+msgid ""
+"End-to-end behavior (breakpoint binds, backtrace, `info args`/`info locals`) "
+"is checked on real hardware by `scripts/debug-smoketest.sh`."
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:304
+msgid ""
+"Full mode does **not** yet describe: enums (`Option`, `Result`, and other "
+"multi-variant types), bare slice arguments split into a `(ptr, len)` pair at "
+"the ABI boundary, closures, projections like `x.0`, or destructured "
+"variables. Locals of an inlined helper frame may also show fewer entries "
+"than the kernel frame; select the kernel frame (`frame 1`) to inspect kernel "
+"locals."
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:310
+msgid "Breakpoint workflow"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:312
+msgid "Build with debug: `cargo oxide debug <example>`"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:313
+msgid "Set a breakpoint on your kernel: `break vecadd`"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:314
+msgid "Run: `run`"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:315
+msgid "Inspect threads: `cuda thread`, `cuda block`, `cuda warp`"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:316
+msgid "Print variables: `print idx`, `print *c_elem`"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:318
+msgid ""
+"`cargo oxide debug` selects the executable from Cargo's build artifact "
+"metadata instead of assuming `target/release/<example>`. That keeps "
+"debugging working with custom binary names, `package.default-run`, "
+"configured target directories, host target triples, and virtual workspaces. "
+"Use `--bin <name>` when a package has multiple binaries and no unambiguous "
+"default."
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:324
+msgid ""
+"For programmatic breakpoints, use `debug::breakpoint()` in your kernel code. "
+"When cuda-gdb hits the `brkpt` instruction, it pauses execution and lets you "
+"inspect the GPU state."
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:329
+msgid ""
+"`debug::breakpoint()` will **crash** the kernel if no debugger is attached. "
+"Guard it with a compile-time flag or only use it during debugging sessions."
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:333
+msgid "`cargo oxide sanitize` -- Compute Sanitizer"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:335
+msgid ""
+"For memory and synchronization correctness checks, run the same build path "
+"under NVIDIA Compute Sanitizer:"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:338
+msgid ""
+"cargo oxide sanitize vecadd\n"
+"cargo oxide sanitize sharedmem --tool racecheck\n"
+"cargo oxide sanitize debug --tool synccheck -- --kernel-name kns=clock\n"
+"cargo oxide sanitize my_app -- --leak-check full -- --app-flag value\n"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:345
+msgid ""
+"`memcheck` is the default tool. Use `racecheck` for shared-memory hazards, "
+"`initcheck` for uninitialized global-memory reads, and `synccheck` for "
+"invalid synchronization usage. Extra arguments after `--` are passed "
+"directly to `compute-sanitizer` before the executable; use a second `--` to "
+"pass arguments to the target program after the executable."
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:351
+msgid ""
+"The command enables optimized device line tables by default so findings can "
+"name Rust source files and lines. An explicit `CUDA_OXIDE_DEBUG` process or "
+"project setting still wins."
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:355
+msgid ""
+"Compute Sanitizer normally exits with status zero even when it reports a "
+"tool finding. `cargo oxide sanitize` therefore supplies `--error-exitcode "
+"86` by default, making findings fail scripts and CI. An explicit sanitizer "
+"argument overrides that default:"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:360
+msgid ""
+"# Intentionally keep a zero exit status and inspect the printed report.\n"
+"cargo oxide sanitize vecadd -- --error-exitcode 0\n"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:365
+msgid ""
+"Options such as `--check-exit-code no` and `--require-cuda-init no` weaken "
+"what a zero status proves. The wrapper therefore never declares the report "
+"clean from process status alone; it reports completion and leaves the "
+"sanitizer output visible for inspection."
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:370
+msgid ""
+"The `--no-fmad` CLI flag is forwarded through both ordinary and interop "
+"builds. It keeps ordinary multiply and add/subtract operations separate, "
+"with one rounding per operation. Explicit fused operations such as `f32::"
+"mul_add` remain fused."
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:375
+msgid ""
+"NVVM IR and LTOIR builds also produce `.options` and versioned `.target` "
+"sidecars. Keep both files with the artifact so later libNVVM and nvJitLink "
+"steps preserve the same FMA policy."
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:379
+msgid ""
+"Run `memcheck` first when investigating memory safety. The other tools are "
+"complementary and do not perform full memory-access checking."
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:382
+msgid "`cargo oxide doctor` -- environment validation"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:384
+msgid ""
+"Before debugging kernel failures, verify your environment is correctly set "
+"up:"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:386
+msgid "cargo oxide doctor\n"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:390
+msgid "Doctor checks:"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:328
+msgid "Check"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:328
+msgid "What it verifies"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:328
+msgid "Rust toolchain"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:328
+msgid "Nightly compiler with required components"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:328
+msgid "Codegen backend"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:328
+msgid "`librustc_codegen_cuda.so` built"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:328
+msgid "CUDA headers"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:328
+msgid "`cuda.h` present under the toolkit root"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:328
+msgid "CUDA toolkit"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:328
+msgid "`nvcc` found and version compatible"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:328
+msgid "libNVVM"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:328
+msgid "`libnvvm.so` loadable (libdevice math kernels)"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:328
+msgid "nvJitLink"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:328
+msgid "`libnvJitLink.so` loadable (same)"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:328
+msgid "libdevice"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:328
+msgid "`libdevice.10.bc` discoverable (same)"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:328
+msgid "LLVM"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:328
+msgid "`llc` (21+) available for PTX generation"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:328
+msgid "Driver / GPU"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:328
+msgid "`nvidia-smi` reports a GPU and its compute cap"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:404
+msgid ""
+"The libNVVM / nvJitLink / libdevice checks fire only when a kernel calls "
+"CUDA libdevice math (`sin`, `cos`, `exp`, `pow`, `sqrt`, ...). If your "
+"kernel is pure arithmetic, those three failing is harmless. They all ship "
+"with the CUDA Toolkit -- no separate download. If any check fails, doctor "
+"prints the standard install location for that component."
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:410
+msgid ""
+"Doctor itself needs neither the CUDA toolkit nor a driver, and it never "
+"builds anything first, so it works on a machine where nothing is installed "
+"yet. Two checks are informational rather than fatal: the codegen backend (a "
+"missing `.so` just means \"run `cargo oxide setup`\"; `run`/`build` build it "
+"on demand anyway) and the driver / GPU check (only `cargo oxide run` needs a "
+"GPU; `build` and `pipeline` work without one)."
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:417
+msgid "`cargo oxide pipeline` -- inspecting the compilation"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:419
+msgid ""
+"When a kernel produces wrong results but no errors, inspect the compilation "
+"pipeline to see exactly what code was generated:"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:422
+msgid "cargo oxide pipeline vecadd\n"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:426
+msgid "This prints the full pipeline output:"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:428
+msgid "**MIR collection** -- which functions the collector found"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:429
+msgid ""
+"**`dialect-mir`** -- pliron IR modelling Rust MIR (before and after "
+"`mem2reg`)"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:430
+msgid ""
+"**LLVM dialect** -- pliron IR modelling LLVM IR, provided by `pliron-llvm` "
+"(after `mir-lower`)"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:431
+msgid "**Textual LLVM IR** -- serialized `.ll` file"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:432
+msgid "**Final PTX** -- the generated assembly"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:434
+msgid "Environment variables"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:436
+msgid "For more targeted inspection:"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:328
+msgid "Variable"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:328
+msgid "Effect"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:328
+msgid "`CUDA_OXIDE_VERBOSE=1`"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:328
+msgid "Verbose compiler output"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:328
+msgid "`CUDA_OXIDE_SHOW_RUSTC_MIR=1`"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:328
+msgid "Dump the rustc MIR before import"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:328
+msgid "Emit source line-table metadata"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:328
+msgid "Emit full metadata for basic locals and args"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:445
+msgid "Profiling with Nsight Compute"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:447
+msgid ""
+"For performance debugging, NVIDIA's **Nsight Compute** (`ncu`) provides "
+"roofline analysis, memory throughput, and occupancy metrics:"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:450
+msgid "ncu --set full ./target/release/my_example\n"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:454
+msgid ""
+"cuda-oxide kernels can emit profiler triggers using `debug::prof_trigger::"
+"<N>()`, which generates a `pmevent` instruction that Nsight Compute and "
+"Nsight Systems can capture for timeline annotation."
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:459
+msgid ""
+"[Nsight Compute Documentation](https://docs.nvidia.com/nsight-compute/) for "
+"the full profiling toolkit."
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:463
+msgid "Common pitfalls"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:458
+msgid "Pitfall"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:458
+msgid "Symptom"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:458
+msgid "Fix"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:458
+msgid "Race condition on output buffer"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:458
+msgid "Wrong results, non-deterministic"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:458
+msgid "Use `DisjointSlice` plus matching prepared launch geometry"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:458
+msgid "Missing `sync_threads()`"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:458
+msgid "Stale shared memory reads"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:458
+msgid "Add barrier between writes and reads"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:458
+msgid "Wrong `shared_mem_bytes`"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:458
+msgid "`LAUNCH_OUT_OF_RESOURCES` or garbage data"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:458
+msgid "Match `LaunchConfig` to actual `DynamicSharedArray` usage"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:458
+msgid "Out-of-bounds with raw pointers"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:458
+msgid "Trap or silent corruption"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:458
+msgid "Use `DisjointSlice::get_mut` for bounds checking"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:458
+msgid "`panic!(\"message\")` in kernel"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:458
+msgid "Compile error (fmt unavailable)"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:458
+msgid "Use `gpu_assert!` or `debug::trap()`"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:458
+msgid "Forgetting to sync after launch"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:458
+msgid "Host reads stale data"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:458
+msgid "Call `to_host_vec`, `stream.synchronize()`, or `.sync()`"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:458
+msgid "PTX built for wrong arch"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:458
+msgid "`NO_BINARY_FOR_GPU`"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:458
+msgid "Rebuild with `cargo oxide build --arch sm_XX`"
+msgstr ""
+
+#: ../../../gpu-programming/error-handling-and-debugging.md:479
+msgid ""
+"Debugging decision tree: kernel problems fall into three categories (compile "
+"error, runtime trap, silent corruption), each with different diagnostic "
+"tools. Common fixes are shown at the bottom."
+msgstr ""

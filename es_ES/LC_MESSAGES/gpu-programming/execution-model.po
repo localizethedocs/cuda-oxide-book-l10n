@@ -1,0 +1,548 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025-2026, NVIDIA Corporation
+# This file is distributed under the same license as the cuda-oxide package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: cuda-oxide \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-16 12:33+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: es_ES\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../../gpu-programming/execution-model.md:1
+msgid "The CUDA Execution Model"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:3
+msgid ""
+"This chapter covers the CUDA SIMT execution model -- how work is organized "
+"into threads, warps, blocks, and grids -- and how cuda-oxide exposes each "
+"level through safe, ergonomic Rust APIs."
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:8
+msgid ""
+"[CUDA Programming Guide -- Programming Model](https://docs.nvidia.com/cuda/"
+"cuda-programming-guide/#programming-model) for the authoritative reference "
+"on the CUDA execution model."
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:12
+msgid "Threads, blocks, and grids"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:14
+msgid ""
+"Every kernel launch creates a **grid** of **thread blocks**. The three-level "
+"hierarchy is the foundation of GPU programming:"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:7
+msgid "Level"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:7
+msgid "What it is"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:7
+msgid "Size"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:7
+msgid "Key property"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:7
+msgid "**Grid**"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:7
+msgid "All blocks launched by one kernel call"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:7
+msgid "Up to 2³¹ - 1 blocks per dimension"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:7
+msgid "Blocks execute independently"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:7
+msgid "**Block**"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:7
+msgid "A group of threads that can cooperate"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:7
+msgid "Up to 1024 threads"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:7
+msgid "Threads share fast on-chip memory"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:7
+msgid "**Warp**"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:7
+msgid "32 consecutive threads within a block"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:7
+msgid "Always 32"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:7
+msgid "Execute instructions in lockstep (SIMT)"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:23
+msgid ""
+"A kernel launch specifies two things: how many blocks in the grid (the "
+"**grid dimensions**) and how many threads in each block (the **block "
+"dimensions**). The hardware then groups every 32 consecutive threads into "
+"warps automatically -- you never create warps explicitly."
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:32
+msgid ""
+"The three-level CUDA thread hierarchy. A 2×2 grid of blocks, each containing "
+"256 threads arranged in 8 warps of 32. The bottom legend maps CUDA concepts "
+"to their cuda-oxide API equivalents."
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:37
+msgid "Thread indexing in cuda-oxide"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:39
+msgid ""
+"Inside a kernel, every thread needs to know *which* element it should work "
+"on. CUDA provides built-in variables (`threadIdx`, `blockIdx`, `blockDim`, "
+"`gridDim`); cuda-oxide wraps these in the `cuda_device::thread` module:"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:43
+msgid ""
+"use cuda_device::{kernel, thread, DisjointSlice};\n"
+"\n"
+"#[kernel]\n"
+"pub fn vecadd(a: &[f32], b: &[f32], mut c: DisjointSlice<f32>) {\n"
+"    let idx = thread::index_1d();\n"
+"    if let Some(c_elem) = c.get_mut(idx) {\n"
+"        *c_elem = a[idx.get()] + b[idx.get()];\n"
+"    }\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:55
+msgid ""
+"`thread::index_1d()` computes `blockIdx.x * blockDim.x + threadIdx.x`. It "
+"maps threads to distinct array elements when grid and block Y/Z dimensions "
+"are 1. That is the common shape for 1D data-parallel kernels; a `domain = 1` "
+"prepared launch proves it."
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:60
+msgid ""
+"For cases where you need individual components, cuda-oxide exposes the raw "
+"accessors:"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:28
+msgid "cuda-oxide API"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:28
+msgid "Equivalent CUDA C++"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:28
+msgid "Returns"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:28
+msgid "`thread::index_1d()`"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:28
+msgid "`blockIdx.x * blockDim.x + threadIdx.x`"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:28
+msgid "Global 1D thread index"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:28
+msgid "`thread::threadIdx_x()`"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:28
+msgid "`threadIdx.x`"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:28
+msgid "Thread's position within its block"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:28
+msgid "`thread::blockIdx_x()`"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:28
+msgid "`blockIdx.x`"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:28
+msgid "Block's position within the grid"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:28
+msgid "`thread::blockDim_x()`"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:28
+msgid "`blockDim.x`"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:28
+msgid "Number of threads per block (x)"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:71
+msgid ""
+"For multi-dimensional indexing (e.g., 2D matrix operations), use "
+"`threadIdx_y()`, `blockIdx_y()`, and `blockDim_y()` alongside the `_x` "
+"variants to compute row/column indices."
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:76
+msgid "Warps and SIMT execution"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:78
+msgid ""
+"A **warp** is the fundamental scheduling unit on NVIDIA GPUs. Every 32 "
+"consecutive threads in a block form one warp, and all 32 threads in a warp "
+"execute the **same instruction** at the **same time** -- but on **different "
+"data**. This model is called **SIMT** (Single Instruction, Multiple Thread)."
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:83
+msgid ""
+"When all threads in a warp follow the same control-flow path, the warp "
+"achieves full throughput. When threads diverge (different threads take "
+"different `if` branches), the hardware serializes the paths: it executes one "
+"branch with some threads masked off, then the other branch, then "
+"reconverges. This is called **branch divergence** and it directly reduces "
+"throughput."
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:93
+msgid ""
+"Left: uniform execution where all 32 threads run the same instruction in one "
+"cycle. Right: branch divergence where even and odd threads take different "
+"paths, requiring two serial passes."
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:98
+msgid "Why this matters"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:100
+msgid ""
+"You don't need to think about warps to write *correct* kernels -- cuda-oxide "
+"handles the details. But understanding SIMT helps you write *fast* ones:"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:103
+msgid ""
+"**Prefer uniform control flow.** When all threads in a warp evaluate the "
+"same branch, there is no divergence penalty."
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:105
+msgid ""
+"**Data-dependent branches are fine** as long as nearby threads (those in the "
+"same warp) tend to take the same path."
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:107
+msgid ""
+"**Avoid thread-ID-based branching** like `if thread::threadIdx_x() % 2 == 0` "
+"inside hot loops -- this guarantees every warp diverges."
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:111
+msgid ""
+"[CUDA Programming Guide -- SIMT Architecture](https://docs.nvidia.com/cuda/"
+"cuda-programming-guide/#simt-architecture) for the full hardware "
+"specification of warp execution and reconvergence."
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:115
+msgid "Hardware mapping"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:117
+msgid ""
+"When you launch a kernel, the GPU's hardware scheduler assigns each block to "
+"a **Streaming Multiprocessor** (SM). Multiple blocks can run concurrently on "
+"the same SM -- the exact number depends on the block's resource usage "
+"(registers, shared memory, threads)."
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:122
+msgid ""
+"The key insight: **you control the grid and block dimensions; the hardware "
+"controls everything else.** You never specify which SM runs which block, or "
+"in what order blocks execute. This separation is what lets the same kernel "
+"scale from a laptop GPU with a handful of SMs to a data-center GPU with 100+."
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:131
+msgid ""
+"Eight blocks assigned to four SMs by the GPU scheduler. Each SM has its own "
+"warp schedulers, CUDA cores, and shared memory/L1 cache. Blocks 4-7 (dashed "
+"arrows) run after blocks 0-3 complete or are queued alongside them if "
+"resources permit."
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:137
+msgid "What limits concurrency"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:139
+msgid ""
+"Each SM has a fixed pool of resources. A block is assigned to an SM only if "
+"the SM has enough of *all* of the following:"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:127
+msgid "Resource"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:127
+msgid "Typical limit (Ampere)"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:127
+msgid "Controlled by"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:127
+msgid "Threads"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:127
+msgid "2048 per SM"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:127
+msgid "`block_dim`"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:127
+msgid "Registers"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:127
+msgid "65536 per SM"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:127
+msgid "Compiler allocation"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:127
+msgid "Shared memory"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:127
+msgid "164 KB per SM (configurable)"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:127
+msgid "`shared_mem_bytes`"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:127
+msgid "Block slots"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:127
+msgid "32 per SM"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:127
+msgid "Grid size"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:149
+msgid ""
+"When a block finishes, its resources are freed and the scheduler immediately "
+"assigns a queued block to that SM. This is why launching *more* blocks than "
+"the GPU has SMs is not just okay -- it's the normal and expected pattern."
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:154
+msgid ""
+"[CUDA Programming Guide -- Hardware Implementation](https://docs.nvidia.com/"
+"cuda/cuda-programming-guide/#hardware-implementation) for architecture-"
+"specific SM resource limits and occupancy calculations."
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:158
+msgid "Launch configuration"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:160
+msgid ""
+"On the host side, `LaunchConfig` tells the runtime how to shape the grid:"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:162
+msgid ""
+"use cuda_core::LaunchConfig;\n"
+"\n"
+"// Quick 1D launch: 256 threads per block, enough blocks to cover N "
+"elements\n"
+"let cfg = LaunchConfig::for_num_elems(N as u32);\n"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:169
+msgid ""
+"`for_num_elems` uses a block size of 256 and computes the grid size via "
+"ceiling division -- the right default for most element-wise kernels. For "
+"more control, construct `LaunchConfig` directly:"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:173
+msgid ""
+"let cfg = LaunchConfig {\n"
+"    grid_dim: (4, 4, 1),      // 4×4 = 16 blocks\n"
+"    block_dim: (16, 16, 1),   // 16×16 = 256 threads per block\n"
+"    shared_mem_bytes: 0,       // no dynamic shared memory\n"
+"};\n"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:181
+msgid ""
+"Then pass it to the generated raw launch method. The call is unsafe because "
+"`LaunchConfig` itself does not prove that hidden Y/Z dimensions are inactive:"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:184
+msgid ""
+"// SAFETY: `for_num_elems` is 1D and all three buffers contain N elements.\n"
+"unsafe {\n"
+"    module.vecadd(\n"
+"        &stream,\n"
+"        LaunchConfig::for_num_elems(N as u32),\n"
+"        &a_dev,\n"
+"        &b_dev,\n"
+"        &mut c_dev,\n"
+"    )\n"
+"}\n"
+".expect(\"Kernel launch failed\");\n"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:198
+msgid "Or with the async API:"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:200
+msgid ""
+"// SAFETY: this is 1D, buffers contain N elements, and module/scheduler "
+"share a context.\n"
+"unsafe {\n"
+"    module.vecadd_async(\n"
+"        LaunchConfig::for_num_elems(N as u32),\n"
+"        &a_dev,\n"
+"        &b_dev,\n"
+"        &mut c_dev,\n"
+"    )\n"
+"}?\n"
+".sync()?;\n"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:215
+msgid "Choosing block size"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:217
+msgid "The block size is the single most important tuning knob:"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:219
+msgid ""
+"**256 threads** is a safe default. It balances occupancy (multiple blocks "
+"per SM) with register pressure on most architectures."
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:221
+msgid ""
+"**Powers of 2** (128, 256, 512) align naturally with warp boundaries and "
+"avoid wasting threads."
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:223
+msgid "**Too small** (< 128) may leave warp schedulers underutilized."
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:224
+msgid ""
+"**Too large** (1024) uses the full block thread limit, which may reduce the "
+"number of concurrent blocks per SM."
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:227
+msgid ""
+"The grid size follows from the block size and the problem size: `grid_x = (N "
+"+ block_x - 1) / block_x`. This is exactly what `LaunchConfig::"
+"for_num_elems` computes."
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:231
+msgid "Bounds checking"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:233
+msgid ""
+"Because the grid size is rounded up, some threads will have indices beyond "
+"the array length. cuda-oxide's `DisjointSlice` handles this safely -- "
+"`get_mut` returns `None` for out-of-bounds indices, so those threads simply "
+"do nothing:"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:237
+msgid ""
+"#[kernel]\n"
+"pub fn vecadd(a: &[f32], b: &[f32], mut c: DisjointSlice<f32>) {\n"
+"    let idx = thread::index_1d();\n"
+"    if let Some(c_elem) = c.get_mut(idx) {   // out-of-bounds threads skip\n"
+"        *c_elem = a[idx.get()] + b[idx.get()];\n"
+"    }\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-programming/execution-model.md:247
+msgid ""
+"This is a deliberate departure from CUDA C++, where bounds-checking is the "
+"programmer's responsibility. cuda-oxide's approach eliminates an entire "
+"class of out-of-bounds memory bugs at the cost of a single branch (which is "
+"uniform across the warp for all but the last block)."
+msgstr ""
