@@ -8,10 +8,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-16 12:33+0000\n"
+"POT-Creation-Date: 2026-08-31 15:39+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -307,8 +308,8 @@ msgstr ""
 #: ../../../compiler/fuzzing-and-differential-testing.md:159
 msgid ""
 "results:\n"
-"  seed 0: UNSUPPORTED [adapter] unsupported dumped type for Stage 2 adapter: "
-"u128 (...)\n"
+"  seed 0: UNSUPPORTED [adapter] unsupported return type for return-value "
+"tracing: *const i8 (...)\n"
 "  seed 1: COMPILE_FAIL [backend] Unsupported construct: Type translation not "
 "yet implemented for: RigidTy(Char) (...)\n"
 "summary: COMPILE_FAIL=1, UNSUPPORTED=1\n"
@@ -380,72 +381,95 @@ msgid ""
 msgstr ""
 
 #: ../../../compiler/fuzzing-and-differential-testing.md:185
-msgid "unsupported dumped type for Stage 2 adapter: u128\n"
+msgid "unsupported return type for return-value tracing: *const i8\n"
 msgstr ""
 
 #: ../../../compiler/fuzzing-and-differential-testing.md:189
 msgid ""
-"That usually means the generated MIR had a `dump_var(...)` containing a type "
-"our trace API does not yet know how to hash. Today the trace supports:"
+"That refusal comes from the function boundary, not from a dump site. "
+"rustlantis only dumps values it can hash, and the adapter accepts all of "
+"those. What the adapter can still refuse is the function itself: a return "
+"type the trace API cannot hash, or an argument type it has no literal for. "
+"The trace hashes these scalars:"
 msgstr ""
 
-#: ../../../compiler/fuzzing-and-differential-testing.md:192
-msgid "bool, i8, i16, i32, i64, u8, u16, u32, u64\n"
-msgstr ""
-
-#: ../../../compiler/fuzzing-and-differential-testing.md:196
+#: ../../../compiler/fuzzing-and-differential-testing.md:195
 msgid ""
-"It does not yet support `u128`, `i128`, `usize`, `isize`, or `char`. Many "
-"adapter-level unsupported cases are therefore not \"bad MIR\" and not cuda-"
-"oxide bugs. They are simply places where the fuzzer harness has not grown up "
-"yet. Compilers, like people, need snacks before they can handle `u128`."
+"bool, i8, i16, i32, i64, i128, isize, u8, u16, u32, u64, u128, usize, char,\n"
+"f32, f64\n"
 msgstr ""
 
-#: ../../../compiler/fuzzing-and-differential-testing.md:203
-msgid "Artifacts"
+#: ../../../compiler/fuzzing-and-differential-testing.md:200
+msgid ""
+"It also hashes arrays and tuples of anything in that list, nested as deep as "
+"you like: the trace just hashes every scalar inside. Tuples work up to 5 "
+"elements, matching the `TraceDump` implementations."
 msgstr ""
 
-#: ../../../compiler/fuzzing-and-differential-testing.md:205
-msgid "Per-seed logs live under:"
-msgstr ""
-
-#: ../../../compiler/fuzzing-and-differential-testing.md:207
-msgid "crates/fuzzer/artifacts/\n"
+#: ../../../compiler/fuzzing-and-differential-testing.md:204
+msgid ""
+"[u128; 4]                  hashes fine\n"
+"(u32, char)                hashes fine\n"
+"(i8, i8, i8, i8, i8, i8)   rejected: six elements\n"
+"*const i8                  rejected: pointer\n"
 msgstr ""
 
 #: ../../../compiler/fuzzing-and-differential-testing.md:211
-msgid "Failure logs include:"
-msgstr ""
-
-#: ../../../compiler/fuzzing-and-differential-testing.md:213
-msgid "the seed"
-msgstr ""
-
-#: ../../../compiler/fuzzing-and-differential-testing.md:214
-msgid "status and stage"
-msgstr ""
-
-#: ../../../compiler/fuzzing-and-differential-testing.md:215
-msgid "reason"
-msgstr ""
-
-#: ../../../compiler/fuzzing-and-differential-testing.md:216
-msgid "return code"
-msgstr ""
-
-#: ../../../compiler/fuzzing-and-differential-testing.md:217
-msgid "command"
-msgstr ""
-
-#: ../../../compiler/fuzzing-and-differential-testing.md:218
-msgid "full command output"
-msgstr ""
-
-#: ../../../compiler/fuzzing-and-differential-testing.md:219
-msgid "the generated `generated_case.rs` snapshot, when one exists"
+msgid ""
+"What's left out: raw pointers and references, because the CPU and the GPU "
+"hold different addresses for the same object, so a pointer's hash could "
+"never match; and tuples with more than 5 elements. Many adapter-level "
+"unsupported cases are therefore not \"bad MIR\" and not cuda-oxide bugs. The "
+"pointer refusal is permanent by design; no amount of widening makes those "
+"hashes agree. The tuple limit is just a gap. The harness needs one more "
+"`TraceDump` impl, and maybe a snack, before it can hash a six-element tuple."
 msgstr ""
 
 #: ../../../compiler/fuzzing-and-differential-testing.md:221
+msgid "Artifacts"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:223
+msgid "Per-seed logs live under:"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:225
+msgid "crates/fuzzer/artifacts/\n"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:229
+msgid "Failure logs include:"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:231
+msgid "the seed"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:232
+msgid "status and stage"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:233
+msgid "reason"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:234
+msgid "return code"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:235
+msgid "command"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:236
+msgid "full command output"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:237
+msgid "the generated `generated_case.rs` snapshot, when one exists"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:239
 msgid ""
 "The generated snapshot matters. If a backend failure appears in CI or a long "
 "batch run, the log is enough to see the exact MIR-shaped program that "
@@ -453,44 +477,44 @@ msgid ""
 "round trip."
 msgstr ""
 
-#: ../../../compiler/fuzzing-and-differential-testing.md:227
+#: ../../../compiler/fuzzing-and-differential-testing.md:245
 msgid "Current Limits"
 msgstr ""
 
-#: ../../../compiler/fuzzing-and-differential-testing.md:229
+#: ../../../compiler/fuzzing-and-differential-testing.md:247
 msgid ""
 "The current config is intentionally small. It keeps the first stage focused "
 "on scalar custom MIR and backend plumbing rather than every Rust construct "
 "at once. That is why many early seeds classify as `UNSUPPORTED [adapter]`."
 msgstr ""
 
-#: ../../../compiler/fuzzing-and-differential-testing.md:233
-msgid "The widening plan is incremental:"
-msgstr ""
-
-#: ../../../compiler/fuzzing-and-differential-testing.md:235
+#: ../../../compiler/fuzzing-and-differential-testing.md:251
 msgid ""
-"Add trace support for more scalar types (`u128`, `i128`, `usize`, `isize`)."
+"The widening plan is incremental, and two steps have already landed: the "
+"adapter now accepts every scalar the trace API can hash (f32 and f64 arrived "
+"last, in [#484](https://github.com/NVlabs/cuda-oxide/pull/484)), plus arrays "
+"and tuples built from them ([#792](https://github.com/NVlabs/cuda-oxide/"
+"pull/792)). What remains:"
 msgstr ""
 
-#: ../../../compiler/fuzzing-and-differential-testing.md:236
+#: ../../../compiler/fuzzing-and-differential-testing.md:257
 msgid ""
 "Decide whether and how to support `char` in cuda-oxide's type translation."
 msgstr ""
 
-#: ../../../compiler/fuzzing-and-differential-testing.md:237
+#: ../../../compiler/fuzzing-and-differential-testing.md:258
 msgid "Expand control-flow and cast coverage."
 msgstr ""
 
-#: ../../../compiler/fuzzing-and-differential-testing.md:238
-msgid "Add arrays, tuples, and eventually structs/enums."
+#: ../../../compiler/fuzzing-and-differential-testing.md:259
+msgid "Add structs and enums; the trace can't look inside those yet."
 msgstr ""
 
-#: ../../../compiler/fuzzing-and-differential-testing.md:239
+#: ../../../compiler/fuzzing-and-differential-testing.md:260
 msgid "Add minimization for failing seeds."
 msgstr ""
 
-#: ../../../compiler/fuzzing-and-differential-testing.md:241
+#: ../../../compiler/fuzzing-and-differential-testing.md:262
 msgid ""
 "That order is deliberate. A fuzzer that generates everything on day one "
 "mostly generates noise. A fuzzer that grows one axis at a time tells you "

@@ -1,0 +1,1067 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025-2026, NVIDIA Corporation
+# This file is distributed under the same license as the cuda-oxide package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: cuda-oxide \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-31 15:39+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:1
+msgid "Virtual Memory Management and Peer Access"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:3
+msgid ""
+"CUDA Virtual Memory Management (VMM) separates physical memory allocation, "
+"virtual address reservation, mapping, and access permissions into "
+"independent operations."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:7
+msgid ""
+"This is lower-level than `DeviceBuffer`, which allocates memory and returns "
+"a ready-to-use device pointer in one operation. VMM is useful when an "
+"application needs explicit control over where physical memory is mapped or "
+"which GPUs may access it."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:12
+msgid ""
+"Peer-to-peer access (P2P) is a related but separate mechanism. It allows one "
+"CUDA context to access memory associated with another GPU directly over a "
+"supported interconnect such as NVLink or PCIe."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:16
+msgid "This chapter covers:"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:18
+msgid "Querying whether two GPUs support peer access."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:19
+msgid "Enabling and disabling directional peer access."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:20
+msgid "Allocating physical device memory with VMM."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:21
+msgid "Reserving virtual address ranges."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:22
+msgid "Mapping physical allocations into those ranges."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:23
+msgid "Granting mappings to one or more devices."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:24
+msgid ""
+"Mapping one physical allocation into multiple GPU-visible address ranges."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:25
+msgid "Synchronization and resource destruction order."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:28
+msgid ""
+"The complete integration test is available in [`crates/cuda-core/tests/"
+"vmm_p2p.rs`](https://github.com/NVlabs/cuda-oxide/blob/main/crates/cuda-core/"
+"tests/vmm_p2p.rs)."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:31
+msgid "The corresponding implementations are:"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:33
+msgid ""
+"[`crates/cuda-core/src/vmm.rs`](https://github.com/NVlabs/cuda-oxide/blob/"
+"main/crates/cuda-core/src/vmm.rs)"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:34
+msgid ""
+"[`crates/cuda-core/src/peer.rs`](https://github.com/NVlabs/cuda-oxide/blob/"
+"main/crates/cuda-core/src/peer.rs)"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:37
+msgid "VMM and P2P solve different problems"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:39
+msgid ""
+"VMM controls the relationship between physical memory and virtual addresses:"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:41
+msgid ""
+"Physical allocation\n"
+"        |\n"
+"        v\n"
+"Virtual address reservation\n"
+"        |\n"
+"        v\n"
+"Mapping\n"
+"        |\n"
+"        v\n"
+"Per-device access permissions\n"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:54
+msgid ""
+"P2P controls whether a CUDA context can access memory associated with "
+"another device:"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:57
+msgid ""
+"Context on GPU 0\n"
+"        |\n"
+"        | enable_peer_access(&gpu0, &gpu1)\n"
+"        v\n"
+"Memory accessible through GPU 1\n"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:65
+msgid "A multi-GPU application may use both mechanisms:"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:67
+msgid "Allocate physical memory on one device."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:68
+msgid "Reserve virtual address ranges."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:69
+msgid "Map the physical allocation into those ranges."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:70
+msgid "Grant both devices access to the mappings."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:71
+msgid "Enable peer access in the required directions."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:73
+msgid ""
+"Neither operation implies the other. A VMM mapping still requires explicit "
+"access permissions, and peer access must be enabled when a context needs "
+"direct access to memory associated with a peer context."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:77
+msgid "Hardware and topology requirements"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:79
+msgid ""
+"Peer access depends on the physical GPU topology, the CUDA driver, and the "
+"platform configuration. Two GPUs in the same machine are not necessarily "
+"able to access each other directly."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:83
+msgid "Always query support before enabling peer access:"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:85
+msgid ""
+"use cuda_core::{peer, CudaContext, DriverError};\n"
+"\n"
+"fn check_peer_access() -> Result<(), DriverError> {\n"
+"    let ctx0 = CudaContext::new(0)?;\n"
+"    let ctx1 = CudaContext::new(1)?;\n"
+"\n"
+"    if peer::can_access_peer(&ctx0, &ctx1)? {\n"
+"        println!(\"GPU 0 can access GPU 1\");\n"
+"    } else {\n"
+"        println!(\"GPU 0 cannot access GPU 1\");\n"
+"    }\n"
+"\n"
+"    Ok(())\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:102
+msgid ""
+"`can_access_peer(from, to)` is only a capability query. It does not change "
+"either context."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:106
+msgid ""
+"Peer access is directional. Support from GPU 0 to GPU 1 should not be "
+"treated as proof that the reverse direction is enabled."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:110
+msgid "Enabling peer access"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:112
+msgid ""
+"Use `peer::enable_peer_access` to allow one context to access memory "
+"associated with another device:"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:115
+msgid ""
+"use cuda_core::{peer, CudaContext, DriverError};\n"
+"\n"
+"fn enable_bidirectional_peer_access() -> Result<(), DriverError> {\n"
+"    let ctx0 = CudaContext::new(0)?;\n"
+"    let ctx1 = CudaContext::new(1)?;\n"
+"\n"
+"    if !peer::can_access_peer(&ctx0, &ctx1)? {\n"
+"        return Ok(());\n"
+"    }\n"
+"\n"
+"    peer::enable_peer_access(&ctx0, &ctx1)?;\n"
+"    peer::enable_peer_access(&ctx1, &ctx0)?;\n"
+"\n"
+"    // Both contexts may now initiate peer accesses.\n"
+"\n"
+"    peer::disable_peer_access(&ctx0, &ctx1)?;\n"
+"    peer::disable_peer_access(&ctx1, &ctx0)?;\n"
+"\n"
+"    Ok(())\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:138
+msgid "The direction is determined by the argument order:"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:105
+msgid "Call"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:105
+msgid "Effect"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:105
+msgid "`enable_peer_access(&ctx0, &ctx1)`"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:105
+msgid "GPU 0's context may access GPU 1 memory"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:105
+msgid "`enable_peer_access(&ctx1, &ctx0)`"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:105
+msgid "GPU 1's context may access GPU 0 memory"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:105
+msgid "Both calls"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:105
+msgid "Bidirectional peer access"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:146
+msgid ""
+"Calling `enable_peer_access` when access is already enabled succeeds. "
+"Likewise, disabling access that is not currently enabled is treated as a "
+"successful no-op."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:151
+msgid ""
+"Complete all operations using peer memory before disabling peer access. "
+"Disabling access while kernels or copies are still using peer-visible memory "
+"can invalidate those operations."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:156
+msgid "The VMM lifecycle"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:158
+msgid "A VMM allocation has four explicit stages:"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:160
+msgid "Query the device's allocation granularity."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:161
+msgid "Allocate physical memory."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:162
+msgid "Reserve a virtual address range and map the physical memory into it."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:163
+msgid "Grant one or more devices access to the mapping."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:165
+msgid "The main APIs are:"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:150
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "API"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:150
+msgid "Purpose"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:150
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "`vmm::allocation_granularity(device)`"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:150
+msgid "Query the required allocation granularity"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:150
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "`vmm::align_size(size, granularity)`"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:150
+msgid "Round a size to that granularity"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:150
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "`PhysicalAllocation::new(device, size)`"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:150
+msgid "Allocate physical memory"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:150
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "`VirtualReservation::new(size, alignment)`"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:150
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "Reserve a virtual address range"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:150
+msgid "`Mapping::new(va, size, &physical, offset)`"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:150
+msgid "Map physical memory into a VA range"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:150
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "`vmm::set_access(va, size, devices)`"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:150
+msgid "Grant devices access to the mapped range"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:176
+msgid "Allocation granularity"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:178
+msgid ""
+"CUDA VMM operations require allocation sizes and mapping sizes to be "
+"multiples of the device's allocation granularity."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:181
+msgid "Use `allocation_granularity` and `align_size` before allocating:"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:183
+msgid ""
+"use cuda_core::{vmm, CudaContext, DriverError};\n"
+"\n"
+"fn aligned_allocation_size(requested: usize) -> Result<usize, DriverError> "
+"{\n"
+"    let ctx = CudaContext::new(0)?;\n"
+"    let granularity = vmm::allocation_granularity(ctx.cu_device())?;\n"
+"\n"
+"    Ok(vmm::align_size(requested, granularity))\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:194
+msgid ""
+"Do not assume that a page-sized value such as 4 KiB satisfies the CUDA VMM "
+"granularity requirement. The required value is device-dependent."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:197
+msgid "Single-GPU VMM mapping"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:199
+msgid ""
+"The following example allocates physical memory, maps it into a virtual "
+"address range, writes data through the mapping, and reads it back."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:202
+msgid ""
+"use cuda_core::{vmm, CudaContext, DriverError};\n"
+"\n"
+"fn single_gpu_vmm_roundtrip() -> Result<(), DriverError> {\n"
+"    let ctx = CudaContext::new(0)?;\n"
+"    let stream = ctx.default_stream();\n"
+"\n"
+"    let granularity = vmm::allocation_granularity(ctx.cu_device())?;\n"
+"    let allocation_size = vmm::align_size(4096, granularity);\n"
+"\n"
+"    // Stage 1: allocate physical memory.\n"
+"    let physical =\n"
+"        vmm::PhysicalAllocation::new(ctx.cu_device(), allocation_size)?;\n"
+"\n"
+"    // Stage 2: reserve virtual address space.\n"
+"    let reservation =\n"
+"        vmm::VirtualReservation::new(allocation_size, 0)?;\n"
+"\n"
+"    // Stage 3: map the physical allocation into the reserved range.\n"
+"    let mapping = vmm::Mapping::new(\n"
+"        reservation.base(),\n"
+"        allocation_size,\n"
+"        &physical,\n"
+"        0,\n"
+"    )?;\n"
+"\n"
+"    // Stage 4: grant GPU 0 read/write access to the mapping.\n"
+"    vmm::set_access(\n"
+"        reservation.base(),\n"
+"        allocation_size,\n"
+"        &[ctx.cu_device()],\n"
+"    )?;\n"
+"\n"
+"    let input: Vec<u8> = (0..64).map(|i| (i * 3 + 7) as u8).collect();\n"
+"\n"
+"    unsafe {\n"
+"        cuda_core::memory::memcpy_htod_async(\n"
+"            reservation.base(),\n"
+"            input.as_ptr(),\n"
+"            input.len(),\n"
+"            stream.cu_stream(),\n"
+"        )?;\n"
+"    }\n"
+"\n"
+"    ctx.synchronize()?;\n"
+"\n"
+"    let mut output = vec![0u8; input.len()];\n"
+"\n"
+"    unsafe {\n"
+"        cuda_core::memory::memcpy_dtoh_async(\n"
+"            output.as_mut_ptr(),\n"
+"            reservation.base(),\n"
+"            output.len(),\n"
+"            stream.cu_stream(),\n"
+"        )?;\n"
+"    }\n"
+"\n"
+"    ctx.synchronize()?;\n"
+"\n"
+"    assert_eq!(output, input);\n"
+"\n"
+"    // Resources must be destroyed in dependency order.\n"
+"    drop(mapping);\n"
+"    drop(reservation);\n"
+"    drop(physical);\n"
+"\n"
+"    Ok(())\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:272
+msgid ""
+"`Mapping::new` does not by itself make the mapped address accessible. The "
+"mapping remains unusable until `vmm::set_access` grants access to at least "
+"one device."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:276
+msgid "Mapping one physical allocation for two GPUs"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:278
+msgid ""
+"VMM allows one physical allocation to be mapped into multiple virtual "
+"address ranges."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:281
+msgid "The following pattern:"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:283
+msgid "Allocates physical memory on GPU 0."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:284
+msgid "Creates one virtual address mapping for GPU 0."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:285
+msgid "Creates another virtual address mapping for GPU 1."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:286
+msgid "Grants both devices access to both mappings."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:287
+msgid "Writes through GPU 0's mapping."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:288
+msgid "Reads the same physical memory through GPU 1's mapping."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:290
+msgid ""
+"use cuda_core::error::IntoResult;\n"
+"use cuda_core::{peer, vmm, CudaContext, DriverError};\n"
+"use std::mem::MaybeUninit;\n"
+"\n"
+"fn gpu_count() -> Result<usize, DriverError> {\n"
+"    unsafe {\n"
+"        cuda_core::init(0)?;\n"
+"    }\n"
+"\n"
+"    let mut count = MaybeUninit::uninit();\n"
+"\n"
+"    unsafe {\n"
+"        cuda_core::sys::cuDeviceGetCount(count.as_mut_ptr()).result()?;\n"
+"        Ok(count.assume_init() as usize)\n"
+"    }\n"
+"}\n"
+"\n"
+"fn cross_gpu_vmm_roundtrip() -> Result<(), DriverError> {\n"
+"    if gpu_count()? < 2 {\n"
+"        println!(\"This example requires at least two CUDA devices.\");\n"
+"        return Ok(());\n"
+"    }\n"
+"\n"
+"    let ctx0 = CudaContext::new(0)?;\n"
+"    let ctx1 = CudaContext::new(1)?;\n"
+"\n"
+"    if !peer::can_access_peer(&ctx0, &ctx1)? {\n"
+"        println!(\"The selected devices do not support peer access.\");\n"
+"        return Ok(());\n"
+"    }\n"
+"\n"
+"    peer::enable_peer_access(&ctx0, &ctx1)?;\n"
+"    peer::enable_peer_access(&ctx1, &ctx0)?;\n"
+"\n"
+"    let granularity =\n"
+"        vmm::allocation_granularity(ctx0.cu_device())?;\n"
+"    let allocation_size =\n"
+"        vmm::align_size(4096, granularity);\n"
+"\n"
+"    // The physical memory is allocated only once, on GPU 0.\n"
+"    let physical =\n"
+"        vmm::PhysicalAllocation::new(\n"
+"            ctx0.cu_device(),\n"
+"            allocation_size,\n"
+"        )?;\n"
+"\n"
+"    // GPU 0 virtual address range.\n"
+"    let reservation0 =\n"
+"        vmm::VirtualReservation::new(allocation_size, 0)?;\n"
+"\n"
+"    let mapping0 = vmm::Mapping::new(\n"
+"        reservation0.base(),\n"
+"        allocation_size,\n"
+"        &physical,\n"
+"        0,\n"
+"    )?;\n"
+"\n"
+"    vmm::set_access(\n"
+"        reservation0.base(),\n"
+"        allocation_size,\n"
+"        &[ctx0.cu_device(), ctx1.cu_device()],\n"
+"    )?;\n"
+"\n"
+"    // GPU 1 virtual address range backed by the same physical allocation.\n"
+"    let reservation1 =\n"
+"        vmm::VirtualReservation::new(allocation_size, 0)?;\n"
+"\n"
+"    let mapping1 = vmm::Mapping::new(\n"
+"        reservation1.base(),\n"
+"        allocation_size,\n"
+"        &physical,\n"
+"        0,\n"
+"    )?;\n"
+"\n"
+"    vmm::set_access(\n"
+"        reservation1.base(),\n"
+"        allocation_size,\n"
+"        &[ctx0.cu_device(), ctx1.cu_device()],\n"
+"    )?;\n"
+"\n"
+"    let input: Vec<u32> = (0..256).collect();\n"
+"    let byte_length =\n"
+"        input.len() * std::mem::size_of::<u32>();\n"
+"\n"
+"    let stream0 = ctx0.default_stream();\n"
+"    ctx0.bind_to_thread()?;\n"
+"\n"
+"    unsafe {\n"
+"        cuda_core::memory::memcpy_htod_async(\n"
+"            reservation0.base(),\n"
+"            input.as_ptr(),\n"
+"            byte_length,\n"
+"            stream0.cu_stream(),\n"
+"        )?;\n"
+"    }\n"
+"\n"
+"    ctx0.synchronize()?;\n"
+"\n"
+"    let mut output = vec![0u32; input.len()];\n"
+"    let stream1 = ctx1.default_stream();\n"
+"    ctx1.bind_to_thread()?;\n"
+"\n"
+"    unsafe {\n"
+"        cuda_core::memory::memcpy_dtoh_async(\n"
+"            output.as_mut_ptr(),\n"
+"            reservation1.base(),\n"
+"            byte_length,\n"
+"            stream1.cu_stream(),\n"
+"        )?;\n"
+"    }\n"
+"\n"
+"    ctx1.synchronize()?;\n"
+"\n"
+"    assert_eq!(output, input);\n"
+"\n"
+"    // Destroy mappings before their reservations and backing allocation.\n"
+"    drop(mapping1);\n"
+"    drop(mapping0);\n"
+"    drop(reservation1);\n"
+"    drop(reservation0);\n"
+"    drop(physical);\n"
+"\n"
+"    peer::disable_peer_access(&ctx0, &ctx1)?;\n"
+"    peer::disable_peer_access(&ctx1, &ctx0)?;\n"
+"\n"
+"    Ok(())\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:420
+msgid "Virtual addresses are not guaranteed to match"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:422
+msgid ""
+"`VirtualReservation::new(size, 0)` asks the CUDA driver to select a virtual "
+"address. Two reservations backed by the same physical allocation may "
+"therefore have different base addresses:"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:426
+msgid ""
+"GPU 0 VA: 0x0000_7f10_0000_0000\n"
+"                         \\\n"
+"                          same physical allocation\n"
+"                         /\n"
+"GPU 1 VA: 0x0000_7e80_0000_0000\n"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:434
+msgid ""
+"The current API supports shared physical backing, but it does not guarantee "
+"that every GPU observes that memory at the same numerical virtual address."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:437
+msgid ""
+"Code must use the `base()` returned by the reservation associated with the "
+"current access path."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:441
+msgid ""
+"Do not describe this pattern as a complete symmetric heap. A symmetric heap "
+"requires equivalent virtual addresses across participating devices, which "
+"the current driver-selected reservation API does not guarantee."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:446
+msgid "Ownership and destruction order"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:448
+msgid "The VMM wrapper types own CUDA resources through RAII:"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:440
+msgid "Type"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:440
+msgid "CUDA resource"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:440
+msgid "Drop operation"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:440
+msgid "`PhysicalAllocation`"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:440
+msgid "Generic physical allocation handle"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:440
+msgid "`cuMemRelease`"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:440
+msgid "`VirtualReservation`"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:440
+msgid "Reserved virtual address range"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:440
+msgid "`cuMemAddressFree`"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:440
+msgid "`Mapping`"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:440
+msgid "Physical-to-virtual mapping"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:440
+msgid "`cuMemUnmap`"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:456
+msgid "The dependency order is:"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:458
+msgid ""
+"PhysicalAllocation   VirtualReservation\n"
+"        ^                    ^\n"
+"         \\                  /\n"
+"          \\                /\n"
+"               Mapping\n"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:466
+msgid ""
+"A `Mapping` consumes one `PhysicalAllocation` and one `VirtualReservation`, "
+"so both must outlive it."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:469
+msgid "Destroy resources in the reverse order:"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:471
+msgid ""
+"ctx0.synchronize()?;\n"
+"ctx1.synchronize()?;\n"
+"\n"
+"drop(mapping1);\n"
+"drop(mapping0);\n"
+"\n"
+"drop(reservation1);\n"
+"drop(reservation0);\n"
+"\n"
+"drop(physical);\n"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:484
+msgid "The complete teardown sequence for a multi-GPU operation is:"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:486
+msgid "Stop submitting operations that use the mappings."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:487
+msgid "Synchronize every stream or context using them."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:488
+msgid "Drop all `Mapping` values."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:489
+msgid "Drop all `VirtualReservation` values."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:490
+msgid "Drop the `PhysicalAllocation`."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:491
+msgid "Disable peer access if it is no longer needed."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:494
+msgid ""
+"Rust does not encode the mapping dependencies in the type system. A "
+"`Mapping` does not borrow its `PhysicalAllocation` or `VirtualReservation` "
+"for its full lifetime. The application is responsible for preserving the "
+"required drop order."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:500
+msgid "Do not wrap VMM pointers in an owning buffer"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:502
+msgid ""
+"A VMM virtual address is owned by its `Mapping`, `VirtualReservation`, and "
+"`PhysicalAllocation`."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:505
+msgid ""
+"Do not construct an owning `DeviceBuffer` from that pointer unless the API "
+"explicitly defines a non-owning conversion. An owning buffer could attempt "
+"to release the pointer using `cuMemFree`, while the VMM resources expect "
+"`cuMemUnmap`, `cuMemAddressFree`, and `cuMemRelease`."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:510
+msgid ""
+"Pass the raw `CUdeviceptr` only to APIs that accept non-owning device "
+"addresses."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:513
+msgid "Error handling and unsupported systems"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:515
+msgid ""
+"A portable multi-GPU application should treat these conditions separately:"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "Condition"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "Recommended behavior"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "Fewer than two devices"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "Skip the P2P path"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "`can_access_peer` returns `false`"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "Use host-staged transfers or another path"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "VMM allocation fails"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "Report the CUDA driver error"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "Access permission setup fails"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "Destroy mappings and fall back"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "Peer access is already enabled"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "Continue"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "Peer access is already disabled"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:526
+msgid ""
+"The cuda-oxide integration test returns early when the machine has fewer "
+"than two GPUs or when the selected topology does not support P2P. This "
+"allows the test suite to run on single-GPU development systems while still "
+"exercising the feature on compatible multi-GPU hosts."
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:531
+msgid "API summary"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:533
+msgid "VMM"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "Description"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "Required size granularity for VMM operations"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "Round a requested size upward"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "Allocate physical memory on a device"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "`PhysicalAllocation::handle()`"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "Return the raw allocation handle"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "`PhysicalAllocation::size()`"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "Return the physical allocation size"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "`VirtualReservation::base()`"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "Return the reserved base address"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "`VirtualReservation::size()`"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "Return the reserved range size"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "`Mapping::new(va, size, physical, offset)`"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "Map physical memory into a virtual range"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "`Mapping::va()`"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "Return the mapped virtual address"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "`Mapping::size()`"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "Return the mapped size"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "Grant read/write access to selected devices"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:550
+msgid "P2P"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "`peer::can_access_peer(from, to)`"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "Query topology support"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "`peer::enable_peer_access(from, to)`"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "Enable directional peer access"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "`peer::disable_peer_access(from, to)`"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:493
+msgid "Disable directional peer access"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:558
+msgid "Next steps"
+msgstr ""
+
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:560
+msgid ""
+"For production multi-GPU code, add an explicit fallback path for systems "
+"where P2P is unavailable. A common fallback copies data through pinned host "
+"memory instead of assuming that every multi-GPU topology supports direct "
+"access."
+msgstr ""

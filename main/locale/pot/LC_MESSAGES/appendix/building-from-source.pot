@@ -8,10 +8,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-16 12:33+0000\n"
+"POT-Creation-Date: 2026-08-31 15:39+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -49,7 +50,7 @@ msgid "**Rust nightly**"
 msgstr ""
 
 #: ../../../appendix/building-from-source.md:0
-msgid "`nightly-2026-04-03` (pinned)"
+msgid "`nightly-2026-08-28` (pinned)"
 msgstr ""
 
 #: ../../../appendix/building-from-source.md:0
@@ -128,9 +129,9 @@ msgstr ""
 msgid ""
 "# rust-toolchain.toml (already in the repo root)\n"
 "[toolchain]\n"
-"channel = \"nightly-2026-04-03\"\n"
+"channel = \"nightly-2026-08-28\"\n"
 "components = [\"rust-src\", \"rustc-dev\", \"rust-analyzer\", \"clippy\", "
-"\"llvm-tools\"]\n"
+"\"rustfmt\", \"llvm-tools\"]\n"
 msgstr ""
 
 #: ../../../appendix/building-from-source.md:38
@@ -139,55 +140,59 @@ msgstr ""
 
 #: ../../../appendix/building-from-source.md:40
 msgid ""
-"rustup toolchain install nightly-2026-04-03\n"
-"rustup component add rust-src rustc-dev --toolchain nightly-2026-04-03\n"
+"rustup toolchain install nightly-2026-08-28\n"
+"rustup component add rust-src rustc-dev rust-analyzer clippy rustfmt llvm-"
+"tools --toolchain nightly-2026-08-28\n"
 msgstr ""
 
 #: ../../../appendix/building-from-source.md:45
 msgid ""
-"`rust-src` provides the standard library source for cross-compilation and "
+"`rust-src` provides the standard library source for cross-compilation, "
 "`rustc-dev` exposes compiler internals that the codegen backend links "
-"against."
-msgstr ""
-
-#: ../../../appendix/building-from-source.md:48
-msgid "Install CUDA"
-msgstr ""
-
-#: ../../../appendix/building-from-source.md:50
-msgid "Make sure the CUDA toolkit is on your `PATH`:"
+"against, and `llvm-tools` installs the toolchain-bundled `llc` used for PTX "
+"generation (also required by `cargo oxide doctor`). The other three are not "
+"needed to build: `rust-analyzer` powers IDE support, `clippy` is the lint "
+"gate CI runs, and `rustfmt` backs `cargo oxide fmt`."
 msgstr ""
 
 #: ../../../appendix/building-from-source.md:52
+msgid "Install CUDA"
+msgstr ""
+
+#: ../../../appendix/building-from-source.md:54
+msgid "Make sure the CUDA toolkit is on your `PATH`:"
+msgstr ""
+
+#: ../../../appendix/building-from-source.md:56
 msgid ""
 "export PATH=\"/usr/local/cuda/bin:$PATH\"\n"
 "nvcc --version   # should print 12.x or later\n"
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:57
+#: ../../../appendix/building-from-source.md:61
 msgid ""
 "If you are building on a system without a GPU (e.g. CI), the toolkit is "
 "still required for `ptxas` and header files, but you will not be able to run "
 "kernels."
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:60
+#: ../../../appendix/building-from-source.md:64
 msgid "Install LLVM (usually optional)"
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:62
+#: ../../../appendix/building-from-source.md:66
 msgid ""
 "The codegen pipeline emits LLVM IR and invokes `llc` to produce PTX. The "
-"pinned Rust toolchain (`nightly-2026-04-03`) already ships LLVM 22 with the "
+"pinned Rust toolchain (`nightly-2026-08-28`) already ships LLVM 23 with the "
 "NVPTX backend enabled via the `llvm-tools` component, so the recommended "
 "path is:"
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:67
+#: ../../../appendix/building-from-source.md:71
 msgid "rustup component add llvm-tools\n"
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:71
+#: ../../../appendix/building-from-source.md:75
 msgid ""
 "The component is already listed in `rust-toolchain.toml`, so on a fresh "
 "clone rustup installs it automatically; running the command above is the one-"
@@ -195,61 +200,62 @@ msgid ""
 "`<sysroot>/lib/rustlib/<host>/bin/llc`."
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:76
+#: ../../../appendix/building-from-source.md:80
 msgid ""
 "If you would rather use a system LLVM (for a specific patch level, or "
 "because you already have one installed), the pipeline falls back to "
-"`llc-22` / `llc-21` on `PATH`. LLVM 21 is the minimum — earlier releases "
-"reject the TMA / tcgen05 / WGMMA intrinsic signatures that cuda-oxide emits."
+"`llc-23` / `llc-22` / `llc-21` on `PATH`. LLVM 21 is the minimum — earlier "
+"releases reject the TMA / tcgen05 / WGMMA intrinsic signatures that cuda-"
+"oxide emits."
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:82
+#: ../../../appendix/building-from-source.md:86
 msgid ""
 "# Ubuntu / Debian\n"
 "sudo apt install llvm-21\n"
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:87
+#: ../../../appendix/building-from-source.md:91
 msgid ""
 "If your distro packages do not provide `llvm-21`, use LLVM's apt helper:"
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:89
+#: ../../../appendix/building-from-source.md:93
 msgid ""
 "sudo apt-get install -y lsb-release wget software-properties-common gnupg\n"
 "wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh\n"
 "sudo ./llvm.sh 21\n"
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:95
+#: ../../../appendix/building-from-source.md:99
 msgid ""
 "# Verify NVPTX support\n"
 "llc-21 --version | grep nvptx\n"
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:100
+#: ../../../appendix/building-from-source.md:104
 msgid "You should see `nvptx64 - NVIDIA PTX 64-bit` in the target list."
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:102
+#: ../../../appendix/building-from-source.md:106
 msgid ""
 "To pin a specific binary (rustup's, a distro's, or a custom build), set "
 "`CUDA_OXIDE_LLC=/path/to/llc`. The pipeline's full resolution order is:"
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:105
+#: ../../../appendix/building-from-source.md:109
 msgid "`$CUDA_OXIDE_LLC` (if set)"
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:106
+#: ../../../appendix/building-from-source.md:110
 msgid "The Rust toolchain's `llvm-tools` llc"
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:107
-msgid "`llc-22`, then `llc-21`, then bare `llc` on `PATH`"
+#: ../../../appendix/building-from-source.md:111
+msgid "`llc-23`, then `llc-22`, then `llc-21`, then bare `llc` on `PATH`"
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:110
+#: ../../../appendix/building-from-source.md:114
 msgid ""
 "Older `llc` binaries (LLVM 20 and earlier) will compile simpler kernels when "
 "pointed at via `CUDA_OXIDE_LLC=/path/to/llc-20`, but any example that uses "
@@ -258,74 +264,74 @@ msgid ""
 "argument type!` until you upgrade to LLVM 21+."
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:117
+#: ../../../appendix/building-from-source.md:121
 msgid "Install Clang (for host `cuda-bindings`)"
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:119
+#: ../../../appendix/building-from-source.md:123
 msgid ""
 "The host `cuda-bindings` crate runs `bindgen`, which loads libclang and "
 "needs clang's own resource-dir `stddef.h` — a bare `libclang1-*` runtime is "
 "not enough."
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:123
+#: ../../../appendix/building-from-source.md:127
 msgid "sudo apt install clang-21   # or libclang-common-21-dev\n"
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:127
+#: ../../../appendix/building-from-source.md:131
 msgid "`cargo oxide doctor` verifies this up front."
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:129
+#: ../../../appendix/building-from-source.md:133
 msgid "Build the workspace"
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:131
+#: ../../../appendix/building-from-source.md:135
 msgid ""
 "The main workspace contains the user-facing crates (`cuda-device`, `cuda-"
 "core`, `cuda-async`, etc.) and the build tooling (`cargo-oxide`):"
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:134
+#: ../../../appendix/building-from-source.md:138
 msgid "cargo build\n"
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:139
+#: ../../../appendix/building-from-source.md:143
 msgid ""
 "The codegen backend (`crates/rustc-codegen-cuda/`) is intentionally **not** "
 "a workspace member because it requires special nightly features and a "
 "different build process. `cargo-oxide` handles building it transparently."
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:144
+#: ../../../appendix/building-from-source.md:148
 msgid "Install cargo-oxide"
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:146
+#: ../../../appendix/building-from-source.md:150
 msgid ""
 "`cargo-oxide` is the cargo subcommand that drives the full compilation "
 "pipeline. Inside the repo, it works via a workspace alias. For standalone "
 "use, install it with the pinned nightly toolchain:"
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:149
+#: ../../../appendix/building-from-source.md:153
 msgid ""
-"cargo +nightly-2026-04-03 install --git https://github.com/NVlabs/cuda-oxide."
+"cargo +nightly-2026-08-28 install --git https://github.com/NVlabs/cuda-oxide."
 "git cargo-oxide\n"
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:153
+#: ../../../appendix/building-from-source.md:157
 msgid ""
 "On first run, `cargo-oxide` automatically fetches and builds the codegen "
 "backend dylib."
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:156
+#: ../../../appendix/building-from-source.md:160
 msgid "Verify the installation"
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:158
+#: ../../../appendix/building-from-source.md:162
 msgid ""
 "# Check all prerequisites\n"
 "cargo oxide doctor\n"
@@ -334,7 +340,7 @@ msgid ""
 "cargo oxide run vecadd\n"
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:166
+#: ../../../appendix/building-from-source.md:170
 msgid ""
 "`cargo oxide doctor` validates your Rust toolchain, CUDA toolkit (including "
 "libNVVM / nvJitLink / libdevice for kernels that use math intrinsics), LLVM "
@@ -343,17 +349,23 @@ msgid ""
 "GPU, and prints a success message."
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:172
+#: ../../../appendix/building-from-source.md:176
 msgid "Common commands"
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:174
+#: ../../../appendix/building-from-source.md:178
 msgid ""
 "# Build and run an example\n"
 "cargo oxide run <example>\n"
 "\n"
+"# Print generated PTX only\n"
+"cargo oxide inspect <example>\n"
+"\n"
 "# Show the full compilation pipeline (MIR → LLVM IR → PTX)\n"
 "cargo oxide pipeline <example>\n"
+"\n"
+"# Remove local build outputs and generated artifacts\n"
+"cargo oxide clean\n"
 "\n"
 "# Run under NVIDIA Compute Sanitizer\n"
 "cargo oxide sanitize <example> --tool memcheck\n"
@@ -365,17 +377,17 @@ msgid ""
 "cargo oxide build <example> --emit-nvvm-ir --arch sm_120\n"
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:191
+#: ../../../appendix/building-from-source.md:201
 msgid "Building the book"
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:193
+#: ../../../appendix/building-from-source.md:203
 msgid ""
 "The documentation lives in `cuda-oxide-book/` and uses Sphinx with MyST "
 "Markdown. To build and serve locally:"
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:196
+#: ../../../appendix/building-from-source.md:206
 msgid ""
 "cd cuda-oxide-book\n"
 "make setup      # creates venv, installs dependencies\n"
@@ -383,30 +395,30 @@ msgid ""
 "make livehtml   # starts dev server on http://localhost:8000\n"
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:203
+#: ../../../appendix/building-from-source.md:213
 msgid "Generating API documentation"
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:205
+#: ../../../appendix/building-from-source.md:215
 msgid "Standard `cargo doc` works for the workspace crates:"
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:207
+#: ../../../appendix/building-from-source.md:217
 msgid "cargo doc --no-deps --open\n"
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:211
+#: ../../../appendix/building-from-source.md:221
 msgid ""
 "This generates rustdoc for `cuda-device`, `cuda-core`, `cuda-async`, and all "
 "other workspace members. The codegen backend is excluded since it is not a "
 "workspace member."
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:215
+#: ../../../appendix/building-from-source.md:225
 msgid "Workspace structure"
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:217
+#: ../../../appendix/building-from-source.md:227
 msgid ""
 "cuda-oxide/\n"
 "├── Cargo.toml              # Workspace root\n"
@@ -436,59 +448,59 @@ msgid ""
 "└── cuda-oxide-book/        # This book (Sphinx + MyST)\n"
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:242
+#: ../../../appendix/building-from-source.md:252
 msgid "Troubleshooting"
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:244
+#: ../../../appendix/building-from-source.md:254
 msgid "`llc` not found or missing NVPTX"
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:245
+#: ../../../appendix/building-from-source.md:255
 msgid ""
 "The fastest fix is `rustup component add llvm-tools` — the pinned "
-"toolchain's `llc` is LLVM 22 with NVPTX enabled and is auto-picked up. "
+"toolchain's `llc` is LLVM 23 with NVPTX enabled and is auto-picked up. "
 "Otherwise install a system LLVM 21+ (`sudo apt install llvm-21`); the "
-"pipeline probes the rustup `llc` first, then `llc-22` → `llc-21` on `PATH`. "
-"To pin a specific binary set `CUDA_OXIDE_LLC=/path/to/llc`."
+"pipeline probes the rustup `llc` first, then `llc-23` → `llc-22` → `llc-21` "
+"on `PATH`. To pin a specific binary set `CUDA_OXIDE_LLC=/path/to/llc`."
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:251
+#: ../../../appendix/building-from-source.md:262
 msgid "`Intrinsic has incorrect argument type!` (from `llc`)"
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:252
+#: ../../../appendix/building-from-source.md:263
 msgid ""
 "Your `llc` is older than LLVM 21 and cannot lower the modern TMA / tcgen05 / "
 "WGMMA intrinsic signatures. Install `llvm-21` and re-run."
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:255
+#: ../../../appendix/building-from-source.md:266
 msgid "`error[E0463]: can't find crate for rustc_middle`"
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:256
+#: ../../../appendix/building-from-source.md:267
 msgid ""
 "You are missing the `rustc-dev` component. Run: `rustup component add rustc-"
-"dev --toolchain nightly-2026-04-03`."
+"dev --toolchain nightly-2026-08-28`."
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:259
+#: ../../../appendix/building-from-source.md:270
 msgid "CUDA driver version mismatch"
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:260
+#: ../../../appendix/building-from-source.md:271
 msgid ""
 "The toolkit version (compile-time) and driver version (runtime) must be "
 "compatible. Run `nvidia-smi` to check the driver version, and `nvcc --"
 "version` for the toolkit."
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:264
+#: ../../../appendix/building-from-source.md:275
 msgid "`cargo oxide doctor` fails on codegen backend"
 msgstr ""
 
-#: ../../../appendix/building-from-source.md:265
+#: ../../../appendix/building-from-source.md:276
 msgid ""
 "The backend is built on first use. If the build fails, check that `rust-src` "
 "is installed and that the nightly version matches `rust-toolchain.toml`."

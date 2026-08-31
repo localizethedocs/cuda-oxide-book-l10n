@@ -1,0 +1,1966 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025-2026, NVIDIA Corporation
+# This file is distributed under the same license as the cuda-oxide package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: cuda-oxide \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-31 15:39+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../../gpu-programming/kernel-families.md:1
+msgid "Kernel Families"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:3
+msgid ""
+"GPU kernels are frequently specialized for different problem shapes, "
+"hardware capabilities, resource limits, or tuning decisions. A single "
+"logical operation may therefore have several ahead-of-time compiled entry "
+"points."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:7
+msgid ""
+"`KernelFamily` represents such a set of compiled variants and provides a "
+"validated host-side selection mechanism."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:10
+msgid "It separates two independent decisions:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:12
+msgid ""
+"Eligibility: can this variant safely execute this problem?\n"
+"Preference:  which eligible variant should execute?\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:17
+msgid ""
+"This distinction is important. Performance policy must never select a "
+"variant that violates its launch, shape, hardware, or resource requirements."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:20
+msgid ""
+"`KernelFamily` performs selection entirely on the CPU. It does not compile "
+"kernels, query CUDA devices, benchmark entries, create threads, or access "
+"the filesystem. The application supplies all relevant problem and hardware "
+"facts."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:24
+msgid "When to use a kernel family"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:26
+msgid ""
+"Use `KernelFamily` when an operation has a small, fixed set of already "
+"compiled implementations, such as:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:29
+msgid "different output tile sizes"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:30
+msgid "different block dimensions"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:31
+msgid "specialized tensor-core kernels for particular compute capabilities"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:32
+msgid "small-input and large-input implementations"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:33
+msgid "kernels with different shared-memory requirements"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:34
+msgid "kernels tuned for different problem-shape ranges"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:35
+msgid "a generic fallback plus one or more optimized variants"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:37
+msgid ""
+"A kernel family is not a runtime registry or a JIT compiler. Its number of "
+"variants is a const generic and is therefore part of the Rust type:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:40
+msgid "KernelFamily<Id, Entry, Meta, const N: usize>\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:44
+msgid "The family owns exactly `N` variants."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:46
+msgid ""
+"This bounded representation is useful when the available kernels are "
+"determined at build time and should remain explicit and auditable."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:49
+msgid "Selection model"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:51
+msgid "The selection flow has two modes:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:53
+msgid ""
+"Force(id) -> resolve variant -> validate ----------------------> Override\n"
+"\n"
+"Auto      -> cache lookup -> resolve -> validate --------------> Cache\n"
+"          -> filter eligible variants\n"
+"          -> selector chooses an ID\n"
+"          -> validate selector output\n"
+"          -> cache selected ID --------------------------------> Selector\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:63
+msgid ""
+"`SelectionMode::Force(id)` is a validated manual override. It bypasses the "
+"cache and selector, but it does not bypass eligibility validation."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:66
+msgid ""
+"`SelectionMode::Auto` first attempts to use a cached stable variant ID. "
+"Unknown or newly ineligible cache entries are treated as misses. The "
+"selector then sees only eligible variants."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:70
+msgid "Every successful selection reports its provenance:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:72
+msgid ""
+"pub enum SelectionSource {\n"
+"    Override,\n"
+"    Cache,\n"
+"    Selector,\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:80
+msgid ""
+"This lets applications distinguish operator overrides, cached decisions, and "
+"new selector decisions in logs and diagnostics."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:83
+msgid "Family anatomy"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:85
+msgid "A family contains a stable family identity and an array of variants:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:87
+msgid ""
+"pub struct KernelFamily<Id, Entry, Meta, const N: usize> {\n"
+"    // Private fields\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:93
+msgid "Each variant contains three caller-defined values:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:95
+msgid ""
+"pub struct KernelVariant<Id, Entry, Meta> {\n"
+"    // Private fields\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:0
+msgid "Component"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:0
+msgid "Purpose"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:0
+msgid "`Id`"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:0
+msgid "Stable semantic identity for the variant"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:0
+msgid "`Entry`"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:0
+msgid "Callable entry or launcher associated with the variant"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:0
+msgid "`Meta`"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:0
+msgid "Eligibility and preference metadata"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:0
+msgid "`N`"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:0
+msgid "Compile-time number of variants"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:108
+msgid ""
+"`Entry` is intentionally generic. It can be a function pointer, a typed "
+"launch wrapper, an enum describing generated methods, or another application-"
+"defined value."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:112
+msgid ""
+"`Meta` is also application-defined. It commonly stores requirements and "
+"tuning facts such as:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:115
+msgid "minimum compute capability"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:116
+msgid "tile dimensions"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:117
+msgid "alignment requirements"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:118
+msgid "shared-memory usage"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:119
+msgid "supported data types"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:120
+msgid "preferred problem-size range"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:121
+msgid "launch geometry"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:122
+msgid "tuning score or priority"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:124
+msgid "Defining stable variant IDs"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:126
+msgid "Every variant requires an explicit ID:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:128
+msgid ""
+"#[derive(Clone, Copy, Debug, PartialEq, Eq)]\n"
+"enum VariantId {\n"
+"    Scalar,\n"
+"    Chunked,\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:136
+msgid "IDs are used by:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:138
+msgid "manual overrides"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:139
+msgid "caches"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:140
+msgid "selectors"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:141
+msgid "diagnostics"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:142
+msgid "configuration files"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:143
+#: ../../../gpu-programming/kernel-families.md:435
+msgid "environment variables"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:145
+msgid "An ID must represent the semantic identity of a compiled variant."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:147
+msgid ""
+"Good IDs include enum values or stable strings whose meaning is controlled "
+"by the application:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:150
+msgid ""
+"enum GemmVariantId {\n"
+"    M256xN256,\n"
+"    M512xN256,\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:157
+msgid ""
+"Do not use values whose identity may change between builds or processes:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:159
+msgid "array indices"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:160
+msgid "pointers"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:161
+msgid "`TypeId`"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:162
+msgid "formatted debug output"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:163
+msgid "addresses of generated functions"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:164
+msgid "hashes whose algorithm or inputs are not stable"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:166
+msgid ""
+"Array position is not a substitute for a stable ID. Declaration order may "
+"affect selection policy, but it must not define cache identity."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:169
+msgid "Constructing a family"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:171
+msgid "Create variants with `KernelVariant::new`:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:173
+msgid ""
+"let variant = KernelVariant::new(\n"
+"    VariantId::Chunked,\n"
+"    chunked_entry,\n"
+"    VariantMetadata {\n"
+"        min_len: 1024,\n"
+"        chunk_width: 256,\n"
+"    },\n"
+");\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:184
+msgid "Create the family with `KernelFamily::try_new`:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:186
+msgid ""
+"let family = KernelFamily::try_new(\n"
+"    \"vector-copy\",\n"
+"    1,\n"
+"    [\n"
+"        scalar_variant,\n"
+"        chunked_variant,\n"
+"    ],\n"
+")?;\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:197
+msgid "The arguments are:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:199
+msgid ""
+"KernelFamily::try_new(\n"
+"    name: &'static str,\n"
+"    revision: u32,\n"
+"    variants: [KernelVariant<Id, Entry, Meta>; N],\n"
+")\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:207
+msgid "Construction validates three structural invariants:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:209
+msgid "The family contains at least one variant."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:210
+msgid "The family name is not empty or whitespace-only."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:211
+msgid "Variant IDs are unique within the family."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:213
+msgid "Construction can return:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:215
+msgid ""
+"pub enum KernelFamilyBuildError {\n"
+"    EmptyFamily,\n"
+"    EmptyFamilyName,\n"
+"    DuplicateVariantId {\n"
+"        first_index: usize,\n"
+"        duplicate_index: usize,\n"
+"    },\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:226
+msgid "Family identity and revisioning"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:228
+msgid "The family name and revision form its selection and cache namespace:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:230
+msgid ""
+"let id = family.id();\n"
+"\n"
+"println!(\"{}\", id.name());\n"
+"println!(\"{}\", id.revision());\n"
+"println!(\"{id}\"); // vector-copy@1\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:238
+msgid "A persistent or in-memory cache must include both values in its key."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:240
+msgid ""
+"Increment the revision whenever an existing cached decision might no longer "
+"mean the same thing."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:243
+msgid "Revision changes are required when modifying:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:245
+msgid "variant membership"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:246
+msgid "the meaning of a variant ID"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:247
+msgid "eligibility rules"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:248
+msgid "selector or preference policy"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:249
+msgid "tuning methodology"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:250
+msgid "metadata used by selection"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:251
+msgid ""
+"declaration order, unless selection and tuning are explicitly order-"
+"independent"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:254
+#: ../../../gpu-programming/kernel-families.md:292
+#: ../../../gpu-programming/kernel-families.md:901
+msgid "For example:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:256
+msgid ""
+"KernelFamily::try_new(\"vector-copy\", 1, variants_v1)?;\n"
+"KernelFamily::try_new(\"vector-copy\", 2, variants_v2)?;\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:261
+msgid ""
+"Changing the revision prevents decisions made under the first contract from "
+"being interpreted under the second contract."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:264
+msgid ""
+"The family name should describe the logical operation and specialization "
+"axis:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:266
+msgid ""
+"image-filter/radius\n"
+"gemm/output-tile\n"
+"reduction/block-size\n"
+"attention/head-dimension\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:273
+msgid ""
+"Avoid names based on transient implementation locations or process-specific "
+"state."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:276
+msgid "Eligibility with `KernelProblem`"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:278
+msgid ""
+"Eligibility answers whether a specific variant can safely handle a problem."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:280
+msgid "Implement:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:282
+msgid ""
+"pub trait KernelProblem<Variant> {\n"
+"    type Rejection: std::error::Error + Send + Sync + 'static;\n"
+"\n"
+"    fn validate(&self, variant: &Variant) -> Result<(), Self::Rejection>;\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:290
+msgid ""
+"The problem type should contain every fact required to validate the launch."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:294
+msgid ""
+"#[derive(Clone, Copy, Debug)]\n"
+"struct CopyProblem {\n"
+"    len: usize,\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:301
+msgid "Validation may consider:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:303
+msgid "problem dimensions"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:304
+msgid "divisibility requirements"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:305
+msgid "buffer alignment"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:306
+msgid "data type"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:307
+msgid "device compute capability"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:308
+msgid "shared-memory capacity"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:309
+msgid "grid and block limits"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:310
+msgid "cooperative-launch support"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:311
+msgid "cluster-launch support"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:312
+msgid "integer conversion and allocation overflow"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:313
+msgid "application-specific semantic constraints"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:315
+msgid "Implementations should be deterministic and free of side effects."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:317
+msgid ""
+"Eligibility is a safety and correctness boundary. It should not encode only "
+"performance preference."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:320
+msgid ""
+"For example, a variant requiring a length divisible by 256 should reject an "
+"incompatible problem even if another layer is expected to avoid selecting it."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:323
+msgid "Preference with `KernelSelector`"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:325
+msgid ""
+"A selector chooses among variants that have already passed eligibility "
+"validation:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:328
+msgid ""
+"pub trait KernelSelector<Problem, Variant, Id> {\n"
+"    type Error: std::error::Error + Send + Sync + 'static;\n"
+"\n"
+"    fn select(\n"
+"        &mut self,\n"
+"        family: KernelFamilyId,\n"
+"        problem: &Problem,\n"
+"        eligible: &[&Variant],\n"
+"    ) -> Result<Id, Self::Error>;\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:341
+msgid "The `eligible` slice has two guarantees:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:343
+msgid "It is not empty."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:344
+msgid "It preserves family declaration order."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:346
+msgid ""
+"The selector returns a stable variant ID, not an array index or entry "
+"reference."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:348
+msgid "Selectors can implement policies such as:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:350
+msgid "choose the largest tile supported by the problem"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:351
+msgid "choose a small-input kernel below a threshold"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:352
+msgid "choose using offline benchmark results"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:353
+msgid "choose using hardware generation"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:354
+msgid "choose the first eligible variant"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:355
+msgid "choose from an application configuration"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:356
+msgid "invoke an external tuning service"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:358
+msgid ""
+"A selector must return an ID from the provided eligible slice. "
+"`KernelFamily` checks this requirement and rejects invalid selector output."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:361
+msgid ""
+"Closures can also act as selectors when their signature matches the trait. "
+"Annotate every closure parameter type. Without the annotations, closure "
+"lifetime inference can fix the borrows to one specific call and rustc "
+"rejects the closure with \"implementation of `FnMut` is not general "
+"enough\". A selector that cannot fail can use `std::convert::Infallible` as "
+"its error type:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:368
+msgid ""
+"let mut selector =\n"
+"    |_: KernelFamilyId, _: &CopyProblem, eligible: &[&Variant]| {\n"
+"        Ok::<_, Infallible>(*eligible[0].id())\n"
+"    };\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:375
+msgid "Automatic selection"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:377
+msgid "Automatic selection uses:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:379
+msgid "SelectionMode::Auto\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:383
+msgid "The full call is:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:385
+msgid ""
+"let selected = family.select(\n"
+"    &problem,\n"
+"    SelectionMode::Auto,\n"
+"    &mut selector,\n"
+"    &mut cache,\n"
+")?;\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:394
+msgid "The automatic path performs these operations:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:396
+msgid "Ask the cache for a stable variant ID."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:397
+msgid "Resolve the cached ID within the family."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:398
+msgid "Revalidate the cached variant against the current problem."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:399
+msgid "Return a valid cache hit immediately."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:400
+msgid "Otherwise, validate every family member."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:401
+msgid "Preserve eligible variants in declaration order."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:402
+msgid "Fail if no variant is eligible."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:403
+msgid "Ask the selector to choose from the eligible slice."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:404
+msgid "Verify that the selector returned a family member."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:405
+msgid "Verify that the returned member was in the eligible slice."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:406
+msgid "Store the validated selected ID in the cache."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:407
+msgid "Return the selected variant with `SelectionSource::Selector`."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:409
+msgid "Cached IDs are hints, not authority."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:411
+msgid "A cache entry may become invalid because:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:413
+msgid "the cache was written by an older application version"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:414
+msgid "eligibility depends on hardware"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:415
+msgid "problem constraints changed"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:416
+msgid "a persistent cache is corrupted"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:417
+msgid "a variant was removed"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:418
+msgid "a previous policy used a different revision incorrectly"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:420
+msgid ""
+"For these reasons, every cached ID is resolved and validated before use."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:422
+msgid "Forced selection"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:424
+msgid "Use:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:426
+msgid "SelectionMode::Force(id)\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:430
+msgid "when a caller explicitly requests a variant."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:432
+msgid "Typical sources include:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:434
+msgid "command-line options"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:436
+msgid "test configuration"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:437
+msgid "debugging controls"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:438
+msgid "performance experiments"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:439
+msgid "operator policy"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:441
+msgid "Example:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:443
+msgid ""
+"let selected = family.select(\n"
+"    &problem,\n"
+"    SelectionMode::Force(VariantId::Scalar),\n"
+"    &mut selector,\n"
+"    &mut cache,\n"
+")?;\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:452
+msgid "Forced selection:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:454
+msgid "bypasses cache lookup"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:455
+msgid "bypasses selector invocation"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:456
+msgid "does not update the cache"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:457
+msgid "verifies that the requested ID belongs to the family"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:458
+msgid "validates that the requested variant is eligible"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:460
+msgid "An unknown forced ID returns `UnknownForcedVariant`."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:462
+msgid "A known but incompatible variant returns `IneligibleForcedVariant`."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:464
+msgid "A manual override therefore cannot silently bypass launch requirements."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:466
+msgid "Selection results"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:468
+msgid "A successful call returns a borrowed `SelectedVariant`:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:470
+msgid ""
+"pub struct SelectedVariant<'family, Id, Entry, Meta> {\n"
+"    // Private fields\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:476
+msgid "Access the variant and provenance with:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:478
+msgid ""
+"let variant = selected.variant();\n"
+"let source = selected.source();\n"
+"\n"
+"println!(\"selected {:?} from {}\", variant.id(), source);\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:485
+msgid ""
+"The selected value borrows from the family. It does not copy or move the "
+"variant entry or metadata."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:488
+msgid "The variant provides:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:490
+msgid ""
+"variant.id();\n"
+"variant.entry();\n"
+"variant.metadata();\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:496
+msgid "`SelectionSource` implements `Display`:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:498
+msgid ""
+"override\n"
+"cache\n"
+"selector\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:504
+msgid "Complete example"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:506
+msgid ""
+"The following example uses ordinary CPU functions as entries. The same "
+"selection structure applies when entries are typed wrappers around compiled "
+"CUDA kernels."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:510
+msgid ""
+"use cuda_host::{\n"
+"    KernelFamily, KernelFamilyBuildError, KernelFamilyId, KernelProblem,\n"
+"    KernelSelector, KernelVariant, NoKernelSelectionCache, SelectionMode,\n"
+"    SelectionSource,\n"
+"};\n"
+"use std::convert::Infallible;\n"
+"use std::error::Error;\n"
+"use std::fmt;\n"
+"\n"
+"#[derive(Clone, Copy, Debug, PartialEq, Eq)]\n"
+"enum VariantId {\n"
+"    Scalar,\n"
+"    Chunked,\n"
+"}\n"
+"\n"
+"type Entry = fn(&[f32], &mut [f32]);\n"
+"\n"
+"#[derive(Clone, Copy, Debug, PartialEq, Eq)]\n"
+"struct VariantMetadata {\n"
+"    min_len: usize,\n"
+"    chunk_width: usize,\n"
+"}\n"
+"\n"
+"type Variant = KernelVariant<VariantId, Entry, VariantMetadata>;\n"
+"type CopyFamily = KernelFamily<VariantId, Entry, VariantMetadata, 2>;\n"
+"\n"
+"fn scalar_copy(input: &[f32], output: &mut [f32]) {\n"
+"    output.copy_from_slice(input);\n"
+"}\n"
+"\n"
+"fn chunked_copy(input: &[f32], output: &mut [f32]) {\n"
+"    const WIDTH: usize = 256;\n"
+"\n"
+"    for (input_chunk, output_chunk) in input\n"
+"        .chunks_exact(WIDTH)\n"
+"        .zip(output.chunks_exact_mut(WIDTH))\n"
+"    {\n"
+"        output_chunk.copy_from_slice(input_chunk);\n"
+"    }\n"
+"}\n"
+"\n"
+"fn copy_family() -> Result<CopyFamily, KernelFamilyBuildError> {\n"
+"    KernelFamily::try_new(\n"
+"        \"book/vector-copy\",\n"
+"        1,\n"
+"        [\n"
+"            KernelVariant::new(\n"
+"                VariantId::Scalar,\n"
+"                scalar_copy as Entry,\n"
+"                VariantMetadata {\n"
+"                    min_len: 0,\n"
+"                    chunk_width: 1,\n"
+"                },\n"
+"            ),\n"
+"            KernelVariant::new(\n"
+"                VariantId::Chunked,\n"
+"                chunked_copy as Entry,\n"
+"                VariantMetadata {\n"
+"                    min_len: 1024,\n"
+"                    chunk_width: 256,\n"
+"                },\n"
+"            ),\n"
+"        ],\n"
+"    )\n"
+"}\n"
+"\n"
+"#[derive(Clone, Copy, Debug)]\n"
+"struct CopyProblem {\n"
+"    len: usize,\n"
+"}\n"
+"\n"
+"#[derive(Clone, Copy, Debug, PartialEq, Eq)]\n"
+"struct CopyVariantRejection {\n"
+"    variant: VariantId,\n"
+"    required_min_len: usize,\n"
+"    required_multiple: usize,\n"
+"    actual_len: usize,\n"
+"}\n"
+"\n"
+"impl fmt::Display for CopyVariantRejection {\n"
+"    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {\n"
+"        write!(\n"
+"            formatter,\n"
+"            \"{:?} requires len >= {} and len divisible by {}, but len is "
+"{}\",\n"
+"            self.variant,\n"
+"            self.required_min_len,\n"
+"            self.required_multiple,\n"
+"            self.actual_len,\n"
+"        )\n"
+"    }\n"
+"}\n"
+"\n"
+"impl Error for CopyVariantRejection {}\n"
+"\n"
+"impl KernelProblem<Variant> for CopyProblem {\n"
+"    type Rejection = CopyVariantRejection;\n"
+"\n"
+"    fn validate(&self, variant: &Variant) -> Result<(), Self::Rejection> {\n"
+"        let metadata = variant.metadata();\n"
+"\n"
+"        if self.len < metadata.min_len\n"
+"            || !self.len.is_multiple_of(metadata.chunk_width)\n"
+"        {\n"
+"            return Err(CopyVariantRejection {\n"
+"                variant: *variant.id(),\n"
+"                required_min_len: metadata.min_len,\n"
+"                required_multiple: metadata.chunk_width,\n"
+"                actual_len: self.len,\n"
+"            });\n"
+"        }\n"
+"\n"
+"        Ok(())\n"
+"    }\n"
+"}\n"
+"\n"
+"struct CopySelector;\n"
+"\n"
+"impl KernelSelector<CopyProblem, Variant, VariantId> for CopySelector {\n"
+"    type Error = Infallible;\n"
+"\n"
+"    fn select(\n"
+"        &mut self,\n"
+"        _family: KernelFamilyId,\n"
+"        _problem: &CopyProblem,\n"
+"        eligible: &[&Variant],\n"
+"    ) -> Result<VariantId, Self::Error> {\n"
+"        let preferred = eligible\n"
+"            .iter()\n"
+"            .copied()\n"
+"            .max_by_key(|variant| variant.metadata().chunk_width)\n"
+"            .expect(\"eligible is guaranteed to be non-empty\");\n"
+"\n"
+"        Ok(*preferred.id())\n"
+"    }\n"
+"}\n"
+"\n"
+"fn main() -> Result<(), Box<dyn Error>> {\n"
+"    let family = copy_family()?;\n"
+"\n"
+"    let input = vec![1.0f32; 4096];\n"
+"    let mut output = vec![0.0f32; input.len()];\n"
+"    let problem = CopyProblem { len: input.len() };\n"
+"\n"
+"    let mut selector = CopySelector;\n"
+"    let mut cache = NoKernelSelectionCache;\n"
+"\n"
+"    let selected = family.select(\n"
+"        &problem,\n"
+"        SelectionMode::Auto,\n"
+"        &mut selector,\n"
+"        &mut cache,\n"
+"    )?;\n"
+"\n"
+"    println!(\n"
+"        \"selected {:?} from {}\",\n"
+"        selected.variant().id(),\n"
+"        selected.source(),\n"
+"    );\n"
+"\n"
+"    assert_eq!(selected.variant().id(), &VariantId::Chunked);\n"
+"    assert_eq!(selected.source(), SelectionSource::Selector);\n"
+"\n"
+"    let entry = *selected.variant().entry();\n"
+"    entry(&input, &mut output);\n"
+"\n"
+"    assert_eq!(input, output);\n"
+"\n"
+"    let forced = family.select(\n"
+"        &problem,\n"
+"        SelectionMode::Force(VariantId::Scalar),\n"
+"        &mut selector,\n"
+"        &mut cache,\n"
+"    )?;\n"
+"\n"
+"    assert_eq!(forced.variant().id(), &VariantId::Scalar);\n"
+"    assert_eq!(forced.source(), SelectionSource::Override);\n"
+"\n"
+"    Ok(())\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:692
+msgid ""
+"For an input length of 4096, both variants are eligible. The selector "
+"prefers the variant with the larger `chunk_width`."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:695
+msgid ""
+"For an input length of 1000, only `Scalar` is eligible because `Chunked` "
+"requires at least 1024 elements and a length divisible by 256."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:698
+msgid ""
+"The selection mechanism does not know what `chunk_width` means. Eligibility "
+"and preference semantics belong entirely to the application."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:701
+msgid "Adding a cache"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:703
+msgid "Use `NoKernelSelectionCache` when selection should run every time:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:705
+msgid "let mut cache = NoKernelSelectionCache;\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:709
+msgid "For repeated problem classes, implement `KernelSelectionCache`:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:711
+msgid ""
+"pub trait KernelSelectionCache<Problem, Id> {\n"
+"    type Error: std::error::Error + Send + Sync + 'static;\n"
+"\n"
+"    fn lookup(\n"
+"        &mut self,\n"
+"        family: KernelFamilyId,\n"
+"        problem: &Problem,\n"
+"    ) -> Result<Option<Id>, Self::Error>;\n"
+"\n"
+"    fn store(\n"
+"        &mut self,\n"
+"        family: KernelFamilyId,\n"
+"        problem: &Problem,\n"
+"        variant: &Id,\n"
+"    ) -> Result<(), Self::Error>;\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:730
+msgid ""
+"A simple in-memory cache for the previous example can use problem length as "
+"part of its key:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:733
+msgid ""
+"use cuda_host::{KernelFamilyId, KernelSelectionCache};\n"
+"use std::collections::HashMap;\n"
+"use std::convert::Infallible;\n"
+"\n"
+"#[derive(Default)]\n"
+"struct MemoryCache {\n"
+"    values: HashMap<(KernelFamilyId, usize), VariantId>,\n"
+"}\n"
+"\n"
+"impl KernelSelectionCache<CopyProblem, VariantId> for MemoryCache {\n"
+"    type Error = Infallible;\n"
+"\n"
+"    fn lookup(\n"
+"        &mut self,\n"
+"        family: KernelFamilyId,\n"
+"        problem: &CopyProblem,\n"
+"    ) -> Result<Option<VariantId>, Self::Error> {\n"
+"        Ok(self.values.get(&(family, problem.len)).copied())\n"
+"    }\n"
+"\n"
+"    fn store(\n"
+"        &mut self,\n"
+"        family: KernelFamilyId,\n"
+"        problem: &CopyProblem,\n"
+"        variant: &VariantId,\n"
+"    ) -> Result<(), Self::Error> {\n"
+"        self.values.insert((family, problem.len), *variant);\n"
+"        Ok(())\n"
+"    }\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:766
+msgid ""
+"The application decides which problem properties define cache equivalence."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:768
+msgid "For example, a GEMM cache key may include:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:770
+msgid ""
+"family name\n"
+"family revision\n"
+"compute capability\n"
+"M\n"
+"N\n"
+"K\n"
+"input type\n"
+"output type\n"
+"layout\n"
+"alignment class\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:783
+msgid "Do not omit a property when it can change eligibility or preference."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:785
+msgid "A cache implementation may be:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:787
+msgid "an in-memory map"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:788
+msgid "a process-wide cache"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:789
+msgid "a database"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:790
+msgid "a configuration file"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:791
+msgid "a benchmark result store"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:792
+msgid "a remote tuning service"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:794
+msgid ""
+"Cache errors are explicit. If `lookup` or `store` returns an error, "
+"selection stops and returns `CacheLookupFailed` or `CacheStoreFailed`."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:797
+msgid ""
+"A best-effort cache may internally translate storage failures into misses or "
+"no-op stores when that policy is appropriate."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:800
+msgid "Error handling"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:802
+msgid "`KernelFamily::select` can report errors from four layers:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:804
+msgid "forced selection"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:805
+msgid "eligibility validation"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:806
+msgid "selector execution or output validation"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:807
+msgid "cache operations"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:809
+msgid "The principal variants are:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:0
+msgid "Error"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:0
+msgid "Meaning"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:0
+msgid "`UnknownForcedVariant`"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:0
+msgid "A forced ID is not a family member"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:0
+msgid "`IneligibleForcedVariant`"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:0
+msgid "A forced family member cannot handle the problem"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:0
+msgid "`NoEligibleVariants`"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:0
+msgid "Every family member failed validation"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:0
+msgid "`SelectorFailed`"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:0
+msgid "The selector returned its own policy error"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:0
+msgid "`SelectorReturnedUnknownVariant`"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:0
+msgid "The selector returned an ID outside the family"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:0
+msgid "`SelectorReturnedIneligibleVariant`"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:0
+msgid "The selector returned a family member that was not eligible"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:0
+msgid "`CacheLookupFailed`"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:0
+msgid "Cache lookup returned an error"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:0
+msgid "`CacheStoreFailed`"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:0
+msgid "Cache storage returned an error"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:822
+msgid ""
+"Unknown or ineligible cached IDs are not selection errors. They are treated "
+"as cache misses because cache contents are untrusted hints."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:825
+msgid ""
+"Selector mistakes are errors because the selector receives the authoritative "
+"eligible slice during the current selection call."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:828
+msgid "Declaration order"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:830
+msgid "Family variants retain declaration order:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:832
+msgid ""
+"KernelFamily::try_new(\n"
+"    \"operation\",\n"
+"    1,\n"
+"    [\n"
+"        fallback,\n"
+"        medium,\n"
+"        aggressive,\n"
+"    ],\n"
+")?;\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:844
+msgid "The selector receives eligible variants in this same relative order."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:846
+msgid "This supports deterministic policies such as:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:848
+msgid "Ok(*eligible[0].id())\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:852
+msgid "or priority encoded through declaration order."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:854
+msgid ""
+"If declaration order affects selection or tuning, changing the order "
+"requires a family revision bump."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:857
+msgid ""
+"Prefer explicit metadata when the policy is more complex than a simple "
+"ordered fallback. Metadata makes the policy easier to inspect, test, and "
+"evolve."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:860
+msgid "Testing a family"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:862
+msgid ""
+"Kernel-family policy is host-side logic and can be tested without a CUDA "
+"device."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:865
+msgid "Tests should verify at least:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:867
+msgid "empty families are rejected"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:868
+msgid "blank names are rejected"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:869
+msgid "duplicate IDs are rejected"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:870
+msgid "forced selection bypasses selector and cache"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:871
+msgid "forced selection still validates eligibility"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:872
+msgid "valid cache hits bypass the selector"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:873
+msgid "unknown cache IDs fall back to the selector"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:874
+msgid "newly ineligible cache IDs fall back to the selector"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:875
+msgid "stale cache entries are replaced"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:876
+msgid "selectors receive only eligible variants"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:877
+msgid "declaration order is preserved"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:878
+msgid "unknown selector output is rejected"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:879
+msgid "ineligible selector output is rejected"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:880
+msgid "no eligible variants produces an error"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:881
+msgid "cache lookup failures propagate"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:882
+msgid "cache store failures propagate"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:883
+msgid "family revisions isolate cached decisions"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:885
+msgid "The repository integration tests provide executable examples:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:887
+msgid "crates/cuda-host/tests/kernel_family.rs\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:891
+msgid "Run them with:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:893
+msgid "cargo test -p cuda-host --test kernel_family\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:897
+msgid "Using generated CUDA launchers"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:899
+msgid ""
+"In a real application, `Entry` commonly represents a concrete typed launcher."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:903
+msgid ""
+"type KernelLauncher = unsafe fn(\n"
+"    &kernels::LoadedModule,\n"
+"    &CudaStream,\n"
+"    LaunchConfig,\n"
+"    &DeviceBuffer<f32>,\n"
+"    &mut DeviceBuffer<f32>,\n"
+") -> Result<(), cuda_core::DriverError>;\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:913
+msgid "The family then stores one launcher per compiled specialization:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:915
+msgid ""
+"type Family =\n"
+"    KernelFamily<VariantId, KernelLauncher, VariantMetadata, 2>;\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:920
+msgid "Selection returns the launcher and its metadata:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:922
+msgid ""
+"let selected = family.select(\n"
+"    &problem,\n"
+"    mode,\n"
+"    &mut selector,\n"
+"    &mut cache,\n"
+")?;\n"
+"\n"
+"let launch = *selected.variant().entry();\n"
+"let metadata = selected.variant().metadata();\n"
+"\n"
+"println!(\n"
+"    \"launching {:?} from {}\",\n"
+"    selected.variant().id(),\n"
+"    selected.source(),\n"
+");\n"
+"\n"
+"unsafe {\n"
+"    launch(\n"
+"        &module,\n"
+"        &stream,\n"
+"        launch_config,\n"
+"        &input,\n"
+"        &mut output,\n"
+"    )?;\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:950
+msgid ""
+"`KernelFamily` validates variant selection. It does not make an otherwise "
+"unsafe raw launch safe."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:953
+msgid ""
+"Launch geometry, pointer validity, buffer sizes, context identity, and "
+"kernel ABI obligations still belong to the launch API. Prefer prepared "
+"launch contracts when the kernel geometry can be expressed statically. See "
+"[Launching Kernels](launching-kernels.md)."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:958
+msgid "Real-world example"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:960
+msgid ""
+"The `gemm_sol_final` example uses a two-entry family for two Blackwell GEMM "
+"output-tile specializations:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:963
+msgid ""
+"M256xN256\n"
+"M512xN256\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:968
+msgid "Its family metadata includes:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:970
+msgid "kernel name"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:971
+msgid "output tile"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:972
+msgid "M tile size"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:973
+msgid "N tile size"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:974
+msgid "K tile multiple"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:975
+msgid "problem-size preference threshold"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:977
+msgid ""
+"Eligibility checks validate matrix dimensions, tile divisibility, integer "
+"ranges, allocation-size overflow, and CUDA grid limits."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:980
+msgid ""
+"The selector chooses the largest preferred tile whose threshold is "
+"compatible with the problem."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:983
+msgid "The `GEMM_SOL_VARIANT` environment variable exposes:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:985
+msgid ""
+"auto\n"
+"m256xn256\n"
+"m512xn256\n"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:991
+msgid ""
+"The forced values remain validated overrides. They cannot select a tile "
+"whose compiled shape is incompatible with the matrix dimensions."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:994
+msgid "See:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:996
+msgid ""
+"[`gemm_sol_final`](https://github.com/NVlabs/cuda-oxide/tree/main/crates/"
+"rustc-codegen-cuda/examples/gemm_sol_final)"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:997
+msgid ""
+"[`KernelFamily` integration tests](https://github.com/NVlabs/cuda-oxide/blob/"
+"main/crates/cuda-host/tests/kernel_family.rs)"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:998
+msgid ""
+"[`cuda-host` kernel-family implementation](https://github.com/NVlabs/cuda-"
+"oxide/blob/main/crates/cuda-host/src/kernel_family.rs)"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:999
+msgid ""
+"[`cuda-host` README](https://github.com/NVlabs/cuda-oxide/blob/main/crates/"
+"cuda-host/README.md)"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:1001
+msgid "Design guidelines"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:1003
+msgid "Use the following rules when introducing a new family."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:1005
+msgid "Keep the family bounded"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:1007
+msgid "Prefer a small set of meaningful compiled variants."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:1009
+msgid ""
+"A large dynamically changing set usually indicates that a registry, "
+"generated dispatch table, or tuning database is a better abstraction."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:1012
+msgid "Make IDs semantic"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:1014
+msgid ""
+"The ID should describe which compiled contract is selected, not where it "
+"happens to appear in an array."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:1017
+msgid "Put correctness in eligibility"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:1019
+msgid ""
+"Any condition required for safe or correct execution belongs in "
+"`KernelProblem::validate`."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:1022
+msgid "Do not rely on the selector to avoid unsafe variants."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:1024
+msgid "Put performance in preference"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:1026
+msgid "The selector should decide among already valid choices."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:1028
+msgid "This keeps tuning policy independent from safety validation."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:1030
+msgid "Treat cache entries as untrusted"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:1032
+msgid "Always allow `KernelFamily` to resolve and revalidate cached IDs."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:1034
+msgid "Do not launch directly from a cached ID without family validation."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:1036
+msgid "Version policy changes"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:1038
+msgid ""
+"Increment the family revision when a cached choice may have different "
+"meaning under the new code."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:1041
+msgid "Preserve observability"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:1043
+msgid ""
+"Record `SelectionSource`, family identity, selected ID, and relevant problem "
+"facts in diagnostics."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:1046
+msgid ""
+"This is particularly useful when comparing operator overrides, cached "
+"tuning, and current selector behavior."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:1049
+msgid "Summary"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:1051
+msgid ""
+"`KernelFamily` provides a bounded and validated dispatch layer for ahead-of-"
+"time compiled kernel specializations."
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:1054
+msgid "Its core properties are:"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:1056
+msgid "fixed family membership"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:1057
+msgid "stable semantic variant IDs"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:1058
+msgid "caller-defined entries and metadata"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:1059
+msgid "explicit eligibility validation"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:1060
+msgid "independent preference selection"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:1061
+msgid "validated manual overrides"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:1062
+msgid "revalidated cache entries"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:1063
+msgid "explicit family revisioning"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:1064
+msgid "observable selection provenance"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:1065
+msgid "CPU-only, device-independent policy logic"
+msgstr ""
+
+#: ../../../gpu-programming/kernel-families.md:1067
+msgid ""
+"The abstraction does not decide how kernels should be tuned. It provides the "
+"invariants required to make that tuning policy explicit, testable, and safe "
+"to integrate with compiled CUDA launchers."
+msgstr ""

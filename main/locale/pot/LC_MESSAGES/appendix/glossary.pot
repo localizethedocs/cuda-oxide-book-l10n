@@ -8,10 +8,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-16 12:33+0000\n"
+"POT-Creation-Date: 2026-08-31 15:39+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -318,24 +319,26 @@ msgstr ""
 
 #: ../../../appendix/glossary.md:172
 msgid ""
-"`unsafe thread::index_2d_runtime(s) -> Option<ThreadIndex<'_, "
-"Runtime2DIndex>>`. Escape hatch when the stride is only known at launch "
-"time. The `unsafe` is the contract: every thread feeding a `Runtime2DIndex` "
-"into the same `DisjointSlice` must have used the same `s`."
+"`thread::index_2d_runtime(&slice) -> Option<ThreadIndex<'_, "
+"Runtime2DIndex>>`. For strides only known at launch time, and safe: the row "
+"width lives in the slice, written once by the host into the launch packet. "
+"The witness stores the thread's `(row, col)` coordinates, and the slice "
+"being addressed resolves them against its own width, so every thread "
+"indexing one slice uses the same row width by construction."
 msgstr ""
 
-#: ../../../appendix/glossary.md:177
+#: ../../../appendix/glossary.md:179
 msgid ""
 "The witness is `!Send + !Sync + !Copy + !Clone` and `'kernel`-scoped, so "
 "threads cannot launder it through shared memory and it cannot outlive the "
 "kernel body."
 msgstr ""
 
-#: ../../../appendix/glossary.md:181
+#: ../../../appendix/glossary.md:183
 msgid "TMA (Tensor Memory Accelerator)"
 msgstr ""
 
-#: ../../../appendix/glossary.md:183
+#: ../../../appendix/glossary.md:185
 msgid ""
 "Hopper+ hardware unit for asynchronous bulk copies between global and shared "
 "memory. Operates via `TmaDescriptor` (128-byte opaque descriptor built on "
@@ -343,11 +346,11 @@ msgid ""
 "`ManagedBarrier`."
 msgstr ""
 
-#: ../../../appendix/glossary.md:187
+#: ../../../appendix/glossary.md:189
 msgid "`TmemGuard<State, N_COLS>`"
 msgstr ""
 
-#: ../../../appendix/glossary.md:189
+#: ../../../appendix/glossary.md:191
 msgid ""
 "A typestate wrapper for Blackwell Tensor Memory (TMEM) — dedicated "
 "accumulator storage for tcgen05 MMA operations. Manages TMEM lifetime: "
@@ -355,11 +358,11 @@ msgid ""
 "errors."
 msgstr ""
 
-#: ../../../appendix/glossary.md:194
+#: ../../../appendix/glossary.md:196
 msgid "Warp"
 msgstr ""
 
-#: ../../../appendix/glossary.md:196
+#: ../../../appendix/glossary.md:198
 msgid ""
 "A group of 32 threads that execute instructions in lockstep on an SM. Warps "
 "are the smallest scheduling unit. Warp-level operations (shuffle, vote) "
@@ -367,22 +370,22 @@ msgid ""
 "synchronization barriers."
 msgstr ""
 
-#: ../../../appendix/glossary.md:200
+#: ../../../appendix/glossary.md:202
 msgid "Warpgroup"
 msgstr ""
 
-#: ../../../appendix/glossary.md:202
+#: ../../../appendix/glossary.md:204
 msgid ""
 "Four consecutive warps (128 threads) that operate collectively for WGMMA "
 "operations on Hopper. The warpgroup is the issuing unit for warpgroup-level "
 "matrix multiply-accumulate."
 msgstr ""
 
-#: ../../../appendix/glossary.md:206
+#: ../../../appendix/glossary.md:208
 msgid "WGMMA (Warpgroup Matrix Multiply-Accumulate)"
 msgstr ""
 
-#: ../../../appendix/glossary.md:208
+#: ../../../appendix/glossary.md:210
 msgid ""
 "The Hopper (sm_90) tensor core instruction set. Four warps collectively "
 "issue MMA from shared memory operands into register accumulators. "

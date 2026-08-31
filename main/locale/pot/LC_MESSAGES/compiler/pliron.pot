@@ -8,10 +8,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-16 12:33+0000\n"
+"POT-Creation-Date: 2026-08-31 15:39+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -680,56 +681,59 @@ msgstr ""
 
 #: ../../../compiler/pliron.md:352
 msgid ""
-"cuda-oxide works with three dialects: it defines `dialect-mir` and `dialect-"
-"nvvm` locally (each as its own crate) and consumes the LLVM dialect from the "
-"upstream `pliron-llvm` crate. Registration is automatic: every dialect, op, "
-"type, and attribute linked into the binary registers itself when a `Context` "
-"is created (`Context::default` runs all link-time registrations), so kernel "
+"The lowering path works with three dialects: cuda-oxide defines `dialect-"
+"mir` and `dialect-nvvm` locally (each as its own crate) and consumes the "
+"LLVM dialect from the upstream `pliron-llvm` crate. Two further local "
+"dialects sit off that path -- `dialect-iket` for in-kernel event tracing and "
+"`dialect-ptx` for structured terminal PTX -- and the sections below cover "
+"only the three above. Registration is automatic: every dialect, op, type, "
+"and attribute linked into the binary registers itself when a `Context` is "
+"created (`Context::default` runs all link-time registrations), so kernel "
 "authors and pass authors never have to think about dialect setup -- "
 "depending on the crate is the only thing you do."
 msgstr ""
 
-#: ../../../compiler/pliron.md:360
+#: ../../../compiler/pliron.md:363
 msgid "dialect-mir -- Rust semantics"
 msgstr ""
 
-#: ../../../compiler/pliron.md:362
+#: ../../../compiler/pliron.md:365
 msgid ""
 "`dialect-mir` captures Rust's mid-level IR as pliron operations, preserving "
 "semantic information that would be lost if we lowered directly to LLVM."
 msgstr ""
 
-#: ../../../compiler/pliron.md:365
+#: ../../../compiler/pliron.md:368
 msgid ""
 "**Function definition**: `MirFuncOp` -- entry point for each device "
 "function, with typed block arguments matching the Rust function signature."
 msgstr ""
 
-#: ../../../compiler/pliron.md:367
+#: ../../../compiler/pliron.md:370
 msgid ""
 "**Arithmetic and comparison**: checked and unchecked binary ops (`mir.add`, "
 "`mir.sub`, `mir.eq`, `mir.lt`, ...) that preserve Rust's overflow semantics."
 msgstr ""
 
-#: ../../../compiler/pliron.md:369
+#: ../../../compiler/pliron.md:372
 msgid ""
 "**Aggregate types**: `MirTupleType`, `MirStructType`, `MirEnumType`, "
 "`MirSliceType`, `MirArrayType` -- first-class Rust compound types with "
 "operations like `mir.extract_field` and `mir.get_discriminant`."
 msgstr ""
 
-#: ../../../compiler/pliron.md:372
+#: ../../../compiler/pliron.md:375
 msgid ""
 "**Memory and control flow**: `mir.load`, `mir.store`, `mir.ref`, `mir.goto`, "
 "`mir.cond_br`, `mir.return` -- with GPU address-space tracking (`global`, "
 "`shared`, `local`, `tmem`)."
 msgstr ""
 
-#: ../../../compiler/pliron.md:376
+#: ../../../compiler/pliron.md:379
 msgid "LLVM dialect -- machine-near IR"
 msgstr ""
 
-#: ../../../compiler/pliron.md:378
+#: ../../../compiler/pliron.md:381
 msgid ""
 "The LLVM dialect models LLVM IR as pliron operations, providing a 1:1 "
 "mapping to textual `.ll` files. Its modeling lives upstream in the `pliron-"
@@ -737,49 +741,49 @@ msgid ""
 "through the `llvm-export` crate."
 msgstr ""
 
-#: ../../../compiler/pliron.md:383
+#: ../../../compiler/pliron.md:386
 msgid ""
 "**Arithmetic and casts**: all 19 LLVM binary ops (`llvm.add` through `llvm."
 "frem`), plus 13 cast ops (`llvm.sext`, `llvm.trunc`, `llvm.bitcast`, ...)."
 msgstr ""
 
-#: ../../../compiler/pliron.md:385
+#: ../../../compiler/pliron.md:388
 msgid ""
 "**Control flow**: `llvm.br`, `llvm.cond_br`, `llvm.switch`, `llvm.return`, "
 "`llvm.unreachable` -- with block arguments translated to PHI nodes on export."
 msgstr ""
 
-#: ../../../compiler/pliron.md:387
+#: ../../../compiler/pliron.md:390
 msgid ""
 "**Textual export**: the `llvm_export::export` module emits valid LLVM IR "
 "text, including `@llvm.used` arrays and `!nvvm.annotations` metadata for GPU "
 "kernels."
 msgstr ""
 
-#: ../../../compiler/pliron.md:390
+#: ../../../compiler/pliron.md:393
 msgid "dialect-nvvm -- GPU intrinsics"
 msgstr ""
 
-#: ../../../compiler/pliron.md:392
+#: ../../../compiler/pliron.md:395
 msgid ""
 "`dialect-nvvm` wraps LLVM's NVPTX backend intrinsics as typed pliron "
 "operations."
 msgstr ""
 
-#: ../../../compiler/pliron.md:395
+#: ../../../compiler/pliron.md:398
 msgid ""
 "**Thread indexing**: `nvvm.read_ptx_sreg_tid_x`, `nvvm."
 "read_ptx_sreg_ctaid_x`, `nvvm.barrier0` -- the building blocks of `thread::"
 "index_1d()`."
 msgstr ""
 
-#: ../../../compiler/pliron.md:397
+#: ../../../compiler/pliron.md:400
 msgid ""
 "**Warp-level primitives**: shuffle (`nvvm.shfl_sync`), vote, and reduce "
 "operations for warp-cooperative algorithms."
 msgstr ""
 
-#: ../../../compiler/pliron.md:399
+#: ../../../compiler/pliron.md:402
 msgid ""
 "**Accelerator ops**: TMA bulk copies, WGMMA matrix multiply-accumulate "
 "(Hopper), and tcgen05 tensor core operations (Blackwell) -- the hardware "
@@ -787,7 +791,7 @@ msgid ""
 "accelerator.md) chapters."
 msgstr ""
 
-#: ../../../compiler/pliron.md:404
+#: ../../../compiler/pliron.md:407
 msgid ""
 "Each dialect is covered in detail in [Pliron Dialects](mlir-dialects.md)."
 msgstr ""

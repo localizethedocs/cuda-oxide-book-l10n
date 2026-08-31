@@ -8,10 +8,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-16 12:33+0000\n"
+"POT-Creation-Date: 2026-08-31 15:39+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -139,22 +140,75 @@ msgid ""
 "experience."
 msgstr ""
 
+#: ../../../compiler/compiler-optimizations.md:68
+msgid "Diagnosing locals that remain stack-backed"
+msgstr ""
+
 #: ../../../compiler/compiler-optimizations.md:70
+msgid ""
+"An optimized verbose build also checks the exact LLVM IR that will be passed "
+"to `llc`. If a Rust local's stack allocation survives both cuda-oxide "
+"`mem2reg` and LLVM's `-O2` scalar-replacement pipeline, cuda-oxide reports "
+"it before PTX generation. For example:"
+msgstr ""
+
+#: ../../../compiler/compiler-optimizations.md:75
+msgid ""
+"warning: local `scratch` (`[u32; 4]`, 16 bytes) in `kernel` could not be "
+"promoted to registers\n"
+"  = note: indexed by a non-constant value; the allocation survives LLVM "
+"scalar replacement and remains stack-backed\n"
+"  = help: use constant indexing or a small match/select when the index range "
+"is bounded\n"
+msgstr ""
+
+#: ../../../compiler/compiler-optimizations.md:81
+msgid ""
+"Dynamic indexing is one common blocker because LLVM cannot replace a small "
+"aggregate with independent SSA values when the selected element is not "
+"known. An address passed to another function, stored as a pointer, returned, "
+"or otherwise made observable can also prevent promotion. When the surviving "
+"use pattern is not one of the conservative cases cuda-oxide recognizes, the "
+"warning still identifies the local but gives a generic scalar-replacement "
+"explanation rather than guessing at the cause."
+msgstr ""
+
+#: ../../../compiler/compiler-optimizations.md:89
+msgid ""
+"The check runs only after a successful LLVM optimization pass and only in "
+"verbose mode:"
+msgstr ""
+
+#: ../../../compiler/compiler-optimizations.md:92
+#: ../../../compiler/compiler-optimizations.md:329
+msgid "cargo oxide build <example> --verbose\n"
+msgstr ""
+
+#: ../../../compiler/compiler-optimizations.md:96
+msgid ""
+"This placement matters. Reporting immediately after cuda-oxide `mem2reg` "
+"would produce false positives for allocations that LLVM SROA removes later. "
+"The check is skipped for no-optimization builds and full variable-debug "
+"builds because those modes intentionally retain storage that an optimized "
+"build would normally try to promote."
+msgstr ""
+
+#: ../../../compiler/compiler-optimizations.md:104
 msgid "The first pass: loop unrolling"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:72
+#: ../../../compiler/compiler-optimizations.md:106
 msgid ""
 "A loop normally tests its condition and branches back after every iteration. "
 "**Unrolling** copies the body so that one trip through the new loop performs "
 "several iterations' work."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:76
+#: ../../../compiler/compiler-optimizations.md:110
 msgid "Consider this small counted loop inside a kernel or device function:"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:78
+#: ../../../compiler/compiler-optimizations.md:112
 msgid ""
 "let mut i = 0u32;\n"
 "#[unroll]\n"
@@ -164,11 +218,11 @@ msgid ""
 "}\n"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:87
+#: ../../../compiler/compiler-optimizations.md:121
 msgid "Conceptually, full unrolling turns it into:"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:89
+#: ../../../compiler/compiler-optimizations.md:123
 msgid ""
 "work(0);\n"
 "work(1);\n"
@@ -176,25 +230,25 @@ msgid ""
 "work(3);\n"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:96
+#: ../../../compiler/compiler-optimizations.md:130
 msgid ""
 "The condition and branch back to the loop header disappear. More "
 "importantly, each copy now has a constant value for `i`, exposing further "
 "simplifications."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:99
+#: ../../../compiler/compiler-optimizations.md:133
 msgid ""
 "The tradeoff is larger generated code. A larger body may also need more "
 "registers, so unrolling is a request to the compiler, not a promise of "
 "better performance."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:105
+#: ../../../compiler/compiler-optimizations.md:139
 msgid "Full and partial unrolling"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:107
+#: ../../../compiler/compiler-optimizations.md:141
 msgid "cuda-oxide provides two forms:"
 msgstr ""
 
@@ -234,15 +288,15 @@ msgstr ""
 msgid "`N` copies in a main loop, plus a remainder loop"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:114
+#: ../../../compiler/compiler-optimizations.md:148
 msgid "Full unrolling"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:116
+#: ../../../compiler/compiler-optimizations.md:150
 msgid "Bare `#[unroll]` needs a compile-time-known trip count:"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:118
+#: ../../../compiler/compiler-optimizations.md:152
 msgid ""
 "let mut i = 0u32;\n"
 "#[unroll]\n"
@@ -252,21 +306,21 @@ msgid ""
 "}\n"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:127
+#: ../../../compiler/compiler-optimizations.md:161
 msgid ""
 "The pass gives the eight copies counter values `0` through `7`. Constant "
 "propagation can then fold expressions derived from those literals."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:130
+#: ../../../compiler/compiler-optimizations.md:164
 msgid "Partial unrolling"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:132
+#: ../../../compiler/compiler-optimizations.md:166
 msgid "`#[unroll(4)]` also works when the limit is a runtime value:"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:134
+#: ../../../compiler/compiler-optimizations.md:168
 msgid ""
 "let mut i = 0u32;\n"
 "#[unroll(4)]\n"
@@ -276,31 +330,31 @@ msgid ""
 "}\n"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:143
+#: ../../../compiler/compiler-optimizations.md:177
 msgid ""
 "If `n` is `10`, the main loop handles two groups of four iterations. The "
 "remainder loop handles iterations `8` and `9`. The result is still correct "
 "when `n` is not divisible by four."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:147
+#: ../../../compiler/compiler-optimizations.md:181
 msgid ""
 "This removes three out of every four main-loop tests and gives the compiler "
 "a larger straight-line region to optimize."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:152
+#: ../../../compiler/compiler-optimizations.md:186
 msgid "A useful peephole: folding pipeline stages"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:154
+#: ../../../compiler/compiler-optimizations.md:188
 msgid ""
 "Partial unrolling has one wrinkle: the main loop still has a runtime "
 "counter. cuda-oxide includes a small **peephole optimization** for a common "
 "software-pipeline pattern:"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:158
+#: ../../../compiler/compiler-optimizations.md:192
 msgid ""
 "let mut k_idx = 0u32;\n"
 "#[unroll(4)]\n"
@@ -317,13 +371,13 @@ msgid ""
 "}\n"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:174
+#: ../../../compiler/compiler-optimizations.md:208
 msgid ""
 "The unrolled main-loop counter advances by four. Its low two bits therefore "
 "do not change between groups, so the four copies have fixed stage values:"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:177
+#: ../../../compiler/compiler-optimizations.md:211
 msgid ""
 "copy 0: (k_idx + 0) & 3  →  0\n"
 "copy 1: (k_idx + 1) & 3  →  1\n"
@@ -331,29 +385,29 @@ msgid ""
 "copy 3: (k_idx + 3) & 3  →  3\n"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:184
+#: ../../../compiler/compiler-optimizations.md:218
 msgid ""
 "The peephole replaces those expressions with literals. Constant propagation "
 "then removes the dead `match` arms, leaving four straight-line, stage-"
 "specific bodies. The remainder loop stays intact for leftover iterations."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:189
+#: ../../../compiler/compiler-optimizations.md:223
 msgid ""
 "`k_idx % 4` works too when `k_idx` is unsigned, and constant offsets such as "
 "`(k_idx + 1) & 3` are also recognized. The pass folds these forms only when "
 "their power-of-two period divides the unrolled step."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:193
+#: ../../../compiler/compiler-optimizations.md:227
 msgid "Why a runtime base does not fold"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:195
+#: ../../../compiler/compiler-optimizations.md:229
 msgid "The expression must be based directly on the loop counter:"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:197
+#: ../../../compiler/compiler-optimizations.md:231
 msgid ""
 "let stage = k_idx & 3;                    // can fold\n"
 "\n"
@@ -362,7 +416,7 @@ msgid ""
 "fold\n"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:204
+#: ../../../compiler/compiler-optimizations.md:238
 msgid ""
 "Because the low bits of runtime `tile_k_base` are unknown at compile time, "
 "the compiler cannot choose one literal stage for each copy. Rewriting it to "
@@ -370,74 +424,74 @@ msgid ""
 "`tile_k_base` is a multiple of four. The pass deliberately refuses to guess."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:210
+#: ../../../compiler/compiler-optimizations.md:244
 msgid ""
 "Full unrolling does not need this peephole. A fully unrolled counter is "
 "already a literal in every copy, so ordinary constant propagation can do the "
 "work."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:216
+#: ../../../compiler/compiler-optimizations.md:250
 msgid "How the annotation reaches the pass"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:218
+#: ../../../compiler/compiler-optimizations.md:252
 msgid "The source attribute travels through the compiler in six stages:"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:220
+#: ../../../compiler/compiler-optimizations.md:254
 msgid ""
 "The `#[kernel]` or `#[device]` macro consumes `#[unroll]` or `#[unroll(N)]` "
 "and inserts an internal marker call at the start of that loop."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:222
+#: ../../../compiler/compiler-optimizations.md:256
 msgid ""
 "`mir-importer` recognizes the call and emits a `mir.unroll_hint` operation. "
 "The marker produces no runtime code."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:224
+#: ../../../compiler/compiler-optimizations.md:258
 msgid ""
 "`LoopInfo` finds the enclosing loop, while induction analysis finds its "
 "counter, start, step, bound, and—when possible—trip count."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:226
+#: ../../../compiler/compiler-optimizations.md:260
 msgid ""
 "The pass normalizes supported control flow. It joins multiple `continue` "
 "paths into one path back to the loop header and routes supported loop-"
 "carried values out of a fully unrolled loop."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:229
+#: ../../../compiler/compiler-optimizations.md:263
 msgid ""
 "The transform clones and reconnects the body for full or partial unrolling."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:230
+#: ../../../compiler/compiler-optimizations.md:264
 msgid ""
 "A cleanup phase folds constants, simplifies branches, and removes dead or "
 "unreachable code."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:233
+#: ../../../compiler/compiler-optimizations.md:267
 msgid ""
 "The unroll pass leaves functions without an unroll hint untouched. If it "
 "cannot prove a requested rewrite is safe, it prints a warning and does not "
 "apply the unroll; the loop continues with the same behavior."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:239
+#: ../../../compiler/compiler-optimizations.md:273
 msgid "Supported loops and safe fallback"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:241
+#: ../../../compiler/compiler-optimizations.md:275
 msgid ""
 "The current pass intentionally recognizes a conservative set of loop shapes:"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:243
+#: ../../../compiler/compiler-optimizations.md:277
 msgid ""
 "Both forms need a counter the pass can follow: a compile-time-constant "
 "starting value, the same fixed step on every path back to the header, and a "
@@ -447,85 +501,85 @@ msgid ""
 "the loop."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:209
+#: ../../../compiler/compiler-optimizations.md:243
 msgid "Shape"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:209
+#: ../../../compiler/compiler-optimizations.md:243
 msgid "Current behavior"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:209
+#: ../../../compiler/compiler-optimizations.md:243
 msgid "Explicit counted `while` loop"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:209
+#: ../../../compiler/compiler-optimizations.md:243
 msgid "Supported when the requirements above hold"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:209
+#: ../../../compiler/compiler-optimizations.md:243
 msgid "Range-based `for` loop"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:209
+#: ../../../compiler/compiler-optimizations.md:243
 msgid "Not yet recognized"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:209
+#: ../../../compiler/compiler-optimizations.md:243
 msgid "Constant trip count with `#[unroll]`"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:209
+#: ../../../compiler/compiler-optimizations.md:243
 msgid "Fully unrolled"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:209
+#: ../../../compiler/compiler-optimizations.md:243
 msgid "Runtime, loop-invariant limit with `#[unroll(N)]`"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:209
+#: ../../../compiler/compiler-optimizations.md:243
 msgid "Partially unrolled"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:209
+#: ../../../compiler/compiler-optimizations.md:243
 msgid "Several `continue` paths with the same counter step"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:209
+#: ../../../compiler/compiler-optimizations.md:243
 msgid "Joined and unrolled"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:209
+#: ../../../compiler/compiler-optimizations.md:243
 msgid "Early `break` or multiple exits with `#[unroll]`"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:209
+#: ../../../compiler/compiler-optimizations.md:243
 msgid "Supported"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:209
+#: ../../../compiler/compiler-optimizations.md:243
 msgid "Early `break` or another exit with `#[unroll(N)]`"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:209
+#: ../../../compiler/compiler-optimizations.md:243
 msgid "Warns; partial unroll is skipped"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:209
+#: ../../../compiler/compiler-optimizations.md:243
 msgid "Nested loops"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:209
+#: ../../../compiler/compiler-optimizations.md:243
 msgid "Only the annotated loop is unrolled"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:260
+#: ../../../compiler/compiler-optimizations.md:294
 msgid ""
 "Partial unrolling also requires `N >= 2`, a positive counter step, a `<` or "
 "`<=` comparison, and a limit that does not change inside the loop."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:263
+#: ../../../compiler/compiler-optimizations.md:297
 msgid ""
 "When an annotated outer loop contains an unannotated inner loop, each outer "
 "copy receives an intact clone of that inner loop; the inner loop remains a "
@@ -533,84 +587,80 @@ msgid ""
 "first."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:268
+#: ../../../compiler/compiler-optimizations.md:302
 msgid ""
 "To bound compile time and memory, one annotation may create at most 1,024 "
 "body copies, 8,192 cloned basic blocks, and 65,536 cloned operations. A "
 "request over one of those limits warns and is not unrolled."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:272
+#: ../../../compiler/compiler-optimizations.md:306
 msgid ""
 "For the complete kernel-author reference, see {ref}`Loop unrolling <loop-"
 "unrolling>`."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:276
+#: ../../../compiler/compiler-optimizations.md:310
 msgid "When should you unroll?"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:278
+#: ../../../compiler/compiler-optimizations.md:312
 msgid "Good candidates are:"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:280
+#: ../../../compiler/compiler-optimizations.md:314
 msgid "small loops with a fixed trip count;"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:281
+#: ../../../compiler/compiler-optimizations.md:315
 msgid "hot counted loops where branch overhead matters;"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:282
+#: ../../../compiler/compiler-optimizations.md:316
 msgid ""
 "software pipelines whose stage selection becomes constant after unrolling;"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:283
+#: ../../../compiler/compiler-optimizations.md:317
 msgid ""
 "loops where several independent copies expose instruction-level parallelism."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:285
+#: ../../../compiler/compiler-optimizations.md:319
 msgid ""
 "Be cautious when the body is large or already uses many registers. Extra "
 "code can increase register pressure, reduce occupancy, or put more pressure "
 "on the instruction cache."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:289
+#: ../../../compiler/compiler-optimizations.md:323
 msgid ""
 "Choose a factor that matches the structure of the algorithm—often a pipeline "
 "depth or another small natural group—and benchmark the result. Removing "
 "`#[unroll]` should always remain an easy comparison."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:293
+#: ../../../compiler/compiler-optimizations.md:327
 msgid "To inspect the pass's analysis, build verbosely:"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:295
-msgid "cargo oxide build <example> --verbose\n"
-msgstr ""
-
-#: ../../../compiler/compiler-optimizations.md:299
+#: ../../../compiler/compiler-optimizations.md:333
 msgid ""
 "Verbose mode prints the requested factor and the loop facts the pass found. "
 "If a request is skipped, a warning explains why. Loop numbers and analysis "
 "fields are internal details and may change."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:305
+#: ../../../compiler/compiler-optimizations.md:339
 msgid "A home for future transforms"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:307
+#: ../../../compiler/compiler-optimizations.md:341
 msgid ""
 "The `mir-transforms` crate keeps reusable analysis separate from IR mutation:"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:309
+#: ../../../compiler/compiler-optimizations.md:343
 msgid ""
 "crates/mir-transforms/src/\n"
 "├── analyses/\n"
@@ -621,7 +671,7 @@ msgid ""
 "└── unroll.rs             # prove, clone, reconnect, and clean up loops\n"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:318
+#: ../../../compiler/compiler-optimizations.md:352
 msgid ""
 "This separation gives future optimizations a predictable place to live: "
 "analyses gather facts, canonicalization normalizes equivalent shapes, and "
@@ -629,22 +679,22 @@ msgid ""
 "rs` controls when each pass runs."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:323
+#: ../../../compiler/compiler-optimizations.md:357
 msgid ""
 "Every transform should follow the same rule as the unroller: prove the "
 "rewrite is safe, bound its resource use, and fall back without changing "
 "behavior when a program is outside the supported shape."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:327
+#: ../../../compiler/compiler-optimizations.md:361
 msgid "The focused test suite runs with:"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:329
+#: ../../../compiler/compiler-optimizations.md:363
 msgid "cargo test -p mir-transforms --all-targets\n"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:333
+#: ../../../compiler/compiler-optimizations.md:367
 msgid ""
 "From here, [The Lowering Pipeline](lowering-pipeline.md) explains how the "
 "optimized `dialect-mir` becomes the LLVM dialect and, eventually, PTX."
