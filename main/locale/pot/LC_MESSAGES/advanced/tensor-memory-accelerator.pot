@@ -8,10 +8,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-16 12:33+0000\n"
+"POT-Creation-Date: 2026-09-07 13:48+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -148,8 +149,8 @@ msgstr ""
 
 #: ../../../advanced/tensor-memory-accelerator.md:103
 msgid ""
-"use cuda_device::tma::{cp_async_bulk_tensor_2d_g2s, TmaDescriptor};\n"
 "use cuda_device::barrier::Barrier;\n"
+"use cuda_device::tma::{TmaDescriptor, cp_async_bulk_tensor_2d_g2s};\n"
 "\n"
 "unsafe fn load_tile(\n"
 "    smem_dst: *mut u8,\n"
@@ -215,9 +216,9 @@ msgstr ""
 
 #: ../../../advanced/tensor-memory-accelerator.md:153
 msgid ""
-"use cuda_device::barrier::{Barrier, ManagedBarrier, TmaBarrierHandle, "
-"Uninit, Ready};\n"
 "use cuda_device::SharedArray;\n"
+"use cuda_device::barrier::{Barrier, ManagedBarrier, Ready, TmaBarrierHandle, "
+"Uninit};\n"
 "\n"
 "#[kernel]\n"
 "pub fn tma_load_kernel(desc: *const TmaDescriptor) {\n"
@@ -316,9 +317,8 @@ msgstr ""
 #: ../../../advanced/tensor-memory-accelerator.md:207
 msgid ""
 "use cuda_device::tma::{\n"
-"    cp_async_bulk_tensor_2d_s2g,\n"
-"    cp_async_bulk_commit_group,\n"
-"    cp_async_bulk_wait_group,\n"
+"    cp_async_bulk_commit_group, cp_async_bulk_tensor_2d_s2g, "
+"cp_async_bulk_wait_group,\n"
 "};\n"
 "\n"
 "unsafe {\n"
@@ -328,25 +328,25 @@ msgid ""
 "}\n"
 msgstr ""
 
-#: ../../../advanced/tensor-memory-accelerator.md:221
+#: ../../../advanced/tensor-memory-accelerator.md:219
 msgid ""
 "S2G copies do not use barriers. Instead, `commit_group` bundles outstanding "
 "copies into a group, and `wait_group(n)` blocks until at most `n` groups "
 "remain in flight. `wait_group(0)` waits for everything."
 msgstr ""
 
-#: ../../../advanced/tensor-memory-accelerator.md:227
+#: ../../../advanced/tensor-memory-accelerator.md:225
 msgid "Alignment requirements"
 msgstr ""
 
-#: ../../../advanced/tensor-memory-accelerator.md:229
+#: ../../../advanced/tensor-memory-accelerator.md:227
 msgid ""
 "TMA destinations in shared memory must be **128-byte aligned**. cuda-oxide "
 "provides this through the `ALIGN` parameter on `SharedArray` and "
 "`DynamicSharedArray`:"
 msgstr ""
 
-#: ../../../advanced/tensor-memory-accelerator.md:233
+#: ../../../advanced/tensor-memory-accelerator.md:231
 msgid ""
 "static mut TILE: SharedArray<f32, 1024, 128> = SharedArray::UNINIT;\n"
 "\n"
@@ -354,24 +354,24 @@ msgid ""
 "let dst: *mut u8 = DynamicSharedArray::<u8, 128>::get();\n"
 msgstr ""
 
-#: ../../../advanced/tensor-memory-accelerator.md:240
+#: ../../../advanced/tensor-memory-accelerator.md:238
 msgid ""
 "If the destination is not 128-byte aligned, the TMA engine will silently "
 "produce incorrect results or fault. There is no runtime check — the "
 "alignment must be correct by construction."
 msgstr ""
 
-#: ../../../advanced/tensor-memory-accelerator.md:246
+#: ../../../advanced/tensor-memory-accelerator.md:244
 msgid "Multicast variants"
 msgstr ""
 
-#: ../../../advanced/tensor-memory-accelerator.md:248
+#: ../../../advanced/tensor-memory-accelerator.md:246
 msgid ""
 "On Hopper+ with clusters enabled, TMA can multicast a single global load "
 "into the shared memory of multiple CTAs simultaneously:"
 msgstr ""
 
-#: ../../../advanced/tensor-memory-accelerator.md:251
+#: ../../../advanced/tensor-memory-accelerator.md:249
 msgid ""
 "use cuda_device::tma::cp_async_bulk_tensor_2d_g2s_multicast;\n"
 "\n"
@@ -383,108 +383,108 @@ msgid ""
 "}\n"
 msgstr ""
 
-#: ../../../advanced/tensor-memory-accelerator.md:262
+#: ../../../advanced/tensor-memory-accelerator.md:260
 msgid ""
 "This is particularly useful for GEMM-style kernels where the same tile of A "
 "or B is needed by multiple thread blocks. Instead of each block loading its "
 "own copy, one TMA operation serves all of them."
 msgstr ""
 
-#: ../../../advanced/tensor-memory-accelerator.md:267
+#: ../../../advanced/tensor-memory-accelerator.md:265
 msgid ""
 "[Cluster Programming](cluster-programming.md) for the full cluster model and "
 "distributed shared memory, which pairs naturally with TMA multicast."
 msgstr ""
 
-#: ../../../advanced/tensor-memory-accelerator.md:273
+#: ../../../advanced/tensor-memory-accelerator.md:271
 msgid "TMA vs. manual loads"
 msgstr ""
 
-#: ../../../advanced/tensor-memory-accelerator.md:266
+#: ../../../advanced/tensor-memory-accelerator.md:264
 msgid "Property"
 msgstr ""
 
-#: ../../../advanced/tensor-memory-accelerator.md:266
+#: ../../../advanced/tensor-memory-accelerator.md:264
 msgid "Manual thread loads"
 msgstr ""
 
-#: ../../../advanced/tensor-memory-accelerator.md:266
+#: ../../../advanced/tensor-memory-accelerator.md:264
 msgid "TMA bulk copy"
 msgstr ""
 
-#: ../../../advanced/tensor-memory-accelerator.md:266
+#: ../../../advanced/tensor-memory-accelerator.md:264
 msgid "Threads required"
 msgstr ""
 
-#: ../../../advanced/tensor-memory-accelerator.md:266
+#: ../../../advanced/tensor-memory-accelerator.md:264
 msgid "All threads in block"
 msgstr ""
 
-#: ../../../advanced/tensor-memory-accelerator.md:266
+#: ../../../advanced/tensor-memory-accelerator.md:264
 msgid "1 thread issues; hardware executes"
 msgstr ""
 
-#: ../../../advanced/tensor-memory-accelerator.md:266
+#: ../../../advanced/tensor-memory-accelerator.md:264
 msgid "Address computation"
 msgstr ""
 
-#: ../../../advanced/tensor-memory-accelerator.md:266
+#: ../../../advanced/tensor-memory-accelerator.md:264
 msgid "Per-thread (index math)"
 msgstr ""
 
-#: ../../../advanced/tensor-memory-accelerator.md:266
+#: ../../../advanced/tensor-memory-accelerator.md:264
 msgid "Encoded in descriptor"
 msgstr ""
 
-#: ../../../advanced/tensor-memory-accelerator.md:266
+#: ../../../advanced/tensor-memory-accelerator.md:264
 msgid "Swizzle for bank conflicts"
 msgstr ""
 
-#: ../../../advanced/tensor-memory-accelerator.md:266
+#: ../../../advanced/tensor-memory-accelerator.md:264
 msgid "Manual padding"
 msgstr ""
 
-#: ../../../advanced/tensor-memory-accelerator.md:266
+#: ../../../advanced/tensor-memory-accelerator.md:264
 msgid "Descriptor-level swizzle mode"
 msgstr ""
 
-#: ../../../advanced/tensor-memory-accelerator.md:266
+#: ../../../advanced/tensor-memory-accelerator.md:264
 msgid "Completion tracking"
 msgstr ""
 
-#: ../../../advanced/tensor-memory-accelerator.md:266
+#: ../../../advanced/tensor-memory-accelerator.md:264
 msgid "`sync_threads()`"
 msgstr ""
 
-#: ../../../advanced/tensor-memory-accelerator.md:266
+#: ../../../advanced/tensor-memory-accelerator.md:264
 msgid "`mbarrier` with TX tracking"
 msgstr ""
 
-#: ../../../advanced/tensor-memory-accelerator.md:266
+#: ../../../advanced/tensor-memory-accelerator.md:264
 msgid "Overlap with compute"
 msgstr ""
 
-#: ../../../advanced/tensor-memory-accelerator.md:266
+#: ../../../advanced/tensor-memory-accelerator.md:264
 msgid "Not possible (threads are loading)"
 msgstr ""
 
-#: ../../../advanced/tensor-memory-accelerator.md:266
+#: ../../../advanced/tensor-memory-accelerator.md:264
 msgid "Compute on previous tile while loading next"
 msgstr ""
 
-#: ../../../advanced/tensor-memory-accelerator.md:266
+#: ../../../advanced/tensor-memory-accelerator.md:264
 msgid "Minimum architecture"
 msgstr ""
 
-#: ../../../advanced/tensor-memory-accelerator.md:266
+#: ../../../advanced/tensor-memory-accelerator.md:264
 msgid "Any CUDA GPU"
 msgstr ""
 
-#: ../../../advanced/tensor-memory-accelerator.md:266
+#: ../../../advanced/tensor-memory-accelerator.md:264
 msgid "Hopper (SM 90+)"
 msgstr ""
 
-#: ../../../advanced/tensor-memory-accelerator.md:284
+#: ../../../advanced/tensor-memory-accelerator.md:282
 msgid ""
 "The key advantage is not raw bandwidth — TMA and manual loads can achieve "
 "similar peak throughput. The advantage is **thread utilization**: while TMA "
@@ -493,13 +493,13 @@ msgid ""
 "implementations rely on."
 msgstr ""
 
-#: ../../../advanced/tensor-memory-accelerator.md:291
+#: ../../../advanced/tensor-memory-accelerator.md:289
 msgid ""
 "[Shared Memory and Synchronization](shared-memory-and-synchronization.md) — "
 "the manual load pattern that TMA replaces"
 msgstr ""
 
-#: ../../../advanced/tensor-memory-accelerator.md:293
+#: ../../../advanced/tensor-memory-accelerator.md:291
 msgid ""
 "[Matrix Multiply Accelerators](matrix-multiply-accelerators.md) — where TMA "
 "feeds the tensor cores"

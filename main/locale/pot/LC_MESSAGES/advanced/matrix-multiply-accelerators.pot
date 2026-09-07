@@ -8,10 +8,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-16 12:33+0000\n"
+"POT-Creation-Date: 2026-09-07 13:48+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -109,7 +110,7 @@ msgid ""
 msgstr ""
 
 #: ../../../advanced/matrix-multiply-accelerators.md:62
-msgid "Supported shapes"
+msgid "Hardware-supported shapes"
 msgstr ""
 
 #: ../../../advanced/matrix-multiply-accelerators.md:64
@@ -169,8 +170,8 @@ msgstr ""
 #: ../../../advanced/matrix-multiply-accelerators.md:80
 msgid ""
 "use cuda_device::wgmma::{\n"
-"    make_smem_desc, wgmma_fence, wgmma_commit_group, wgmma_wait_group,\n"
-"    wgmma_mma_m64n64k16_f32_f16,\n"
+"    make_smem_desc, wgmma_commit_group, wgmma_fence, "
+"wgmma_mma_m64n64k16_f32_bf16, wgmma_wait_group,\n"
 "};\n"
 "\n"
 "// After TMA has loaded A and B tiles into shared memory...\n"
@@ -179,22 +180,128 @@ msgid ""
 "let a_desc = unsafe { make_smem_desc(tile_a_ptr as *const u8) };\n"
 "let b_desc = unsafe { make_smem_desc(tile_b_ptr as *const u8) };\n"
 "\n"
-"// Accumulator (4 warps × 8 floats per row = 64×64 tile)\n"
+"// Accumulator (32 floats per thread = 64×64 tile across the warpgroup)\n"
 "let mut acc = [[0.0f32; 8]; 4];\n"
 "\n"
-"// Fence + issue WGMMA — all 128 threads in the warpgroup participate\n"
 "unsafe {\n"
 "    wgmma_fence();\n"
-"    wgmma_mma_m64n64k16_f32_f16(&mut acc, a_desc, b_desc);\n"
+"    wgmma_mma_m64n64k16_f32_bf16(&mut acc, a_desc, b_desc);\n"
 "    wgmma_commit_group();\n"
-"    wgmma_wait_group::<0>(); // wait for all outstanding groups\n"
+"    wgmma_wait_group::<0>();\n"
 "}\n"
 "\n"
-"// Accumulator in `acc` is now valid — store, transform, or pass to next "
-"stage\n"
+"// `acc` is now safe to observe.\n"
+msgstr ""
+
+#: ../../../advanced/matrix-multiply-accelerators.md:104
+msgid ""
+"The BF16 m64n128 full-drain variant uses the same synchronization contract "
+"but a 64-value per-thread accumulator:"
 msgstr ""
 
 #: ../../../advanced/matrix-multiply-accelerators.md:107
+msgid ""
+"use cuda_device::wgmma::wgmma_mma_m64n128k16_f32_bf16;\n"
+"\n"
+"let mut wide_acc = [[0.0f32; 8]; 8];\n"
+"unsafe {\n"
+"    wgmma_fence();\n"
+"    wgmma_mma_m64n128k16_f32_bf16(&mut wide_acc, a_desc, b_desc);\n"
+"    wgmma_commit_group();\n"
+"    wgmma_wait_group::<0>();\n"
+"}\n"
+msgstr ""
+
+#: ../../../advanced/matrix-multiply-accelerators.md:119
+msgid ""
+"For TF32, use `wgmma_mma_m64n64k8_f32_tf32`. The K=16 TF32 compatibility "
+"entry point remains unsupported because Hopper's TF32 WGMMA hardware shape "
+"uses K=8."
+msgstr ""
+
+#: ../../../advanced/matrix-multiply-accelerators.md:123
+msgid "Current cuda-oxide WGMMA lowering"
+msgstr ""
+
+#: ../../../advanced/matrix-multiply-accelerators.md:125
+msgid ""
+"The compiler supports `m64n64k16.f32.bf16.bf16` across three conservative "
+"lowering shapes, `m64n64k16.f32.f16.f16` for canonical linear full-drain and "
+"counted K-loop regions, `m64n64k8.f32.tf32.tf32` for canonical linear full-"
+"drain regions only, and `m64n128k16.f32.bf16.bf16` for canonical linear full-"
+"drain regions. In every accepted case, the entire asynchronous accumulator "
+"lifetime stays inside one convergent inline-PTX statement so LLVM cannot "
+"insert a spill boundary while a WGMMA group is pending."
+msgstr ""
+
+#: ../../../advanced/matrix-multiply-accelerators.md:133
+msgid ""
+"**m64n64 linear full drain.** A canonical `[[f32; 8]; 4]` accumulator is "
+"loaded into 32 SSA `f32` values before the WGMMA region and stored once "
+"after the final `wait_group<0>`. BF16, F16, and TF32 use this value-threaded "
+"carrier. Unsupported BF16 full-drain pointer shapes retain the original "
+"deferred pointer-form lowering; F16 and TF32 do not have a pointer-form "
+"fallback."
+msgstr ""
+
+#: ../../../advanced/matrix-multiply-accelerators.md:139
+msgid ""
+"**m64n128 BF16 linear full drain.** A canonical `[[f32; 8]; 8]` accumulator "
+"is carried as 64 tied SSA `f32` values through one or more homogeneous "
+"`m64n128k16.f32.bf16.bf16` instructions, one commit, and a final "
+"`wait_group<0>`. Accumulator element addresses are recomputed after the "
+"fused inline-PTX scope instead of being kept live across it. This shape has "
+"no pointer-form fallback, counted-loop lowering, or partial-wait pipeline "
+"lowering."
+msgstr ""
+
+#: ../../../advanced/matrix-multiply-accelerators.md:146
+msgid ""
+"**Canonical counted K-loop.** For a compile-time counted BF16 or F16 m64n64 "
+"loop with one MMA per iteration and affine `u64` descriptor recurrences, "
+"cuda-oxide moves the loop control and descriptor arithmetic into the same "
+"convergent PTX region as the WGMMA instruction. The accumulator is therefore "
+"loaded once before the K-loop and stored once after its final wait rather "
+"than round-tripped every iteration."
+msgstr ""
+
+#: ../../../advanced/matrix-multiply-accelerators.md:153
+msgid ""
+"**Static partial-wait pipeline.** A BF16 m64n64 `wait_group<N>` with `N > 0` "
+"uses `N + 1` independent accumulator slots. Groups are committed separately "
+"and slots are reused round-robin only after the partial wait has made the "
+"oldest slot safe. For example, two groups can remain overlapped with:"
+msgstr ""
+
+#: ../../../advanced/matrix-multiply-accelerators.md:158
+msgid ""
+"wgmma_fence\n"
+"mma acc0\n"
+"commit_group\n"
+"mma acc1\n"
+"commit_group\n"
+"wait_group<1>\n"
+"wait_group<0>\n"
+msgstr ""
+
+#: ../../../advanced/matrix-multiply-accelerators.md:168
+msgid ""
+"Longer pipelines repeat the slot schedule and partial wait before reusing an "
+"accumulator. A final `wait_group<0>` is mandatory before any accumulator "
+"value escapes the fused region."
+msgstr ""
+
+#: ../../../advanced/matrix-multiply-accelerators.md:172
+msgid ""
+"Selection is intentionally fail-closed. Dynamic partial waits, unsupported "
+"control flow, malformed accumulator schedules, F16 partial-wait shapes, TF32 "
+"counted-loop or partial-wait shapes, m64n128 counted-loop or partial-wait "
+"shapes, F16/TF32/m64n128 non-canonical accumulators, and the legacy K=16 "
+"TF32 compatibility entry point are rejected instead of exposing an in-flight "
+"accumulator to LLVM."
+msgstr ""
+
+#: ../../../advanced/matrix-multiply-accelerators.md:180
 msgid ""
 "WGMMA is often paired with a **multi-stage pipeline**: while the tensor "
 "cores process tile *k*, TMA loads tile *k+1* into a second shared memory "
@@ -202,49 +309,49 @@ msgid ""
 "data movement and computation."
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:115
+#: ../../../advanced/matrix-multiply-accelerators.md:188
 msgid "tcgen05 — Blackwell (SM 100)"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:117
+#: ../../../advanced/matrix-multiply-accelerators.md:190
 msgid ""
 "Blackwell introduces a fundamentally different matrix accelerator: "
 "**tcgen05**. The key innovations are:"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:120
+#: ../../../advanced/matrix-multiply-accelerators.md:193
 msgid ""
 "**Single-thread issue.** Instead of a warpgroup-collective instruction, one "
 "thread issues the MMA. The hardware distributes work internally."
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:122
+#: ../../../advanced/matrix-multiply-accelerators.md:195
 msgid ""
 "**Tensor Memory (TMEM).** A dedicated on-chip memory for accumulators, "
 "separate from the register file. TMEM is larger and has different access "
 "characteristics than registers."
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:125
+#: ../../../advanced/matrix-multiply-accelerators.md:198
 msgid ""
 "**Larger tiles.** tcgen05 supports shapes up to 256×256, vs WGMMA's 64×256."
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:128
+#: ../../../advanced/matrix-multiply-accelerators.md:201
 msgid "TMEM — Tensor Memory"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:130
+#: ../../../advanced/matrix-multiply-accelerators.md:203
 msgid ""
 "TMEM is a new tier in the memory hierarchy, sitting alongside the register "
 "file but dedicated to matrix accumulation. It must be explicitly allocated "
 "and deallocated:"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:134
+#: ../../../advanced/matrix-multiply-accelerators.md:207
 msgid ""
-"use cuda_device::tcgen05::{TmemGuard, TmemUninit, TmemReady};\n"
 "use cuda_device::SharedArray;\n"
+"use cuda_device::tcgen05::{TmemGuard, TmemReady, TmemUninit};\n"
 "\n"
 "static mut TMEM_ADDR: SharedArray<u32, 1> = SharedArray::UNINIT;\n"
 "\n"
@@ -260,7 +367,7 @@ msgid ""
 "unsafe { tmem.dealloc(); }\n"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:152
+#: ../../../advanced/matrix-multiply-accelerators.md:225
 msgid ""
 "`TmemGuard` uses typestates: `TmemUninit` → `alloc()` → `TmemReady` → "
 "`dealloc()` → `TmemDeallocated`. The type system prevents using TMEM before "
@@ -268,79 +375,76 @@ msgid ""
 "resources and fault."
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:157
+#: ../../../advanced/matrix-multiply-accelerators.md:230
 msgid ""
 "The `N_COLS` const parameter determines the TMEM tile width. Common "
 "configurations:"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:106
+#: ../../../advanced/matrix-multiply-accelerators.md:179
 msgid "`N_COLS`"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:106
+#: ../../../advanced/matrix-multiply-accelerators.md:179
 msgid "TMEM per warp"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:106
+#: ../../../advanced/matrix-multiply-accelerators.md:179
 msgid "Use case"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:106
+#: ../../../advanced/matrix-multiply-accelerators.md:179
 msgid "64"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:106
+#: ../../../advanced/matrix-multiply-accelerators.md:179
 msgid "Smallest allocation"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:106
+#: ../../../advanced/matrix-multiply-accelerators.md:179
 msgid "Narrow tiles"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:106
+#: ../../../advanced/matrix-multiply-accelerators.md:179
 msgid "128"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:106
+#: ../../../advanced/matrix-multiply-accelerators.md:179
 msgid "Default"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:106
+#: ../../../advanced/matrix-multiply-accelerators.md:179
 msgid "Standard GEMM tiles"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:106
+#: ../../../advanced/matrix-multiply-accelerators.md:179
 msgid "256"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:106
+#: ../../../advanced/matrix-multiply-accelerators.md:179
 msgid "Maximum"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:106
+#: ../../../advanced/matrix-multiply-accelerators.md:179
 msgid "Wide tiles, higher throughput"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:166
+#: ../../../advanced/matrix-multiply-accelerators.md:239
 msgid "Instruction and SMEM descriptors"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:168
+#: ../../../advanced/matrix-multiply-accelerators.md:241
 msgid "tcgen05 uses two descriptors per MMA instruction:"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:170
+#: ../../../advanced/matrix-multiply-accelerators.md:243
 msgid "**Instruction descriptor** — encodes the MMA configuration:"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:172
+#: ../../../advanced/matrix-multiply-accelerators.md:245
 msgid ""
-"use cuda_device::tcgen05::{\n"
-"    Tcgen05InstructionDescriptor,\n"
-"    Tcgen05ElementType,\n"
-"    Tcgen05MmaShape,\n"
-"};\n"
+"use cuda_device::tcgen05::{Tcgen05ElementType, Tcgen05InstructionDescriptor, "
+"Tcgen05MmaShape};\n"
 "\n"
 "let idesc = Tcgen05InstructionDescriptor::builder()\n"
 "    .shape(Tcgen05MmaShape::M128_N128)\n"
@@ -349,11 +453,11 @@ msgid ""
 "    .build();\n"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:186
+#: ../../../advanced/matrix-multiply-accelerators.md:255
 msgid "**SMEM descriptor** — points to the operand tile in shared memory:"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:188
+#: ../../../advanced/matrix-multiply-accelerators.md:257
 msgid ""
 "use cuda_device::tcgen05::{Tcgen05SmemDescriptor, Tcgen05SwizzleMode};\n"
 "\n"
@@ -365,18 +469,18 @@ msgid ""
 ");\n"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:199
+#: ../../../advanced/matrix-multiply-accelerators.md:268
 msgid "Issuing MMA"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:201
+#: ../../../advanced/matrix-multiply-accelerators.md:270
 msgid ""
 "One thread issues the MMA instruction, then all threads wait on a barrier:"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:204
+#: ../../../advanced/matrix-multiply-accelerators.md:273
 msgid ""
-"use cuda_device::tcgen05::{tcgen05_mma_f16, tcgen05_commit};\n"
+"use cuda_device::tcgen05::{tcgen05_commit, tcgen05_mma_f16};\n"
 "\n"
 "if thread::threadIdx_x() == 0 {\n"
 "    unsafe {\n"
@@ -395,25 +499,23 @@ msgid ""
 "mma_barrier.wait(token);\n"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:224
+#: ../../../advanced/matrix-multiply-accelerators.md:293
 msgid "Epilog — reading results from TMEM"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:226
+#: ../../../advanced/matrix-multiply-accelerators.md:295
 msgid ""
 "After the MMA loop, the accumulator lives in TMEM. To move it to shared "
 "memory (for a subsequent TMA store to global), you load from TMEM into "
 "registers and then use `stmatrix` to write to shared memory:"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:230
+#: ../../../advanced/matrix-multiply-accelerators.md:299
 msgid ""
+"use cuda_device::convert::cvt_bf16x2_f32;\n"
 "use cuda_device::tcgen05::{\n"
-"    cvt_f32x2_bf16x2,\n"
-"    tcgen05_ld_16x256b_pure,\n"
-"    tcgen05_load_wait,\n"
-"    stmatrix_m8n8_x2,\n"
-"    TmemF32x4,\n"
+"    TmemF32x4, stmatrix_m8n8_x2, tcgen05_ld_16x256b_pure, "
+"tcgen05_load_wait,\n"
 "};\n"
 "\n"
 "unsafe {\n"
@@ -423,171 +525,171 @@ msgid ""
 "\n"
 "    // Convert four f32 accumulators into two registers of packed bf16 "
 "values.\n"
-"    let packed0 = cvt_f32x2_bf16x2(regs[0], regs[1]);\n"
-"    let packed1 = cvt_f32x2_bf16x2(regs[2], regs[3]);\n"
+"    let packed0 = cvt_bf16x2_f32(regs[0], regs[1]);\n"
+"    let packed1 = cvt_bf16x2_f32(regs[2], regs[3]);\n"
 "\n"
 "    // Store two 8×8 matrices from registers (warp-collective).\n"
 "    stmatrix_m8n8_x2(smem_ptr, packed0, packed1);\n"
 "}\n"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:253
+#: ../../../advanced/matrix-multiply-accelerators.md:319
 msgid ""
 "`stmatrix` is a warp-collective operation — all 32 threads participate, each "
 "contributing its register slice to form the shared memory tile."
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:256
+#: ../../../advanced/matrix-multiply-accelerators.md:322
 msgid "CTA-group-2 (CG2)"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:258
+#: ../../../advanced/matrix-multiply-accelerators.md:324
 msgid ""
 "Blackwell also supports **CG2 mode**, where two CTAs (from a cluster) issue "
 "MMA instructions that are coordinated as a pair. This doubles the effective "
 "tile width and requires the `_cg2` API variants:"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:262
+#: ../../../advanced/matrix-multiply-accelerators.md:328
 msgid "use cuda_device::tcgen05::{tcgen05_alloc_cg2, tcgen05_mma_f16_cg2};\n"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:266
+#: ../../../advanced/matrix-multiply-accelerators.md:332
 msgid "CG2 and CG1 (standard) must not be mixed in the same kernel."
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:269
+#: ../../../advanced/matrix-multiply-accelerators.md:335
 msgid ""
 "tcgen05 is only available on **Blackwell datacenter** GPUs (SM 100a). "
 "Consumer Blackwell (SM 120) uses the older `mma.sync` instruction set. Check "
 "the target architecture before reaching for the tcgen05 API."
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:276
+#: ../../../advanced/matrix-multiply-accelerators.md:342
 msgid "Choosing the right accelerator"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:268
+#: ../../../advanced/matrix-multiply-accelerators.md:334
 msgid "Feature"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:268
+#: ../../../advanced/matrix-multiply-accelerators.md:334
 msgid "WGMMA (Hopper)"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:268
+#: ../../../advanced/matrix-multiply-accelerators.md:334
 msgid "tcgen05 (Blackwell DC)"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:268
+#: ../../../advanced/matrix-multiply-accelerators.md:334
 msgid "mma.sync (Ampere/consumer)"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:268
+#: ../../../advanced/matrix-multiply-accelerators.md:334
 msgid "Issue model"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:268
+#: ../../../advanced/matrix-multiply-accelerators.md:334
 msgid "Warpgroup (128 threads)"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:268
+#: ../../../advanced/matrix-multiply-accelerators.md:334
 msgid "Single thread"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:268
+#: ../../../advanced/matrix-multiply-accelerators.md:334
 msgid "Warp (32 threads)"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:268
+#: ../../../advanced/matrix-multiply-accelerators.md:334
 msgid "Accumulator"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:268
+#: ../../../advanced/matrix-multiply-accelerators.md:334
 msgid "Registers"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:268
+#: ../../../advanced/matrix-multiply-accelerators.md:334
 msgid "TMEM (dedicated)"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:268
+#: ../../../advanced/matrix-multiply-accelerators.md:334
 msgid "Max tile (M×N)"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:268
+#: ../../../advanced/matrix-multiply-accelerators.md:334
 msgid "64×256"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:268
+#: ../../../advanced/matrix-multiply-accelerators.md:334
 msgid "256×256"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:268
+#: ../../../advanced/matrix-multiply-accelerators.md:334
 msgid "16×8"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:268
+#: ../../../advanced/matrix-multiply-accelerators.md:334
 msgid "Async execution"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:268
+#: ../../../advanced/matrix-multiply-accelerators.md:334
 msgid "Yes (commit+barrier)"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:268
+#: ../../../advanced/matrix-multiply-accelerators.md:334
 msgid "Synchronous"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:268
+#: ../../../advanced/matrix-multiply-accelerators.md:334
 msgid "TMA integration"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:268
+#: ../../../advanced/matrix-multiply-accelerators.md:334
 msgid "Native"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:268
+#: ../../../advanced/matrix-multiply-accelerators.md:334
 msgid "Native + multicast CG2"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:268
+#: ../../../advanced/matrix-multiply-accelerators.md:334
 msgid "Manual loads"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:268
+#: ../../../advanced/matrix-multiply-accelerators.md:334
 msgid "Cluster support"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:268
+#: ../../../advanced/matrix-multiply-accelerators.md:334
 msgid "Yes"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:268
+#: ../../../advanced/matrix-multiply-accelerators.md:334
 msgid "Yes + CG2"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:268
+#: ../../../advanced/matrix-multiply-accelerators.md:334
 msgid "No"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:268
+#: ../../../advanced/matrix-multiply-accelerators.md:334
 msgid "Minimum SM"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:268
+#: ../../../advanced/matrix-multiply-accelerators.md:334
 msgid "90 (Hopper)"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:268
+#: ../../../advanced/matrix-multiply-accelerators.md:334
 msgid "100a (Blackwell DC)"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:268
+#: ../../../advanced/matrix-multiply-accelerators.md:334
 msgid "80 (Ampere)"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:288
+#: ../../../advanced/matrix-multiply-accelerators.md:354
 msgid ""
 "For most users, the choice is determined by the target GPU. If you are "
 "writing a library that targets multiple architectures, you will need compile-"
@@ -595,44 +697,44 @@ msgid ""
 "code path."
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:295
+#: ../../../advanced/matrix-multiply-accelerators.md:361
 msgid "The GEMM progression"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:297
+#: ../../../advanced/matrix-multiply-accelerators.md:363
 msgid ""
 "These accelerators do not exist in isolation. A high-performance GEMM kernel "
 "combines every technique from this chapter and the preceding ones:"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:300
+#: ../../../advanced/matrix-multiply-accelerators.md:366
 msgid "**TMA** loads tiles from global to shared memory (no thread loads)"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:301
+#: ../../../advanced/matrix-multiply-accelerators.md:367
 msgid "**Barriers** track TMA completion per stage"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:302
+#: ../../../advanced/matrix-multiply-accelerators.md:368
 msgid ""
 "**MMA instructions** (WGMMA or tcgen05) consume tiles from shared memory"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:303
+#: ../../../advanced/matrix-multiply-accelerators.md:369
 msgid ""
 "**Multi-stage pipeline** overlaps load of tile *k+1* with MMA on tile *k*"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:304
+#: ../../../advanced/matrix-multiply-accelerators.md:370
 msgid "**Warp specialization** dedicates some warps to loading, others to MMA"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:305
+#: ../../../advanced/matrix-multiply-accelerators.md:371
 msgid ""
 "**Epilog** (tcgen05) loads from TMEM, converts precision, stores via TMA"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:307
+#: ../../../advanced/matrix-multiply-accelerators.md:373
 msgid ""
 "This is the kernel structure that cuBLAS and CUTLASS use internally. With "
 "cuda-oxide, you can build this same structure in Rust — using `SharedArray` "
@@ -640,7 +742,7 @@ msgid ""
 "compute."
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:312
+#: ../../../advanced/matrix-multiply-accelerators.md:378
 msgid ""
 "The [`gemm_sol` example](https://github.com/NVlabs/cuda-oxide/tree/main/"
 "crates/rustc-codegen-cuda/examples/gemm_sol) is the worked-out reference. "
@@ -654,19 +756,19 @@ msgid ""
 "than a fixed B200 number."
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:324
+#: ../../../advanced/matrix-multiply-accelerators.md:390
 msgid ""
 "[Shared Memory and Synchronization](shared-memory-and-synchronization.md) — "
 "tile management for MMA operands"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:326
+#: ../../../advanced/matrix-multiply-accelerators.md:392
 msgid ""
 "[Tensor Memory Accelerator](tensor-memory-accelerator.md) — feeding tiles to "
 "the tensor cores"
 msgstr ""
 
-#: ../../../advanced/matrix-multiply-accelerators.md:328
+#: ../../../advanced/matrix-multiply-accelerators.md:394
 msgid ""
 "[Cluster Programming](cluster-programming.md) — CG2 mode and multicast for "
 "multi-CTA MMA"
