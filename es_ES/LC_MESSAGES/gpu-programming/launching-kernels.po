@@ -1,0 +1,897 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025-2026, NVIDIA Corporation
+# This file is distributed under the same license as the cuda-oxide package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: cuda-oxide \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-16 12:33+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: es_ES\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../../gpu-programming/launching-kernels.md:1
+msgid "Launching Kernels"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:3
+msgid ""
+"Writing a kernel is only half the story. The host must load device code, "
+"configure the launch grid, marshal arguments, and dispatch the work to the "
+"GPU. The primary cuda-oxide launch path is `#[cuda_module]`: it embeds the "
+"generated device artifact into the host binary and generates typed launch "
+"methods. The lower-level `load_kernel_module` and `cuda_launch!` APIs remain "
+"available when you need explicit sidecar loading or custom launch code; note "
+"`cuda_launch!` is unsafe and must be wrapped in `unsafe { }`."
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:12
+msgid ""
+"[CUDA Programming Guide -- Execution Configuration](https://docs.nvidia.com/"
+"cuda/cuda-programming-guide/#execution-configuration) for the authoritative "
+"reference on `<<<grid, block, smem, stream>>>` semantics."
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:16
+msgid "The launch lifecycle"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:18
+msgid "Every kernel launch follows the same sequence:"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:20
+msgid "**Initialize a CUDA context** -- bind to a GPU device."
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:21
+msgid ""
+"**Load the device module** -- usually from the embedded artifact bundle."
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:22
+msgid "**Look up the kernel function** -- by its PTX entry point name."
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:23
+msgid ""
+"**Configure the grid** -- block dimensions, grid dimensions, shared memory."
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:24
+msgid "**Launch** -- enqueue the kernel on a stream."
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:25
+msgid "**Synchronize** -- wait for results (explicit or implicit)."
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:31
+msgid ""
+"The kernel launch lifecycle. The host initializes a context, loads the "
+"device module, configures the grid, and launches via a typed method. The GPU "
+"scheduler dispatches blocks to SMs."
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:36
+msgid ""
+"In practice, `#[cuda_module]` handles steps 2--5 behind a generated Rust "
+"API. You normally interact with context creation, `kernels::load`, and a "
+"typed method call."
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:40
+msgid "`#[cuda_module]` -- typed arguments"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:42
+msgid ""
+"Wrap kernels in an inline `#[cuda_module]` module to generate a typed loader "
+"and one method per `#[kernel]`. The generated signature checks kernel "
+"arguments, but a raw `LaunchConfig` does not prove the kernel's indexing "
+"shape or resource requirements. The raw launch method is therefore unsafe."
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:47
+msgid ""
+"raw LaunchConfig   -> unsafe launch\n"
+"PreparedLaunch<K>  -> safe launch of exactly K\n"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:52
+msgid ""
+"\"Synchronous\" here means that you provide a stream and enqueue "
+"immediately; GPU execution can still overlap the host until you synchronize."
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:55
+msgid ""
+"use cuda_device::{cuda_module, kernel, thread, DisjointSlice};\n"
+"use cuda_core::{CudaContext, DeviceBuffer, LaunchConfig};\n"
+"\n"
+"#[cuda_module]\n"
+"mod kernels {\n"
+"    use super::*;\n"
+"\n"
+"    #[kernel]\n"
+"    pub fn vecadd(a: &[f32], b: &[f32], mut c: DisjointSlice<f32>) {\n"
+"        let idx = thread::index_1d();\n"
+"        let i = idx.get();\n"
+"        if let Some(c_elem) = c.get_mut(idx) {\n"
+"            *c_elem = a[i] + b[i];\n"
+"        }\n"
+"    }\n"
+"}\n"
+"\n"
+"fn main() {\n"
+"    let ctx = CudaContext::new(0).unwrap();\n"
+"    let stream = ctx.default_stream();\n"
+"    let module = kernels::load(&ctx).unwrap();\n"
+"\n"
+"    let a = DeviceBuffer::from_host(&stream, &[1.0f32; 1024]).unwrap();\n"
+"    let b = DeviceBuffer::from_host(&stream, &[2.0f32; 1024]).unwrap();\n"
+"    let mut c = DeviceBuffer::<f32>::zeroed(&stream, 1024).unwrap();\n"
+"\n"
+"    // SAFETY: this is a 1D launch and all three buffers contain 1024 "
+"elements.\n"
+"    unsafe {\n"
+"        module.vecadd(&stream, LaunchConfig::for_num_elems(1024), &a, &b, "
+"&mut c)\n"
+"    }\n"
+"    .expect(\"Kernel launch failed\");\n"
+"\n"
+"    let result = c.to_host_vec(&stream).unwrap();\n"
+"    assert_eq!(result[0], 3.0);\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:93
+msgid "Field-by-field breakdown"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:27
+msgid "Piece"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:27
+msgid "Description"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:27
+msgid "`#[cuda_module]`"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:27
+msgid "Generates loader and launch methods"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:27
+msgid "`kernels::load(&ctx)`"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:27
+msgid "Loads the embedded artifact bundle"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:27
+msgid "`module.vecadd(...)`"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:27
+msgid "Type-checks arguments; raw config requires `unsafe`"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:220
+msgid "`LaunchConfig`"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:27
+msgid "Grid/block dimensions and smem"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:102
+msgid "Argument mapping"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:104
+msgid "The generated method maps kernel parameters to host values:"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:27
+msgid "Kernel parameter"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:27
+msgid "Host argument"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:27
+msgid "GPU ABI"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:27
+msgid "`&[T]`"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:27
+msgid "`&DeviceBuffer<T>`"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:27
+msgid "Pointer + length"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:27
+msgid "`&mut [T]`"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:27
+msgid "`&mut DeviceBuffer<T>`"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:27
+msgid "`DisjointSlice<T>`"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:27
+msgid "scalar/raw pointer"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:27
+msgid "Same value"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:27
+msgid "Value directly"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:113
+msgid "Return value"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:115
+msgid ""
+"Raw typed launch methods return `Result<(), DriverError>`. The `Ok` case "
+"means the kernel was successfully **enqueued** -- not that it finished. To "
+"check for runtime errors (e.g., out-of-bounds trap), synchronize the stream "
+"or context afterward."
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:120
+msgid "Safe prepared launches"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:122
+msgid "Declare the kernel's geometry when it is part of correctness:"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:124
+msgid ""
+"use cuda_core::LaunchConfig1D;\n"
+"use cuda_device::{cuda_module, kernel, launch_bounds, launch_contract, "
+"thread, DisjointSlice};\n"
+"\n"
+"#[cuda_module]\n"
+"mod contracted {\n"
+"    use super::*;\n"
+"\n"
+"    #[kernel]\n"
+"    #[launch_bounds(256)]\n"
+"    #[launch_contract(domain = 1, block = (256, 1, 1))]\n"
+"    pub fn vecadd(a: &[f32], b: &[f32], mut c: DisjointSlice<f32>) {\n"
+"        let idx = thread::index_1d();\n"
+"        if let Some(c_elem) = c.get_mut(idx) {\n"
+"            *c_elem = a[idx.get()] + b[idx.get()];\n"
+"        }\n"
+"    }\n"
+"}\n"
+"\n"
+"let module = contracted::load(&ctx)?;\n"
+"let config = LaunchConfig1D::new(4, 256, 0);\n"
+"let prepared = module.prepare_vecadd(config)?;\n"
+"module.vecadd(&stream, &prepared, &a, &b, &mut c)?;\n"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:149
+msgid ""
+"`prepare_vecadd` checks the exact block shape, device limits, dynamic shared "
+"memory, context, and any cluster/cooperative requirements. `LaunchConfig1D` "
+"cannot represent active Y/Z dimensions, and `PreparedLaunch<vecadd>` cannot "
+"be used with another kernel. Preparation may fail; once it succeeds, the "
+"branded launch can be reused safely."
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:155
+msgid ""
+"For a contracted kernel, the raw escape hatch is named `vecadd_unchecked` "
+"and remains unsafe. Uncontracted kernels expose only unsafe raw launch "
+"methods."
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:158
+msgid "`cuda_launch!` -- unsafe lower-level launch"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:160
+msgid ""
+"`cuda_launch!` is the explicit, unsafe escape hatch below `#[cuda_module]`. "
+"Its niche is modules loaded at runtime by name (a sidecar PTX/cubin/LTOIR "
+"artifact you choose manually), where no compile-time kernel signature exists "
+"to check against."
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:165
+msgid ""
+"Because the macro cannot verify the argument list, every use must sit inside "
+"an `unsafe { }` block. The caller promises that argument count, order, and "
+"types match the kernel's actual signature, and that pointer arguments are "
+"device-accessible. A mismatch is undefined behavior: the driver reads past "
+"the end of the args array, or the device dereferences junk."
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:171
+msgid ""
+"use cuda_host::{cuda_launch, load_kernel_module};\n"
+"\n"
+"let module = load_kernel_module(&ctx, \"vecadd\").unwrap();\n"
+"\n"
+"// SAFETY: args match vecadd, buffers are live, and the config is 1D with\n"
+"// bounds guarded by c.get_mut(idx).\n"
+"unsafe {\n"
+"    cuda_launch! {\n"
+"        kernel: vecadd,\n"
+"        stream: stream,\n"
+"        module: module,\n"
+"        config: LaunchConfig::for_num_elems(1024),\n"
+"        args: [slice(a), slice(b), slice_mut(c)]\n"
+"    }\n"
+"}\n"
+".expect(\"Kernel launch failed\");\n"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:190
+msgid ""
+"The wrappers in `args` produce the same host packet as the generated "
+"`#[cuda_module]` methods: `slice(...)` and `slice_mut(...)` push the `(ptr, "
+"len)` pair, scalar arguments push their value directly, and a closure or by-"
+"value struct pushes as a single byval value (the kernel boundary receives it "
+"as one `.param`, not as per-field flattened parameters)."
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:197
+msgid "Artifact policy"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:199
+msgid ""
+"`#[cuda_module]` is a launch-surface feature, not a target-selection "
+"feature. It loads the embedded payload that the compiler placed in the host "
+"binary. Decisions such as PTX versus LTOIR, cubin versus fatbin, or single-"
+"arch versus multi-arch packaging live in the compiler and artifact/runtime "
+"loader layers. Keeping that policy separate lets the generated Rust launch "
+"methods stay stable as payload formats evolve."
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:206
+msgid ""
+"PTX and cubin payloads load directly. NVVM IR records its target because pre-"
+"Blackwell GPUs use LLVM 7 typed pointers, while Blackwell and newer GPUs use "
+"opaque pointers. The loader uses that recorded target when invoking libNVVM."
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:210
+msgid ""
+"NVVM IR and LTOIR normally compile for their original target. For a standard "
+"pre-Blackwell target such as `sm_86`, the loader can instead produce PTX and "
+"let the CUDA driver JIT it on Blackwell. This is not supported for suffixed "
+"targets such as `sm_90a`, or for running newer-GPU artifacts on older GPUs. "
+"The driver must also support the PTX version produced by the selected "
+"toolkit. CUDA error 222 means the toolkit is too new for the driver's PTX "
+"JIT; select a compatible toolkit or upgrade the driver. The {ref}"
+"`installation guide <installation-toolkit-driver-compatibility>` explains "
+"why this can differ from the normal LLVM-to-PTX path."
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:222
+msgid "`LaunchConfig` specifies the grid shape:"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:224
+msgid ""
+"use cuda_core::LaunchConfig;\n"
+"\n"
+"let config = LaunchConfig {\n"
+"    grid_dim: (num_blocks, 1, 1),\n"
+"    block_dim: (256, 1, 1),\n"
+"    shared_mem_bytes: 0,\n"
+"};\n"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:27
+msgid "Field"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:27
+msgid "Type"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:27
+msgid "`grid_dim`"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:27
+msgid "`(u32, u32, u32)`"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:27
+msgid "Number of blocks in x, y, z"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:27
+msgid "`block_dim`"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:27
+msgid "Threads per block in x, y, z"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:27
+msgid "`shared_mem_bytes`"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:27
+msgid "`u32`"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:27
+msgid "Dynamic shared memory per block"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:240
+msgid "`for_num_elems` helper"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:242
+msgid ""
+"For 1D data-parallel kernels, the common pattern is one thread per element:"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:244
+msgid "let config = LaunchConfig::for_num_elems(N as u32);\n"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:248
+msgid ""
+"This uses 256 threads per block and computes the grid size via ceiling "
+"division: `grid_x = (N + 255) / 256`. It is a convenient 1D shape, but it is "
+"still raw data; only preparation ties a configuration to a kernel."
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:252
+msgid "2D and 3D configurations"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:254
+msgid "For matrix operations, use 2D block and grid dimensions:"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:256
+msgid ""
+"let config = LaunchConfig {\n"
+"    grid_dim: ((cols + 15) / 16, (rows + 15) / 16, 1),\n"
+"    block_dim: (16, 16, 1),\n"
+"    shared_mem_bytes: 0,\n"
+"};\n"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:264
+msgid ""
+"Inside the kernel, combine `threadIdx_x()` / `blockIdx_x()` with their "
+"`_y()` counterparts to compute row and column indices."
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:267
+msgid "Choosing block size"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:269
+msgid ""
+"The block size is the single most important tuning parameter (see the {ref}"
+"`Execution Model <execution-choosing-block-size>` chapter for details). "
+"Quick guidelines:"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:273
+msgid "**256** is a safe default for most kernels."
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:274
+msgid "**Powers of 2** (128, 256, 512) align with warp boundaries."
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:275
+msgid ""
+"Use `#[launch_bounds]` to hint the compiler about your intended block size."
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:277
+msgid "Typed async launch"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:279
+msgid ""
+"With the `cuda-host` async feature enabled, `#[cuda_module]` also generates "
+"borrowed and owned async methods. These return lazy `DeviceOperation` values "
+"instead of enqueuing immediately. No stream is specified at launch time -- "
+"the scheduling policy chooses one when the operation is executed:"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:284
+msgid ""
+"use cuda_async::device_context::init_device_contexts;\n"
+"use cuda_async::device_operation::DeviceOperation;\n"
+"\n"
+"init_device_contexts(0, 1)?;\n"
+"let module = kernels::load_async(0)?;\n"
+"\n"
+"// SAFETY: this is 1D, buffers contain 1024 elements, and module/scheduler "
+"share a context.\n"
+"let op = unsafe {\n"
+"    module.vecadd_async(\n"
+"        LaunchConfig::for_num_elems(1024),\n"
+"        &a_dev,\n"
+"        &b_dev,\n"
+"        &mut c_dev,\n"
+"    )\n"
+"}?;\n"
+"\n"
+"// Execute and wait\n"
+"op.sync()?;\n"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:305
+msgid ""
+"Use the owned form when the operation must be spawned or stored as a "
+"`'static` future:"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:308
+msgid ""
+"use std::future::IntoFuture;\n"
+"\n"
+"// SAFETY: this is 1D, owned buffers contain 1024 elements, and contexts "
+"match.\n"
+"let op = unsafe {\n"
+"    module.vecadd_async_owned(\n"
+"        LaunchConfig::for_num_elems(1024),\n"
+"        a_dev,\n"
+"        b_dev,\n"
+"        c_dev,\n"
+"    )\n"
+"}?;\n"
+"\n"
+"let (a_dev, b_dev, c_dev) = tokio::spawn(op.into_future()).await??;\n"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:324
+msgid "Async buffer lifetimes"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:326
+msgid "Async launches are lazy, so pointer lifetimes matter:"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:328
+msgid ""
+"raw pointer shape:\n"
+"  build op from CUdeviceptr\n"
+"  drop buffer\n"
+"  run op later  -> stale pointer\n"
+"\n"
+"borrowed typed shape:\n"
+"  build op from &DeviceBuffer\n"
+"  Rust keeps the buffer borrowed until op completes\n"
+"\n"
+"owned typed shape:\n"
+"  move DeviceBox into op\n"
+"  spawned task owns the allocation until completion\n"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:343
+msgid ""
+"For a contracted kernel, both async forms accept `&PreparedLaunch<K>` and "
+"are safe. `cuda_launch_async!` remains a lower-level unsafe migration API; "
+"its invocation must be inside an `unsafe` block. Raw pointer async launches "
+"are only correct when the caller can prove that the allocation outlives the "
+"lazy operation."
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:349
+msgid "`.sync()` vs `.await`"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:27
+msgid "Method"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:27
+msgid "What it does"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:27
+msgid "`.sync()`"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:27
+msgid ""
+"Execute on the default scheduling policy, block the current thread until "
+"complete"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:27
+msgid "`.await`"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:27
+msgid "Execute and yield the current async task (requires a Tokio runtime)"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:356
+msgid "Composing GPU work"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:358
+msgid ""
+"`DeviceOperation` supports functional composition. Chain operations with "
+"`and_then` and run independent work in parallel with `zip!`:"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:361
+msgid ""
+"use cuda_async::zip;\n"
+"\n"
+"let forward_pass = layer1_op\n"
+"    .and_then(|output1| layer2_op(output1))\n"
+"    .and_then(|output2| layer3_op(output2));\n"
+"\n"
+"// Run two independent operations concurrently\n"
+"let combined = zip!(branch_a, branch_b);\n"
+"let (result_a, result_b) = combined.sync()?;\n"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:373
+msgid ""
+"Each operation in the chain is scheduled onto a stream only when it "
+"executes. The `and_then` combinator passes the output of one operation as "
+"input to the next, forming a lazy computation graph."
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:378
+msgid ""
+"The [Async GPU Programming](../async-programming/the-device-operation-model."
+"md) section covers `DeviceOperation`, scheduling policies, and stream "
+"management in depth."
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:383
+msgid "Cluster launch"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:385
+msgid ""
+"Thread Block Clusters (Hopper and newer) allow blocks to cooperate beyond "
+"shared memory via **distributed shared memory** (DSMEM). To launch with "
+"clusters, add `#[cluster_launch]` to the kernel and include `cluster_dim` in "
+"the launch:"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:389
+msgid ""
+"use cuda_device::{kernel, cluster, cluster_launch, DisjointSlice};\n"
+"\n"
+"#[kernel]\n"
+"#[cluster_launch(4, 1, 1)]\n"
+"pub fn cluster_kernel(mut out: DisjointSlice<u32>) {\n"
+"    let rank = cluster::block_rank();\n"
+"    // Blocks 0-3 can communicate via DSMEM\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:400
+msgid ""
+"On the host, the launch uses `launch_kernel_ex` (the extended launch API) "
+"with cluster dimensions. `cuda_launch!` supports this via the `cluster_dim` "
+"field:"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:403
+msgid ""
+"// SAFETY: args/config match cluster_kernel, including its 4-block cluster;\n"
+"// out_dev stays live through synchronization.\n"
+"unsafe {\n"
+"    cuda_launch! {\n"
+"        kernel: cluster_kernel,\n"
+"        stream: stream,\n"
+"        module: module,\n"
+"        config: config,\n"
+"        cluster_dim: (4, 1, 1),\n"
+"        args: [slice_mut(out_dev)]\n"
+"    }\n"
+"}\n"
+".expect(\"Cluster launch failed\");\n"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:420
+msgid ""
+"Cluster launch requires **Hopper (sm_90)** or newer. The maximum cluster "
+"size is typically 16 blocks. Use `cargo oxide build --arch sm_90` to target "
+"Hopper."
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:424
+msgid "Cooperative launch"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:426
+msgid ""
+"Grid-wide barriers (`cuda_device::grid::sync()` or `this_grid().sync()`) "
+"only work when every block in the grid is resident on the device at the same "
+"time. A **cooperative launch** asks the driver to guarantee exactly that; "
+"without it, blocks that have not been scheduled yet can never reach the "
+"barrier and the kernel deadlocks."
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:432
+msgid ""
+"On the typed `#[cuda_module]` path, mark the kernel with "
+"`#[cooperative_launch]`. Every generated launch method (sync, async, and "
+"owned-async) then submits through `cuLaunchKernelEx` with the "
+"`CU_LAUNCH_ATTRIBUTE_COOPERATIVE` attribute set:"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:437
+msgid ""
+"use cuda_device::{cooperative_launch, grid, kernel, DisjointSlice};\n"
+"\n"
+"#[cuda_module]\n"
+"mod kernels {\n"
+"    use super::*;\n"
+"\n"
+"    #[kernel]\n"
+"    #[cooperative_launch]\n"
+"    pub fn grid_sync_kernel(mut out: DisjointSlice<u32>) {\n"
+"        // ... per-block work ...\n"
+"        grid::sync();\n"
+"        // ... grid-wide post-barrier work ...\n"
+"    }\n"
+"}\n"
+"\n"
+"let module = kernels::load(&ctx)?;\n"
+"// SAFETY: config satisfies the kernel's indexing, residency, and output "
+"bounds.\n"
+"unsafe { module.grid_sync_kernel(&stream, config, &mut out_dev) }?;\n"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:458
+msgid ""
+"Unlike `#[cluster_launch]`, the attribute changes nothing in the PTX; it "
+"only changes how the host submits the launch. The two attributes may be "
+"combined on one kernel, in which case both launch attributes go into the "
+"same `cuLaunchKernelEx` call."
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:463
+msgid ""
+"The legacy (caller-unsafe) `cuda_launch!` macro offers the same behaviour "
+"through its `cooperative: true` field."
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:467
+msgid ""
+"The whole grid must fit on the device in a single wave, or the driver "
+"rejects the launch with `CUDA_ERROR_COOPERATIVE_LAUNCH_TOO_LARGE`. Size the "
+"grid from `cuOccupancyMaxActiveBlocksPerMultiprocessor` (blocks per SM × SM "
+"count) when in doubt."
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:473
+msgid "Common launch errors"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:466
+msgid "Error"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:466
+msgid "Likely cause"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:466
+msgid "Fix"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:466
+msgid "`CUDA_ERROR_INVALID_VALUE`"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:466
+msgid "Grid or block dimensions are zero or exceed limits"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:466
+msgid "Check `LaunchConfig` values; max block is 1024 threads"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:466
+msgid "`CUDA_ERROR_NOT_FOUND`"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:466
+msgid "PTX entry point name doesn't match"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:466
+msgid "Verify `#[kernel]` name matches the loaded module"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:466
+msgid "`CUDA_ERROR_LAUNCH_OUT_OF_RESOURCES`"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:466
+msgid "Too much shared memory or too many registers per block"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:466
+msgid "Reduce `shared_mem_bytes` or block size; use `#[launch_bounds]`"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:466
+msgid "`CUDA_ERROR_ILLEGAL_INSTRUCTION`"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:466
+msgid "Kernel hit a trap (panic, assert failure, OOB)"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:466
+msgid "Debug with `cargo oxide debug` or `gpu_printf!`"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:466
+msgid "`CUDA_ERROR_NO_BINARY_FOR_GPU`"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:466
+msgid "PTX compiled for wrong architecture"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:466
+msgid "Rebuild with `--arch` matching your GPU"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:466
+msgid "`CUDA_ERROR_UNSUPPORTED_PTX_VERSION` (222)"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:466
+msgid "Driver cannot compile the PTX version in the module"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:466
+msgid "Select a compatible `CUDA_TOOLKIT_PATH` or upgrade the driver"
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:485
+msgid ""
+"The [Error Handling and Debugging](error-handling-and-debugging.md) chapter "
+"covers how to diagnose and fix kernel failures in detail."
+msgstr ""

@@ -1,0 +1,541 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025-2026, NVIDIA Corporation
+# This file is distributed under the same license as the cuda-oxide package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: cuda-oxide \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-16 12:33+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: zh_TW\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../../getting-started/hello-gpu.md:1
+msgid "Writing Your First Kernel"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:3
+msgid ""
+"This section walks through installing cuda-oxide, creating a project, "
+"writing a GPU kernel, and running it -- all in pure Rust."
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:7
+msgid "Install cargo-oxide"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:9
+msgid ""
+"If you haven't already, install the build tool with the pinned nightly "
+"toolchain:"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:11
+msgid ""
+"cargo +nightly-2026-04-03 install --git https://github.com/NVlabs/cuda-oxide."
+"git cargo-oxide\n"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:15
+msgid "Verify that your environment is set up correctly:"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:17
+msgid "cargo oxide doctor\n"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:21
+msgid ""
+"This checks for a compatible GPU, CUDA toolkit, LLVM, and the codegen "
+"backend. Fix any issues it reports before continuing (see [Installation]"
+"(installation.md) for details)."
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:25
+msgid "Create a project"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:27
+msgid "Scaffold a new project with `cargo oxide new`:"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:29
+msgid ""
+"cargo oxide new my_first_kernel\n"
+"cd my_first_kernel\n"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:34
+msgid "This generates a ready-to-run project:"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:36
+msgid ""
+"my_first_kernel/\n"
+"├── Cargo.toml          # dependencies on cuda-device, cuda-host, cuda-core\n"
+"├── rust-toolchain.toml # pins the required nightly toolchain\n"
+"└── src/\n"
+"    └── main.rs          # kernel + host code in one file\n"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:44
+msgid "Build and run it:"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:46
+msgid "cargo oxide run\n"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:50
+msgid ""
+"You should see `PASSED: all 1024 elements correct`. The generated template "
+"is a vector addition kernel -- a good starting point, but let's look at "
+"something more interesting."
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:54
+msgid "Anatomy of a kernel"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:56
+msgid ""
+"Here's a vector addition with a twist: the element-wise addition is factored "
+"out into a plain helper function. Both the kernel and the helper live in the "
+"same file alongside host code:"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:58
+msgid ""
+"use cuda_device::{cuda_module, kernel, thread, DisjointSlice};\n"
+"use cuda_core::{CudaContext, DeviceBuffer, LaunchConfig};\n"
+"\n"
+"/// Plain helper function -- no annotation needed.\n"
+"/// The compiler discovers it automatically because `vecadd` calls it.\n"
+"fn add(a: f32, b: f32) -> f32 {\n"
+"    a + b\n"
+"}\n"
+"\n"
+"#[cuda_module]\n"
+"mod kernels {\n"
+"    use super::*;\n"
+"\n"
+"    #[kernel]\n"
+"    pub fn vecadd(a: &[f32], b: &[f32], mut c: DisjointSlice<f32>) {\n"
+"        let idx = thread::index_1d();\n"
+"        let i = idx.get();\n"
+"        if let Some(c_elem) = c.get_mut(idx) {\n"
+"            *c_elem = add(a[i], b[i]);\n"
+"        }\n"
+"    }\n"
+"}\n"
+"\n"
+"fn main() {\n"
+"    let ctx = CudaContext::new(0).unwrap();\n"
+"    let stream = ctx.default_stream();\n"
+"\n"
+"    const N: usize = 1024;\n"
+"    let a_host: Vec<f32> = (0..N).map(|i| i as f32).collect();\n"
+"    let b_host: Vec<f32> = (0..N).map(|i| (i * 2) as f32).collect();\n"
+"\n"
+"    let a_dev = DeviceBuffer::from_host(&stream, &a_host).unwrap();\n"
+"    let b_dev = DeviceBuffer::from_host(&stream, &b_host).unwrap();\n"
+"    let mut c_dev = DeviceBuffer::<f32>::zeroed(&stream, N).unwrap();\n"
+"\n"
+"    let module = kernels::load(&ctx).expect(\"Failed to load embedded "
+"module\");\n"
+"    // SAFETY: `for_num_elems` is 1D and all three buffers contain N "
+"elements.\n"
+"    unsafe {\n"
+"        module.vecadd(\n"
+"            &stream,\n"
+"            LaunchConfig::for_num_elems(N as u32),\n"
+"            &a_dev,\n"
+"            &b_dev,\n"
+"            &mut c_dev,\n"
+"        )\n"
+"    }\n"
+"    .unwrap();\n"
+"\n"
+"    let c_host = c_dev.to_host_vec(&stream).unwrap();\n"
+"    let errors = (0..N)\n"
+"        .filter(|&i| (c_host[i] - (a_host[i] + b_host[i])).abs() > 1e-5)\n"
+"        .count();\n"
+"\n"
+"    if errors == 0 {\n"
+"        println!(\"PASSED: all {} elements correct\", N);\n"
+"    } else {\n"
+"        eprintln!(\"FAILED: {} errors\", errors);\n"
+"        std::process::exit(1);\n"
+"    }\n"
+"}\n"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:121
+msgid "There's a lot happening here. Let's unpack the key pieces."
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:123
+msgid "Single-source compilation"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:125
+msgid ""
+"The kernel and host code live in **the same file** and are compiled with a "
+"single `cargo` command invocation. The codegen backend intercepts "
+"compilation, routes `#[kernel]` functions through the MIR-to-PTX pipeline, "
+"and delegates everything else to standard LLVM. The final binary contains "
+"native host code plus the embedded device artifact."
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:127
+msgid "`#[kernel]`"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:129
+msgid ""
+"Marks a function as a **launchable kernel entry point** -- the GPU "
+"equivalent of `main`. The function is compiled to PTX via the pipeline:"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:131
+msgid "Rust source → MIR → Pliron IR → LLVM IR → PTX\n"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:135
+msgid ""
+"The same function is also visible to the host compiler for type-checking, "
+"but its body is never called on the CPU."
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:137
+msgid "Device functions (auto-discovery)"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:139
+msgid ""
+"The `add` helper above has **no annotation**. When the compiler processes a "
+"`#[kernel]`, it walks the call graph and automatically discovers every "
+"function the kernel calls. Those functions are compiled to PTX as device "
+"functions and inlined by the backend -- you don't need to mark them."
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:142
+msgid ""
+"The `#[device]` attribute exists but serves a different purpose: it marks a "
+"function as a standalone device compilation root (for building Rust device "
+"libraries consumed by C++) or is used in `#[device] extern \"C\" { ... }` "
+"blocks to declare external device functions for FFI with CUDA C++ LTOIR. You "
+"do **not** need `#[device]` for private helper functions called from a "
+"kernel."
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:145
+msgid "`#[cuda_module]`"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:147
+msgid ""
+"`#[cuda_module]` wraps the inline kernel module and generates a typed host "
+"API:"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:149
+msgid ""
+"let module = kernels::load(&ctx)?;\n"
+"// SAFETY: this is a 1D launch and all three buffers contain N elements.\n"
+"unsafe {\n"
+"    module.vecadd(\n"
+"        &stream,\n"
+"        LaunchConfig::for_num_elems(N as u32),\n"
+"        &a_dev,\n"
+"        &b_dev,\n"
+"        &mut c_dev,\n"
+"    )\n"
+"}?;\n"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:163
+msgid ""
+"The loader reads the embedded device artifact from the host binary, caches "
+"kernel function handles, and exposes each `#[kernel]` as a Rust method. The "
+"method signature mirrors the kernel signature, with device slices mapped to "
+"`DeviceBuffer` borrows. This checks argument types, but a raw `LaunchConfig` "
+"does not prove that a 1D-index kernel was given a 1D launch. Raw generated "
+"launch methods are therefore unsafe. A declared launch contract enables the "
+"safe prepared path shown in [Launching Kernels](../gpu-programming/launching-"
+"kernels.md)."
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:171
+msgid ""
+"`load_kernel_module` and `cuda_launch!` remain available as lower-level APIs "
+"for manual sidecar artifact loading and custom launch code. `cuda_launch!` "
+"cannot check arguments against the kernel signature, so it is unsafe and "
+"must be wrapped in `unsafe { }`."
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:176
+msgid "Argument scalarization"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:178
+msgid ""
+"Slices cross the host/device ABI as their `(ptr, len)` components -- the "
+"host passes them as two kernel arguments, and the device compiler "
+"reassembles the slice in the entry block. Structs and closures by value "
+"travel as one byval `.param` instead, so the host packet pushes the whole "
+"aggregate as a single slot (this matches what the launcher actually does and "
+"avoids mismatches with field-by-field declarations). All of this is fully "
+"transparent -- the kernel signature still looks like ordinary Rust:"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:180
+msgid ""
+"Host:   unsafe { module.vecadd(&stream, raw_config, &data, ...) }\n"
+"          → extracts (ptr, len) for the slice, passes two args\n"
+"\n"
+"PTX:    .entry kernel(.param .u64 ptr, .param .u64 len, ...)\n"
+"          → receives flat slice parameters\n"
+"\n"
+"Device: kernel body sees unified &[T] slice\n"
+"          → compiler reconstructs at entry\n"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:191
+msgid "Dynamic struct layout"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:193
+msgid ""
+"When you pass structs to the GPU, cuda-oxide queries rustc for the **exact "
+"byte offsets** of each field and rebuilds the layout with explicit padding "
+"on the device side. This means `#[repr(C)]` is **not required** -- regular "
+"Rust structs work as-is, even across HMM (GPU direct access to host memory)."
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:197
+msgid "Going async"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:199
+msgid ""
+"For multi-kernel pipelines or concurrent workloads, cuda-oxide provides an "
+"async execution model built on Tokio. Let's scaffold an async project and "
+"walk through the differences."
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:201
+msgid "Create an async project"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:203
+msgid ""
+"cargo oxide new my_async_kernel --async\n"
+"cd my_async_kernel\n"
+"cargo oxide run\n"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:209
+msgid ""
+"The `--async` flag generates a project with `tokio` and `cuda-async` "
+"dependencies pre-configured."
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:211
+msgid "Full example"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:213
+msgid ""
+"Here's the generated async vecadd template (with minor formatting edits for "
+"readability):"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:215
+msgid ""
+"use cuda_device::{cuda_module, kernel, thread, DisjointSlice};\n"
+"use cuda_async::device_context::init_device_contexts;\n"
+"use cuda_async::device_operation::DeviceOperation;\n"
+"use cuda_core::LaunchConfig;\n"
+"\n"
+"#[cuda_module]\n"
+"mod kernels {\n"
+"    use super::*;\n"
+"\n"
+"    #[kernel]\n"
+"    pub fn vecadd(a: &[f32], b: &[f32], mut c: DisjointSlice<f32>) {\n"
+"        let idx = thread::index_1d();\n"
+"        let i = idx.get();\n"
+"        if let Some(c_elem) = c.get_mut(idx) {\n"
+"            *c_elem = a[i] + b[i];\n"
+"        }\n"
+"    }\n"
+"}\n"
+"\n"
+"#[tokio::main]\n"
+"async fn main() -> Result<(), Box<dyn std::error::Error>> {\n"
+"    use cuda_async::device_box::DeviceBox;\n"
+"    use cuda_core::memory::{malloc_async, memcpy_dtoh_async, "
+"memcpy_htod_async};\n"
+"    use std::mem;\n"
+"\n"
+"    // 1. Initialize the device context map (default device 0, 1 device).\n"
+"    //    The round-robin stream pool is created lazily on first use.\n"
+"    init_device_contexts(0, 1)?;\n"
+"\n"
+"    // 2. Load the embedded kernel module from the async device context.\n"
+"    let module = kernels::load_async(0)?;\n"
+"\n"
+"    const N: usize = 1024;\n"
+"    let a_host: Vec<f32> = (0..N).map(|i| i as f32).collect();\n"
+"    let b_host: Vec<f32> = (0..N).map(|i| (i * 2) as f32).collect();\n"
+"\n"
+"    // 3. Allocate device memory and copy host data.\n"
+"    let (a_dev, b_dev, mut c_dev) =\n"
+"        cuda_async::device_context::with_cuda_context(0, |ctx| {\n"
+"            let stream = ctx.default_stream();\n"
+"            let bytes = N * mem::size_of::<f32>();\n"
+"            unsafe {\n"
+"                let a = malloc_async(stream.cu_stream(), bytes).unwrap();\n"
+"                let b = malloc_async(stream.cu_stream(), bytes).unwrap();\n"
+"                let c = malloc_async(stream.cu_stream(), bytes).unwrap();\n"
+"                memcpy_htod_async(a, a_host.as_ptr(), bytes, stream."
+"cu_stream()).unwrap();\n"
+"                memcpy_htod_async(b, b_host.as_ptr(), bytes, stream."
+"cu_stream()).unwrap();\n"
+"                stream.synchronize().unwrap();\n"
+"                (\n"
+"                    DeviceBox::<[f32]>::from_raw_parts(a, N, 0),\n"
+"                    DeviceBox::<[f32]>::from_raw_parts(b, N, 0),\n"
+"                    DeviceBox::<[f32]>::from_raw_parts(c, N, 0),\n"
+"                )\n"
+"            }\n"
+"        })?;\n"
+"\n"
+"    // 4. Launch -- returns a lazy DeviceOperation, no GPU work yet.\n"
+"    // SAFETY: this is 1D, buffers contain N elements, and module/scheduler\n"
+"    // both use device 0's context.\n"
+"    unsafe {\n"
+"        module.vecadd_async(\n"
+"            LaunchConfig::for_num_elems(N as u32),\n"
+"            &a_dev,\n"
+"            &b_dev,\n"
+"            &mut c_dev,\n"
+"        )\n"
+"    }?\n"
+"    .sync()?;  // Block until the GPU finishes.\n"
+"\n"
+"    // 5. Copy results back to host.\n"
+"    let mut c_host = vec![0.0f32; N];\n"
+"    cuda_async::device_context::with_cuda_context(0, |ctx| {\n"
+"        let stream = ctx.default_stream();\n"
+"        unsafe {\n"
+"            memcpy_dtoh_async(\n"
+"                c_host.as_mut_ptr(),\n"
+"                c_dev.cu_deviceptr(),\n"
+"                N * mem::size_of::<f32>(),\n"
+"                stream.cu_stream(),\n"
+"            )\n"
+"            .unwrap();\n"
+"            stream.synchronize().unwrap();\n"
+"        }\n"
+"    })?;\n"
+"\n"
+"    // 6. Verify.\n"
+"    let errors = (0..N)\n"
+"        .filter(|&i| (c_host[i] - (a_host[i] + b_host[i])).abs() > 1e-5)\n"
+"        .count();\n"
+"\n"
+"    if errors == 0 {\n"
+"        println!(\"PASSED: all {} elements correct\", N);\n"
+"    } else {\n"
+"        eprintln!(\"FAILED: {} errors\", errors);\n"
+"        std::process::exit(1);\n"
+"    }\n"
+"\n"
+"    Ok(())\n"
+"}\n"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:317
+msgid "What changed from sync"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:319
+msgid ""
+"The kernel itself is **identical** -- async only changes how you launch and "
+"manage GPU work on the host side."
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:321
+msgid "`{kernel}_async` instead of `{kernel}`"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:322
+msgid ""
+"Returns a lazy `DeviceOperation` rather than launching immediately. No GPU "
+"work happens until you explicitly schedule it. This lets you build a "
+"computation graph before committing resources."
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:324
+msgid "`init_device_contexts(default_device, num_devices)`"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:325
+msgid ""
+"Initializes the thread-local device context map, setting the default GPU "
+"ordinal and capacity for multi-device use. The round-robin stream pool is "
+"created lazily on first use. Operations are then assigned to streams in "
+"round-robin order, maximizing GPU occupancy without manual stream management."
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:327
+msgid "`DeviceBox` instead of `DeviceBuffer`"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:328
+msgid ""
+"Async-safe wrapper for device memory. Works with the stream pool and "
+"supports async allocation via `malloc_async`."
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:330
+msgid "`.sync()` vs `.await`"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:331
+msgid ""
+"`.sync()` blocks the calling thread until the GPU finishes -- use it when "
+"you have nothing else to do on the host. `.await` suspends the current Tokio "
+"task and lets other tasks progress while waiting -- use it when you have "
+"concurrent host work or multiple GPU pipelines in flight."
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:333
+msgid "`and_then` / `zip!`"
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:334
+msgid ""
+"Chain dependent operations with `.and_then(|result| next_op)`. Run "
+"independent operations concurrently with `zip!(op_a, op_b)` -- both are "
+"submitted to the stream pool, and the combined result is available when both "
+"complete. These combinators let you express complex multi-kernel pipelines "
+"declaratively."
+msgstr ""
+
+#: ../../../getting-started/hello-gpu.md:337
+msgid ""
+"For a more complete async example, see `async_mlp` -- a multi-kernel forward "
+"pass (GEMM, MatVec, ReLU) with `and_then` chaining, `zip!` for parallel "
+"allocation, and `Arc`-shared weights across concurrent batches. Run it with "
+"`cargo oxide run async_mlp` from the cuda-oxide workspace."
+msgstr ""

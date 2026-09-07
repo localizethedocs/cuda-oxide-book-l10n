@@ -1,0 +1,539 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025-2026, NVIDIA Corporation
+# This file is distributed under the same license as the cuda-oxide package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: cuda-oxide \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-16 12:33+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: zh_TW\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../../gpu-programming/closures-and-generics.md:1
+msgid "Closures and Generics"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:3
+msgid ""
+"Rust's zero-cost abstractions -- generics, closures, and trait bounds -- "
+"work on the GPU. This is one of cuda-oxide's most distinctive capabilities: "
+"you can write a single generic kernel that operates on any numeric type, or "
+"pass a closure from the host to customize GPU behavior, all without runtime "
+"overhead."
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:8
+msgid "Generic kernels"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:10
+msgid ""
+"A kernel can be generic over types, const values, and trait bounds, just "
+"like any Rust function. The compiler monomorphizes each specialization into "
+"a separate PTX entry point:"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:14
+msgid ""
+"use cuda_device::{kernel, thread, DisjointSlice};\n"
+"use core::ops::Mul;\n"
+"\n"
+"#[kernel]\n"
+"pub fn scale<T: Copy + Mul<Output = T>>(\n"
+"    factor: T,\n"
+"    input: &[T],\n"
+"    mut out: DisjointSlice<T>,\n"
+") {\n"
+"    let idx = thread::index_1d();\n"
+"    let i = idx.get();\n"
+"    if let Some(out_elem) = out.get_mut(idx) {\n"
+"        *out_elem = input[i] * factor;\n"
+"    }\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:32
+msgid "PTX naming"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:34
+msgid ""
+"Each monomorphization produces a distinct PTX entry point. Non-generic "
+"kernels keep their plain function name. Generic kernels (including closure-"
+"generic kernels) get a `_TID_<hex32>` suffix where `<hex32>` is rustc's "
+"stable type-id hash of the concrete generated kernel function item, rendered "
+"as 32 lowercase hex characters:"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:0
+msgid "Instantiation"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:0
+msgid "PTX entry point name"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:0
+msgid "`vecadd` (non-generic)"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:0
+msgid "`vecadd`"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:0
+msgid "`scale::<f32>`"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:0
+msgid "`scale_TID_<hex32>`"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:0
+msgid "`scale::<MyType>`"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:0
+msgid "`tile::<4>`"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:0
+msgid "`tile_TID_<hex32>`"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:0
+msgid "`tile::<8>`"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:0
+msgid "`map::<f32, _>` (closure)"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:0
+msgid "`map_TID_<hex32>`"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:49
+msgid ""
+"Both the host launcher and the device backend ask the pinned rustc toolchain "
+"for the same `FnDef` hash within one unified build, so the strings match "
+"byte-for-byte. The function item contains its definition plus every ordered "
+"type and const argument. The on-wire name therefore remains fixed-length "
+"regardless of generic arity. Borrow lifetimes are erased before hashing, so "
+"they do not create duplicate GPU code."
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:56
+msgid ""
+"Treat the suffix as a build artifact, not a permanent ABI: host code and PTX "
+"must be built together with cuda-oxide's pinned rustc toolchain."
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:59
+msgid "Launching generic kernels"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:61
+msgid ""
+"When launching, specify the type parameter on the generated typed method. "
+"That forces the concrete instantiation and lets the loader look up the "
+"matching PTX entry point:"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:65
+msgid ""
+"use cuda_core::LaunchConfig;\n"
+"\n"
+"// SAFETY: config is 1D and both buffers cover every launched index.\n"
+"unsafe {\n"
+"    module.scale::<f32>(\n"
+"        &stream,\n"
+"        LaunchConfig::for_num_elems(N as u32),\n"
+"        2.0f32,\n"
+"        &input_dev,\n"
+"        &mut output_dev,\n"
+"    )\n"
+"}\n"
+".expect(\"Launch failed\");\n"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:81
+msgid ""
+"The generated method forces monomorphization of `scale::<f32>` so the "
+"instantiation appears in the compiled PTX even though it is never called "
+"directly on the CPU."
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:85
+msgid "Const-generic kernels"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:87
+msgid "Const parameters work on kernel and device-function entry points:"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:89
+msgid ""
+"#[kernel]\n"
+"pub fn add_value<const VALUE: u32>(mut output: DisjointSlice<u32>) {\n"
+"    let index = thread::index_1d();\n"
+"    if let Some(element) = output.get_mut(index) {\n"
+"        *element += VALUE;\n"
+"    }\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:99
+msgid ""
+"add_value::<4> -> add_value_TID_<hash A>\n"
+"add_value::<8> -> add_value_TID_<hash B>\n"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:104
+msgid "Use ordinary Rust turbofish syntax on the generated launch method:"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:106
+msgid ""
+"// SAFETY: config matches the kernels' 1D indexing and output bounds.\n"
+"unsafe {\n"
+"    module.add_value::<4>(&stream, config, &mut output)?;\n"
+"    module.add_value::<{ Config::VALUE }>(&stream, config, &mut output)?;\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:114
+msgid ""
+"The older `#[kernel(f32, i32)]` convenience form only supports one type "
+"parameter. For const or mixed generics, use bare `#[kernel]` and specialize "
+"at the launch site."
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:118
+msgid "Host closures as kernel arguments"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:120
+msgid ""
+"cuda-oxide supports passing closures from the host to the GPU. This enables "
+"powerful `map`-style patterns where the kernel's behavior is parameterized "
+"by a function:"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:124
+msgid ""
+"#[kernel]\n"
+"pub fn map<F: Fn(i32) -> i32>(f: F, input: &[i32], mut out: "
+"DisjointSlice<i32>) {\n"
+"    let idx = thread::index_1d();\n"
+"    let i = idx.get();\n"
+"    if let Some(out_elem) = out.get_mut(idx) {\n"
+"        *out_elem = f(input[i]);\n"
+"    }\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:135
+msgid "Launch with a closure:"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:137
+msgid ""
+"let factor = 3i32;\n"
+"// SAFETY: config is 1D and both buffers cover every launched index.\n"
+"unsafe {\n"
+"    module.map::<_>(&stream, config, move |x| x * factor, &input_dev, &mut "
+"output_dev)\n"
+"}\n"
+".expect(\"Launch failed\");\n"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:146
+msgid "How closure arguments travel"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:148
+msgid ""
+"The closure passes through the launch as one value -- not as a list of "
+"captured fields. The launcher pushes a single driver argument (the whole "
+"closure struct, captures and all), and the kernel receives it as one byval `."
+"param`:"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:153
+msgid ""
+"host          factor = 3i32; cl = move |x| x * factor\n"
+"              push one driver arg ─► closure struct { factor: i32 }\n"
+"\n"
+"GPU kernel    .entry map_TID_<hex>(\n"
+"                .param .align 4 .b8 f[4],    ; one byval closure\n"
+"                .param .u64 input_ptr,        ; slice still (ptr, len)\n"
+"                .param .u64 input_len,\n"
+"                ...\n"
+"              )\n"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:165
+msgid ""
+"Slices keep their `(ptr, len)` flattening because that shape is shared by "
+"the host launch helpers and the PTX entry-point layout. Only aggregate- by-"
+"value parameters (closures and user structs passed by value) land as one "
+"byval at the kernel boundary."
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:170
+msgid ""
+"A closure with no captures is a zero-sized type -- the backend drops the `."
+"param` entirely, and the host launcher knows to skip it so the packet stays "
+"aligned."
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:174
+msgid "PTX naming for closures"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:176
+msgid ""
+"A closure-generic kernel gets the same `_TID_<hex32>` suffix as any other "
+"generic kernel. The closure's anonymous type is part of the concrete "
+"function item, so two distinct closure literals -- even ones with the same "
+"`Fn` signature -- produce two distinct entry points:"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:0
+msgid "Closure"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:0
+msgid "PTX entry point"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:0
+msgid "`move |x| x * factor` (one capture)"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:0
+msgid "`map_TID_<hex_a>`"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:0
+msgid "`move |x| x + offset` (one capture)"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:0
+msgid "`map_TID_<hex_b>`"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:186
+msgid "Move vs reference closures"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:188
+msgid "The `move` keyword determines how captures are transferred to the GPU:"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:190
+msgid "Move closures (recommended default)"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:192
+msgid ""
+"let factor = 3i32;\n"
+"move |x| x * factor   // `factor` is copied into the closure struct\n"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:197
+msgid "The closure struct holds the capture by value (`{ factor: i32 }`)."
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:198
+msgid "The kernel reads `factor` as a regular field of the byval closure."
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:199
+msgid "The host variable can be dropped after launch."
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:200
+msgid "Works on all systems -- no special hardware support needed."
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:202
+msgid "Reference closures (HMM)"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:204
+msgid ""
+"let factor = 3i32;\n"
+"|x| x * factor   // closure captures &factor\n"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:209
+msgid ""
+"The closure struct contains a **host pointer** to `factor` (`{ factor: &i32 }"
+"`)."
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:211
+msgid ""
+"The whole closure still travels as one byval parameter; the kernel deref's "
+"that host pointer through **Hardware-Managed Memory (HMM)**, which migrates "
+"the host page on access."
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:214
+msgid "The host variable **must remain alive** until the kernel completes."
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:215
+msgid "Requires HMM support (Turing+ GPU, Linux 6.1.24+, CUDA 12.2+)."
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:217
+msgid "When to use which"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:0
+msgid "Scenario"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:0
+msgid "Use"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:0
+msgid "Small scalar captures (numbers, booleans)"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:0
+msgid "`move` (zero-copy overhead)"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:0
+msgid "Large struct captures"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:0
+msgid "`move` if the kernel reads it many times; HMM if rarely accessed"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:0
+msgid "Prototyping"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:0
+msgid "Either works; `move` is more portable"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:0
+msgid "Shared mutable state between host and device"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:0
+msgid "Reference (HMM) -- but beware synchronization"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:227
+msgid ""
+"When in doubt, use `move` closures. They are simpler to reason about, work "
+"everywhere, and avoid the synchronization hazards of shared host/device "
+"memory."
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:231
+msgid "In-kernel closures"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:233
+msgid ""
+"Closures defined and called entirely within device code work with normal "
+"Rust semantics -- no host/device ABI is involved because everything is "
+"already on the GPU:"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:237
+msgid ""
+"#[kernel]\n"
+"pub fn apply_transform(input: &[f32], mut out: DisjointSlice<f32>) {\n"
+"    let idx = thread::index_1d();\n"
+"\n"
+"    let transform = |x: f32| -> f32 {\n"
+"        let clamped = if x < 0.0 { 0.0 } else if x > 1.0 { 1.0 } else "
+"{ x };\n"
+"        clamped * clamped\n"
+"    };\n"
+"\n"
+"    if let Some(out_elem) = out.get_mut(idx) {\n"
+"        *out_elem = transform(input[idx.get()]);\n"
+"    }\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:253
+msgid ""
+"In-kernel closures are inlined by the compiler and have zero overhead. They "
+"are useful for factoring logic within a kernel without introducing a "
+"separate device function."
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:257
+msgid "Cross-crate kernels"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:259
+msgid ""
+"Kernels can be defined in a library crate and launched from a binary crate:"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:261
+msgid ""
+"// In lib crate `my_kernels`:\n"
+"use cuda_device::{cuda_module, kernel, thread, DisjointSlice};\n"
+"\n"
+"#[cuda_module]\n"
+"pub mod kernels {\n"
+"    use super::*;\n"
+"\n"
+"    #[kernel]\n"
+"    pub fn vecadd(a: &[f32], b: &[f32], mut c: DisjointSlice<f32>) {\n"
+"        let idx = thread::index_1d();\n"
+"        let i = idx.get();\n"
+"        if let Some(c_elem) = c.get_mut(idx) {\n"
+"            *c_elem = a[i] + b[i];\n"
+"        }\n"
+"    }\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:280
+msgid ""
+"// In binary crate:\n"
+"use my_kernels::kernels;\n"
+"\n"
+"let module = kernels::load(&ctx)?;\n"
+"// SAFETY: config is 1D and all three buffers cover every launched index.\n"
+"unsafe { module.vecadd(&stream, config, &a, &b, &mut c) }\n"
+"    .expect(\"Launch failed\");\n"
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:290
+msgid ""
+"The compiler handles cross-crate kernel discovery through the marker traits "
+"generated by `#[kernel]`. The typed module resolves the PTX name at compile "
+"time and caches the loaded function handle."
+msgstr ""
+
+#: ../../../gpu-programming/closures-and-generics.md:295
+msgid ""
+"For generic cross-crate kernels, the monomorphization happens in the "
+"**calling** crate (where the concrete type is known), so the PTX is "
+"generated as part of the binary's compilation."
+msgstr ""

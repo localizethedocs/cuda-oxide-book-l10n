@@ -1,0 +1,1328 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025-2026, NVIDIA Corporation
+# This file is distributed under the same license as the cuda-oxide package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: cuda-oxide \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-16 12:33+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../../gpu-programming/memory-and-data-movement.md:1
+msgid "Memory and Data Movement"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:3
+msgid ""
+"GPUs have their own memory, separate from the host. Getting data to and from "
+"the device -- and choosing the right kind of memory once it's there -- is "
+"fundamental to every CUDA program. This chapter covers cuda-oxide's memory "
+"abstractions, from host/device transfers to shared memory and the kernel ABI."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:9
+msgid ""
+"[CUDA Programming Guide -- Device Memory](https://docs.nvidia.com/cuda/cuda-"
+"programming-guide/#device-memory-accesses) for the authoritative reference "
+"on the CUDA memory hierarchy and access patterns."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:13
+msgid "The CUDA memory hierarchy"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:15
+msgid ""
+"NVIDIA GPUs expose several tiers of memory, each with different capacity, "
+"latency, and scope:"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:8
+msgid "Memory"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:8
+msgid "Scope"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:8
+msgid "Typical size"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:8
+msgid "Latency"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:8
+msgid "cuda-oxide API"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:8
+msgid "**Registers**"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:8
+msgid "Per thread"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:8
+msgid "~255 × 32-bit"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:8
+msgid "0 cycles"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:8
+msgid "Local variables"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:8
+msgid "**Shared memory**"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:8
+msgid "Per block"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:8
+msgid "48--228 KB (arch-dependent)"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:8
+msgid "~5 cycles"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:8
+msgid "`SharedArray`, `DynamicSharedArray`"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:8
+msgid "**L1 cache**"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:8
+msgid "Per SM"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:8
+msgid "Combined with shared"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:8
+msgid "Hardware-managed"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:8
+msgid "Automatic"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:8
+msgid "**L2 cache**"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:8
+msgid "Chip-wide"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:8
+msgid "Up to 50 MB (Hopper)"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:8
+msgid "~30 cycles"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:8
+msgid "**Global memory (DRAM)**"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:8
+msgid "All threads"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:8
+msgid "16--80 GB (HBM)"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:8
+msgid "~400 cycles"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:8
+msgid "`DeviceBuffer`, `DeviceBox`"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:26
+msgid ""
+"The guiding principle: move frequently accessed data into faster, closer "
+"memory. Registers are fastest but per-thread; shared memory is fast and "
+"visible to the whole block; global memory is large but slow."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:34
+msgid ""
+"The CUDA memory hierarchy from fastest (registers, per-thread) to largest "
+"(global DRAM, all threads). Each tier trades capacity for latency. The right "
+"panel shows scope and the cuda-oxide API for each level."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:39
+msgid "Contexts and streams"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:41
+msgid ""
+"Before diving into memory APIs, two host-side concepts that appear in every "
+"code example need introduction: **contexts** and **streams**."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:44
+msgid ""
+"A **CUDA context** (`CudaContext`) binds the host thread to a specific GPU. "
+"It owns all resources on that device -- modules, streams, allocations. You "
+"typically create one at the start of your program:"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:48
+msgid ""
+"use cuda_core::CudaContext;\n"
+"\n"
+"let ctx = CudaContext::new(0).unwrap();   // bind to GPU 0\n"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:54
+msgid ""
+"A **CUDA stream** (`CudaStream`) is an ordered queue of GPU operations. "
+"Operations enqueued on the **same** stream execute in FIFO order -- each one "
+"sees all side effects of the preceding operations. Operations on "
+"**different** streams may overlap and run concurrently with no ordering "
+"guarantees between them."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:60
+msgid ""
+"let stream = ctx.default_stream();     // the implicit, always-available "
+"stream\n"
+"let work_stream = stream.fork()?;      // a new stream, joined to the "
+"parent's current position\n"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:65
+msgid ""
+"Every memory transfer and kernel launch requires a stream. For single-stream "
+"programs (which covers most examples in this book), the **default stream** "
+"is all you need -- everything is sequential and correct by construction. "
+"Multi-stream pipelines unlock overlap between compute and data movement, but "
+"require explicit synchronization via events or `join`:"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:71
+msgid ""
+"Same stream:       [kernel_A] → [memcpy_B] → [kernel_C]     (automatic "
+"ordering)\n"
+"Different streams: [kernel_A on stream 1] | [memcpy_B on stream 2]  "
+"(concurrent, needs events)\n"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:80
+msgid ""
+"Top: single-stream execution where operations are automatically ordered in "
+"FIFO. Bottom: multi-stream execution where streams A and B run concurrently, "
+"with an event establishing the data dependency between kernel_write and "
+"kernel_read."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:86
+msgid ""
+"The [Launching Kernels](launching-kernels.md) chapter covers stream usage in "
+"launch macros, and the [Async GPU Programming](../async-programming/the-"
+"device-operation-model.md) section covers `DeviceOperation` which manages "
+"streams automatically."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:91
+msgid "`DeviceBuffer` -- host/device transfers"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:93
+msgid ""
+"`DeviceBuffer<T>` in `cuda_core` is the primary way to allocate device "
+"memory and move data between host and GPU:"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:96
+msgid ""
+"use cuda_core::{CudaContext, DeviceBuffer};\n"
+"\n"
+"let ctx = CudaContext::new(0).unwrap();\n"
+"let stream = ctx.default_stream();\n"
+"\n"
+"// Host → device: copy a host slice to GPU memory\n"
+"let a_dev = DeviceBuffer::from_host(&stream, &host_data).unwrap();\n"
+"\n"
+"// Allocate zeroed device memory\n"
+"let mut c_dev = DeviceBuffer::<f32>::zeroed(&stream, 1024).unwrap();\n"
+"\n"
+"// Device → host: read results back\n"
+"let results = c_dev.to_host_vec(&stream).unwrap();\n"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:112
+msgid "Key methods"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:85
+msgid "Method"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:85
+msgid "Direction"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:85
+msgid "Description"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:85
+msgid "`from_host(&stream, &[T])`"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:85
+msgid "Host → Device"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:85
+msgid "Allocate + blocking copy"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:85
+msgid "`zeroed(&stream, len)`"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:85
+msgid "--"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:85
+msgid "Allocate + zero-fill"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:85
+msgid "`to_host_vec(&stream)`"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:85
+msgid "Device → Host"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:85
+msgid "Async copy + return `Vec<T>`"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:85
+msgid "`copy_to_host(&stream, &mut [T])`"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:85
+msgid "Copy into existing slice"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:85
+msgid "`cu_deviceptr()`"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:85
+msgid "Raw `CUdeviceptr` for FFI"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:122
+msgid "Ownership and drop"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:124
+msgid ""
+"`DeviceBuffer` frees its allocation **synchronously** on drop via "
+"`cuMemFree`. This is a blocking driver call -- it internally synchronizes "
+"the entire device to ensure no in-flight kernel is still touching the "
+"memory. In practice, this means:"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:129
+msgid ""
+"**Dropping while a kernel is running** will stall the host thread until the "
+"GPU is completely idle, then free the memory."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:131
+msgid ""
+"**Dropping after synchronization** (e.g., after `to_host_vec` or `stream."
+"synchronize()`) has no additional cost because the device is already idle."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:135
+msgid ""
+"For single-stream workloads this is fine -- everything executes in FIFO "
+"order, so by the time you read results back, all kernels are done and the "
+"free is instant. The cost becomes visible in multi-stream scenarios where "
+"you want to overlap compute with memory operations; a synchronous free on "
+"one stream can stall work on all other streams."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:141
+msgid "`DeviceBox` -- async-friendly device memory"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:143
+msgid ""
+"`DeviceBox<T>` in `cuda_async` solves the synchronous-free problem. On drop, "
+"it frees memory via `cuMemFreeAsync` on a **dedicated deallocator stream**. "
+"This is a stream-ordered operation -- the free is enqueued on the "
+"deallocator stream and executes only after all preceding work on that stream "
+"completes. Critically, it does **not** synchronize the device:"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:149
+msgid ""
+"use cuda_async::device_box::DeviceBox;\n"
+"use cuda_async::device_context::init_device_contexts;\n"
+"\n"
+"init_device_contexts(0, 1)?;  // Initialize device context map (default "
+"device 0)\n"
+"\n"
+"// DeviceBox wraps a device pointer; freed asynchronously on drop\n"
+"let dev_ptr: DeviceBox<f32> = /* allocated by DeviceOperation chain */;\n"
+"// When dev_ptr is dropped, cuMemFreeAsync is called on the deallocator "
+"stream.\n"
+"// Other streams continue running without stalling.\n"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:161
+msgid "Choosing between them"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:85
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "`DeviceBuffer`"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:85
+msgid "`DeviceBox`"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:85
+msgid "**Crate**"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:85
+msgid "`cuda_core`"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:85
+msgid "`cuda_async`"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:85
+msgid "**Free on drop**"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:85
+msgid "`cuMemFree` (sync -- stalls device)"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:85
+msgid "`cuMemFreeAsync` (async -- no stall)"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:85
+msgid "**Use with**"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:85
+msgid "typed sync launches"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:85
+msgid "typed async launches"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:85
+msgid "**Host readback**"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:85
+msgid "`to_host_vec()`"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:85
+msgid "Via explicit memcpy operation"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:85
+msgid "**Best for**"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:85
+msgid "Single-stream, blocking workloads"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:85
+msgid "Multi-stream, pipelined workloads"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:172
+msgid ""
+"For latency-sensitive teardown in multi-stream pipelines, prefer "
+"`DeviceBox`. For straightforward single-stream examples, `DeviceBuffer` is "
+"simpler and the synchronous free is effectively zero-cost."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:179
+msgid "Argument scalarization"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:181
+msgid ""
+"When you write a kernel that takes `&[f32]`, the host and device don't agree "
+"on how to represent a Rust slice in memory -- the struct layout can differ "
+"between the host's x86 ABI and the NVPTX ABI. cuda-oxide solves this by "
+"**scalarizing** aggregate types at the kernel boundary: decomposing them "
+"into primitive values that both sides interpret identically."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:171
+msgid "Kernel parameter type"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:171
+msgid "What the host actually passes"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:171
+msgid "`&[T]`"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:171
+msgid "`ptr: *const T` + `len: u64`"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:171
+msgid "`DisjointSlice<T>`"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:171
+msgid "`ptr: *mut T` + `len: u64`"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:171
+msgid "`T` (scalar)"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:171
+msgid "`T` directly"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:171
+msgid "Struct `{ a: u32, b: f32 }`"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:171
+msgid "One byval value (whole struct)"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:171
+msgid "Closure (with N captures)"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:171
+msgid "Zero-sized types"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:171
+msgid "Stripped entirely"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:196
+msgid ""
+"This is why typed `#[cuda_module]` methods accept `&DeviceBuffer<T>` for "
+"`&[T]` and `&mut DeviceBuffer<T>` for writable slice-like parameters. The "
+"generated method extracts the pointer and length for you. Inside the kernel, "
+"the compiler reconstitutes the slice struct from the scalar parameters, so "
+"your kernel code sees normal `&[T]` types."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:206
+msgid ""
+"Argument scalarization: the host passes Rust slices as (ptr, len) pairs "
+"through the ABI boundary. The device kernel receives flat scalar parameters "
+"and the compiler reconstitutes the original Rust types inside the kernel."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:212
+msgid ""
+"Scalarization is completely invisible in normal kernel code. You write "
+"`&[f32]` in the signature and use it as a regular slice. The generated "
+"launch method and the compiler handle everything else."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:217
+msgid "`DisjointSlice` -- safe parallel writes"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:219
+msgid ""
+"In CUDA C++, the standard pattern for parallel output is a raw `__global__` "
+"pointer that every thread indexes into. This is inherently unsafe -- nothing "
+"prevents two threads from writing to the same location."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:223
+msgid ""
+"cuda-oxide provides `DisjointSlice<T, IndexSpace>` as a safe alternative. It "
+"wraps a mutable slice and only allows writes through a `ThreadIndex` whose "
+"`IndexSpace` matches its own. Combined with matching prepared launch "
+"geometry, this ensures each thread accesses a unique element:"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:228
+msgid ""
+"use cuda_device::{kernel, DisjointSlice};\n"
+"\n"
+"#[kernel]\n"
+"pub fn double(input: &[f32], mut out: DisjointSlice<f32>) {\n"
+"    if let Some((out_elem, idx)) = out.get_mut_indexed() {\n"
+"        *out_elem = input[idx.get()] * 2.0;\n"
+"    }\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:239
+msgid ""
+"`get_mut_indexed()` is the one-call form: it mints the per-thread witness "
+"and resolves it to a `&mut T` in a single shot. `None` covers both out-of-"
+"grid threads (e.g. `col >= ROW_STRIDE` for 2D) and out-of-slice indices."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:243
+msgid ""
+"The explicit two-step form `let idx = thread::index_1d(); out.get_mut(idx)` "
+"is also available when you need the index for parallel arithmetic across "
+"multiple slices."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:246
+msgid ""
+"For patterns like reductions where multiple threads intentionally write to "
+"the same location, `get_unchecked_mut` (unsafe) provides an escape hatch."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:250
+msgid "Why `ThreadIndex` makes this safe"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:252
+msgid ""
+"The key to `DisjointSlice`'s safety is `ThreadIndex<'kernel, IndexSpace>` -- "
+"an opaque witness with no public constructor. The only way to obtain one is "
+"through trusted index functions that derive the value from hardware built-in "
+"variables (`threadIdx`, `blockIdx`, `blockDim`):"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:257
+msgid ""
+"let idx = thread::index_1d();          // ThreadIndex<'_, Index1D> -- ok\n"
+"let bad = ThreadIndex::new(42);        // does not exist -- private "
+"constructor\n"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:262
+msgid ""
+"This works because CUDA's thread indices are **uniform values provided by "
+"the hardware**: every thread in a block receives a unique `threadIdx` from "
+"the GPU's warp scheduler. For 1D grid launches (where only the x dimension "
+"is used), the global index derived from `blockIdx.x * blockDim.x + threadIdx."
+"x` is unique across the entire grid."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:268
+msgid ""
+"That last statement is conditional: `index_1d()` ignores Y and Z. A 2D grid "
+"would repeat the same X-derived index for every Y coordinate."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:271
+msgid ""
+"PreparedLaunch(domain=1) -> Y/Z inactive -> safe DisjointSlice writes\n"
+"raw LaunchConfig         -> caller proves Y/Z inactive -> unsafe launch\n"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:276
+msgid ""
+"The witness proves the device-side index space; the prepared launch proves "
+"the host-side geometry. Both are needed for a fully safe launch."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:279
+msgid ""
+"The witness is also `!Send + !Sync + !Copy + !Clone`, and its `'kernel` "
+"lifetime is borrowed from a stack-local scope the macros inject -- so a "
+"thread can't park its `ThreadIndex` in shared memory for a neighbour to pick "
+"up later, and the witness can't outlive the kernel body. Combine that with "
+"the `IndexSpace` parameter (`Index1D`, `Index2D<S>`, `Runtime2DIndex`) and "
+"the type system rejects mismatched 2D strides at compile time too -- a data-"
+"race hazard becomes a type error."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:287
+msgid "Shared memory"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:289
+msgid ""
+"**Shared memory** is fast on-chip memory visible to all threads within a "
+"block. It is the primary tool for inter-thread communication and data reuse "
+"within a block, sitting between registers (per-thread) and global memory "
+"(all threads) in both speed and scope."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:294
+msgid "Static shared memory -- `SharedArray`"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:296
+msgid "When the size is known at compile time, use `SharedArray<T, N>`:"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:298
+msgid ""
+"use cuda_device::{kernel, thread, SharedArray, DisjointSlice};\n"
+"\n"
+"static mut TILE: SharedArray<f32, 256> = SharedArray::UNINIT;\n"
+"\n"
+"#[kernel]\n"
+"pub fn smem_example(input: &[f32], mut out: DisjointSlice<f32>) {\n"
+"    let idx = thread::index_1d();\n"
+"    let tid = thread::threadIdx_x() as usize;\n"
+"\n"
+"    // Load from global to shared\n"
+"    unsafe { TILE[tid] = input[idx.get()]; }\n"
+"    thread::sync_threads();\n"
+"\n"
+"    // Read neighbor from shared (much faster than global)\n"
+"    let neighbor = if tid > 0 {\n"
+"        unsafe { TILE[tid - 1] }\n"
+"    } else {\n"
+"        0.0\n"
+"    };\n"
+"    thread::sync_threads();\n"
+"\n"
+"    if let Some(out_elem) = out.get_mut(idx) {\n"
+"        *out_elem = unsafe { TILE[tid] } + neighbor;\n"
+"    }\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:326
+msgid ""
+"Each `static mut SharedArray` maps to a separate `.shared` allocation in "
+"PTX. The `sync_threads()` barrier ensures all threads have finished writing "
+"before any thread reads."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:330
+msgid "Dynamic shared memory -- `DynamicSharedArray`"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:332
+msgid ""
+"When the size depends on runtime parameters, use `DynamicSharedArray<T>` and "
+"specify the allocation size via `LaunchConfig::shared_mem_bytes`:"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:335
+msgid ""
+"use cuda_device::{kernel, thread, DynamicSharedArray, DisjointSlice};\n"
+"\n"
+"#[kernel]\n"
+"pub fn dynamic_smem_example(input: &[f32], mut out: DisjointSlice<f32>) {\n"
+"    let smem = DynamicSharedArray::<f32>::get();\n"
+"    let tid = thread::threadIdx_x() as usize;\n"
+"\n"
+"    unsafe { *smem.add(tid) = input[thread::index_1d().get()]; }\n"
+"    thread::sync_threads();\n"
+"    // ... use smem ...\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:349
+msgid "On the host, set the size at launch:"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:351
+msgid ""
+"let config = LaunchConfig {\n"
+"    grid_dim: (num_blocks, 1, 1),\n"
+"    block_dim: (256, 1, 1),\n"
+"    shared_mem_bytes: 256 * std::mem::size_of::<f32>() as u32,\n"
+"};\n"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:359
+msgid ""
+"Multiple dynamic arrays can share the same allocation by using "
+"`DynamicSharedArray::offset(byte_offset)` to partition it."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:362
+msgid "Alignment"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:211
+msgid "Type"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:211
+msgid "Default alignment"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:211
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "Notes"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:211
+msgid "`SharedArray<T, N>`"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:211
+msgid "`align_of::<T>()`"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:211
+msgid "Standard alignment"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:211
+msgid "`SharedArray<T, N, 128>`"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:211
+msgid "128 bytes"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:211
+msgid "Required for TMA operations"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:211
+msgid "`DynamicSharedArray<T>`"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:211
+msgid "16 bytes"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:211
+msgid "nvcc-compatible default"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:211
+msgid "`DynamicSharedArray<T, 128>`"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:211
+msgid "Required for TMA"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:371
+msgid "Common pitfalls"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:373
+msgid ""
+"**Missing `sync_threads()`:** Without a barrier between shared memory writes "
+"and reads, threads may read stale or uninitialized data."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:375
+msgid ""
+"**Exceeding SM limits:** Requesting too much shared memory causes "
+"`CUDA_ERROR_LAUNCH_OUT_OF_RESOURCES`. Check your architecture's limit."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:379
+msgid ""
+"[CUDA Programming Guide -- Shared Memory](https://docs.nvidia.com/cuda/cuda-"
+"programming-guide/#shared-memory) for details on bank conflicts, "
+"broadcasting, and optimal access patterns."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:383
+msgid "Unified memory and HMM"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:385
+msgid ""
+"By default, GPUs operate in a **separate address space** from the CPU. A GPU "
+"cannot dereference an ordinary host pointer -- the address simply doesn't "
+"map to anything in the GPU's page tables. The traditional CUDA workflow "
+"therefore requires explicit allocation in device memory followed by explicit "
+"copies:"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:390
+msgid ""
+"┌──────────────────┐              ┌──────────────────┐\n"
+"│   CPU Memory     │    PCIe /    │   GPU Memory     │\n"
+"│   (host DRAM)    │◄────────────►│   (device HBM)   │\n"
+"│                  │   NVLink     │                  │\n"
+"└──────────────────┘    copy      └──────────────────┘\n"
+"   Separate address spaces -- GPU cannot dereference host pointers\n"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:399
+msgid ""
+"CUDA provides mechanisms that relax this restriction by letting the GPU "
+"access host memory transparently, at the cost of page-fault latency on first "
+"access."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:402
+msgid "Memory access modes at a glance"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "Mode"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "What GPU can access"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "Allocation required"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "First-access cost"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "Hardware requirement"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "**Explicit copy**"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "Device memory only"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "None (data copied upfront)"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "Any CUDA GPU"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "**Pinned (mapped)**"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "Specific host buffers"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "`cudaHostAlloc`"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "High (~10--20 µs per access)"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "**Unified Memory**"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "Managed allocations"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "`cudaMallocManaged`"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "Medium (page migration)"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "Kepler+ (sm_30+)"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "**HMM**"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "*Any* host memory"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "None"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "Medium (page fault + fetch)"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "Turing+ on Linux"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:411
+msgid ""
+"cuda-oxide primarily uses **explicit copies** (`DeviceBuffer`, `DeviceBox`) "
+"for bulk data and **HMM** for non-move closure captures and small "
+"configuration data."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:415
+msgid "Unified Memory"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:417
+msgid ""
+"Unified Memory is CUDA's managed-memory allocator (`cudaMallocManaged`). The "
+"resulting pointer is valid on both the CPU and GPU -- the CUDA runtime "
+"tracks which processor \"owns\" each page and migrates it on demand. When "
+"the GPU accesses a page that currently resides in host DRAM, the runtime "
+"transparently copies it to device memory before the kernel reads the data. "
+"This migration is invisible to your code but not free: the first access from "
+"the \"wrong\" side incurs a page fault and a DMA transfer over the "
+"interconnect. Subsequent accesses to the same page hit the GPU's local cache."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:426
+msgid ""
+"cuda-oxide does not currently wrap `cudaMallocManaged` directly. For "
+"managed- memory workflows you would use the CUDA driver API through raw "
+"bindings. In practice, `DeviceBuffer::from_host` (explicit copy) covers most "
+"use cases and gives predictable performance."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:431
+msgid "HMM (Heterogeneous Memory Management)"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:433
+msgid ""
+"HMM is a Linux kernel feature that extends Unified Memory's demand-paging "
+"model to **all system memory** -- heap allocations, `mmap` regions, and even "
+"stack variables. With HMM enabled, the GPU can dereference any valid host "
+"pointer without a special CUDA allocator:"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:438
+msgid ""
+"let factor = 5i32;                           // ordinary stack variable\n"
+"let scale = |x: i32| x * factor;            // captures &factor (non-move)\n"
+"// SAFETY: args match the kernel's signature; &factor stays alive via HMM.\n"
+"unsafe { cuda_launch! { kernel: scale, args: [...] } }  // GPU reads &factor "
+"via HMM\n"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:445
+msgid ""
+"Unlike Unified Memory, HMM requires no special allocation API -- the pointer "
+"is a plain host address. When ATS (Address Translation Services) is "
+"available on hardware-coherent platforms like Grace Hopper, it supersedes "
+"HMM and provides hardware coherence at cache-line granularity; HMM is "
+"automatically disabled."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:450
+msgid "What happens on a page fault"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:452
+msgid ""
+"When a kernel loads from an address whose page is not resident in device "
+"memory, the hardware and driver cooperate to fetch it:"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:455
+msgid "The SM executes a global load (`ld.global`) for a virtual address."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:456
+msgid ""
+"The **GPU MMU** looks up the address in the TLB. On a miss, it walks the "
+"device page table."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:458
+msgid ""
+"If the page table has no mapping, the GPU raises a **page fault**. The "
+"faulting warp stalls; other warps on the same SM can continue."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:460
+msgid "The **CUDA driver fault handler** determines the source of the page:"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:461
+msgid ""
+"*Unified Memory* -- the CUDA runtime identifies the managed allocation and "
+"initiates migration."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:463
+msgid ""
+"*HMM* -- the Linux kernel's HMM layer resolves the host virtual address, "
+"pins the host page, and either migrates it or creates a remote mapping."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:465
+msgid ""
+"A **DMA transfer** over PCIe or NVLink copies the page from host DRAM to "
+"device HBM. The GPU memory controller writes the data; the host memory "
+"controller services the read."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:468
+msgid ""
+"The GPU page table is updated, the TLB is refilled, and the **warp "
+"resumes**. The page is now local and cached in L2; subsequent accesses cost "
+"only hundreds of cycles."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:472
+msgid "The latency of step 5 depends on the interconnect:"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "Interconnect"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "Bandwidth"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "Fault latency"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "PCIe 4.0 x16"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "~25 GB/s"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "~10--20 µs"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "Most desktop / workstation GPUs"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "PCIe 5.0 x16"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "~50 GB/s"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "~5--15 µs"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "Ada Lovelace + newer platforms"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "NVLink 4.0"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "~900 GB/s"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "~1--5 µs"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "Data-center GPUs (H100, B100)"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "Grace Hopper C2C"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "<1 µs"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "Hardware coherent -- uses ATS, not HMM"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:481
+msgid ""
+"Because faults operate at page granularity (4 KB or 2 MB), a single fault "
+"can satisfy many threads. Warp-level coalescing also helps: 32 threads "
+"reading consecutive 4-byte elements touch at most one or two pages, not 32. "
+"On PCIe systems, a single fault costs roughly the same as a small "
+"`cudaMemcpy` -- the advantage of demand paging is that you only pay for the "
+"pages you actually touch."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:488
+msgid "How cuda-oxide uses HMM"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:490
+msgid "cuda-oxide leverages HMM in two ways:"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:492
+msgid ""
+"**Non-move closure captures.** When a non-`move` closure is passed to a "
+"kernel, captured variables remain on the host stack and the GPU accesses "
+"them through HMM pointers. This avoids copying data that the kernel only "
+"reads once or infrequently."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:497
+msgid ""
+"**Struct ABI with dynamic layout.** cuda-oxide matches Rust's actual struct "
+"layout (including `#[repr(Rust)]` field reordering) on the device side, so "
+"HMM-accessed host structs are read correctly without `#[repr(C)]` or manual "
+"layout specification. The compiler queries `rustc` for field offsets and "
+"builds matching LLVM struct types with explicit padding."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:503
+msgid "HMM system requirements"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "Requirement"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "Minimum"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "GPU architecture"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "Turing (compute capability 7.5+)"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "Linux kernel"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "6.1.24+, 6.2.11+, or 6.3+"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "CUDA driver"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "535+ with Open Kernel Modules"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:511
+msgid "Check whether HMM is active on your system:"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:513
+msgid ""
+"nvidia-smi -q | grep Addressing\n"
+"# Addressing Mode : HMM  ← HMM is enabled\n"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:518
+msgid "When to use HMM vs explicit copies"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "Scenario"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "Recommended approach"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "Large arrays processed by many threads"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "`DeviceBuffer::from_host` (explicit copy)"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "Small read-only configuration data"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "HMM (pass pointer, let GPU page-fault)"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "Data shared between CPU and GPU iteratively"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "Explicit copies with double-buffering"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "Prototyping / quick experiments"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:378
+msgid "HMM (simplest -- no copies needed)"
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:528
+msgid ""
+"HMM is a convenience, not a performance strategy. For bandwidth-sensitive "
+"kernels, explicit copies to device memory will always be faster because they "
+"avoid page-fault overhead and use the full memory bus width."
+msgstr ""
+
+#: ../../../gpu-programming/memory-and-data-movement.md:534
+msgid ""
+"[CUDA Programming Guide -- Unified Memory](https://docs.nvidia.com/cuda/cuda-"
+"programming-guide/04-special-topics/unified-memory.html) and [NVIDIA Blog -- "
+"Simplifying GPU Development with HMM](https://developer.nvidia.com/blog/"
+"simplifying-gpu-application-development-with-heterogeneous-memory-"
+"management/) for the full details on page migration, prefetching, and system "
+"requirements."
+msgstr ""

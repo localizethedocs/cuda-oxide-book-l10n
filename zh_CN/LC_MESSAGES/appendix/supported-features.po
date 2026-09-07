@@ -1,0 +1,1061 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025-2026, NVIDIA Corporation
+# This file is distributed under the same license as the cuda-oxide package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: cuda-oxide \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-16 12:33+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../../appendix/supported-features.md:1
+msgid "Supported Features"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:3
+msgid ""
+"This appendix presents the cuda-oxide feature matrix: every compiler "
+"capability, runtime API, and hardware feature along with its current support "
+"status. The data is drawn from the compiler/runtime sources and the test "
+"suite."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:7
+msgid ""
+"**Legend:** **Full** = tested and working, **Partial** = ships and works but "
+"has a known gap (called out in the row description), **Planned** = on the "
+"roadmap, **N/A** = not applicable or no identified need."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:13
+msgid "Compiler: Memory Model"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Feature"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Status"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Description"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "HMM / Unified Memory Management"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "**Full**"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"GPU directly reads/writes host memory without `cudaMemcpy`. Reference "
+"captures in closures leverage HMM for host pointer access. Requires Turing+ "
+"GPU, Linux 6.1.24+, CUDA 12.2+."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Unified Struct ABI (no `#[repr(C)]`)"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Device struct layout matches host exactly. The compiler queries rustc's "
+"actual layout and reproduces it with explicit padding in LLVM IR. Works with "
+"`#[repr(Rust)]` default."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Dynamic Layout Matching"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Compiler queries rustc's `fields_by_offset_order()` and byte offsets, builds "
+"LLVM structs with correct field order and explicit padding bytes. "
+"Independent of LLVM's datalayout."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Pointer Distance (`offset_from`)"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"`ptr_offset_from` / `ptr_offset_from_unsigned` intrinsics (and the "
+"`offset_from`, `offset_from_unsigned`, `byte_offset_from`, "
+"`byte_offset_from_unsigned` methods) lower to an address difference divided "
+"by the rustc-reported pointee size, returning `isize` (signed) or `usize` "
+"(unsigned). Errors on a zero-sized pointee."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Volatile Load/Store"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"`core::ptr::read_volatile` / `write_volatile` carry an explicit volatile bit "
+"through MIR import, mem2reg (volatile accesses are never promoted), MIR-to-"
+"LLVM lowering, and textual export (`load volatile` / `store volatile`). "
+"Emits `ld.volatile` / `st.volatile` in PTX."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Bulk Copy (`copy_nonoverlapping`)"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"`core::ptr::copy_nonoverlapping` lowers to a `mir.memcpy` op and then `llvm."
+"memcpy`, with the element count scaled to bytes for the pointee. The "
+"intrinsic overload suffix is derived from the operand address spaces and "
+"length width."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:24
+msgid "Compiler: Type System"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Generics and Monomorphization"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Generic kernels and device functions with trait bounds. Monomorphized "
+"instances collected from rustc MIR. Const generics supported."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Enums (`Option<T>`, `Result<T,E>`, custom)"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Full enum support including discriminant extraction and payload access. "
+"Pattern matching on enums works."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Struct Construction and Field Access"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Struct literals, field access, pass-by-value and return values. User-defined "
+"structs supported without annotations."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Array Types (`[T; N]`)"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Static construction, constant- and runtime-index access. Array value "
+"constants (bare and nested) materialized. Mutable arrays auto-promoted to "
+"memory-backed."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "`CuSimd<T, N>` SIMD Type"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Generic SIMD register type with named accessors (`x`/`y`/`z`/`w`), runtime "
+"and compile-time indexing, `to_array` conversion."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "ABI Scalarization"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Slices are scalarized at kernel boundaries (`&[T]` -> `(ptr, len)`, "
+"reconstructed inside the function). Structs and closures pass by value as "
+"one byval `.param`; field flattening still applies on internal device-to-"
+"device calls."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:35
+msgid ""
+"Array value constants are limited to primitive leaves (integers, `f16`, "
+"`f32`, `f64`) and nested arrays of those. Arrays whose elements are structs "
+"or other ADTs are not yet materialized as constants; they need layout-aware "
+"field decoding rather than the primitive byte-slicing rule."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:40
+msgid "Compiler: Closures"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Move Closures (`FnOnce`)"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Closures that capture by value. The whole closure struct is pushed as one "
+"byval kernel argument. `move |x| x * factor` pattern."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Reference Closures (`Fn`/`FnMut`)"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Non-move closures that capture by reference. The closure struct (containing "
+"host pointers) still travels as one byval argument; the GPU reads through "
+"those pointers via HMM."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Host-to-Device Closures"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Closures defined on host passed to generic kernels. Polynomial evaluation "
+"with captured coefficients tested."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Device-Internal Closures"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Closures created and used entirely on device, including closures passed to "
+"device functions."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:49
+msgid "Compiler: Control Flow"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Match Expressions (integer switch)"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Multi-way match on integers. Generates chain of conditional branches."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Match on Enums"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Pattern matching on `Option<T>` and custom enums. Discriminant extraction + "
+"payload access."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "For Loops (range, iterator, enumerate)"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Full iterator desugaring: range-based, `slice.iter()`, `enumerate()`, nested "
+"loops, `break`, `continue`."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "While Loops / If-Else"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Baseline control flow fully supported."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Break and Continue"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "`break` and `continue` in for/while loops, including early exit."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Loop Unroll Annotations"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "**Partial**"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"`#[unroll]` and `#[unroll(N)]` request unrolling of explicit counted `while` "
+"loops. Nested loops and multiple `continue` paths work; full unrolling "
+"preserves `break` paths and multiple exit targets, while partial unrolling "
+"requires a positive-step `<`/`<=` loop with an invariant limit and only the "
+"normal header exit. Requests are capped at 1,024 copies, 8,192 cloned "
+"blocks, and 65,536 cloned operations."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:60
+msgid "Compiler: Arithmetic and Casting"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "64-bit Arithmetic"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Full 64-bit integer arithmetic including shifts, bitwise ops, and descriptor "
+"field packing."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Type Casting (all kinds)"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"IntToInt, IntToFloat, FloatToInt, FloatToFloat, Transmute (bitcast), "
+"PtrToPtr, PtrToInt, IntToPtr, pointer coercions."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Packed bf16x2 FMA"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"`bf16x2::fma_bf16x2(a, b, c)` lowers to PTX `fma.rn.bf16x2`, two bf16 lanes "
+"per `u32`. sm_80+."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:68
+msgid "Compiler: Interop"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Bi-directional LTOIR Support"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Rust kernels call CUDA C++ device functions **and** C++ calls Rust device "
+"functions. Via NVVM IR → libNVVM → LTOIR → nvJitLink."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Device FFI (`extern \"C\"`)"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"`#[device] extern \"C\" { fn ... }` declarations for external LTOIR "
+"functions. CUB/CCCL integration demonstrated."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "MathDx FFI (cuFFTDx / cuBLASDx)"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"cuFFTDx (8/16/32-point thread-level FFT), cuBLASDx (32x32x32 block-level "
+"GEMM) via LTOIR."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Tile interop"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "**Experimental**"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Inter-kernel interop works today: a [cutile-rs Tile kernel](https://github."
+"com/NVlabs/cutile-rs) and a cuda-oxide SIMT PTX kernel can run in one host "
+"process on the same CUDA stream over shared device tensors. Intra-kernel "
+"Tile interop is work in progress and tracked in [#96](https://github.com/"
+"NVlabs/cuda-oxide/issues/96)."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Cross-Crate Kernels"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Kernels and device functions defined in library crates with monomorphization "
+"at the binary crate use site."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:78
+msgid "Compiler: Functions"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "`#[kernel]` Attribute"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Marks functions as GPU kernel entry points (`ptx_kernel` calling "
+"convention). Multiple kernels per file."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "`#[device]` Helper Functions"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Device-side helper functions callable from kernels. `#[inline(always)]` is "
+"preserved as the LLVM `alwaysinline` attribute (emitted alongside the "
+"convergent group and any `!dbg` scope), so `opt` honors the inline intent."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Standalone `#[device]` Functions"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Device functions compiled without any kernel present. Clean export names for "
+"C++ consumption."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Multi-Kernel Modules"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Multiple `#[kernel]` functions in a single source file compile to a single "
+"PTX module."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:87
+msgid "Compiler: Compilation Pipeline"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Unified Single-Source Compilation"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Host and device code in the same file. Custom rustc codegen backend "
+"intercepts codegen. No `#[cfg]` needed."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "PTX Output"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Default output: Rust MIR → `dialect-mir` → `mem2reg` → annotated loop unroll "
+"→ LLVM dialect → LLVM IR → `llc` → PTX. Targets sm_80 through sm_100a."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "NVVM IR Output"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Selects LLVM 7 typed-pointer syntax for pre-Blackwell GPUs and opaque-"
+"pointer syntax for Blackwell and newer GPUs. The generated module is "
+"verified by libNVVM, and unsupported legacy operations produce a compile "
+"error."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "LTOIR Linking"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Device-side LTO via libNVVM and nvJitLink."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Float Math Intrinsics (libdevice)"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Rust `f32`/`f64` math methods (`sin`, `cos`, `exp`, `pow`, `sqrt`, ...) "
+"lower to CUDA libdevice (`__nv_*`) on pre-Blackwell and Blackwell GPUs. cuda-"
+"oxide selects the matching NVVM IR syntax automatically. On Blackwell, the "
+"runtime can also JIT PTX produced from a standard pre-Blackwell target such "
+"as `sm_86`."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Pipeline Inspection"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"`cargo oxide pipeline <example>` shows imported and post-`mem2reg` MIR, LLVM "
+"dialect, exported LLVM IR, and PTX."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Compute Sanitizer Wrapper"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"`cargo oxide sanitize <example>` builds the example and runs the host binary "
+"under NVIDIA Compute Sanitizer (`memcheck`, `racecheck`, `initcheck`, or "
+"`synccheck`)."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "cuda-gdb Source Debugging"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"`cargo oxide debug` builds device debug information on the PTX path and "
+"launches `cuda-gdb`. Legacy NVVM IR does not yet support debug metadata."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "cuda-gdb Local / Argument Inspection"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"`CUDA_OXIDE_DEBUG=full` is a `-G`-style build (optimization off, locals kept "
+"in memory) so `info args`/`info locals` show real values for scalars, "
+"pointers/references, and structs/tuples/arrays with their fields. Enums, ABI-"
+"split bare slices, closures, and projections (`x.0`) are not yet described."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:101
+msgid "Compiler: Inline PTX"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "`ptx_asm!` Macro"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"CUDA inline PTX with `%0` operands, `in`, zero or one `out`, up to 16 "
+"inputs, CUDA register constraints `h`, `r`, `l`, `q`, `f`, and `d`, "
+"immediate integer constraint `n`, `clobber(\"memory\")`, and "
+"`options(register_only)` for pure register snippets. By default, snippets "
+"are treated as side-effecting and stay inside their current control flow. "
+"Use `options(register_only, may_diverge)` only for pure snippets that are "
+"safe to move across divergent control flow; **never** use it for `.sync` "
+"instructions or collectives. Multiple outputs, read-write operands, and the "
+"`\"C\"` constraint are not implemented yet."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:109
+msgid "Runtime Library: Safety"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "`DisjointSlice<T, IndexSpace>`"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Bounds-checked parallel write output slice. `IndexSpace` rejects mismatched "
+"layouts; uniqueness also requires matching prepared launch geometry (or a "
+"raw unsafe proof)."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "`ThreadIndex<'kernel, IndexSpace>`"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Opaque, non-transferable witness. `index_1d` uniqueness requires inactive Y/"
+"Z dimensions, proven by a `domain = 1` prepared launch or by the caller of a "
+"raw unsafe launch."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "`PreparedLaunch<K>`"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Checked, reusable launch geometry branded for the exact kernel. Raw "
+"`LaunchConfig` generated methods are unsafe."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "`ManagedBarrier` Typestate"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Compile-time barrier lifecycle: `Uninit → Ready → Invalidated`. Invalid "
+"transitions are compile errors."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:118
+msgid "Runtime Library: Atomics"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Device-Scope Atomics"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"`DeviceAtomic{U32,I32,U64,I64,F32,F64}` with `.gpu` scope. All 5 orderings."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Block-Scope Atomics"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "`BlockAtomic{U32,I32,U64,I64,F32,F64}` with `.cta` scope."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "System-Scope Atomics"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"`SystemAtomic{U32,I32,U64,I64,F32,F64}` with `.sys` scope. For CPU-GPU "
+"shared data."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "`core::sync::atomic` Support"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Standard library atomic types lowered to PTX `atom.sys` instructions."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:127
+msgid "Runtime Library: Shared Memory"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Static Shared Memory"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"`SharedArray<T, N, ALIGN>` — compile-time sized, block-scoped. Optional "
+"alignment up to 256B."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Dynamic Shared Memory"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"`DynamicSharedArray<T, ALIGN>` — runtime-sized, set via `LaunchConfig::"
+"shared_mem_bytes`."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Distributed Shared Memory (DSMEM)"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Direct access to other blocks' shared memory within a cluster. "
+"`map_shared_rank()` for address mapping. sm_90+."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:135
+msgid "Runtime Library: Thread and Synchronization"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Thread/Block/Grid Intrinsics"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"`threadIdx`, `blockIdx`, `blockDim`, `gridDim`. Index witnesses are layout-"
+"typed; their uniqueness also depends on matching launch dimensionality. "
+"`index_2d_runtime(s)` adds a caller-proved stride. See [The Safety Model](../"
+"gpu-safety/the-safety-model.md)."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Block Synchronization"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "`sync_threads()` — thread block barrier."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Async Barriers (mbarrier)"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Hardware async barriers for Hopper+: init, arrive, test_wait, try_wait, "
+"inval."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Cluster Synchronization"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "`cluster_sync()` for all blocks in a cluster. sm_90+."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Fence Operations"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "`fence_proxy_async_shared_cta()` for TMA visibility, `nanosleep(ns)`."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:145
+msgid "Runtime Library: Warp"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Warp Shuffle Operations"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"`shuffle`, `shuffle_xor`, `shuffle_down`, `shuffle_up` for `i32` and `f32`."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Warp Vote Operations"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "`all(pred)`, `any(pred)`, `ballot(pred)` → bitmask."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Lane/Warp ID"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "`lane_id()` (0–31), `warp_id()`. Direct register reads."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:153
+msgid "Runtime Library: Cooperative Groups"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Typed Group Handles"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"`Grid`, `Cluster`, `ThreadBlock`, `WarpTile<N>` (N ∈ {1,2,4,8,16,32}), "
+"`CoalescedThreads`."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Group Universal API"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "`size()`, `thread_rank()`, `sync()` on every group handle."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Warp Tile Partitioning"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"`ThreadBlock::tiled_partition::<N>()` carves a sub-warp `WarpTile<N>`. "
+"`coalesced_threads()` materialises the active-lane group."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Warp Collectives"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"`ballot`, `all`, `any`, `shfl`, `shfl_xor`, `shfl_down`, `shfl_up` (`i32` "
+"and `f32`); `match_any` / `match_all` (`i32` and `i64`); `active_mask`."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Warp Reductions / Scans"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"`warp_reduce`, `warp_scan` (inclusive). `Sum`/`Min`/`Max` for `u32`/`i32`/"
+"`f32`; `BitAnd`/`BitOr`/`BitXor` for `u32`."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Block Reductions / Scans"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"`block_reduce`, `block_scan` (inclusive). Const-generic over `NUM_WARPS`; "
+"same op/type matrix as warp variants; uses `__shared__` scratch."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Cooperative Kernel Launch"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"`#[cooperative_launch]` on a `#[cuda_module]` kernel (or `unsafe "
+"{ cuda_launch! { cooperative: true, ... } }`) enables `Grid::sync()` for "
+"grid-wide barriers."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:165
+msgid "Runtime Library: Debug"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "`gpu_printf!` Macro"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Formatted GPU output with full format specifier support. Lowers to `vprintf`."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "`gpu_assert!` Macro"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Runtime GPU assertion. Calls `trap()` if condition is false."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Debug Intrinsics"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"`clock()`, `clock64()`, `trap()`, `breakpoint()`, `prof_trigger::<N>()`."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:173
+msgid "Runtime Library: Kernel Launch"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "`#[cuda_module]` Typed Launch"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Embedded module loading with typed sync/async arguments. Raw configuration "
+"methods are unsafe."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "`#[launch_contract]` / `PreparedLaunch<K>`"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Checked dimensionality, exact block shape, resources, capabilities, context, "
+"and kernel identity."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "`cuda_launch!` Macro"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Unsafe lower-level launch for runtime-loaded modules; requires `unsafe { }`."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "`cuda_launch_async!` Macro"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Unsafe lower-level lazy launch; requires `unsafe { }`."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "`#[launch_bounds]`"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Occupancy hints: max threads per block, min blocks per SM."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "`#[cluster_launch]`"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Compile-time cluster dimensions. Emits `.reqnctapercluster` in PTX."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:184
+msgid "Runtime Library: TMA"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "TMA Bulk Tensor Copy (1D–5D)"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "`cp_async_bulk_tensor_{1..5}d_g2s`. 128-byte TMA descriptors. sm_90+."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "TMA Multicast"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Single TMA load broadcast to all CTAs in cluster. sm_100a for full multicast."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "TMA Commit/Wait Groups"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"`cp_async_bulk_commit_group`, `cp_async_bulk_wait_group` for async "
+"completion tracking."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:194
+msgid "Not Yet Implemented"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Notes"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Rust `asm!` macro"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "**Planned**"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Use `ptx_asm!` for CUDA inline PTX. Direct lowering of Rust MIR `InlineAsm` "
+"is not implemented."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "FP8 / MX Data Types"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Roadmap item for Blackwell. No architectural limitation."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Dynamic Dispatch (`dyn Trait`)"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "**N/A**"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Use generics with static dispatch. Haven't found a real need for this."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Heap Allocation (`Box`, `Vec`)"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"CUDA has a device-side heap (`malloc`/`free` in kernels), and the compiler "
+"allows the `alloc` crate through -- but no device-side `#[global_allocator]` "
+"is wired up today. Even if it were, device `malloc` is extremely slow "
+"(serialized, fragmented, uncoalesced). Use slices and `SharedArray`."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "`String` / `format_args!`"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Use `gpu_printf!` for formatted output."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Panic / Unwinding"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"Panic paths exist in MIR but the compiler strips `core::panicking::*` and "
+"all unwind edges. The GPU hardware *can* support unwinding (absolute "
+"branches + per-thread call stack tracking post-Volta), but the CUDA "
+"toolchain (nvcc/ptxas) doesn't expose it today -- no landing pads survive to "
+"PTX. If a panic path is reached at runtime the GPU traps (same as "
+"`panic=abort`). NVIDIA has an active project to add C++ exception support to "
+"CUDA for automotive safety; the current cuda-oxide design is forward-"
+"compatible with that work. Use `gpu_assert!()` + `trap()` for explicit "
+"runtime checks today."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Standard Library (`std`/`alloc`)"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid ""
+"`std` is forbidden. `alloc` is allowed by the collector but has no backing "
+"allocator. Only `core` is fully functional. `Option`, `Result`, iterators "
+"all work."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Texture Memory"
+msgstr ""
+
+#: ../../../appendix/supported-features.md:0
+msgid "Lower priority given TMA availability on Hopper+."
+msgstr ""
