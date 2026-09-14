@@ -1,0 +1,499 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025-2026, NVIDIA Corporation
+# This file is distributed under the same license as the cuda-oxide package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: cuda-oxide \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-16 12:33+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: zh_TW\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:1
+msgid "Fuzzing and Differential Testing"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:3
+msgid ""
+"The happy path through cuda-oxide is easy to test with examples: `vecadd`, "
+"`gemm`, `sharedmem`, and friends prove that known programs still work. But "
+"compilers do not only fail on known programs. They fail on the weird little "
+"corners no one thought to write by hand -- the cast after the branch, the "
+"tuple inside the call terminator, the integer width that nobody invited to "
+"the party."
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:9
+msgid "That is where fuzzing enters the picture."
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:11
+msgid ""
+"cuda-oxide uses a small rustlantis-based harness to generate random custom "
+"MIR programs, run them through both the normal Rust CPU backend and cuda-"
+"oxide's GPU backend, and compare a compact trace of intermediate values. The "
+"aim is not to prove all of Rust correct on GPUs. The aim is more modest, and "
+"more useful: stress the MIR importer, lowering pipeline, LLVM export, PTX "
+"generation, and runtime execution with programs we did not hand-author."
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:20
+msgid "What We Are Comparing"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:22
+msgid ""
+"At first glance, \"compare CPU and GPU execution\" sounds suspicious. CPUs "
+"and GPUs have different execution models: one scalar thread versus thousands "
+"of SIMT lanes, divergent control flow, different memory spaces, different "
+"synchronization rules. A general CPU-vs-GPU semantic comparison would be a "
+"very fancy way to lie to ourselves."
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:28
+msgid "So the harness deliberately avoids that."
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:30
+msgid "It runs generated MIR as a scalar GPU program:"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:32
+msgid "<<<1, 1>>>\n"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:36
+msgid ""
+"One block. One thread. No inter-thread communication. No scheduling drama. "
+"The GPU is being used as a second codegen target for the same scalar MIR, "
+"not as a parallel programming model."
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:40
+msgid "The comparison is:"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:42
+msgid ""
+"same generated MIR\n"
+"  -> normal rustc/LLVM CPU execution\n"
+"  -> cuda-oxide -> LLVM IR -> PTX -> CUDA execution\n"
+"  -> compare trace hash\n"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:49
+msgid ""
+"If the hashes match, the generated program observed the same sequence of "
+"intermediate values on both paths. If they differ, something in the cuda-"
+"oxide path deserves attention."
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:54
+msgid ""
+"The trace is intentionally compact. Instead of copying every intermediate "
+"value back to the host, each `dump_var(...)` call folds values into one "
+"`u64` using a byte-wise hash. This makes generated tests cheap to run and "
+"easy to compare."
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:61
+msgid "The Moving Pieces"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:63
+msgid "The fuzzing setup is split into four parts:"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:53
+msgid "Piece"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:53
+msgid "Role"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:53
+msgid "`crates/fuzzer`"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:53
+msgid "Shared trace API and vendored rustlantis"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:53
+msgid "`crates/fuzzer/tools/mir_generator.py`"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:53
+msgid "Seed-to-`generated_case.rs` adapter"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:53
+msgid "`crates/fuzzer/tools/run_seed.py`"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:53
+msgid "Batch runner and artifact recorder"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:53
+msgid "`rustlantis-smoke`"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:53
+msgid "Stable CPU/GPU execution harness"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:72
+msgid ""
+"`crates/fuzzer` is a normal workspace crate, but its library surface is "
+"`no_std`. Device code imports `trace_reset`, `trace_finish`, and the generic "
+"`dump_var` from there. The actual rustlantis source is vendored under "
+"`crates/fuzzer/rustlantis`; it is invoked as an external generator, not used "
+"as a Rust library dependency."
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:78
+msgid ""
+"The `rustlantis-smoke` example lives under `crates/rustc-codegen-cuda/"
+"examples/`. It owns the host/GPU launch logic and a small hand-written "
+"sanity test, then includes one generated file:"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:82
+msgid ""
+"crates/rustc-codegen-cuda/examples/rustlantis-smoke/src/generated_case.rs\n"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:86
+msgid ""
+"The fuzzer tools rewrite that file for each seed. Everything else in the "
+"example stays stable. This keeps the harness easy to review: if a seed "
+"fails, the generated MIR is isolated in one place."
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:92
+msgid "The Seed Pipeline"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:94
+msgid "One seed follows this path:"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:96
+msgid ""
+"**Generate.** rustlantis receives a numeric seed and a small config. Same "
+"seed plus same config means the same custom-MIR program."
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:98
+msgid ""
+"**Extract.** `mir_generator.py` pulls out the first generated "
+"`#[custom_mir]` function."
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:100
+msgid ""
+"**Adapt.** rustlantis emits calls like `dump_var(a, b, c)`. The adapter "
+"rewrites those into tuple locals and one generic `fuzzer::dump_var(...)` "
+"call, because custom MIR call operands are picky about tuple expressions."
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:103
+msgid ""
+"**Inject.** The adapted function and a small wrapper are written to `src/"
+"generated_case.rs`."
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:105
+msgid ""
+"**Run.** `cargo oxide run rustlantis-smoke` executes the CPU oracle and GPU "
+"kernel."
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:107
+msgid ""
+"**Classify.** `run_seed.py` records whether the seed passed, mismatched, "
+"failed to compile, or exceeded the adapter's current support surface."
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:110
+msgid ""
+"The checked-in generated case currently uses seed `19`, because it shows the "
+"important property we want from the harness: multiple intermediate dumps, "
+"not just one final value."
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:114
+msgid ""
+"__rl_dump0 = (Move(_1), Move(_2), Move(_3), Move(_4));\n"
+"Call(_9 = dump_var(Move(__rl_dump0)), ReturnTo(bb4), UnwindUnreachable())\n"
+"\n"
+"__rl_dump1 = (Move(_6),);\n"
+"Call(_9 = dump_var(Move(__rl_dump1)), ReturnTo(bb5), UnwindUnreachable())\n"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:122
+msgid ""
+"That means the final trace hash includes several values from one point in "
+"the program and another value from a later point. It is still compact, but "
+"it is no longer merely \"did the return value match?\""
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:128
+msgid "Running It"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:130
+msgid "Run one seed:"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:132
+msgid "python3 crates/fuzzer/tools/run_seed.py --seed 192\n"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:136
+msgid "Run a batch:"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:138
+msgid ""
+"python3 crates/fuzzer/tools/run_seed.py --start 0 --count 20 --keep-going\n"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:142
+msgid "Useful flags:"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:144
+msgid "`--keep-going`: continue after a failing seed."
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:145
+msgid "`--keep-logs`: write logs for passing seeds too."
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:146
+msgid "`--no-build`: reuse an already-built rustlantis generator."
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:147
+msgid ""
+"`--append-summary`: append to the existing summary instead of replacing it."
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:149
+msgid ""
+"By default, `summary.jsonl` is replaced at the start of each run. This makes "
+"it answer the obvious question: \"what happened in the run I just did?\" If "
+"you want history, opt in with `--append-summary`."
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:155
+msgid "Reading Results"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:157
+msgid "The runner prints one line per seed and then a full summary:"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:159
+msgid ""
+"results:\n"
+"  seed 0: UNSUPPORTED [adapter] unsupported dumped type for Stage 2 adapter: "
+"u128 (...)\n"
+"  seed 1: COMPILE_FAIL [backend] Unsupported construct: Type translation not "
+"yet implemented for: RigidTy(Char) (...)\n"
+"summary: COMPILE_FAIL=1, UNSUPPORTED=1\n"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:166
+msgid "The statuses mean:"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:53
+msgid "Status"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:53
+msgid "Meaning"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:53
+msgid "`PASS`"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:53
+msgid "CPU and GPU traces matched"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:53
+msgid "`MISMATCH`"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:53
+msgid "CPU and GPU traces differed"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:53
+msgid "`COMPILE_FAIL [backend]`"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:53
+msgid "The adapter produced a case, but cuda-oxide failed it"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:53
+msgid "`UNSUPPORTED [adapter]`"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:53
+msgid "rustlantis generated MIR, but the adapter declined it"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:175
+msgid ""
+"`MISMATCH` is the result to take most seriously. Both paths compiled and "
+"ran, but observed different values. That is a potential backend correctness "
+"bug."
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:178
+msgid ""
+"`COMPILE_FAIL [backend]` means the generated case made it past the adapter "
+"and into cuda-oxide. The failure may still be expected -- for example, a "
+"currently unsupported MIR type -- but the backend is the component that "
+"rejected it."
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:182
+msgid ""
+"`UNSUPPORTED [adapter]` means rustlantis produced a program, but our adapter "
+"refused to turn it into a smoke case. For example:"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:185
+msgid "unsupported dumped type for Stage 2 adapter: u128\n"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:189
+msgid ""
+"That usually means the generated MIR had a `dump_var(...)` containing a type "
+"our trace API does not yet know how to hash. Today the trace supports:"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:192
+msgid "bool, i8, i16, i32, i64, u8, u16, u32, u64\n"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:196
+msgid ""
+"It does not yet support `u128`, `i128`, `usize`, `isize`, or `char`. Many "
+"adapter-level unsupported cases are therefore not \"bad MIR\" and not cuda-"
+"oxide bugs. They are simply places where the fuzzer harness has not grown up "
+"yet. Compilers, like people, need snacks before they can handle `u128`."
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:203
+msgid "Artifacts"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:205
+msgid "Per-seed logs live under:"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:207
+msgid "crates/fuzzer/artifacts/\n"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:211
+msgid "Failure logs include:"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:213
+msgid "the seed"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:214
+msgid "status and stage"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:215
+msgid "reason"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:216
+msgid "return code"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:217
+msgid "command"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:218
+msgid "full command output"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:219
+msgid "the generated `generated_case.rs` snapshot, when one exists"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:221
+msgid ""
+"The generated snapshot matters. If a backend failure appears in CI or a long "
+"batch run, the log is enough to see the exact MIR-shaped program that "
+"triggered it. The seed lets you regenerate it, but the snapshot saves you a "
+"round trip."
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:227
+msgid "Current Limits"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:229
+msgid ""
+"The current config is intentionally small. It keeps the first stage focused "
+"on scalar custom MIR and backend plumbing rather than every Rust construct "
+"at once. That is why many early seeds classify as `UNSUPPORTED [adapter]`."
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:233
+msgid "The widening plan is incremental:"
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:235
+msgid ""
+"Add trace support for more scalar types (`u128`, `i128`, `usize`, `isize`)."
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:236
+msgid ""
+"Decide whether and how to support `char` in cuda-oxide's type translation."
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:237
+msgid "Expand control-flow and cast coverage."
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:238
+msgid "Add arrays, tuples, and eventually structs/enums."
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:239
+msgid "Add minimization for failing seeds."
+msgstr ""
+
+#: ../../../compiler/fuzzing-and-differential-testing.md:241
+msgid ""
+"That order is deliberate. A fuzzer that generates everything on day one "
+"mostly generates noise. A fuzzer that grows one axis at a time tells you "
+"what broke, and why. Much friendlier."
+msgstr ""
