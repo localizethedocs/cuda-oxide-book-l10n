@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-21 14:41+0000\n"
+"POT-Creation-Date: 2026-09-28 16:13+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -190,7 +190,7 @@ msgid "Type-checks arguments; raw config requires `unsafe`"
 msgstr ""
 
 #: ../../../gpu-programming/launching-kernels.md:27
-#: ../../../gpu-programming/launching-kernels.md:522
+#: ../../../gpu-programming/launching-kernels.md:530
 msgid "`LaunchConfig`"
 msgstr ""
 
@@ -289,19 +289,32 @@ msgid ""
 "    #[launch_contract(domain = 1, block = (256, 1, 1))]\n"
 "    pub fn vecadd(a: &[f32], b: &[f32], mut c: DisjointSlice<f32>) {\n"
 "        let idx = thread::index_1d();\n"
+"        let i = idx.get();\n"
+"\n"
 "        if let Some(c_elem) = c.get_mut(idx) {\n"
-"            *c_elem = a[idx.get()] + b[idx.get()];\n"
+"            *c_elem = a[i] + b[i];\n"
 "        }\n"
 "    }\n"
 "}\n"
 "\n"
-"let module = contracted::load(&ctx)?;\n"
+"// SAFETY: this package embeds the artifact compiled from this `contracted` "
+"module.\n"
+"let module = unsafe { contracted::load(&ctx)? };\n"
 "let config = LaunchConfig1D::new(4, 256, 0);\n"
 "let prepared = module.prepare_vecadd(config)?;\n"
 "module.vecadd(&stream, &prepared, &a, &b, &mut c)?;\n"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:150
+#: ../../../gpu-programming/launching-kernels.md:153
+msgid ""
+"Loading a contracted module is unsafe because the caller must ensure the "
+"selected artifact was compiled from this module. A matching package or "
+"kernel name alone does not prove that its ABI and launch requirements match. "
+"Once the correct artifact is loaded, preparation checks its declared launch "
+"contract."
+msgstr ""
+
+#: ../../../gpu-programming/launching-kernels.md:158
 msgid ""
 "`prepare_vecadd` checks the exact block shape, device limits, dynamic shared "
 "memory, context, and any cluster/cooperative requirements. `LaunchConfig1D` "
@@ -310,7 +323,7 @@ msgid ""
 "branded launch can be reused safely."
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:156
+#: ../../../gpu-programming/launching-kernels.md:164
 msgid ""
 "Cluster and cooperative attributes may be declared together "
 "(`#[cluster_launch(...)]` + `#[cooperative_launch]`). Preparation proves the "
@@ -321,55 +334,55 @@ msgid ""
 "related cluster residency error) instead of submitting an unsound launch."
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:164
+#: ../../../gpu-programming/launching-kernels.md:172
 msgid ""
 "For a contracted kernel, the raw escape hatch is named `vecadd_unchecked` "
 "and remains unsafe. Uncontracted kernels expose only unsafe raw launch "
 "methods."
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:167
+#: ../../../gpu-programming/launching-kernels.md:175
 msgid "Compile-time policy configuration"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:169
+#: ../../../gpu-programming/launching-kernels.md:177
 msgid ""
 "A kernel policy is a named collection of compile-time choices. It can "
 "describe tile shapes, operation atoms, launch bounds, loop-unroll factors, "
 "or any other configuration that a kernel library wants to expose."
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:173
+#: ../../../gpu-programming/launching-kernels.md:181
 msgid ""
 "Policies are represented by Rust types rather than runtime values. A generic "
 "kernel is monomorphized once for every concrete policy type used by the host:"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:176
+#: ../../../gpu-programming/launching-kernels.md:184
 msgid ""
 "transform::<SmallTilePolicy> -> transform_TID_<A>\n"
 "transform::<WideTilePolicy>  -> transform_TID_<B>\n"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:181
+#: ../../../gpu-programming/launching-kernels.md:189
 msgid ""
 "Each specialization has its own PTX entry point and its own folded "
 "constants. The policy is not passed as a kernel argument, and the generated "
 "kernel does not contain a runtime branch that selects a policy."
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:185
+#: ../../../gpu-programming/launching-kernels.md:193
 msgid "Define a domain-specific policy"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:187
+#: ../../../gpu-programming/launching-kernels.md:195
 msgid ""
 "`cuda_device::config::Policy` deliberately contains only a stable "
 "identifier. Kernel libraries extend it with associated types and constants "
 "that are meaningful for their domain:"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:191
+#: ../../../gpu-programming/launching-kernels.md:199
 msgid ""
 "use cuda_device::config::{\n"
 "    Atom, AtomKind, AtomSpec, Block, Global, Policy, PolicyId, RowMajor, "
@@ -400,7 +413,7 @@ msgid ""
 "}\n"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:220
+#: ../../../gpu-programming/launching-kernels.md:228
 msgid ""
 "`Tile`, `Atom`, `Shape`, layout, memory-space, and scope types are metadata. "
 "They do not allocate memory, provide pointer access, emit an instruction, or "
@@ -408,17 +421,17 @@ msgid ""
 "decide what those descriptions mean and which combinations are valid."
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:225
+#: ../../../gpu-programming/launching-kernels.md:233
 msgid "Define concrete policies"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:227
+#: ../../../gpu-programming/launching-kernels.md:235
 msgid ""
 "A concrete policy implements both `Policy` and the domain-specific policy "
 "trait:"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:230
+#: ../../../gpu-programming/launching-kernels.md:238
 msgid ""
 "enum SmallTilePolicy {}\n"
 "\n"
@@ -442,13 +455,13 @@ msgid ""
 "}\n"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:253
+#: ../../../gpu-programming/launching-kernels.md:261
 msgid ""
 "A second policy can select a different tile, launch bound, and unroll factor "
 "without duplicating the kernel:"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:256
+#: ../../../gpu-programming/launching-kernels.md:264
 msgid ""
 "enum WideTilePolicy {}\n"
 "\n"
@@ -472,7 +485,7 @@ msgid ""
 "}\n"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:279
+#: ../../../gpu-programming/launching-kernels.md:287
 msgid ""
 "`PolicyId` is an explicit library-facing identity. Its namespace and value "
 "are supplied by the policy author and must remain stable while the policy's "
@@ -480,22 +493,22 @@ msgid ""
 "compiler mangling, a type name, or a compiler-generated hash."
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:284
+#: ../../../gpu-programming/launching-kernels.md:292
 msgid ""
 "cuda-oxide does not maintain a global policy-ID registry. A policy library "
 "is responsible for choosing its namespace and preventing duplicate IDs."
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:287
+#: ../../../gpu-programming/launching-kernels.md:295
 msgid "Use policy constants in a kernel"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:289
+#: ../../../gpu-programming/launching-kernels.md:297
 msgid ""
 "Policy-associated constants can be used by supported compile-time attributes:"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:291
+#: ../../../gpu-programming/launching-kernels.md:299
 msgid ""
 "use cuda_device::{cuda_module, kernel, launch_bounds, launch_contract, "
 "thread};\n"
@@ -537,13 +550,13 @@ msgid ""
 "}\n"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:331
+#: ../../../gpu-programming/launching-kernels.md:339
 msgid ""
 "rustc resolves the associated constants after monomorphization. cuda-oxide "
 "therefore sees concrete values for each specialization:"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:334
+#: ../../../gpu-programming/launching-kernels.md:342
 msgid ""
 "SmallTilePolicy:\n"
 "  launch_bounds = (64, 2)\n"
@@ -554,44 +567,44 @@ msgid ""
 "  unroll         = 4\n"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:344
+#: ../../../gpu-programming/launching-kernels.md:352
 msgid ""
 "`MAX_THREADS` specifies the maximum block size accepted by that "
 "specialization. It does not force every launch to use exactly that number of "
 "threads."
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:347
+#: ../../../gpu-programming/launching-kernels.md:355
 msgid ""
 "`MIN_BLOCKS` is a compiler occupancy hint represented by PTX `."
 "minnctapersm`. It is not a grid or block dimension and is not enforced as "
 "launch geometry."
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:351
+#: ../../../gpu-programming/launching-kernels.md:359
 msgid ""
 "`UNROLL` is a partial-unroll factor. `UNROLL = 4` groups four loop "
 "iterations per transformed loop body; it does not limit the loop to four "
 "iterations. Runtime bounds and remainder iterations are preserved."
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:355
+#: ../../../gpu-programming/launching-kernels.md:363
 msgid ""
 "Invalid or unevaluatable policy expressions produce compilation errors "
 "instead of silently using default values."
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:358
+#: ../../../gpu-programming/launching-kernels.md:366
 msgid "Prepare a policy-specific launch"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:360
+#: ../../../gpu-programming/launching-kernels.md:368
 msgid ""
 "Generic kernels generate generic host methods whose policy parameter selects "
 "the concrete kernel specialization:"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:363
+#: ../../../gpu-programming/launching-kernels.md:371
 msgid ""
 "use cuda_core::LaunchConfig1D;\n"
 "\n"
@@ -606,35 +619,35 @@ msgid ""
 "    )?;\n"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:377
+#: ../../../gpu-programming/launching-kernels.md:385
 msgid ""
 "The generated launch contract is evaluated independently for each "
 "specialization:"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:380
+#: ../../../gpu-programming/launching-kernels.md:388
 msgid "`SmallTilePolicy` rejects blocks larger than 64 threads."
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:381
+#: ../../../gpu-programming/launching-kernels.md:389
 msgid "`WideTilePolicy` rejects blocks larger than 256 threads."
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:383
+#: ../../../gpu-programming/launching-kernels.md:391
 msgid ""
 "A prepared launch remains branded for the selected kernel specialization. A "
 "`PreparedLaunch` created for one policy cannot be passed to another policy's "
 "launch method."
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:387
+#: ../../../gpu-programming/launching-kernels.md:395
 msgid ""
 "The policy changes compile-time code generation and launch validation, but "
 "it does not prove raw-pointer memory safety. Kernels that accept raw "
 "pointers remain unsafe to call:"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:391
+#: ../../../gpu-programming/launching-kernels.md:399
 msgid ""
 "// SAFETY: the pointers cover the complete policy tile and remain valid\n"
 "// until the stream completes the launch.\n"
@@ -649,100 +662,100 @@ msgid ""
 "}\n"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:405
+#: ../../../gpu-programming/launching-kernels.md:413
 msgid "Current limitations"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:407
+#: ../../../gpu-programming/launching-kernels.md:415
 msgid "Policy expressions are currently supported first for:"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:409
+#: ../../../gpu-programming/launching-kernels.md:417
 msgid "`#[launch_bounds(...)]`"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:410
+#: ../../../gpu-programming/launching-kernels.md:418
 msgid "partial loop `#[unroll(...)]`"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:412
+#: ../../../gpu-programming/launching-kernels.md:420
 msgid ""
 "Generic constant expressions require Rust's `generic_const_exprs` feature:"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:414
+#: ../../../gpu-programming/launching-kernels.md:422
 msgid ""
 "#![feature(generic_const_exprs)]\n"
 "#![allow(incomplete_features)]\n"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:419
+#: ../../../gpu-programming/launching-kernels.md:427
 msgid ""
 "The following values currently remain literal rather than policy-derived:"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:421
+#: ../../../gpu-programming/launching-kernels.md:429
 msgid "`launch_contract` fields"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:422
+#: ../../../gpu-programming/launching-kernels.md:430
 msgid "cluster dimensions"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:423
+#: ../../../gpu-programming/launching-kernels.md:431
 msgid "dynamic shared-memory sizes"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:425
+#: ../../../gpu-programming/launching-kernels.md:433
 msgid ""
 "A policy-derived maximum launch bound can still be combined with a host "
 "launch contract. The contract and the policy maximum are checked separately "
 "for each monomorphized specialization."
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:429
+#: ../../../gpu-programming/launching-kernels.md:437
 msgid ""
 "Any additional named constants referenced by a policy-derived launch-bound "
 "maximum must be visible at module scope because the host launch contract is "
 "generated beside the kernel function."
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:433
+#: ../../../gpu-programming/launching-kernels.md:441
 msgid "Complete example"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:435
+#: ../../../gpu-programming/launching-kernels.md:443
 msgid ""
 "The [`policy_config`](https://github.com/NVlabs/cuda-oxide/tree/main/crates/"
 "rustc-codegen-cuda/examples/policy_config) example defines two policies for "
 "one generic kernel and verifies that they produce:"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:440
+#: ../../../gpu-programming/launching-kernels.md:448
 msgid "distinct host-addressable PTX entries"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:441
+#: ../../../gpu-programming/launching-kernels.md:449
 msgid "distinct `.maxntid` and `.minnctapersm` directives"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:442
+#: ../../../gpu-programming/launching-kernels.md:450
 msgid "folded policy-specific constants"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:443
+#: ../../../gpu-programming/launching-kernels.md:451
 msgid "different partial-unroll factors in raw LLVM IR"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:444
+#: ../../../gpu-programming/launching-kernels.md:452
 msgid "policy-specific prepared-launch validation"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:446
+#: ../../../gpu-programming/launching-kernels.md:454
 msgid "Build and inspect the generated artifacts without a GPU:"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:448
+#: ../../../gpu-programming/launching-kernels.md:456
 msgid ""
 "cargo oxide build policy_config\n"
 "\n"
@@ -752,18 +765,18 @@ msgid ""
 "  -- --verify-ptx\n"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:456
+#: ../../../gpu-programming/launching-kernels.md:464
 msgid ""
 "Use `--release` for the verifier because compiler-generated specialization "
 "names can differ between build profiles. `PolicyId` remains the explicit, "
 "profile-independent policy identity."
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:460
+#: ../../../gpu-programming/launching-kernels.md:468
 msgid "`cuda_launch!` -- unsafe lower-level launch"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:462
+#: ../../../gpu-programming/launching-kernels.md:470
 msgid ""
 "`cuda_launch!` is the explicit, unsafe escape hatch below `#[cuda_module]`. "
 "Its niche is modules loaded at runtime by name (a sidecar PTX/cubin/LTOIR "
@@ -771,7 +784,7 @@ msgid ""
 "to check against."
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:467
+#: ../../../gpu-programming/launching-kernels.md:475
 msgid ""
 "Because the macro cannot verify the argument list, every use must sit inside "
 "an `unsafe { }` block. The caller promises that argument count, order, and "
@@ -780,7 +793,7 @@ msgid ""
 "the end of the args array, or the device dereferences junk."
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:473
+#: ../../../gpu-programming/launching-kernels.md:481
 msgid ""
 "use cuda_host::{cuda_launch, load_kernel_module};\n"
 "\n"
@@ -800,7 +813,7 @@ msgid ""
 ".expect(\"Kernel launch failed\");\n"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:492
+#: ../../../gpu-programming/launching-kernels.md:500
 msgid ""
 "The wrappers in `args` produce the same host packet as the generated "
 "`#[cuda_module]` methods: `slice(...)` and `slice_mut(...)` push the `(ptr, "
@@ -809,11 +822,11 @@ msgid ""
 "as one `.param`, not as per-field flattened parameters)."
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:499
+#: ../../../gpu-programming/launching-kernels.md:507
 msgid "Artifact policy"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:501
+#: ../../../gpu-programming/launching-kernels.md:509
 msgid ""
 "`#[cuda_module]` is a launch-surface feature, not a target-selection "
 "feature. It loads the embedded payload that the compiler placed in the host "
@@ -823,14 +836,14 @@ msgid ""
 "methods stay stable as payload formats evolve."
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:508
+#: ../../../gpu-programming/launching-kernels.md:516
 msgid ""
 "PTX and cubin payloads load directly. NVVM IR records its target because pre-"
 "Blackwell GPUs use LLVM 7 typed pointers, while Blackwell and newer GPUs use "
 "opaque pointers. The loader uses that recorded target when invoking libNVVM."
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:512
+#: ../../../gpu-programming/launching-kernels.md:520
 msgid ""
 "NVVM IR and LTOIR normally compile for their original target. For a standard "
 "pre-Blackwell target such as `sm_86`, the loader can instead produce PTX and "
@@ -843,11 +856,11 @@ msgid ""
 "why this can differ from the normal LLVM-to-PTX path."
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:524
+#: ../../../gpu-programming/launching-kernels.md:532
 msgid "`LaunchConfig` specifies the grid shape:"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:526
+#: ../../../gpu-programming/launching-kernels.md:534
 msgid ""
 "use cuda_core::simt::LaunchConfig;\n"
 "\n"
@@ -898,35 +911,35 @@ msgstr ""
 msgid "Dynamic shared memory per block"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:542
+#: ../../../gpu-programming/launching-kernels.md:550
 msgid "`for_num_elems` helper"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:544
+#: ../../../gpu-programming/launching-kernels.md:552
 msgid ""
 "For 1D data-parallel kernels, the common pattern is one thread per element:"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:546
+#: ../../../gpu-programming/launching-kernels.md:554
 msgid "let config = LaunchConfig::for_num_elems(N as u32);\n"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:550
+#: ../../../gpu-programming/launching-kernels.md:558
 msgid ""
 "This uses 256 threads per block and computes the grid size via ceiling "
 "division: `grid_x = (N + 255) / 256`. It is a convenient 1D shape, but it is "
 "still raw data; only preparation ties a configuration to a kernel."
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:554
+#: ../../../gpu-programming/launching-kernels.md:562
 msgid "2D and 3D configurations"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:556
+#: ../../../gpu-programming/launching-kernels.md:564
 msgid "For matrix operations, use 2D block and grid dimensions:"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:558
+#: ../../../gpu-programming/launching-kernels.md:566
 msgid ""
 "let config = LaunchConfig {\n"
 "    grid_dim: ((cols + 15) / 16, (rows + 15) / 16, 1),\n"
@@ -935,41 +948,41 @@ msgid ""
 "};\n"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:566
+#: ../../../gpu-programming/launching-kernels.md:574
 msgid ""
 "Inside the kernel, combine `threadIdx_x()` / `blockIdx_x()` with their "
 "`_y()` counterparts to compute row and column indices."
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:569
+#: ../../../gpu-programming/launching-kernels.md:577
 msgid "Choosing block size"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:571
+#: ../../../gpu-programming/launching-kernels.md:579
 msgid ""
 "The block size is the single most important tuning parameter (see the {ref}"
 "`Execution Model <execution-choosing-block-size>` chapter for details). "
 "Quick guidelines:"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:575
+#: ../../../gpu-programming/launching-kernels.md:583
 msgid "**256** is a safe default for most kernels."
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:576
+#: ../../../gpu-programming/launching-kernels.md:584
 msgid "**Powers of 2** (128, 256, 512) align with warp boundaries."
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:577
+#: ../../../gpu-programming/launching-kernels.md:585
 msgid ""
 "Use `#[launch_bounds]` to hint the compiler about your intended block size."
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:579
+#: ../../../gpu-programming/launching-kernels.md:587
 msgid "Typed async launch"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:581
+#: ../../../gpu-programming/launching-kernels.md:589
 msgid ""
 "With the `cuda-host` async feature enabled, `#[cuda_module]` also generates "
 "borrowed and owned async methods. These return lazy `DeviceOperation` values "
@@ -977,7 +990,7 @@ msgid ""
 "the scheduling policy chooses one when the operation is executed:"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:586
+#: ../../../gpu-programming/launching-kernels.md:594
 msgid ""
 "use cuda_async::simt::device_context::init_device_contexts;\n"
 "use cuda_async::simt::device_operation::DeviceOperation;\n"
@@ -1000,13 +1013,13 @@ msgid ""
 "op.sync()?;\n"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:607
+#: ../../../gpu-programming/launching-kernels.md:615
 msgid ""
 "Use the owned form when the operation must be spawned or stored as a "
 "`'static` future:"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:610
+#: ../../../gpu-programming/launching-kernels.md:618
 msgid ""
 "use std::future::IntoFuture;\n"
 "\n"
@@ -1024,15 +1037,15 @@ msgid ""
 "let (a_dev, b_dev, c_dev) = tokio::spawn(op.into_future()).await??;\n"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:626
+#: ../../../gpu-programming/launching-kernels.md:634
 msgid "Async buffer lifetimes"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:628
+#: ../../../gpu-programming/launching-kernels.md:636
 msgid "Async launches are lazy, so pointer lifetimes matter:"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:630
+#: ../../../gpu-programming/launching-kernels.md:638
 msgid ""
 "raw pointer shape:\n"
 "  build op from CUdeviceptr\n"
@@ -1048,7 +1061,7 @@ msgid ""
 "  spawned task owns the allocation until completion\n"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:645
+#: ../../../gpu-programming/launching-kernels.md:653
 msgid ""
 "For a contracted kernel, both async forms accept `&PreparedLaunch<K>` and "
 "are safe. `cuda_launch_async!` remains a lower-level unsafe migration API; "
@@ -1057,7 +1070,7 @@ msgid ""
 "lazy operation."
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:651
+#: ../../../gpu-programming/launching-kernels.md:659
 msgid "`.sync()` vs `.await`"
 msgstr ""
 
@@ -1087,17 +1100,17 @@ msgstr ""
 msgid "Execute and yield the current async task (requires a Tokio runtime)"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:658
+#: ../../../gpu-programming/launching-kernels.md:666
 msgid "Composing GPU work"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:660
+#: ../../../gpu-programming/launching-kernels.md:668
 msgid ""
 "`DeviceOperation` supports functional composition. Chain operations with "
 "`and_then` and run independent work in parallel with `zip!`:"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:663
+#: ../../../gpu-programming/launching-kernels.md:671
 msgid ""
 "use cuda_async::zip;\n"
 "\n"
@@ -1110,25 +1123,25 @@ msgid ""
 "let (result_a, result_b) = combined.sync()?;\n"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:675
+#: ../../../gpu-programming/launching-kernels.md:683
 msgid ""
 "Each operation in the chain is scheduled onto a stream only when it "
 "executes. The `and_then` combinator passes the output of one operation as "
 "input to the next, forming a lazy computation graph."
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:680
+#: ../../../gpu-programming/launching-kernels.md:688
 msgid ""
 "The [Async GPU Programming](../async-programming/the-device-operation-model."
 "md) section covers `DeviceOperation`, scheduling policies, and stream "
 "management in depth."
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:685
+#: ../../../gpu-programming/launching-kernels.md:693
 msgid "Cluster launch"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:687
+#: ../../../gpu-programming/launching-kernels.md:695
 msgid ""
 "Thread Block Clusters (Hopper and newer) allow blocks to cooperate beyond "
 "shared memory via **distributed shared memory** (DSMEM). To launch with "
@@ -1136,7 +1149,7 @@ msgid ""
 "the launch:"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:691
+#: ../../../gpu-programming/launching-kernels.md:699
 msgid ""
 "use cuda_device::{DisjointSlice, cluster, cluster_launch, kernel};\n"
 "\n"
@@ -1148,14 +1161,14 @@ msgid ""
 "}\n"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:702
+#: ../../../gpu-programming/launching-kernels.md:710
 msgid ""
 "On the host, the launch uses `launch_kernel_ex` (the extended launch API) "
 "with cluster dimensions. `cuda_launch!` supports this via the `cluster_dim` "
 "field:"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:705
+#: ../../../gpu-programming/launching-kernels.md:713
 msgid ""
 "// SAFETY: args/config match cluster_kernel, including its 4-block cluster;\n"
 "// out_dev stays live through synchronization.\n"
@@ -1172,18 +1185,18 @@ msgid ""
 ".expect(\"Cluster launch failed\");\n"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:722
+#: ../../../gpu-programming/launching-kernels.md:730
 msgid ""
 "Cluster launch requires **Hopper (sm_90)** or newer. The maximum cluster "
 "size is typically 16 blocks. Use `cargo oxide build --arch sm_90` to target "
 "Hopper."
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:726
+#: ../../../gpu-programming/launching-kernels.md:734
 msgid "Cooperative launch"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:728
+#: ../../../gpu-programming/launching-kernels.md:736
 msgid ""
 "Grid-wide barriers (`cuda_device::grid::sync()` or `this_grid().sync()`) "
 "only work when every block in the grid is resident on the device at the same "
@@ -1192,7 +1205,7 @@ msgid ""
 "barrier and the kernel deadlocks."
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:734
+#: ../../../gpu-programming/launching-kernels.md:742
 msgid ""
 "On the typed `#[cuda_module]` path, mark the kernel with "
 "`#[cooperative_launch]`. Every generated launch method (sync, async, and "
@@ -1200,7 +1213,7 @@ msgid ""
 "`CU_LAUNCH_ATTRIBUTE_COOPERATIVE` attribute set:"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:739
+#: ../../../gpu-programming/launching-kernels.md:747
 msgid ""
 "use cuda_device::{DisjointSlice, cooperative_launch, grid, kernel};\n"
 "\n"
@@ -1223,7 +1236,7 @@ msgid ""
 "unsafe { module.grid_sync_kernel(&stream, config, &mut out_dev) }?;\n"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:760
+#: ../../../gpu-programming/launching-kernels.md:768
 msgid ""
 "Unlike `#[cluster_launch]`, the attribute changes nothing in the PTX; it "
 "only changes how the host submits the launch. The two attributes may be "
@@ -1231,13 +1244,13 @@ msgid ""
 "same `cuLaunchKernelEx` call."
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:765
+#: ../../../gpu-programming/launching-kernels.md:773
 msgid ""
 "The legacy (caller-unsafe) `cuda_launch!` macro offers the same behaviour "
 "through its `cooperative: true` field."
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:769
+#: ../../../gpu-programming/launching-kernels.md:777
 msgid ""
 "The whole grid must fit on the device in a single wave, or the driver "
 "rejects the launch with `CUDA_ERROR_COOPERATIVE_LAUNCH_TOO_LARGE`. Size the "
@@ -1245,121 +1258,121 @@ msgid ""
 "count) when in doubt."
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:775
+#: ../../../gpu-programming/launching-kernels.md:783
 msgid "Common launch errors"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:768
+#: ../../../gpu-programming/launching-kernels.md:776
 msgid "Error"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:768
+#: ../../../gpu-programming/launching-kernels.md:776
 msgid "Likely cause"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:768
+#: ../../../gpu-programming/launching-kernels.md:776
 msgid "Fix"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:768
+#: ../../../gpu-programming/launching-kernels.md:776
 msgid "`CUDA_ERROR_INVALID_VALUE`"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:768
+#: ../../../gpu-programming/launching-kernels.md:776
 msgid "Grid or block dimensions are zero or exceed limits"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:768
+#: ../../../gpu-programming/launching-kernels.md:776
 msgid "Check `LaunchConfig` values; max block is 1024 threads"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:768
+#: ../../../gpu-programming/launching-kernels.md:776
 msgid "`CUDA_ERROR_NOT_FOUND`"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:768
+#: ../../../gpu-programming/launching-kernels.md:776
 msgid "PTX entry point name doesn't match"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:768
+#: ../../../gpu-programming/launching-kernels.md:776
 msgid "Verify `#[kernel]` name matches the loaded module"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:768
+#: ../../../gpu-programming/launching-kernels.md:776
 msgid "`CUDA_ERROR_LAUNCH_OUT_OF_RESOURCES`"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:768
+#: ../../../gpu-programming/launching-kernels.md:776
 msgid "Too much shared memory or too many registers per block"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:768
+#: ../../../gpu-programming/launching-kernels.md:776
 msgid "Reduce `shared_mem_bytes` or block size; use `#[launch_bounds]`"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:768
+#: ../../../gpu-programming/launching-kernels.md:776
 msgid "`CUDA_ERROR_ILLEGAL_INSTRUCTION`"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:768
+#: ../../../gpu-programming/launching-kernels.md:776
 msgid "Kernel hit a trap (panic, assert failure, OOB)"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:768
+#: ../../../gpu-programming/launching-kernels.md:776
 msgid "Debug with `cargo oxide debug` or `gpu_printf!`"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:768
+#: ../../../gpu-programming/launching-kernels.md:776
 msgid "`CUDA_ERROR_NO_BINARY_FOR_GPU`"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:768
+#: ../../../gpu-programming/launching-kernels.md:776
 msgid "PTX compiled for wrong architecture"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:768
+#: ../../../gpu-programming/launching-kernels.md:776
 msgid "Rebuild with `--arch` matching your GPU"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:768
+#: ../../../gpu-programming/launching-kernels.md:776
 msgid "`CUDA_ERROR_UNSUPPORTED_PTX_VERSION` (222)"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:768
+#: ../../../gpu-programming/launching-kernels.md:776
 msgid "Driver cannot compile the PTX version in the module"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:768
+#: ../../../gpu-programming/launching-kernels.md:776
 msgid "Select a compatible `CUDA_TOOLKIT_PATH` or upgrade the driver"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:768
+#: ../../../gpu-programming/launching-kernels.md:776
 msgid "`CUDA_ERROR_NOT_INITIALIZED`"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:768
+#: ../../../gpu-programming/launching-kernels.md:776
 msgid ""
 "`libcuda` missing, or the driver's CUDA major is older than the toolkit's"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:768
+#: ../../../gpu-programming/launching-kernels.md:776
 msgid ""
 "Install an R580+ driver; the error text names the files the loader tried"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:768
+#: ../../../gpu-programming/launching-kernels.md:776
 msgid "`CUDA_ERROR_NOT_FOUND` (from a non-launch call)"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:768
+#: ../../../gpu-programming/launching-kernels.md:776
 msgid "Driver symbol missing from the loaded `libcuda`"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:768
+#: ../../../gpu-programming/launching-kernels.md:776
 msgid "Upgrade the driver to the toolkit's CUDA version"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:789
+#: ../../../gpu-programming/launching-kernels.md:797
 msgid ""
 "The [Error Handling and Debugging](error-handling-and-debugging.md) chapter "
 "covers how to diagnose and fix kernel failures in detail."

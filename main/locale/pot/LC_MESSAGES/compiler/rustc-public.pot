@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-21 14:41+0000\n"
+"POT-Creation-Date: 2026-09-28 16:13+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -260,8 +260,8 @@ msgstr ""
 #: ../../../compiler/rustc-public.md:114
 msgid ""
 "Inside `codegen_crate`, cuda-oxide receives `rustc_middle` types -- the "
-"internal, unstable kind. But the `mir-importer` crate, which does the actual "
-"MIR-to-Pliron-IR translation, is built entirely on `rustc_public` types. To "
+"internal, unstable kind. The `mir-importer` crate, which does the actual MIR-"
+"to-Pliron-IR translation, uses `rustc_public` as its main MIR interface. To "
 "cross the boundary, cuda-oxide uses the bridge:"
 msgstr ""
 
@@ -299,17 +299,15 @@ msgstr ""
 
 #: ../../../compiler/rustc-public.md:142
 msgid ""
-"`TyCtxt<'tcx>` borrows data from the compiler's arena allocator. The `'tcx` "
-"lifetime is tied to the compilation session, and it cannot escape the "
-"arena's scope. You cannot store a `TyCtxt` in a struct, return it from a "
-"function, or send it to another thread. The compiler's solution is **scoped "
-"thread-local storage**: the context is available only while you are inside "
-"the scope, and the type system (plus runtime checks) prevents it from "
-"leaking out."
+"`TyCtxt<'tcx>` borrows data from the compiler's arena allocator. It can be "
+"stored in a struct or passed between functions, but its `'tcx` lifetime must "
+"remain within the compiler session. `rustc_public` uses **scoped thread-"
+"local storage** so its public query methods can find the current context "
+"without requiring a `TyCtxt` argument on every call."
 msgstr ""
 
-#: ../../../compiler/rustc-public.md:149
-msgid "The bridge sets up two nested thread-local variables (TLVs):"
+#: ../../../compiler/rustc-public.md:148
+msgid "The bridge sets up a thread-local variable (TLV):"
 msgstr ""
 
 #: ../../../compiler/rustc-public.md:74
@@ -317,7 +315,7 @@ msgid "TLV"
 msgstr ""
 
 #: ../../../compiler/rustc-public.md:74
-msgid "Type"
+msgid "Stored value"
 msgstr ""
 
 #: ../../../compiler/rustc-public.md:74
@@ -329,76 +327,60 @@ msgid "`compiler_interface::TLV`"
 msgstr ""
 
 #: ../../../compiler/rustc-public.md:74
-msgid "`&dyn CompilerInterface`"
+msgid "`Cell<*const ()>`"
 msgstr ""
 
 #: ../../../compiler/rustc-public.md:74
+msgid "Scoped access to the current `CompilerInterface` reference"
+msgstr ""
+
+#: ../../../compiler/rustc-public.md:154
 msgid ""
-"High-level queries: `local_crate()`, `all_local_items()`, entry point lookup"
-msgstr ""
-
-#: ../../../compiler/rustc-public.md:74
-msgid "`rustc_internal::TLV`"
-msgstr ""
-
-#: ../../../compiler/rustc-public.md:74
-msgid "`&Container`"
-msgstr ""
-
-#: ../../../compiler/rustc-public.md:74
-msgid "Stable-to-internal type translation via the `Tables` mapping"
-msgstr ""
-
-#: ../../../compiler/rustc-public.md:156
-msgid ""
-"Both point to the same underlying `Container` struct, but provide different "
-"access patterns:"
-msgstr ""
-
-#: ../../../compiler/rustc-public.md:159
-msgid ""
-"**`with()`** accesses the outer TLV for making high-level compiler queries."
+"The pointer is erased internally; `compiler_interface::with()` recovers the "
+"`CompilerInterface` reference for queries such as `local_crate()` and "
+"`all_local_items()`. Conversions such as `rustc_internal::stable(instance)` "
+"use `with_bridge()`, which accesses the same interface through `with()` and "
+"borrows its translation tables. There is no second thread-local context."
 msgstr ""
 
 #: ../../../compiler/rustc-public.md:160
 msgid ""
-"**`with_container()`** accesses the inner TLV for converting between stable "
-"and internal types."
+"For example, converting an instance and then asking for its MIR body uses "
+"one context throughout:"
 msgstr ""
 
 #: ../../../compiler/rustc-public.md:163
 msgid ""
-"This two-level design keeps the query interface separate from the raw "
-"translation machinery, so code that only needs to ask \"give me all "
-"functions in the local crate\" does not have to know about internal ID "
-"mappings."
+"rustc_internal::run(tcx, || {\n"
+"    stable_instance = stable(instance) -> with_bridge() -> with() -> tables\n"
+"    stable_instance.body() -----------------------------> with() -> query\n"
+"})\n"
 msgstr ""
 
-#: ../../../compiler/rustc-public.md:167
+#: ../../../compiler/rustc-public.md:170
 msgid ""
-"If you have ever used a web framework's request-scoped context (think "
-"Actix's `web::Data` or Axum's extractors), the mental model is similar: the "
-"data exists for the duration of the request (here, the compilation), and the "
-"framework makes it available without you having to thread it through every "
-"function signature."
+"Queries outside an active scope panic; starting a nested `run()` returns an "
+"error. The current design replaced the old `Container` and two-context "
+"implementation in [rust-lang/rust#147923](https://github.com/rust-lang/rust/"
+"pull/147923)."
 msgstr ""
 
-#: ../../../compiler/rustc-public.md:173
+#: ../../../compiler/rustc-public.md:174
 msgid "The bridge pattern"
 msgstr ""
 
-#: ../../../compiler/rustc-public.md:175
+#: ../../../compiler/rustc-public.md:176
 msgid ""
-"At the heart of the `Container` sits a **`Tables`** struct -- a "
-"bidirectional mapping between `rustc`'s internal IDs and the stable API's "
-"types. When you call `rustc_internal::stable(instance)`, the bridge looks up "
-"(or creates) the corresponding stable ID in the tables. When the stable API "
-"needs to query the compiler on your behalf -- say, to fetch a function's MIR "
-"body -- it goes through the tables in the opposite direction to recover the "
-"internal type."
+"The `CompilerInterface` owns a **`Tables`** struct -- a bidirectional "
+"mapping between `rustc`'s internal IDs and the stable API's types. When you "
+"call `rustc_internal::stable(instance)`, the bridge looks up (or creates) "
+"the corresponding stable ID in the tables. When the stable API needs to "
+"query the compiler on your behalf -- say, to fetch a function's MIR body -- "
+"it goes through the tables in the opposite direction to recover the internal "
+"type."
 msgstr ""
 
-#: ../../../compiler/rustc-public.md:182
+#: ../../../compiler/rustc-public.md:183
 msgid ""
 "    rustc_middle::ty::Instance<'tcx>\n"
 "              │\n"
@@ -411,16 +393,15 @@ msgid ""
 "    rustc_public::mir::mono::Instance\n"
 msgstr ""
 
-#: ../../../compiler/rustc-public.md:194
+#: ../../../compiler/rustc-public.md:195
 msgid "A few implementation details worth knowing:"
 msgstr ""
 
-#: ../../../compiler/rustc-public.md:196
+#: ../../../compiler/rustc-public.md:197
 msgid ""
-"**Interior mutability** -- `Tables` uses `RefCell` because multiple parts of "
-"the codebase need mutable access to the mapping during a single translation "
-"pass. This is safe because access is single-threaded (guaranteed by the "
-"thread-local storage)."
+"**Interior mutability** -- `CompilerInterface` holds the tables and compiler "
+"context in `RefCell`s. Each query borrows them on the current thread; "
+"overlapping mutable borrows are rejected at runtime."
 msgstr ""
 
 #: ../../../compiler/rustc-public.md:200
@@ -431,40 +412,40 @@ msgstr ""
 
 #: ../../../compiler/rustc-public.md:202
 msgid ""
-"**Automatic cleanup** -- when `rustc_internal::run()` returns, the thread-"
-"local storage is torn down and the tables are dropped. No manual cleanup "
-"required, no stale references possible."
+"**Automatic cleanup** -- when `rustc_internal::run()` returns, the scoped "
+"thread-local value is unset and the interface and its tables are dropped. "
+"Stable IDs refer to these tables; do not reuse them in a later context."
 msgstr ""
 
 #: ../../../compiler/rustc-public.md:206
 msgid ""
-"From cuda-oxide's perspective, the bridge is invisible. The `mir-importer` "
-"crate only ever sees `rustc_public` types -- it never imports "
-"`rustc_middle`, never deals with `'tcx` lifetimes, and never touches the "
-"`Tables` directly. All of that complexity is encapsulated behind "
-"`rustc_internal::run()` and `rustc_internal::stable()`, which live in the "
-"`rustc-codegen-cuda` crate at the boundary between the compiler and cuda-"
-"oxide's pipeline."
+"The driver in `rustc-codegen-cuda` opens the scope with `rustc_public::"
+"rustc_internal::run()` and converts instances with `stable()`. The `mir-"
+"importer` translator primarily consumes `rustc_public` types, but some "
+"checks still consult `rustc_middle` through the bridge. For example, grid-"
+"constant validation reads declared reference lifetimes and inlining "
+"ownership from the compiler's internal representation. The importer does not "
+"manage the bridge tables itself."
 msgstr ""
 
-#: ../../../compiler/rustc-public.md:213
+#: ../../../compiler/rustc-public.md:214
 msgid "What MIR looks like"
 msgstr ""
 
-#: ../../../compiler/rustc-public.md:215
+#: ../../../compiler/rustc-public.md:216
 msgid ""
 "Before cuda-oxide can translate MIR, it helps to know what MIR actually "
 "*is*. Here is a simple function and its MIR:"
 msgstr ""
 
-#: ../../../compiler/rustc-public.md:218
+#: ../../../compiler/rustc-public.md:219
 msgid ""
 "fn add(x: i32, y: i32) -> i32 {\n"
 "    x + y\n"
 "}\n"
 msgstr ""
 
-#: ../../../compiler/rustc-public.md:224
+#: ../../../compiler/rustc-public.md:225
 msgid ""
 "// MIR for `add`:\n"
 "// _0: i32              (return place)\n"
@@ -483,25 +464,25 @@ msgid ""
 "// }\n"
 msgstr ""
 
-#: ../../../compiler/rustc-public.md:241
+#: ../../../compiler/rustc-public.md:242
 msgid "A few things to notice:"
 msgstr ""
 
-#: ../../../compiler/rustc-public.md:243
+#: ../../../compiler/rustc-public.md:244
 msgid ""
 "**Locals** are numbered. `_0` is always the return place (where the result "
 "goes). `_1`, `_2`, ... are function arguments. Higher-numbered locals are "
 "temporaries the compiler introduces."
 msgstr ""
 
-#: ../../../compiler/rustc-public.md:246
+#: ../../../compiler/rustc-public.md:247
 msgid ""
 "**Basic blocks** (`bb0`, `bb1`, ...) are straight-line sequences of "
 "statements. Every block ends with exactly one **terminator** that transfers "
 "control -- a branch, a call, a return, or an assert."
 msgstr ""
 
-#: ../../../compiler/rustc-public.md:249
+#: ../../../compiler/rustc-public.md:250
 msgid ""
 "**`CheckedAdd`** returns a tuple `(i32, bool)`. The `bool` is an overflow "
 "flag. The `assert` terminator checks it and either continues to `bb1` or "
@@ -509,7 +490,7 @@ msgid ""
 "check is optimized away."
 msgstr ""
 
-#: ../../../compiler/rustc-public.md:253
+#: ../../../compiler/rustc-public.md:254
 msgid ""
 "**No expressions are nested.** `x + y` in the source becomes two separate "
 "operations in MIR: compute the checked add, then extract the result. Every "
@@ -518,7 +499,7 @@ msgid ""
 "just a flat list of operations per block."
 msgstr ""
 
-#: ../../../compiler/rustc-public.md:260
+#: ../../../compiler/rustc-public.md:261
 msgid ""
 "You can see the MIR for any function by passing `--emit=mir` to `rustc`, or "
 "by visiting the [Rust Playground](https://play.rust-lang.org/) and selecting "
@@ -526,11 +507,11 @@ msgid ""
 "local numbering."
 msgstr ""
 
-#: ../../../compiler/rustc-public.md:266
+#: ../../../compiler/rustc-public.md:267
 msgid "Why this matters for cuda-oxide"
 msgstr ""
 
-#: ../../../compiler/rustc-public.md:268
+#: ../../../compiler/rustc-public.md:269
 msgid ""
 "MIR's flat, explicit structure is what makes it feasible to build a GPU "
 "compiler on top of it. Consider the alternative: if cuda-oxide operated on "
@@ -544,11 +525,11 @@ msgid ""
 "pipeline.md) takes it the rest of the way to PTX."
 msgstr ""
 
-#: ../../../compiler/rustc-public.md:279
+#: ../../../compiler/rustc-public.md:280
 msgid "Nightly pinning"
 msgstr ""
 
-#: ../../../compiler/rustc-public.md:281
+#: ../../../compiler/rustc-public.md:282
 msgid ""
 "Even with `rustc_public` providing a stable *API*, the bridge layer "
 "(`rustc_public_bridge`) is still compiled against the compiler's internals "
@@ -556,11 +537,11 @@ msgid ""
 "version of cuda-oxide works with a specific nightly."
 msgstr ""
 
-#: ../../../compiler/rustc-public.md:286
+#: ../../../compiler/rustc-public.md:287
 msgid "cuda-oxide pins to an exact nightly release via `rust-toolchain.toml`:"
 msgstr ""
 
-#: ../../../compiler/rustc-public.md:288
+#: ../../../compiler/rustc-public.md:289
 msgid ""
 "[toolchain]\n"
 "channel = \"nightly-2026-08-28\"\n"
@@ -568,14 +549,14 @@ msgid ""
 "\"rustfmt\", \"llvm-tools\"]\n"
 msgstr ""
 
-#: ../../../compiler/rustc-public.md:294
+#: ../../../compiler/rustc-public.md:295
 msgid ""
 "This pin guarantees reproducible builds: anyone who clones the repository "
 "gets the same compiler, the same MIR shapes, and the same bridge behavior. "
 "When updating the pin, the process is:"
 msgstr ""
 
-#: ../../../compiler/rustc-public.md:298
+#: ../../../compiler/rustc-public.md:299
 msgid ""
 "Bump the nightly date in `rust-toolchain.toml`, and in the copy at `crates/"
 "rustc-codegen-cuda/rust-toolchain.toml` -- that crate has its own "
@@ -587,23 +568,23 @@ msgid ""
 "READMEs -- so run it to find the stragglers."
 msgstr ""
 
-#: ../../../compiler/rustc-public.md:306
+#: ../../../compiler/rustc-public.md:307
 msgid ""
 "Fix any `rustc_public` API changes (usually minor -- that is the whole point "
 "of the stable API)."
 msgstr ""
 
-#: ../../../compiler/rustc-public.md:308
+#: ../../../compiler/rustc-public.md:309
 msgid ""
 "Run the full test suite to verify that all examples still compile and "
 "produce correct PTX."
 msgstr ""
 
-#: ../../../compiler/rustc-public.md:310
+#: ../../../compiler/rustc-public.md:311
 msgid "Celebrate, or revert and try next week's nightly."
 msgstr ""
 
-#: ../../../compiler/rustc-public.md:313
+#: ../../../compiler/rustc-public.md:314
 msgid ""
 "As `rustc_public` matures and moves toward a crates.io release, the coupling "
 "to a specific nightly will loosen. The long-term goal is for cuda-oxide to "
@@ -611,7 +592,7 @@ msgid ""
 "there yet."
 msgstr ""
 
-#: ../../../compiler/rustc-public.md:321
+#: ../../../compiler/rustc-public.md:322
 msgid ""
 "Now that you understand how cuda-oxide talks to the Rust compiler, the next "
 "chapter covers what happens when that conversation reaches the codegen "
