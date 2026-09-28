@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-21 14:41+0000\n"
+"POT-Creation-Date: 2026-09-28 16:13+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -978,8 +978,9 @@ msgstr ""
 
 #: ../../../appendix/supported-features.md:0
 msgid ""
-"`ThreadBlock::tiled_partition::<N>()` carves a sub-warp `WarpTile<N>`. "
-"`coalesced_threads()` materialises the active-lane group."
+"`ThreadBlock::tiled_partition::<N>()` partitions a block into fixed-size "
+"`WarpTile<N>` groups; the block thread count must be evenly divisible by "
+"`N`. `coalesced_threads()` materialises the active-lane group."
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
@@ -1008,8 +1009,9 @@ msgstr ""
 
 #: ../../../appendix/supported-features.md:0
 msgid ""
-"`block_reduce`, `block_scan` (inclusive). Const-generic over `NUM_WARPS`; "
-"same op/type matrix as warp variants; uses `__shared__` scratch."
+"`block_reduce`, `block_scan` (inclusive). `NUM_WARPS` is the shared-memory "
+"capacity in warp totals and must be at least `ceil(block_threads / 32)`; "
+"partial final warps are supported. Same op/type matrix as warp variants."
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
