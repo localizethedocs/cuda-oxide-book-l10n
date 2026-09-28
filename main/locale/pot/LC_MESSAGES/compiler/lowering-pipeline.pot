@@ -8,10 +8,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-16 12:33+0000\n"
+"POT-Creation-Date: 2026-09-21 14:41+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -181,7 +182,7 @@ msgid "Memory"
 msgstr ""
 
 #: ../../../compiler/lowering-pipeline.md:0
-msgid "`convert/ops/memory.rs`"
+msgid "`convert/ops/memory/*.rs`"
 msgstr ""
 
 #: ../../../compiler/lowering-pipeline.md:0
@@ -207,7 +208,7 @@ msgid "Aggregate"
 msgstr ""
 
 #: ../../../compiler/lowering-pipeline.md:0
-msgid "`convert/ops/aggregate.rs`"
+msgid "`convert/ops/aggregate/*.rs`"
 msgstr ""
 
 #: ../../../compiler/lowering-pipeline.md:0
@@ -292,7 +293,8 @@ msgid "LLVM Type"
 msgstr ""
 
 #: ../../../compiler/lowering-pipeline.md:0
-#: ../../../compiler/lowering-pipeline.md:524
+#: ../../../compiler/lowering-pipeline.md:543
+#: ../../../compiler/lowering-pipeline.md:608
 msgid "Notes"
 msgstr ""
 
@@ -890,36 +892,66 @@ msgstr ""
 msgid ""
 "Pliron `mem2reg` still has a promotion-aware salvage path: when it promotes "
 "a debug-tagged slot it emits a `mir.dbg_value` (\"this source variable has "
-"this SSA value here\") that lowers to `llvm.dbg.value`. That is the "
-"groundwork for a future *optimized* debug tier; the current `full` tier does "
-"not run `mem2reg`, so it relies on `dbg.declare` instead."
+"this SSA value here\") that lowers to `llvm.dbg.value`. The current `full` "
+"tier does not run `mem2reg`, so place-backed locals normally rely on `dbg."
+"declare`."
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:434
-msgid "Variable scopes and inlining"
+#: ../../../compiler/lowering-pipeline.md:433
+msgid ""
+"`ReferencePropagation` can replace a pointer assignment with an internal "
+"`AssignRef` event:"
 msgstr ""
 
 #: ../../../compiler/lowering-pipeline.md:436
+msgid "ptr = &slice[i] -> AssignRef(ptr, slice[i])\n"
+msgstr ""
+
+#: ../../../compiler/lowering-pipeline.md:440
+msgid ""
+"Full mode carries that event across stable MIR. For the supported borrowed-"
+"slice index form, it writes the address into the variable's debugger stack "
+"slot at the same program point:"
+msgstr ""
+
+#: ../../../compiler/lowering-pipeline.md:444
+msgid "AssignRef -> address of slice[i] -> ptr's debugger slot\n"
+msgstr ""
+
+#: ../../../compiler/lowering-pipeline.md:448
+msgid ""
+"The importer validates the complete event set first. Invalid or unsupported "
+"events omit that destination before translation, so no partial "
+"instrumentation is emitted. Default, line-table, and release builds are "
+"unchanged. Promotion salvage remains groundwork for a future *optimized* "
+"debug tier."
+msgstr ""
+
+#: ../../../compiler/lowering-pipeline.md:453
+msgid "Variable scopes and inlining"
+msgstr ""
+
+#: ../../../compiler/lowering-pipeline.md:455
 msgid ""
 "Variable metadata has one extra rule: `arg: 1` means \"formal argument #1 of "
 "the function named by this debug scope.\" After MIR inlining, two variables "
 "in one kernel body can both honestly be `arg: 1`:"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:440
+#: ../../../compiler/lowering-pipeline.md:459
 msgid ""
 "caller kernel:  data  -> arg #1 of caller\n"
 "inlined helper: self  -> arg #1 of helper\n"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:445
+#: ../../../compiler/lowering-pipeline.md:464
 msgid ""
 "So cuda-oxide carries rustc's MIR source-scope table alongside each "
 "translated function. A local debug record stores only the source-scope id it "
 "came from; the LLVM exporter turns that id into the right DWARF shape:"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:449
+#: ../../../compiler/lowering-pipeline.md:468
 msgid ""
 "kernel DISubprogram\n"
 "  |\n"
@@ -928,13 +960,13 @@ msgid ""
 "        +-- DILocation(..., inlinedAt: kernel callsite)\n"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:457
+#: ../../../compiler/lowering-pipeline.md:476
 msgid ""
 "This is why `data` and `self` can both keep `arg: 1` without LLVM rejecting "
 "the module as contradictory."
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:460
+#: ../../../compiler/lowering-pipeline.md:479
 msgid ""
 "The current placement is conservative. If `mem2reg` creates a block argument "
 "that acts like a PHI value, cuda-oxide records the variable at the promoted "
@@ -942,7 +974,7 @@ msgid ""
 "record just because the compiler created a join value:"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:465
+#: ../../../compiler/lowering-pipeline.md:484
 msgid ""
 "then -> merge(10)\n"
 "else -> merge(20)\n"
@@ -951,14 +983,14 @@ msgid ""
 "  ... old load site becomes dbg.value(%x, \"x\") ...\n"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:473
+#: ../../../compiler/lowering-pipeline.md:492
 msgid ""
 "That is correct but not maximally precise. A future pass can make `x` "
 "visible earlier in the merge block once the source location and lexical "
 "scope rules are clear."
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:477
+#: ../../../compiler/lowering-pipeline.md:496
 msgid ""
 "One more compiler-maintainer detail: `mir.dbg_value` is debug-only, but "
 "inside Pliron today it still has a normal operand use. cuda-oxide therefore "
@@ -967,7 +999,7 @@ msgid ""
 "treats `dbg.value`."
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:482
+#: ../../../compiler/lowering-pipeline.md:501
 msgid ""
 "PHI nodes generated by the exporter normally do not get `!dbg`: they are SSA "
 "bookkeeping, not source operations the user wrote. Later variable metadata "
@@ -975,17 +1007,17 @@ msgid ""
 "become a surprise stop in cuda-gdb."
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:489
+#: ../../../compiler/lowering-pipeline.md:508
 msgid "Symbol Name Sanitization"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:491
+#: ../../../compiler/lowering-pipeline.md:510
 msgid ""
 "Function names flow through several stages, each applying its own "
 "constraints:"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:493
+#: ../../../compiler/lowering-pipeline.md:512
 msgid ""
 "rustc_public (FQDN)            helper_fn::cuda_oxide_device_<hash>_vecadd\n"
 "  ↓ body.rs (:: → __)\n"
@@ -998,11 +1030,11 @@ msgid ""
 "PTX                            vecadd\n"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:505
+#: ../../../compiler/lowering-pipeline.md:524
 msgid "Three conversions happen along this path:"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:507
+#: ../../../compiler/lowering-pipeline.md:526
 msgid ""
 "**`::` to `__`** -- Both `body.rs` (function definitions) and `call.rs` "
 "(call targets) replace Rust path separators with double underscores to "
@@ -1010,7 +1042,7 @@ msgid ""
 "conversion, definitions and call sites match."
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:512
+#: ../../../compiler/lowering-pipeline.md:531
 msgid ""
 "**Device prefix stripping** -- `export.rs` strips the reserved "
 "`cuda_oxide_device_<hash>_` prefix (and any preceding FQDN crate prefix) "
@@ -1019,7 +1051,7 @@ msgid ""
 "appear in the final LLVM IR, PTX, or LTOIR output."
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:518
+#: ../../../compiler/lowering-pipeline.md:537
 msgid ""
 "**Device extern prefix stripping** -- For `#[device] unsafe extern \"C\"` "
 "functions, `call.rs` strips the `cuda_oxide_device_extern_<hash>_` prefix "
@@ -1028,118 +1060,136 @@ msgid ""
 "CCCL libraries)."
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:525
+#: ../../../compiler/lowering-pipeline.md:544
 msgid ""
 "This manual sanitization will be replaced by pliron's `Legaliser` when the "
 "framework is upgraded. The `Legaliser` handles `::` to `_` conversion and "
 "collision detection systematically."
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:532
+#: ../../../compiler/lowering-pipeline.md:551
 msgid "PTX Generation"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:534
+#: ../../../compiler/lowering-pipeline.md:553
 msgid ""
 "After the LLVM dialect is exported to a textual `.ll` file, the final step "
 "is invoking `llc` -- LLVM's static compiler -- to produce PTX assembly:"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:537
+#: ../../../compiler/lowering-pipeline.md:556
 msgid "llc -march=nvptx64 -mcpu=sm_90 kernel.ll -o kernel.ptx\n"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:541
+#: ../../../compiler/lowering-pipeline.md:560
 msgid "Target Selection"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:543
+#: ../../../compiler/lowering-pipeline.md:562
 msgid ""
 "The pipeline probes for `llc` in the order below. LLVM 21 is the minimum — "
 "earlier releases reject the TMA / tcgen05 / WGMMA intrinsic signatures that "
 "cuda-oxide emits."
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:524
+#: ../../../compiler/lowering-pipeline.md:543
+#: ../../../compiler/lowering-pipeline.md:608
 msgid "Priority"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:524
+#: ../../../compiler/lowering-pipeline.md:543
+#: ../../../compiler/lowering-pipeline.md:608
 msgid "Source"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:524
+#: ../../../compiler/lowering-pipeline.md:543
+#: ../../../compiler/lowering-pipeline.md:608
 msgid "1st"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:524
+#: ../../../compiler/lowering-pipeline.md:543
 msgid "`$CUDA_OXIDE_LLC` (if set)"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:524
+#: ../../../compiler/lowering-pipeline.md:543
 msgid "Caller-supplied override; whatever binary you point it at."
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:524
+#: ../../../compiler/lowering-pipeline.md:543
+#: ../../../compiler/lowering-pipeline.md:608
 msgid "2nd"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:524
+#: ../../../compiler/lowering-pipeline.md:543
 msgid "Rust toolchain's `llvm-tools` llc"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:524
+#: ../../../compiler/lowering-pipeline.md:543
 msgid "`<sysroot>/lib/rustlib/<host>/bin/llc` (auto-installed via `rustup`)."
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:524
+#: ../../../compiler/lowering-pipeline.md:543
+#: ../../../compiler/lowering-pipeline.md:608
 msgid "3rd"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:524
-msgid "`llc-22` on `PATH`"
+#: ../../../compiler/lowering-pipeline.md:543
+msgid "`llc-23` on `PATH`"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:524
-msgid "Distro / `apt.llvm.org` install of LLVM 22."
+#: ../../../compiler/lowering-pipeline.md:543
+msgid "Distro / `apt.llvm.org` install of LLVM 23."
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:524
+#: ../../../compiler/lowering-pipeline.md:543
+#: ../../../compiler/lowering-pipeline.md:608
 msgid "4th"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:524
-msgid "`llc-21` on `PATH`"
+#: ../../../compiler/lowering-pipeline.md:543
+msgid "`llc-22` on `PATH`"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:524
-msgid "Distro / `apt.llvm.org` install of LLVM 21."
+#: ../../../compiler/lowering-pipeline.md:543
+msgid "Distro / `apt.llvm.org` install of LLVM 22."
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:524
+#: ../../../compiler/lowering-pipeline.md:543
 msgid "5th"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:524
+#: ../../../compiler/lowering-pipeline.md:543
+msgid "`llc-21` on `PATH`"
+msgstr ""
+
+#: ../../../compiler/lowering-pipeline.md:543
+msgid "Distro / `apt.llvm.org` install of LLVM 21."
+msgstr ""
+
+#: ../../../compiler/lowering-pipeline.md:543
+msgid "6th"
+msgstr ""
+
+#: ../../../compiler/lowering-pipeline.md:543
 msgid "`llc` on `PATH`"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:524
+#: ../../../compiler/lowering-pipeline.md:543
 msgid "Reporting fallback only; rejected at runtime if older than LLVM 21."
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:555
+#: ../../../compiler/lowering-pipeline.md:575
 msgid ""
-"The pinned Rust toolchain (`nightly-2026-04-03`) ships LLVM 22 with NVPTX "
+"The pinned Rust toolchain (`nightly-2026-08-28`) ships LLVM 23 with NVPTX "
 "enabled, so `rustup component add llvm-tools` is the recommended onboarding "
-"path. The PATH probes for `llc-22` / `llc-21` are kept as a fallback for "
-"users with an existing LLVM install. If none of the probes succeed the "
-"pipeline fails with a clear error. You can opt into a specific (possibly "
-"older) binary by setting `CUDA_OXIDE_LLC=/path/to/llc`, but simple kernels "
-"are the only thing guaranteed to compile on LLVM 20 and below."
+"path. The PATH probes for `llc-23` / `llc-22` / `llc-21` are kept as a "
+"fallback for users with an existing LLVM install. If none of the probes "
+"succeed the pipeline fails with a clear error. You can opt into a specific "
+"(possibly older) binary by setting `CUDA_OXIDE_LLC=/path/to/llc`, but simple "
+"kernels are the only thing guaranteed to compile on LLVM 20 and below."
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:563
+#: ../../../compiler/lowering-pipeline.md:583
 msgid ""
 "If the selected target does not match the physical GPU, the CUDA driver JIT-"
 "compiles the PTX at load time. First launch costs roughly 30ms while the "
@@ -1147,7 +1197,7 @@ msgid ""
 "rarely notice -- the JIT is fast and the cache is persistent across runs."
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:568
+#: ../../../compiler/lowering-pipeline.md:588
 msgid ""
 "The `CUDA_OXIDE_TARGET` environment variable overrides auto-detection for "
 "cases where you need a specific target. For example, `sm_100a` enables "
@@ -1155,7 +1205,7 @@ msgid ""
 "generic `sm_100` target."
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:573
+#: ../../../compiler/lowering-pipeline.md:593
 msgid ""
 "`cargo oxide run` adds a second layer of auto-detection on top of the "
 "backend's feature-based default: when neither `--arch` nor "
@@ -1167,7 +1217,7 @@ msgid ""
 "remain usable for cross-compilation."
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:582
+#: ../../../compiler/lowering-pipeline.md:602
 msgid ""
 "If the lowered module calls CUDA libdevice, cuda-oxide switches from `llc` "
 "to the NVVM path automatically. It resolves the target with the same "
@@ -1176,7 +1226,7 @@ msgid ""
 "only when an ordinary build discovers that libdevice is needed."
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:589
+#: ../../../compiler/lowering-pipeline.md:609
 msgid ""
 "Why LLVM 21? The 2-D bulk TMA load intrinsic used by `tma_copy`, `gemm_sol`, "
 "and `tcgen05_matmul` gained a 10-operand form with `addrspace(7)` and a "
@@ -1185,124 +1235,305 @@ msgid ""
 "intrinsic emitters per LLVM version, we set 21 as the minimum."
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:596
+#: ../../../compiler/lowering-pipeline.md:616
+msgid "Picking `opt` to match"
+msgstr ""
+
+#: ../../../compiler/lowering-pipeline.md:618
+msgid ""
+"`llc` is not the only LLVM binary the pipeline runs: the middle-end "
+"optimization stage needs `opt`, and the two must come from the **same LLVM "
+"major**. Mixing them is the failure this ordering exists to prevent -- `opt` "
+"from one release can emit IR that `llc` from another does not accept."
+msgstr ""
+
+#: ../../../compiler/lowering-pipeline.md:623
+msgid ""
+"So `llc` is resolved first, by the table above, and its major is read from "
+"`llc --version`. `opt` is then chosen to match:"
+msgstr ""
+
+#: ../../../compiler/lowering-pipeline.md:608
+msgid "`$CUDA_OXIDE_OPT` (if set)"
+msgstr ""
+
+#: ../../../compiler/lowering-pipeline.md:608
+msgid ""
+"Always respected. A major mismatch against the chosen `llc` is not silently "
+"corrected -- it records a diagnostic naming both binaries."
+msgstr ""
+
+#: ../../../compiler/lowering-pipeline.md:608
+msgid "The `opt` beside the chosen `llc`"
+msgstr ""
+
+#: ../../../compiler/lowering-pipeline.md:608
+msgid ""
+"LLVM installs keep their tools side by side. Still version-checked: a "
+"mismatched sibling is rejected, and it is only accepted unverified when "
+"`llc`'s own version cannot be read."
+msgstr ""
+
+#: ../../../compiler/lowering-pipeline.md:608
+msgid "Rust toolchain's `llvm-tools` `opt`"
+msgstr ""
+
+#: ../../../compiler/lowering-pipeline.md:608
+msgid ""
+"`<sysroot>/lib/rustlib/<host>/bin/opt`. Filtered to the same major as `llc`."
+msgstr ""
+
+#: ../../../compiler/lowering-pipeline.md:608
+msgid "`opt-22` / `opt-21` / `opt` on `PATH`"
+msgstr ""
+
+#: ../../../compiler/lowering-pipeline.md:608
+msgid "Filtered to the same major as `llc`."
+msgstr ""
+
+#: ../../../compiler/lowering-pipeline.md:633
+msgid ""
+"If no same-major `opt` exists, resolution records a diagnostic naming every "
+"rejected candidate. The standalone API treats a requested optimization as "
+"strict and fails; the legacy rustc path falls back to running unoptimized."
+msgstr ""
+
+#: ../../../compiler/lowering-pipeline.md:637
+msgid ""
+"Because step 2 keys off whichever `llc` won, pinning `CUDA_OXIDE_LLC` alone "
+"is usually enough -- the matching `opt` is normally found next to it, and "
+"setting `CUDA_OXIDE_OPT` as well is only needed when the pair is split "
+"across directories."
+msgstr ""
+
+#: ../../../compiler/lowering-pipeline.md:642
+msgid "The other two inputs the pipeline looks for"
+msgstr ""
+
+#: ../../../compiler/lowering-pipeline.md:644
+msgid ""
+"`llvm-link` is needed only when device code calls into libdevice and the PTX "
+"path resolves those calls with an IR-level link. `libdevice.10.bc` is needed "
+"more often: the NVVM path adds it to every module it finalizes, whether or "
+"not the kernel calls into libdevice. Both have their own override:"
+msgstr ""
+
+#: ../../../compiler/lowering-pipeline.md:608
+msgid "Variable"
+msgstr ""
+
+#: ../../../compiler/lowering-pipeline.md:608
+msgid "Selects"
+msgstr ""
+
+#: ../../../compiler/lowering-pipeline.md:608
+msgid "Discovery when unset"
+msgstr ""
+
+#: ../../../compiler/lowering-pipeline.md:608
+msgid "`CUDA_OXIDE_LLVM_LINK`"
+msgstr ""
+
+#: ../../../compiler/lowering-pipeline.md:608
+msgid "the `llvm-link` binary"
+msgstr ""
+
+#: ../../../compiler/lowering-pipeline.md:608
+msgid ""
+"the same four steps as `opt` -- beside the chosen `llc`, then the sysroot, "
+"then versioned names on `PATH`, filtered to `llc`'s major. When the variable "
+"*is* set it is respected as `CUDA_OXIDE_OPT` is, with a diagnostic naming "
+"both binaries if its major differs from `llc`'s"
+msgstr ""
+
+#: ../../../compiler/lowering-pipeline.md:608
+msgid "`CUDA_OXIDE_LIBDEVICE`"
+msgstr ""
+
+#: ../../../compiler/lowering-pipeline.md:608
+msgid ""
+"the `libdevice.10.bc` bitcode file; a path that does not exist is skipped "
+"silently"
+msgstr ""
+
+#: ../../../compiler/lowering-pipeline.md:608
+msgid ""
+"`<root>/nvvm/libdevice/libdevice.10.bc` for each of `CUDA_TOOLKIT_PATH`, "
+"`CUDA_HOME`, `CUDA_PATH`, `/usr/local/cuda`, `/opt/cuda`"
+msgstr ""
+
+#: ../../../compiler/lowering-pipeline.md:654
+msgid ""
+"When either piece is missing, the two paths react differently. An ordinary "
+"build does not fail: the backend's path decision sees that the IR-level link "
+"is unavailable and falls back to the NVVM path, the same automatic switch "
+"described under target selection. The standalone API's `Linking::Libdevice` "
+"is strict and fails up front instead, with a `LibdeviceUnavailable` error "
+"naming the missing piece: `libdevice.10.bc`, or an `llvm-link` sharing the "
+"selected `llc`'s major."
+msgstr ""
+
+#: ../../../compiler/lowering-pipeline.md:662
 msgid "Atomic operations in legacy NVVM IR"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:598
+#: ../../../compiler/lowering-pipeline.md:664
 msgid ""
 "An “LLVM-level atomic” is an atomic instruction in the NVVM input. It is not "
 "a statement about whether the GPU has atomic hardware. CUDA 12's LLVM 7 NVVM "
 "dialect accepts only a subset:"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:588
+#: ../../../compiler/lowering-pipeline.md:608
 msgid "LLVM construct"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:588
+#: ../../../compiler/lowering-pipeline.md:608
 msgid "CUDA 12 NVVM IR"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:588
+#: ../../../compiler/lowering-pipeline.md:608
 msgid "cuda-oxide legacy path today"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:588
+#: ../../../compiler/lowering-pipeline.md:608
 msgid "Atomic load or store"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:588
+#: ../../../compiler/lowering-pipeline.md:608
 msgid "Not supported as an LLVM atomic instruction"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:588
+#: ../../../compiler/lowering-pipeline.md:608
 msgid "Rejected; it needs another lowering"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:588
+#: ../../../compiler/lowering-pipeline.md:608
 msgid "`fence`"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:588
+#: ../../../compiler/lowering-pipeline.md:608
 msgid ""
 "LLVM `fence` is unsupported; an NVVM memory-barrier operation is required"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:588
+#: ../../../compiler/lowering-pipeline.md:608
 msgid "Rejected pending an exact ordering/scope mapping"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:588
+#: ../../../compiler/lowering-pipeline.md:608
 msgid "`cmpxchg`"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:588
+#: ../../../compiler/lowering-pipeline.md:608
 msgid ""
 "`i32`/`i64`, plus `i128` on `compute_90+`; global/shared pointers or generic "
 "pointers known to refer there"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:588
+#: ../../../compiler/lowering-pipeline.md:608
 msgid ""
-"Rejected pending type, address-space, alignment, and ordering validation"
+"Kept native for `i32`/`i64` at relaxed (monotonic) ordering in the generic, "
+"global and shared address spaces; a success ordering stronger than relaxed, "
+"or block/system scope, is rewritten to inline PTX. Other widths (`i128` "
+"included, on every capability), other address spaces, and a failure ordering "
+"stronger than the success ordering are rejected"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:588
+#: ../../../compiler/lowering-pipeline.md:608
 msgid "`atomicrmw`"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:588
+#: ../../../compiler/lowering-pipeline.md:608
 msgid ""
 "Integer `xchg`, `add`, `sub`, `and`, `or`, `xor`, `max`, `min`, `umax`, and "
 "`umin` on `i32`/`i64`; `i128 xchg` on `compute_90+`; the same address-space "
 "restriction"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:588
-msgid "Rejected pending the same validation"
+#: ../../../compiler/lowering-pipeline.md:608
+msgid ""
+"Kept native for `i32`/`i64` in the generic, global and shared address "
+"spaces, for those ten operations, at monotonic ordering. Other widths, "
+"kinds, orderings and address spaces are rejected"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:588
+#: ../../../compiler/lowering-pipeline.md:608
 msgid "NVVM atomic intrinsics"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:588
+#: ../../../compiler/lowering-pipeline.md:608
 msgid ""
 "Provide selected additional operations, including floating-point atomic add"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:588
-msgid "Not yet part of generic LLVM-atomic legalization"
-msgstr ""
-
-#: ../../../compiler/lowering-pipeline.md:610
+#: ../../../compiler/lowering-pipeline.md:608
 msgid ""
-"The normal LLVM-to-PTX path keeps its existing atomic support. The "
-"limitation above applies only to the legacy NVVM legalizer. cuda-oxide "
-"rejects these operations until it can prove that their type, address space, "
-"ordering, and scope are preserved. The legacy specification also accepts but "
-"ignores `cmpxchg`'s `weak` marker and failure ordering."
+"Relaxed, device-scoped `atomicrmw fadd` on `f32`/`f64` in generic/global/"
+"shared address spaces is lowered to the exact legacy intrinsic; other "
+"*floating-point* atomic RMW operations remain rejected"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:616
+#: ../../../compiler/lowering-pipeline.md:676
+msgid ""
+"The normal LLVM-to-PTX path keeps its existing atomic support. The table "
+"above describes only the legacy NVVM legalizer."
+msgstr ""
+
+#: ../../../compiler/lowering-pipeline.md:679
+msgid ""
+"Two rules explain that column. The first is that nothing is emitted whose "
+"type, address space, ordering and scope cannot be shown to survive: [#921]"
+"(https://github.com/NVlabs/cuda-oxide/pull/921) and [#923](https://github."
+"com/NVlabs/cuda-oxide/pull/923) admitted integer RMW and compare-exchange by "
+"proving those properties rather than by relaxing the requirement, which is "
+"why the surviving rejections are the cases where the proof does not hold."
+msgstr ""
+
+#: ../../../compiler/lowering-pipeline.md:687
+msgid ""
+"The second is that **scope is never weakened to fit**. libNVVM's legacy "
+"dialect drops what it cannot express: an ordered `cmpxchg` lowers to a bare "
+"`atom.cas.b32`/`.b64` with no ordering qualifier and no surrounding fence, "
+"which PTX then treats as relaxed. So a block- or system-scoped integer "
+"atomic, and a compare-exchange whose success ordering is stronger than "
+"relaxed, are rewritten to inline PTX that states the scope and ordering "
+"explicitly instead of being handed to libNVVM. That rewrite needs `sm_70` or "
+"newer. A failure ordering stronger than the success ordering is never "
+"rewritten; it is rejected outright."
+msgstr ""
+
+#: ../../../compiler/lowering-pipeline.md:697
+msgid ""
+"Monotonic is the only ordering an `atomicrmw` reaches here because MIR "
+"lowering has already split Rust's stronger orderings into separate fences, "
+"so the instruction itself carries none."
+msgstr ""
+
+#: ../../../compiler/lowering-pipeline.md:701
+msgid ""
+"The legacy specification also accepts but ignores `cmpxchg`'s `weak` marker "
+"and failure ordering."
+msgstr ""
+
+#: ../../../compiler/lowering-pipeline.md:704
 msgid ""
 "For the exact accepted types and operations, see the [CUDA 12.4 NVVM IR "
 "specification](https://docs.nvidia.com/cuda/archive/12.4.0/nvvm-ir-spec/"
 "index.html)."
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:621
+#: ../../../compiler/lowering-pipeline.md:709
 msgid "Putting It All Together"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:623
+#: ../../../compiler/lowering-pipeline.md:711
 msgid ""
 "Here is the full sequence of events when `lower_mir_to_llvm` processes a "
 "module:"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:625
+#: ../../../compiler/lowering-pipeline.md:713
 msgid ""
 "1. LLVM dialect types and operations are registered automatically (link-"
 "time)\n"
@@ -1320,13 +1551,13 @@ msgid ""
 "4. Invoke llc to produce .ptx\n"
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:640
+#: ../../../compiler/lowering-pipeline.md:728
 msgid ""
 "After step 4, you have a `.ptx` file that the CUDA driver can load and "
 "execute. The journey from `mir.checked_add` to `add.s32` is complete."
 msgstr ""
 
-#: ../../../compiler/lowering-pipeline.md:645
+#: ../../../compiler/lowering-pipeline.md:733
 msgid ""
 "The lowering pipeline turns Rust-flavored IR into GPU-ready LLVM IR. For a "
 "hands-on walkthrough of adding new GPU operations, see [Adding New "
