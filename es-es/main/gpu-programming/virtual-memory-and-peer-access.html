@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+
+
+<html lang="es-ES" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Virtual Memory Management and Peer Access &#8212; cuda-oxide</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/nvidia-sphinx-theme.css?v=5d97cc0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=3fa0529b" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/lightbox.css?v=9a4ecef8" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=64cc4de3f052d77215f0"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
+
+    <script src="../_static/documentation_options.js?v=4730b09f"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'gpu-programming/virtual-memory-and-peer-access';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../_static/js/lightbox.js?v=dda6eb66"></script>
+    <script src="../_static/js/spa-nav.js?v=793c9294"></script>
+    <link rel="canonical" href="https://projects.localizethedocs.org/cuda-oxide-book-l10n/gpu-programming/virtual-memory-and-peer-access.html" />
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="next" title="Launching Kernels" href="launching-kernels.html" />
+    <link rel="prev" title="Memory and Data Movement" href="memory-and-data-movement.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="es-ES"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+<script type="text/javascript" src="../ltd-provenance.js"></script>
+<script type="text/javascript" src="../ltd-current.js"></script>
+<script type="text/javascript" src="../../../ltd-config.js"></script>
+<script type="text/javascript" src="../../../ltd-flyout.js"></script>
+
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Saltar al contenido principal</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Volver arriba</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Advertencia de versión"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Navegación del sitio">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">cuda-oxide</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<button type="button" class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Búsqueda" aria-label="Búsqueda" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Tema">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Tema" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Claro"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Oscuro"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="Sistema"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>Sistema</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Claro</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Oscuro</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+    <button type="button" class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="En esta página">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<button type="button" class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Búsqueda" aria-label="Búsqueda" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Tema">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Tema" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Claro"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Oscuro"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="Sistema"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>Sistema</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Claro</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Oscuro</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><!--
+SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<div class="sidebar-tree">
+    <p class="sidebar-tree-title">
+        Table of Contents
+    </p>
+    <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/hello-gpu.html">Writing Your First Kernel</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Writing GPU Programs</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="execution-model.html">The CUDA Execution Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kernels-and-device-functions.html">Kernels and Device Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="memory-and-data-movement.html">Memory and Data Movement</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Virtual Memory Management and Peer Access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="launching-kernels.html">Launching Kernels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kernel-families.html">Kernel Families</a></li>
+<li class="toctree-l1"><a class="reference internal" href="closures-and-generics.html">Closures and Generics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="error-handling-and-debugging.html">Error Handling and Debugging</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Safety on the GPU</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-safety/the-safety-model.html">The Safety Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-safety/bounds-checks.html">Bounds Checks: Pay Once or Opt Out</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Async GPU Programming</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/the-device-operation-model.html">The DeviceOperation Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/combinators-and-composition.html">Combinators and Composition</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/scheduling-and-streams.html">Scheduling and Streams</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/concurrent-execution.html">Concurrent Execution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/overlapping-transfers-and-compute.html">Overlapping Transfers and Compute</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Building a Real Application</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../projects/async-mlp-pipeline.html">Project: Async MLP Pipeline</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Advanced GPU Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/shared-memory-and-synchronization.html">Shared Memory and Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/warp-level-programming.html">Warp-Level Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/tensor-memory-accelerator.html">Tensor Memory Accelerator (TMA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/matrix-multiply-accelerators.html">Matrix Multiply Accelerators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cluster-programming.html">Cluster Programming</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Inside the Compiler</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/architecture-overview.html">Architecture Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/pliron.html">Pliron – Pliron IR (MLIR-like)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/rustc-public.html">rustc_public – Stable MIR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/rustc-codegen-cuda.html">The Code Generator: rustc-codegen-cuda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/mir-importer.html">The MIR Importer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/compiler-optimizations.html">Compiler Optimizations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/mlir-dialects.html">Pliron Dialects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/lowering-pipeline.html">The Lowering Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/adding-new-intrinsics.html">Adding New Intrinsics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/catalog-generated-intrinsics.html">Catalog-Generated Intrinsics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/fuzzing-and-differential-testing.html">Fuzzing and Differential Testing</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Appendix</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/building-from-source.html">Building from Source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/api-quick-reference.html">API Quick Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/supported-features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/cuda-cpp-comparison.html">cuda-oxide vs CUDA C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/ecosystem.html">The Rust + GPU Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/glossary.html">Glossary</a></li>
+</ul>
+
+</div></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Miga de pan" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Inicio">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Virtual Memory Management and Peer Access</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="virtual-memory-management-and-peer-access">
+<h1>Virtual Memory Management and Peer Access<a class="headerlink" href="#virtual-memory-management-and-peer-access" title="Link to this heading">#</a></h1>
+<p>CUDA Virtual Memory Management (VMM) separates physical memory allocation,
+virtual address reservation, mapping, and access permissions into independent
+operations.</p>
+<p>This is lower-level than <code class="docutils literal notranslate"><span class="pre">DeviceBuffer</span></code>, which allocates memory and returns a
+ready-to-use device pointer in one operation. VMM is useful when an application
+needs explicit control over where physical memory is mapped or which GPUs may
+access it.</p>
+<p>Peer-to-peer access (P2P) is a related but separate mechanism. It allows one
+CUDA context to access memory associated with another GPU directly over a
+supported interconnect such as NVLink or PCIe.</p>
+<p>This chapter covers:</p>
+<ul class="simple">
+<li><p>Querying whether two GPUs support peer access.</p></li>
+<li><p>Enabling and disabling directional peer access.</p></li>
+<li><p>Allocating physical device memory with VMM.</p></li>
+<li><p>Reserving virtual address ranges.</p></li>
+<li><p>Mapping physical allocations into those ranges.</p></li>
+<li><p>Granting mappings to one or more devices.</p></li>
+<li><p>Mapping one physical allocation into multiple GPU-visible address ranges.</p></li>
+<li><p>Synchronization and resource destruction order.</p></li>
+</ul>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p>The complete integration test is available in
+<a class="reference external" href="https://github.com/NVlabs/cutile-rs/blob/main/cuda-core/tests/simt_vmm_p2p.rs"><code class="docutils literal notranslate"><span class="pre">cuda-core/tests/simt_vmm_p2p.rs</span></code> in cutile-rs</a>.</p>
+<p>The corresponding implementations are:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/NVlabs/cutile-rs/blob/main/cuda-core/src/simt/vmm.rs"><code class="docutils literal notranslate"><span class="pre">cuda-core/src/simt/vmm.rs</span></code> in cutile-rs</a></p></li>
+<li><p><a class="reference external" href="https://github.com/NVlabs/cutile-rs/blob/main/cuda-core/src/simt/peer.rs"><code class="docutils literal notranslate"><span class="pre">cuda-core/src/simt/peer.rs</span></code> in cutile-rs</a></p></li>
+</ul>
+</div>
+<section id="vmm-and-p2p-solve-different-problems">
+<h2>VMM and P2P solve different problems<a class="headerlink" href="#vmm-and-p2p-solve-different-problems" title="Link to this heading">#</a></h2>
+<p>VMM controls the relationship between physical memory and virtual addresses:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Physical allocation
+        |
+        v
+Virtual address reservation
+        |
+        v
+Mapping
+        |
+        v
+Per-device access permissions
+</pre></div>
+</div>
+<p>P2P controls whether a CUDA context can access memory associated with another
+device:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Context on GPU 0
+        |
+        | enable_peer_access(&amp;gpu0, &amp;gpu1)
+        v
+Memory accessible through GPU 1
+</pre></div>
+</div>
+<p>A multi-GPU application may use both mechanisms:</p>
+<ol class="arabic simple">
+<li><p>Allocate physical memory on one device.</p></li>
+<li><p>Reserve virtual address ranges.</p></li>
+<li><p>Map the physical allocation into those ranges.</p></li>
+<li><p>Grant both devices access to the mappings.</p></li>
+<li><p>Enable peer access in the required directions.</p></li>
+</ol>
+<p>Neither operation implies the other. A VMM mapping still requires explicit
+access permissions, and peer access must be enabled when a context needs direct
+access to memory associated with a peer context.</p>
+</section>
+<section id="hardware-and-topology-requirements">
+<h2>Hardware and topology requirements<a class="headerlink" href="#hardware-and-topology-requirements" title="Link to this heading">#</a></h2>
+<p>Peer access depends on the physical GPU topology, the CUDA driver, and the
+platform configuration. Two GPUs in the same machine are not necessarily able
+to access each other directly.</p>
+<p>Always query support before enabling peer access:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_core</span><span class="p">::</span><span class="n">simt</span><span class="p">::</span><span class="n">peer</span><span class="p">;</span>
+<span class="k">use</span><span class="w"> </span><span class="n">cuda_core</span><span class="p">::{</span><span class="n">CudaContext</span><span class="p">,</span><span class="w"> </span><span class="n">DriverError</span><span class="p">};</span>
+
+<span class="k">fn</span><span class="w"> </span><span class="nf">check_peer_access</span><span class="p">()</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nb">Result</span><span class="o">&lt;</span><span class="p">(),</span><span class="w"> </span><span class="n">DriverError</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">ctx0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CudaContext</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">ctx1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CudaContext</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">peer</span><span class="p">::</span><span class="n">can_access_peer</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ctx0</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ctx1</span><span class="p">)</span><span class="o">?</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="fm">println!</span><span class="p">(</span><span class="s">"GPU 0 can access GPU 1"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="fm">println!</span><span class="p">(</span><span class="s">"GPU 0 cannot access GPU 1"</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="nb">Ok</span><span class="p">(())</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">can_access_peer(from,</span> <span class="pre">to)</span></code> is only a capability query. It does not change
+either context.</p>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>Peer access is directional. Support from GPU 0 to GPU 1 should not be treated
+as proof that the reverse direction is enabled.</p>
+</div>
+</section>
+<section id="enabling-peer-access">
+<h2>Enabling peer access<a class="headerlink" href="#enabling-peer-access" title="Link to this heading">#</a></h2>
+<p>Use <code class="docutils literal notranslate"><span class="pre">peer::enable_peer_access</span></code> to allow one context to access memory associated
+with another device:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_core</span><span class="p">::</span><span class="n">simt</span><span class="p">::</span><span class="n">peer</span><span class="p">;</span>
+<span class="k">use</span><span class="w"> </span><span class="n">cuda_core</span><span class="p">::{</span><span class="n">CudaContext</span><span class="p">,</span><span class="w"> </span><span class="n">DriverError</span><span class="p">};</span>
+
+<span class="k">fn</span><span class="w"> </span><span class="nf">enable_bidirectional_peer_access</span><span class="p">()</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nb">Result</span><span class="o">&lt;</span><span class="p">(),</span><span class="w"> </span><span class="n">DriverError</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">ctx0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CudaContext</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">ctx1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CudaContext</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">!</span><span class="n">peer</span><span class="p">::</span><span class="n">can_access_peer</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ctx0</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ctx1</span><span class="p">)</span><span class="o">?</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nb">Ok</span><span class="p">(());</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="n">peer</span><span class="p">::</span><span class="n">enable_peer_access</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ctx0</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ctx1</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+<span class="w">    </span><span class="n">peer</span><span class="p">::</span><span class="n">enable_peer_access</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ctx1</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ctx0</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// Both contexts may now initiate peer accesses.</span>
+
+<span class="w">    </span><span class="n">peer</span><span class="p">::</span><span class="n">disable_peer_access</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ctx0</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ctx1</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+<span class="w">    </span><span class="n">peer</span><span class="p">::</span><span class="n">disable_peer_access</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ctx1</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ctx0</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+
+<span class="w">    </span><span class="nb">Ok</span><span class="p">(())</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The direction is determined by the argument order:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Call</p></th>
+<th class="head text-left"><p>Effect</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">enable_peer_access(&amp;ctx0,</span> <span class="pre">&amp;ctx1)</span></code></p></td>
+<td class="text-left"><p>GPU 0’s context may access GPU 1 memory</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">enable_peer_access(&amp;ctx1,</span> <span class="pre">&amp;ctx0)</span></code></p></td>
+<td class="text-left"><p>GPU 1’s context may access GPU 0 memory</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Both calls</p></td>
+<td class="text-left"><p>Bidirectional peer access</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Calling <code class="docutils literal notranslate"><span class="pre">enable_peer_access</span></code> when access is already enabled succeeds.
+Likewise, disabling access that is not currently enabled is treated as a
+successful no-op.</p>
+<div class="admonition warning">
+<p class="admonition-title">Advertencia</p>
+<p>Complete all operations using peer memory before disabling peer access.
+Disabling access while kernels or copies are still using peer-visible memory
+can invalidate those operations.</p>
+</div>
+</section>
+<section id="the-vmm-lifecycle">
+<h2>The VMM lifecycle<a class="headerlink" href="#the-vmm-lifecycle" title="Link to this heading">#</a></h2>
+<p>A VMM allocation has four explicit stages:</p>
+<ol class="arabic simple">
+<li><p>Query the device’s allocation granularity.</p></li>
+<li><p>Allocate physical memory.</p></li>
+<li><p>Reserve a virtual address range and map the physical memory into it.</p></li>
+<li><p>Grant one or more devices access to the mapping.</p></li>
+</ol>
+<p>The main APIs are:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>API</p></th>
+<th class="head text-left"><p>Purpose</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">vmm::allocation_granularity(device)</span></code></p></td>
+<td class="text-left"><p>Query the required allocation granularity</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">vmm::align_size(size,</span> <span class="pre">granularity)</span></code></p></td>
+<td class="text-left"><p>Round a size to that granularity</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">PhysicalAllocation::new(device,</span> <span class="pre">size)</span></code></p></td>
+<td class="text-left"><p>Allocate physical memory</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">VirtualReservation::new(size,</span> <span class="pre">alignment)</span></code></p></td>
+<td class="text-left"><p>Reserve a virtual address range</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">Mapping::new(va,</span> <span class="pre">size,</span> <span class="pre">&amp;physical,</span> <span class="pre">offset)</span></code></p></td>
+<td class="text-left"><p>Map physical memory into a VA range</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">vmm::set_access(va,</span> <span class="pre">size,</span> <span class="pre">devices)</span></code></p></td>
+<td class="text-left"><p>Grant devices access to the mapped range</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="allocation-granularity">
+<h2>Allocation granularity<a class="headerlink" href="#allocation-granularity" title="Link to this heading">#</a></h2>
+<p>CUDA VMM operations require allocation sizes and mapping sizes to be multiples
+of the device’s allocation granularity.</p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">allocation_granularity</span></code> and <code class="docutils literal notranslate"><span class="pre">align_size</span></code> before allocating:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_core</span><span class="p">::</span><span class="n">simt</span><span class="p">::</span><span class="n">vmm</span><span class="p">;</span>
+<span class="k">use</span><span class="w"> </span><span class="n">cuda_core</span><span class="p">::{</span><span class="n">CudaContext</span><span class="p">,</span><span class="w"> </span><span class="n">DriverError</span><span class="p">};</span>
+
+<span class="k">fn</span><span class="w"> </span><span class="nf">aligned_allocation_size</span><span class="p">(</span><span class="n">requested</span><span class="p">:</span><span class="w"> </span><span class="kt">usize</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nb">Result</span><span class="o">&lt;</span><span class="kt">usize</span><span class="p">,</span><span class="w"> </span><span class="n">DriverError</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">ctx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CudaContext</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">granularity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vmm</span><span class="p">::</span><span class="n">allocation_granularity</span><span class="p">(</span><span class="n">ctx</span><span class="p">.</span><span class="n">cu_device</span><span class="p">())</span><span class="o">?</span><span class="p">;</span>
+
+<span class="w">    </span><span class="nb">Ok</span><span class="p">(</span><span class="n">vmm</span><span class="p">::</span><span class="n">align_size</span><span class="p">(</span><span class="n">requested</span><span class="p">,</span><span class="w"> </span><span class="n">granularity</span><span class="p">))</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Do not assume that a page-sized value such as 4 KiB satisfies the CUDA VMM
+granularity requirement. The required value is device-dependent.</p>
+</section>
+<section id="single-gpu-vmm-mapping">
+<h2>Single-GPU VMM mapping<a class="headerlink" href="#single-gpu-vmm-mapping" title="Link to this heading">#</a></h2>
+<p>The following example allocates physical memory, maps it into a virtual address
+range, writes data through the mapping, and reads it back.</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_core</span><span class="p">::</span><span class="n">simt</span><span class="p">::</span><span class="n">vmm</span><span class="p">;</span>
+<span class="k">use</span><span class="w"> </span><span class="n">cuda_core</span><span class="p">::{</span><span class="n">CudaContext</span><span class="p">,</span><span class="w"> </span><span class="n">DriverError</span><span class="p">};</span>
+
+<span class="k">fn</span><span class="w"> </span><span class="nf">single_gpu_vmm_roundtrip</span><span class="p">()</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nb">Result</span><span class="o">&lt;</span><span class="p">(),</span><span class="w"> </span><span class="n">DriverError</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">ctx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CudaContext</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">stream</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ctx</span><span class="p">.</span><span class="n">default_stream</span><span class="p">();</span>
+
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">granularity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vmm</span><span class="p">::</span><span class="n">allocation_granularity</span><span class="p">(</span><span class="n">ctx</span><span class="p">.</span><span class="n">cu_device</span><span class="p">())</span><span class="o">?</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">allocation_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vmm</span><span class="p">::</span><span class="n">align_size</span><span class="p">(</span><span class="mi">4096</span><span class="p">,</span><span class="w"> </span><span class="n">granularity</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// Stage 1: allocate physical memory.</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">physical</span><span class="w"> </span><span class="o">=</span>
+<span class="w">        </span><span class="n">vmm</span><span class="p">::</span><span class="n">PhysicalAllocation</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="n">ctx</span><span class="p">.</span><span class="n">cu_device</span><span class="p">(),</span><span class="w"> </span><span class="n">allocation_size</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// Stage 2: reserve virtual address space.</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">reservation</span><span class="w"> </span><span class="o">=</span>
+<span class="w">        </span><span class="n">vmm</span><span class="p">::</span><span class="n">VirtualReservation</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="n">allocation_size</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// Stage 3: map the physical allocation into the reserved range.</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">mapping</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vmm</span><span class="p">::</span><span class="n">Mapping</span><span class="p">::</span><span class="n">new</span><span class="p">(</span>
+<span class="w">        </span><span class="n">reservation</span><span class="p">.</span><span class="n">base</span><span class="p">(),</span>
+<span class="w">        </span><span class="n">allocation_size</span><span class="p">,</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="n">physical</span><span class="p">,</span>
+<span class="w">        </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">    </span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// Stage 4: grant GPU 0 read/write access to the mapping.</span>
+<span class="w">    </span><span class="n">vmm</span><span class="p">::</span><span class="n">set_access</span><span class="p">(</span>
+<span class="w">        </span><span class="n">reservation</span><span class="p">.</span><span class="n">base</span><span class="p">(),</span>
+<span class="w">        </span><span class="n">allocation_size</span><span class="p">,</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="p">[</span><span class="n">ctx</span><span class="p">.</span><span class="n">cu_device</span><span class="p">()],</span>
+<span class="w">    </span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">input</span><span class="p">:</span><span class="w"> </span><span class="nb">Vec</span><span class="o">&lt;</span><span class="kt">u8</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mi">0</span><span class="o">..</span><span class="mi">64</span><span class="p">).</span><span class="n">map</span><span class="p">(</span><span class="o">|</span><span class="n">i</span><span class="o">|</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">7</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">u8</span><span class="p">).</span><span class="n">collect</span><span class="p">();</span>
+
+<span class="w">    </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">cuda_core</span><span class="p">::</span><span class="n">simt</span><span class="p">::</span><span class="n">memory</span><span class="p">::</span><span class="n">memcpy_htod_async</span><span class="p">(</span>
+<span class="w">            </span><span class="n">reservation</span><span class="p">.</span><span class="n">base</span><span class="p">(),</span>
+<span class="w">            </span><span class="n">input</span><span class="p">.</span><span class="n">as_ptr</span><span class="p">(),</span>
+<span class="w">            </span><span class="n">input</span><span class="p">.</span><span class="n">len</span><span class="p">(),</span>
+<span class="w">            </span><span class="n">stream</span><span class="p">.</span><span class="n">cu_stream</span><span class="p">(),</span>
+<span class="w">        </span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="n">ctx</span><span class="p">.</span><span class="n">synchronize</span><span class="p">()</span><span class="o">?</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="fm">vec!</span><span class="p">[</span><span class="mi">0</span><span class="k">u8</span><span class="p">;</span><span class="w"> </span><span class="n">input</span><span class="p">.</span><span class="n">len</span><span class="p">()];</span>
+
+<span class="w">    </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">cuda_core</span><span class="p">::</span><span class="n">simt</span><span class="p">::</span><span class="n">memory</span><span class="p">::</span><span class="n">memcpy_dtoh_async</span><span class="p">(</span>
+<span class="w">            </span><span class="n">output</span><span class="p">.</span><span class="n">as_mut_ptr</span><span class="p">(),</span>
+<span class="w">            </span><span class="n">reservation</span><span class="p">.</span><span class="n">base</span><span class="p">(),</span>
+<span class="w">            </span><span class="n">output</span><span class="p">.</span><span class="n">len</span><span class="p">(),</span>
+<span class="w">            </span><span class="n">stream</span><span class="p">.</span><span class="n">cu_stream</span><span class="p">(),</span>
+<span class="w">        </span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="n">ctx</span><span class="p">.</span><span class="n">synchronize</span><span class="p">()</span><span class="o">?</span><span class="p">;</span>
+
+<span class="w">    </span><span class="fm">assert_eq!</span><span class="p">(</span><span class="n">output</span><span class="p">,</span><span class="w"> </span><span class="n">input</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// Resources must be destroyed in dependency order.</span>
+<span class="w">    </span><span class="nb">drop</span><span class="p">(</span><span class="n">mapping</span><span class="p">);</span>
+<span class="w">    </span><span class="nb">drop</span><span class="p">(</span><span class="n">reservation</span><span class="p">);</span>
+<span class="w">    </span><span class="nb">drop</span><span class="p">(</span><span class="n">physical</span><span class="p">);</span>
+
+<span class="w">    </span><span class="nb">Ok</span><span class="p">(())</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Mapping::new</span></code> does not by itself make the mapped address accessible. The
+mapping remains unusable until <code class="docutils literal notranslate"><span class="pre">vmm::set_access</span></code> grants access to at least one
+device.</p>
+</section>
+<section id="mapping-one-physical-allocation-for-two-gpus">
+<h2>Mapping one physical allocation for two GPUs<a class="headerlink" href="#mapping-one-physical-allocation-for-two-gpus" title="Link to this heading">#</a></h2>
+<p>VMM allows one physical allocation to be mapped into multiple virtual address
+ranges.</p>
+<p>The following pattern:</p>
+<ul class="simple">
+<li><p>Allocates physical memory on GPU 0.</p></li>
+<li><p>Creates one virtual address mapping for GPU 0.</p></li>
+<li><p>Creates another virtual address mapping for GPU 1.</p></li>
+<li><p>Grants both devices access to both mappings.</p></li>
+<li><p>Writes through GPU 0’s mapping.</p></li>
+<li><p>Reads the same physical memory through GPU 1’s mapping.</p></li>
+</ul>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_core</span><span class="p">::</span><span class="n">simt</span><span class="p">::{</span><span class="n">peer</span><span class="p">,</span><span class="w"> </span><span class="n">vmm</span><span class="p">};</span>
+<span class="k">use</span><span class="w"> </span><span class="n">cuda_core</span><span class="p">::{</span><span class="n">CudaContext</span><span class="p">,</span><span class="w"> </span><span class="n">DriverError</span><span class="p">,</span><span class="w"> </span><span class="n">IntoResult</span><span class="p">};</span>
+<span class="k">use</span><span class="w"> </span><span class="n">std</span><span class="p">::</span><span class="n">mem</span><span class="p">::</span><span class="n">MaybeUninit</span><span class="p">;</span>
+
+<span class="k">fn</span><span class="w"> </span><span class="nf">gpu_count</span><span class="p">()</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nb">Result</span><span class="o">&lt;</span><span class="kt">usize</span><span class="p">,</span><span class="w"> </span><span class="n">DriverError</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">cuda_core</span><span class="p">::</span><span class="n">init</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MaybeUninit</span><span class="p">::</span><span class="n">uninit</span><span class="p">();</span>
+
+<span class="w">    </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">cuda_core</span><span class="p">::</span><span class="n">sys</span><span class="p">::</span><span class="n">cuDeviceGetCount</span><span class="p">(</span><span class="n">count</span><span class="p">.</span><span class="n">as_mut_ptr</span><span class="p">()).</span><span class="n">result</span><span class="p">()</span><span class="o">?</span><span class="p">;</span>
+<span class="w">        </span><span class="nb">Ok</span><span class="p">(</span><span class="n">count</span><span class="p">.</span><span class="n">assume_init</span><span class="p">()</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">usize</span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">fn</span><span class="w"> </span><span class="nf">cross_gpu_vmm_roundtrip</span><span class="p">()</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nb">Result</span><span class="o">&lt;</span><span class="p">(),</span><span class="w"> </span><span class="n">DriverError</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">gpu_count</span><span class="p">()</span><span class="o">?</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="fm">println!</span><span class="p">(</span><span class="s">"This example requires at least two CUDA devices."</span><span class="p">);</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nb">Ok</span><span class="p">(());</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">ctx0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CudaContext</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">ctx1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CudaContext</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">!</span><span class="n">peer</span><span class="p">::</span><span class="n">can_access_peer</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ctx0</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ctx1</span><span class="p">)</span><span class="o">?</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="fm">println!</span><span class="p">(</span><span class="s">"The selected devices do not support peer access."</span><span class="p">);</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nb">Ok</span><span class="p">(());</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="n">peer</span><span class="p">::</span><span class="n">enable_peer_access</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ctx0</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ctx1</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+<span class="w">    </span><span class="n">peer</span><span class="p">::</span><span class="n">enable_peer_access</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ctx1</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ctx0</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">granularity</span><span class="w"> </span><span class="o">=</span>
+<span class="w">        </span><span class="n">vmm</span><span class="p">::</span><span class="n">allocation_granularity</span><span class="p">(</span><span class="n">ctx0</span><span class="p">.</span><span class="n">cu_device</span><span class="p">())</span><span class="o">?</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">allocation_size</span><span class="w"> </span><span class="o">=</span>
+<span class="w">        </span><span class="n">vmm</span><span class="p">::</span><span class="n">align_size</span><span class="p">(</span><span class="mi">4096</span><span class="p">,</span><span class="w"> </span><span class="n">granularity</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// The physical memory is allocated only once, on GPU 0.</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">physical</span><span class="w"> </span><span class="o">=</span>
+<span class="w">        </span><span class="n">vmm</span><span class="p">::</span><span class="n">PhysicalAllocation</span><span class="p">::</span><span class="n">new</span><span class="p">(</span>
+<span class="w">            </span><span class="n">ctx0</span><span class="p">.</span><span class="n">cu_device</span><span class="p">(),</span>
+<span class="w">            </span><span class="n">allocation_size</span><span class="p">,</span>
+<span class="w">        </span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// GPU 0 virtual address range.</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">reservation0</span><span class="w"> </span><span class="o">=</span>
+<span class="w">        </span><span class="n">vmm</span><span class="p">::</span><span class="n">VirtualReservation</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="n">allocation_size</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">mapping0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vmm</span><span class="p">::</span><span class="n">Mapping</span><span class="p">::</span><span class="n">new</span><span class="p">(</span>
+<span class="w">        </span><span class="n">reservation0</span><span class="p">.</span><span class="n">base</span><span class="p">(),</span>
+<span class="w">        </span><span class="n">allocation_size</span><span class="p">,</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="n">physical</span><span class="p">,</span>
+<span class="w">        </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">    </span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">vmm</span><span class="p">::</span><span class="n">set_access</span><span class="p">(</span>
+<span class="w">        </span><span class="n">reservation0</span><span class="p">.</span><span class="n">base</span><span class="p">(),</span>
+<span class="w">        </span><span class="n">allocation_size</span><span class="p">,</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="p">[</span><span class="n">ctx0</span><span class="p">.</span><span class="n">cu_device</span><span class="p">(),</span><span class="w"> </span><span class="n">ctx1</span><span class="p">.</span><span class="n">cu_device</span><span class="p">()],</span>
+<span class="w">    </span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// GPU 1 virtual address range backed by the same physical allocation.</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">reservation1</span><span class="w"> </span><span class="o">=</span>
+<span class="w">        </span><span class="n">vmm</span><span class="p">::</span><span class="n">VirtualReservation</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="n">allocation_size</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">mapping1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vmm</span><span class="p">::</span><span class="n">Mapping</span><span class="p">::</span><span class="n">new</span><span class="p">(</span>
+<span class="w">        </span><span class="n">reservation1</span><span class="p">.</span><span class="n">base</span><span class="p">(),</span>
+<span class="w">        </span><span class="n">allocation_size</span><span class="p">,</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="n">physical</span><span class="p">,</span>
+<span class="w">        </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">    </span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">vmm</span><span class="p">::</span><span class="n">set_access</span><span class="p">(</span>
+<span class="w">        </span><span class="n">reservation1</span><span class="p">.</span><span class="n">base</span><span class="p">(),</span>
+<span class="w">        </span><span class="n">allocation_size</span><span class="p">,</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="p">[</span><span class="n">ctx0</span><span class="p">.</span><span class="n">cu_device</span><span class="p">(),</span><span class="w"> </span><span class="n">ctx1</span><span class="p">.</span><span class="n">cu_device</span><span class="p">()],</span>
+<span class="w">    </span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">input</span><span class="p">:</span><span class="w"> </span><span class="nb">Vec</span><span class="o">&lt;</span><span class="kt">u32</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mi">0</span><span class="o">..</span><span class="mi">256</span><span class="p">).</span><span class="n">collect</span><span class="p">();</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">byte_length</span><span class="w"> </span><span class="o">=</span>
+<span class="w">        </span><span class="n">input</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">std</span><span class="p">::</span><span class="n">mem</span><span class="p">::</span><span class="n">size_of</span><span class="p">::</span><span class="o">&lt;</span><span class="kt">u32</span><span class="o">&gt;</span><span class="p">();</span>
+
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">stream0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ctx0</span><span class="p">.</span><span class="n">default_stream</span><span class="p">();</span>
+<span class="w">    </span><span class="n">ctx0</span><span class="p">.</span><span class="n">bind_to_thread</span><span class="p">()</span><span class="o">?</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">cuda_core</span><span class="p">::</span><span class="n">simt</span><span class="p">::</span><span class="n">memory</span><span class="p">::</span><span class="n">memcpy_htod_async</span><span class="p">(</span>
+<span class="w">            </span><span class="n">reservation0</span><span class="p">.</span><span class="n">base</span><span class="p">(),</span>
+<span class="w">            </span><span class="n">input</span><span class="p">.</span><span class="n">as_ptr</span><span class="p">(),</span>
+<span class="w">            </span><span class="n">byte_length</span><span class="p">,</span>
+<span class="w">            </span><span class="n">stream0</span><span class="p">.</span><span class="n">cu_stream</span><span class="p">(),</span>
+<span class="w">        </span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="n">ctx0</span><span class="p">.</span><span class="n">synchronize</span><span class="p">()</span><span class="o">?</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="fm">vec!</span><span class="p">[</span><span class="mi">0</span><span class="k">u32</span><span class="p">;</span><span class="w"> </span><span class="n">input</span><span class="p">.</span><span class="n">len</span><span class="p">()];</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">stream1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ctx1</span><span class="p">.</span><span class="n">default_stream</span><span class="p">();</span>
+<span class="w">    </span><span class="n">ctx1</span><span class="p">.</span><span class="n">bind_to_thread</span><span class="p">()</span><span class="o">?</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">cuda_core</span><span class="p">::</span><span class="n">simt</span><span class="p">::</span><span class="n">memory</span><span class="p">::</span><span class="n">memcpy_dtoh_async</span><span class="p">(</span>
+<span class="w">            </span><span class="n">output</span><span class="p">.</span><span class="n">as_mut_ptr</span><span class="p">(),</span>
+<span class="w">            </span><span class="n">reservation1</span><span class="p">.</span><span class="n">base</span><span class="p">(),</span>
+<span class="w">            </span><span class="n">byte_length</span><span class="p">,</span>
+<span class="w">            </span><span class="n">stream1</span><span class="p">.</span><span class="n">cu_stream</span><span class="p">(),</span>
+<span class="w">        </span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="n">ctx1</span><span class="p">.</span><span class="n">synchronize</span><span class="p">()</span><span class="o">?</span><span class="p">;</span>
+
+<span class="w">    </span><span class="fm">assert_eq!</span><span class="p">(</span><span class="n">output</span><span class="p">,</span><span class="w"> </span><span class="n">input</span><span class="p">);</span>
+
+<span class="w">    </span><span class="c1">// Destroy mappings before their reservations and backing allocation.</span>
+<span class="w">    </span><span class="nb">drop</span><span class="p">(</span><span class="n">mapping1</span><span class="p">);</span>
+<span class="w">    </span><span class="nb">drop</span><span class="p">(</span><span class="n">mapping0</span><span class="p">);</span>
+<span class="w">    </span><span class="nb">drop</span><span class="p">(</span><span class="n">reservation1</span><span class="p">);</span>
+<span class="w">    </span><span class="nb">drop</span><span class="p">(</span><span class="n">reservation0</span><span class="p">);</span>
+<span class="w">    </span><span class="nb">drop</span><span class="p">(</span><span class="n">physical</span><span class="p">);</span>
+
+<span class="w">    </span><span class="n">peer</span><span class="p">::</span><span class="n">disable_peer_access</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ctx0</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ctx1</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+<span class="w">    </span><span class="n">peer</span><span class="p">::</span><span class="n">disable_peer_access</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ctx1</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ctx0</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+
+<span class="w">    </span><span class="nb">Ok</span><span class="p">(())</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="virtual-addresses-are-not-guaranteed-to-match">
+<h2>Virtual addresses are not guaranteed to match<a class="headerlink" href="#virtual-addresses-are-not-guaranteed-to-match" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">VirtualReservation::new(size,</span> <span class="pre">0)</span></code> asks the CUDA driver to select a virtual
+address. Two reservations backed by the same physical allocation may therefore
+have different base addresses:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>GPU 0 VA: 0x0000_7f10_0000_0000
+                         \
+                          same physical allocation
+                         /
+GPU 1 VA: 0x0000_7e80_0000_0000
+</pre></div>
+</div>
+<p>The current API supports shared physical backing, but it does not guarantee
+that every GPU observes that memory at the same numerical virtual address.</p>
+<p>Code must use the <code class="docutils literal notranslate"><span class="pre">base()</span></code> returned by the reservation associated with the
+current access path.</p>
+<div class="admonition warning">
+<p class="admonition-title">Advertencia</p>
+<p>Do not describe this pattern as a complete symmetric heap. A symmetric heap
+requires equivalent virtual addresses across participating devices, which the
+current driver-selected reservation API does not guarantee.</p>
+</div>
+</section>
+<section id="ownership-and-destruction-order">
+<h2>Ownership and destruction order<a class="headerlink" href="#ownership-and-destruction-order" title="Link to this heading">#</a></h2>
+<p>The VMM wrapper types own CUDA resources through RAII:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Type</p></th>
+<th class="head text-left"><p>CUDA resource</p></th>
+<th class="head text-left"><p>Drop operation</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">PhysicalAllocation</span></code></p></td>
+<td class="text-left"><p>Generic physical allocation handle</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cuMemRelease</span></code></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">VirtualReservation</span></code></p></td>
+<td class="text-left"><p>Reserved virtual address range</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cuMemAddressFree</span></code></p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">Mapping</span></code></p></td>
+<td class="text-left"><p>Physical-to-virtual mapping</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cuMemUnmap</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The dependency order is:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>PhysicalAllocation   VirtualReservation
+        ^                    ^
+         \                  /
+          \                /
+               Mapping
+</pre></div>
+</div>
+<p>A <code class="docutils literal notranslate"><span class="pre">Mapping</span></code> consumes one <code class="docutils literal notranslate"><span class="pre">PhysicalAllocation</span></code> and one <code class="docutils literal notranslate"><span class="pre">VirtualReservation</span></code>,
+so both must outlive it.</p>
+<p>Destroy resources in the reverse order:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="n">ctx0</span><span class="p">.</span><span class="n">synchronize</span><span class="p">()</span><span class="o">?</span><span class="p">;</span>
+<span class="n">ctx1</span><span class="p">.</span><span class="n">synchronize</span><span class="p">()</span><span class="o">?</span><span class="p">;</span>
+
+<span class="nb">drop</span><span class="p">(</span><span class="n">mapping1</span><span class="p">);</span>
+<span class="nb">drop</span><span class="p">(</span><span class="n">mapping0</span><span class="p">);</span>
+
+<span class="nb">drop</span><span class="p">(</span><span class="n">reservation1</span><span class="p">);</span>
+<span class="nb">drop</span><span class="p">(</span><span class="n">reservation0</span><span class="p">);</span>
+
+<span class="nb">drop</span><span class="p">(</span><span class="n">physical</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The complete teardown sequence for a multi-GPU operation is:</p>
+<ol class="arabic simple">
+<li><p>Stop submitting operations that use the mappings.</p></li>
+<li><p>Synchronize every stream or context using them.</p></li>
+<li><p>Drop all <code class="docutils literal notranslate"><span class="pre">Mapping</span></code> values.</p></li>
+<li><p>Drop all <code class="docutils literal notranslate"><span class="pre">VirtualReservation</span></code> values.</p></li>
+<li><p>Drop the <code class="docutils literal notranslate"><span class="pre">PhysicalAllocation</span></code>.</p></li>
+<li><p>Disable peer access if it is no longer needed.</p></li>
+</ol>
+<div class="admonition warning">
+<p class="admonition-title">Advertencia</p>
+<p>Rust does not encode the mapping dependencies in the type system. A <code class="docutils literal notranslate"><span class="pre">Mapping</span></code>
+does not borrow its <code class="docutils literal notranslate"><span class="pre">PhysicalAllocation</span></code> or <code class="docutils literal notranslate"><span class="pre">VirtualReservation</span></code> for its full
+lifetime. The application is responsible for preserving the required drop
+order.</p>
+</div>
+</section>
+<section id="do-not-wrap-vmm-pointers-in-an-owning-buffer">
+<h2>Do not wrap VMM pointers in an owning buffer<a class="headerlink" href="#do-not-wrap-vmm-pointers-in-an-owning-buffer" title="Link to this heading">#</a></h2>
+<p>A VMM virtual address is owned by its <code class="docutils literal notranslate"><span class="pre">Mapping</span></code>, <code class="docutils literal notranslate"><span class="pre">VirtualReservation</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">PhysicalAllocation</span></code>.</p>
+<p>Do not construct an owning <code class="docutils literal notranslate"><span class="pre">DeviceBuffer</span></code> from that pointer unless the API
+explicitly defines a non-owning conversion. An owning buffer could attempt to
+release the pointer using <code class="docutils literal notranslate"><span class="pre">cuMemFree</span></code>, while the VMM resources expect
+<code class="docutils literal notranslate"><span class="pre">cuMemUnmap</span></code>, <code class="docutils literal notranslate"><span class="pre">cuMemAddressFree</span></code>, and <code class="docutils literal notranslate"><span class="pre">cuMemRelease</span></code>.</p>
+<p>Pass the raw <code class="docutils literal notranslate"><span class="pre">CUdeviceptr</span></code> only to APIs that accept non-owning device
+addresses.</p>
+</section>
+<section id="error-handling-and-unsupported-systems">
+<h2>Error handling and unsupported systems<a class="headerlink" href="#error-handling-and-unsupported-systems" title="Link to this heading">#</a></h2>
+<p>A portable multi-GPU application should treat these conditions separately:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Condition</p></th>
+<th class="head text-left"><p>Recommended behavior</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>Fewer than two devices</p></td>
+<td class="text-left"><p>Skip the P2P path</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">can_access_peer</span></code> returns <code class="docutils literal notranslate"><span class="pre">false</span></code></p></td>
+<td class="text-left"><p>Use host-staged transfers or another path</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>VMM allocation fails</p></td>
+<td class="text-left"><p>Report the CUDA driver error</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Access permission setup fails</p></td>
+<td class="text-left"><p>Destroy mappings and fall back</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Peer access is already enabled</p></td>
+<td class="text-left"><p>Continue</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Peer access is already disabled</p></td>
+<td class="text-left"><p>Continue</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The cuda-oxide integration test returns early when the machine has fewer than
+two GPUs or when the selected topology does not support P2P. This allows the
+test suite to run on single-GPU development systems while still exercising the
+feature on compatible multi-GPU hosts.</p>
+</section>
+<section id="api-summary">
+<h2>API summary<a class="headerlink" href="#api-summary" title="Link to this heading">#</a></h2>
+<section id="vmm">
+<h3>VMM<a class="headerlink" href="#vmm" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>API</p></th>
+<th class="head text-left"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">vmm::allocation_granularity(device)</span></code></p></td>
+<td class="text-left"><p>Required size granularity for VMM operations</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">vmm::align_size(size,</span> <span class="pre">granularity)</span></code></p></td>
+<td class="text-left"><p>Round a requested size upward</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">PhysicalAllocation::new(device,</span> <span class="pre">size)</span></code></p></td>
+<td class="text-left"><p>Allocate physical memory on a device</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">PhysicalAllocation::handle()</span></code></p></td>
+<td class="text-left"><p>Return the raw allocation handle</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">PhysicalAllocation::size()</span></code></p></td>
+<td class="text-left"><p>Return the physical allocation size</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">VirtualReservation::new(size,</span> <span class="pre">alignment)</span></code></p></td>
+<td class="text-left"><p>Reserve a virtual address range</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">VirtualReservation::base()</span></code></p></td>
+<td class="text-left"><p>Return the reserved base address</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">VirtualReservation::size()</span></code></p></td>
+<td class="text-left"><p>Return the reserved range size</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">Mapping::new(va,</span> <span class="pre">size,</span> <span class="pre">physical,</span> <span class="pre">offset)</span></code></p></td>
+<td class="text-left"><p>Map physical memory into a virtual range</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">Mapping::va()</span></code></p></td>
+<td class="text-left"><p>Return the mapped virtual address</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">Mapping::size()</span></code></p></td>
+<td class="text-left"><p>Return the mapped size</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">vmm::set_access(va,</span> <span class="pre">size,</span> <span class="pre">devices)</span></code></p></td>
+<td class="text-left"><p>Grant read/write access to selected devices</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="p2p">
+<h3>P2P<a class="headerlink" href="#p2p" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>API</p></th>
+<th class="head text-left"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">peer::can_access_peer(from,</span> <span class="pre">to)</span></code></p></td>
+<td class="text-left"><p>Query topology support</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">peer::enable_peer_access(from,</span> <span class="pre">to)</span></code></p></td>
+<td class="text-left"><p>Enable directional peer access</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">peer::disable_peer_access(from,</span> <span class="pre">to)</span></code></p></td>
+<td class="text-left"><p>Disable directional peer access</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<section id="next-steps">
+<h2>Next steps<a class="headerlink" href="#next-steps" title="Link to this heading">#</a></h2>
+<p>For production multi-GPU code, add an explicit fallback path for systems where
+P2P is unavailable. A common fallback copies data through pinned host memory
+instead of assuming that every multi-GPU topology supports direct access.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="memory-and-data-movement.html"
+       title="página anterior">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">anterior</p>
+        <p class="prev-next-title">Memory and Data Movement</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="launching-kernels.html"
+       title="siguiente página">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">siguiente</p>
+        <p class="prev-next-title">Launching Kernels</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> En esta página
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vmm-and-p2p-solve-different-problems">VMM and P2P solve different problems</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hardware-and-topology-requirements">Hardware and topology requirements</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#enabling-peer-access">Enabling peer access</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-vmm-lifecycle">The VMM lifecycle</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#allocation-granularity">Allocation granularity</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#single-gpu-vmm-mapping">Single-GPU VMM mapping</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mapping-one-physical-allocation-for-two-gpus">Mapping one physical allocation for two GPUs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#virtual-addresses-are-not-guaranteed-to-match">Virtual addresses are not guaranteed to match</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#ownership-and-destruction-order">Ownership and destruction order</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#do-not-wrap-vmm-pointers-in-an-owning-buffer">Do not wrap VMM pointers in an owning buffer</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#error-handling-and-unsupported-systems">Error handling and unsupported systems</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#api-summary">API summary</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#vmm">VMM</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#p2p">P2P</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#next-steps">Next steps</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+    <div class="footer-items__center">
+      
+        <div class="footer-item"><!--
+SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<footer class="bd-footer-content">
+  <div class="footer-container" style="padding: 1rem 0 2rem 0; border-top: 1px solid var(--pst-color-border); text-align: left;">
+    
+    <!-- NVIDIA Logo -->
+    <div style="margin-bottom: 1rem;">
+      <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem; filter: brightness(0);"
+           class="only-light">
+      <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem;"
+           class="only-dark pst-js-only">
+    </div>
+    
+    <!-- Footer Links - single line, left aligned -->
+    <div style="font-size: 0.8125rem; margin-bottom: 0.5rem; color: var(--pst-color-text-muted);">
+      <a href="https://www.nvidia.com/en-us/about-nvidia/privacy-policy/" target="_blank" style="color: inherit; text-decoration: none;">Privacy Policy</a> | 
+      <a href="https://www.nvidia.com/en-us/preferences/email-preferences/" target="_blank" style="color: inherit; text-decoration: none;">Your Privacy Choices</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/terms-of-service/" target="_blank" style="color: inherit; text-decoration: none;">Terms of Service</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/accessibility/" target="_blank" style="color: inherit; text-decoration: none;">Accessibility</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/company-policies/" target="_blank" style="color: inherit; text-decoration: none;">Corporate Policies</a> | 
+      <a href="https://www.nvidia.com/en-us/product-security/" target="_blank" style="color: inherit; text-decoration: none;">Product Security</a> | 
+      <a href="https://www.nvidia.com/en-us/contact/" target="_blank" style="color: inherit; text-decoration: none;">Contact</a>
+    </div>
+    
+    <!-- Copyright -->
+    <div style="font-size: 0.8125rem; color: var(--pst-color-text-muted);">
+      Copyright &copy; 2025-2026, NVIDIA.
+    </div>
+    
+  </div>
+</footer></div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

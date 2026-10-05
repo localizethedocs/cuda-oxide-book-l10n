@@ -1,0 +1,1524 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Kernel Families &#8212; cuda-oxide</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/nvidia-sphinx-theme.css?v=5d97cc0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=3fa0529b" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/lightbox.css?v=9a4ecef8" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=64cc4de3f052d77215f0"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
+
+    <script src="../_static/documentation_options.js?v=d786bb5c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/translations.js?v=540d3cec"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'gpu-programming/kernel-families';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../_static/js/lightbox.js?v=dda6eb66"></script>
+    <script src="../_static/js/spa-nav.js?v=793c9294"></script>
+    <link rel="canonical" href="https://projects.localizethedocs.org/cuda-oxide-book-l10n/gpu-programming/kernel-families.html" />
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="Closures and Generics" href="closures-and-generics.html" />
+    <link rel="prev" title="Launching Kernels" href="launching-kernels.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="zh-CN"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+<script type="text/javascript" src="../ltd-provenance.js"></script>
+<script type="text/javascript" src="../ltd-current.js"></script>
+<script type="text/javascript" src="../../../ltd-config.js"></script>
+<script type="text/javascript" src="../../../ltd-flyout.js"></script>
+
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">跳转至主要内容</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>回到顶部</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="版本警告"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="网页导航">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">cuda-oxide</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<button type="button" class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="亮色"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="暗色"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>亮色</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>暗色</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+    <button type="button" class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="当前页面">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<button type="button" class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="亮色"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="暗色"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>亮色</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>暗色</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><!--
+SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<div class="sidebar-tree">
+    <p class="sidebar-tree-title">
+        Table of Contents
+    </p>
+    <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/hello-gpu.html">Writing Your First Kernel</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Writing GPU Programs</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="execution-model.html">The CUDA Execution Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kernels-and-device-functions.html">Kernels and Device Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="memory-and-data-movement.html">Memory and Data Movement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="virtual-memory-and-peer-access.html">Virtual Memory Management and Peer Access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="launching-kernels.html">Launching Kernels</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Kernel Families</a></li>
+<li class="toctree-l1"><a class="reference internal" href="closures-and-generics.html">Closures and Generics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="error-handling-and-debugging.html">Error Handling and Debugging</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Safety on the GPU</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-safety/the-safety-model.html">The Safety Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-safety/bounds-checks.html">Bounds Checks: Pay Once or Opt Out</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Async GPU Programming</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/the-device-operation-model.html">The DeviceOperation Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/combinators-and-composition.html">Combinators and Composition</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/scheduling-and-streams.html">Scheduling and Streams</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/concurrent-execution.html">Concurrent Execution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/overlapping-transfers-and-compute.html">Overlapping Transfers and Compute</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Building a Real Application</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../projects/async-mlp-pipeline.html">Project: Async MLP Pipeline</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Advanced GPU Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/shared-memory-and-synchronization.html">Shared Memory and Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/warp-level-programming.html">Warp-Level Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/tensor-memory-accelerator.html">Tensor Memory Accelerator (TMA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/matrix-multiply-accelerators.html">Matrix Multiply Accelerators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cluster-programming.html">Cluster Programming</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Inside the Compiler</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/architecture-overview.html">Architecture Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/pliron.html">Pliron -- Pliron IR (MLIR-like)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/rustc-public.html">rustc_public -- Stable MIR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/rustc-codegen-cuda.html">The Code Generator: rustc-codegen-cuda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/mir-importer.html">The MIR Importer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/compiler-optimizations.html">Compiler Optimizations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/mlir-dialects.html">Pliron Dialects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/lowering-pipeline.html">The Lowering Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/adding-new-intrinsics.html">Adding New Intrinsics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/catalog-generated-intrinsics.html">Catalog-Generated Intrinsics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/fuzzing-and-differential-testing.html">Fuzzing and Differential Testing</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Appendix</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/building-from-source.html">Building from Source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/api-quick-reference.html">API Quick Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/supported-features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/cuda-cpp-comparison.html">cuda-oxide vs CUDA C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/ecosystem.html">The Rust + GPU Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/glossary.html">Glossary</a></li>
+</ul>
+
+</div></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="初始页面">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Kernel Families</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="kernel-families">
+<h1>Kernel Families<a class="headerlink" href="#kernel-families" title="链接到此标题。">#</a></h1>
+<p>GPU kernels are frequently specialized for different problem shapes, hardware
+capabilities, resource limits, or tuning decisions. A single logical operation
+may therefore have several ahead-of-time compiled entry points.</p>
+<p><code class="docutils literal notranslate"><span class="pre">KernelFamily</span></code> represents such a set of compiled variants and provides a
+validated host-side selection mechanism.</p>
+<p>It separates two independent decisions:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Eligibility: can this variant safely execute this problem?
+Preference:  which eligible variant should execute?
+</pre></div>
+</div>
+<p>This distinction is important. Performance policy must never select a variant
+that violates its launch, shape, hardware, or resource requirements.</p>
+<p><code class="docutils literal notranslate"><span class="pre">KernelFamily</span></code> performs selection entirely on the CPU. It does not compile
+kernels, query CUDA devices, benchmark entries, create threads, or access the
+filesystem. The application supplies all relevant problem and hardware facts.</p>
+<section id="when-to-use-a-kernel-family">
+<h2>When to use a kernel family<a class="headerlink" href="#when-to-use-a-kernel-family" title="链接到此标题。">#</a></h2>
+<p>Use <code class="docutils literal notranslate"><span class="pre">KernelFamily</span></code> when an operation has a small, fixed set of already compiled
+implementations, such as:</p>
+<ul class="simple">
+<li><p>different output tile sizes</p></li>
+<li><p>different block dimensions</p></li>
+<li><p>specialized tensor-core kernels for particular compute capabilities</p></li>
+<li><p>small-input and large-input implementations</p></li>
+<li><p>kernels with different shared-memory requirements</p></li>
+<li><p>kernels tuned for different problem-shape ranges</p></li>
+<li><p>a generic fallback plus one or more optimized variants</p></li>
+</ul>
+<p>A kernel family is not a runtime registry or a JIT compiler. Its number of
+variants is a const generic and is therefore part of the Rust type:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="n">KernelFamily</span><span class="o">&lt;</span><span class="n">Id</span><span class="p">,</span><span class="w"> </span><span class="n">Entry</span><span class="p">,</span><span class="w"> </span><span class="n">Meta</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">N</span><span class="p">:</span><span class="w"> </span><span class="kt">usize</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>The family owns exactly <code class="docutils literal notranslate"><span class="pre">N</span></code> variants.</p>
+<p>This bounded representation is useful when the available kernels are determined
+at build time and should remain explicit and auditable.</p>
+</section>
+<section id="selection-model">
+<h2>Selection model<a class="headerlink" href="#selection-model" title="链接到此标题。">#</a></h2>
+<p>The selection flow has two modes:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Force(id) -&gt; resolve variant -&gt; validate ----------------------&gt; Override
+
+Auto      -&gt; cache lookup -&gt; resolve -&gt; validate --------------&gt; Cache
+          -&gt; filter eligible variants
+          -&gt; selector chooses an ID
+          -&gt; validate selector output
+          -&gt; cache selected ID --------------------------------&gt; Selector
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">SelectionMode::Force(id)</span></code> is a validated manual override. It bypasses the cache
+and selector, but it does not bypass eligibility validation.</p>
+<p><code class="docutils literal notranslate"><span class="pre">SelectionMode::Auto</span></code> first attempts to use a cached stable variant ID. Unknown
+or newly ineligible cache entries are treated as misses. The selector then sees
+only eligible variants.</p>
+<p>Every successful selection reports its provenance:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">pub</span><span class="w"> </span><span class="k">enum</span><span class="w"> </span><span class="nc">SelectionSource</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Override</span><span class="p">,</span>
+<span class="w">    </span><span class="n">Cache</span><span class="p">,</span>
+<span class="w">    </span><span class="n">Selector</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This lets applications distinguish operator overrides, cached decisions, and
+new selector decisions in logs and diagnostics.</p>
+</section>
+<section id="family-anatomy">
+<h2>Family anatomy<a class="headerlink" href="#family-anatomy" title="链接到此标题。">#</a></h2>
+<p>A family contains a stable family identity and an array of variants:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">pub</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">KernelFamily</span><span class="o">&lt;</span><span class="n">Id</span><span class="p">,</span><span class="w"> </span><span class="n">Entry</span><span class="p">,</span><span class="w"> </span><span class="n">Meta</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">N</span><span class="p">:</span><span class="w"> </span><span class="kt">usize</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Private fields</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Each variant contains three caller-defined values:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">pub</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">KernelVariant</span><span class="o">&lt;</span><span class="n">Id</span><span class="p">,</span><span class="w"> </span><span class="n">Entry</span><span class="p">,</span><span class="w"> </span><span class="n">Meta</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Private fields</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Component</p></th>
+<th class="head text-left"><p>Purpose</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">Id</span></code></p></td>
+<td class="text-left"><p>Stable semantic identity for the variant</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">Entry</span></code></p></td>
+<td class="text-left"><p>Callable entry or launcher associated with the variant</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">Meta</span></code></p></td>
+<td class="text-left"><p>Eligibility and preference metadata</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">N</span></code></p></td>
+<td class="text-left"><p>Compile-time number of variants</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Entry</span></code> is intentionally generic. It can be a function pointer, a typed launch
+wrapper, an enum describing generated methods, or another application-defined
+value.</p>
+<p><code class="docutils literal notranslate"><span class="pre">Meta</span></code> is also application-defined. It commonly stores requirements and tuning
+facts such as:</p>
+<ul class="simple">
+<li><p>minimum compute capability</p></li>
+<li><p>tile dimensions</p></li>
+<li><p>alignment requirements</p></li>
+<li><p>shared-memory usage</p></li>
+<li><p>supported data types</p></li>
+<li><p>preferred problem-size range</p></li>
+<li><p>launch geometry</p></li>
+<li><p>tuning score or priority</p></li>
+</ul>
+</section>
+<section id="defining-stable-variant-ids">
+<h2>Defining stable variant IDs<a class="headerlink" href="#defining-stable-variant-ids" title="链接到此标题。">#</a></h2>
+<p>Every variant requires an explicit ID:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="cp">#[derive(Clone, Copy, Debug, PartialEq, Eq)]</span>
+<span class="k">enum</span><span class="w"> </span><span class="nc">VariantId</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Scalar</span><span class="p">,</span>
+<span class="w">    </span><span class="n">Chunked</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>IDs are used by:</p>
+<ul class="simple">
+<li><p>manual overrides</p></li>
+<li><p>caches</p></li>
+<li><p>selectors</p></li>
+<li><p>diagnostics</p></li>
+<li><p>configuration files</p></li>
+<li><p>environment variables</p></li>
+</ul>
+<p>An ID must represent the semantic identity of a compiled variant.</p>
+<p>Good IDs include enum values or stable strings whose meaning is controlled by
+the application:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">enum</span><span class="w"> </span><span class="nc">GemmVariantId</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">M256xN256</span><span class="p">,</span>
+<span class="w">    </span><span class="n">M512xN256</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Do not use values whose identity may change between builds or processes:</p>
+<ul class="simple">
+<li><p>array indices</p></li>
+<li><p>pointers</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TypeId</span></code></p></li>
+<li><p>formatted debug output</p></li>
+<li><p>addresses of generated functions</p></li>
+<li><p>hashes whose algorithm or inputs are not stable</p></li>
+</ul>
+<p>Array position is not a substitute for a stable ID. Declaration order may
+affect selection policy, but it must not define cache identity.</p>
+</section>
+<section id="constructing-a-family">
+<h2>Constructing a family<a class="headerlink" href="#constructing-a-family" title="链接到此标题。">#</a></h2>
+<p>Create variants with <code class="docutils literal notranslate"><span class="pre">KernelVariant::new</span></code>:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="n">variant</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">KernelVariant</span><span class="p">::</span><span class="n">new</span><span class="p">(</span>
+<span class="w">    </span><span class="n">VariantId</span><span class="p">::</span><span class="n">Chunked</span><span class="p">,</span>
+<span class="w">    </span><span class="n">chunked_entry</span><span class="p">,</span>
+<span class="w">    </span><span class="n">VariantMetadata</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">min_len</span><span class="p">:</span><span class="w"> </span><span class="mi">1024</span><span class="p">,</span>
+<span class="w">        </span><span class="n">chunk_width</span><span class="p">:</span><span class="w"> </span><span class="mi">256</span><span class="p">,</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>Create the family with <code class="docutils literal notranslate"><span class="pre">KernelFamily::try_new</span></code>:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="n">family</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">KernelFamily</span><span class="p">::</span><span class="n">try_new</span><span class="p">(</span>
+<span class="w">    </span><span class="s">"vector-copy"</span><span class="p">,</span>
+<span class="w">    </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">    </span><span class="p">[</span>
+<span class="w">        </span><span class="n">scalar_variant</span><span class="p">,</span>
+<span class="w">        </span><span class="n">chunked_variant</span><span class="p">,</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="p">)</span><span class="o">?</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>The arguments are:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="n">KernelFamily</span><span class="p">::</span><span class="n">try_new</span><span class="p">(</span>
+<span class="w">    </span><span class="n">name</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="o">'</span><span class="nb">static</span><span class="w"> </span><span class="kt">str</span><span class="p">,</span>
+<span class="w">    </span><span class="n">revision</span><span class="p">:</span><span class="w"> </span><span class="kt">u32</span><span class="p">,</span>
+<span class="w">    </span><span class="n">variants</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="n">KernelVariant</span><span class="o">&lt;</span><span class="n">Id</span><span class="p">,</span><span class="w"> </span><span class="n">Entry</span><span class="p">,</span><span class="w"> </span><span class="n">Meta</span><span class="o">&gt;</span><span class="p">;</span><span class="w"> </span><span class="n">N</span><span class="p">],</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Construction validates three structural invariants:</p>
+<ol class="arabic simple">
+<li><p>The family contains at least one variant.</p></li>
+<li><p>The family name is not empty or whitespace-only.</p></li>
+<li><p>Variant IDs are unique within the family.</p></li>
+</ol>
+<p>Construction can return:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">pub</span><span class="w"> </span><span class="k">enum</span><span class="w"> </span><span class="nc">KernelFamilyBuildError</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">EmptyFamily</span><span class="p">,</span>
+<span class="w">    </span><span class="n">EmptyFamilyName</span><span class="p">,</span>
+<span class="w">    </span><span class="n">DuplicateVariantId</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">first_index</span><span class="p">:</span><span class="w"> </span><span class="kt">usize</span><span class="p">,</span>
+<span class="w">        </span><span class="n">duplicate_index</span><span class="p">:</span><span class="w"> </span><span class="kt">usize</span><span class="p">,</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="family-identity-and-revisioning">
+<h2>Family identity and revisioning<a class="headerlink" href="#family-identity-and-revisioning" title="链接到此标题。">#</a></h2>
+<p>The family name and revision form its selection and cache namespace:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">family</span><span class="p">.</span><span class="n">id</span><span class="p">();</span>
+
+<span class="fm">println!</span><span class="p">(</span><span class="s">"{}"</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">.</span><span class="n">name</span><span class="p">());</span>
+<span class="fm">println!</span><span class="p">(</span><span class="s">"{}"</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">.</span><span class="n">revision</span><span class="p">());</span>
+<span class="fm">println!</span><span class="p">(</span><span class="s">"{id}"</span><span class="p">);</span><span class="w"> </span><span class="c1">// vector-copy@1</span>
+</pre></div>
+</div>
+<p>A persistent or in-memory cache must include both values in its key.</p>
+<p>Increment the revision whenever an existing cached decision might no longer
+mean the same thing.</p>
+<p>Revision changes are required when modifying:</p>
+<ul class="simple">
+<li><p>variant membership</p></li>
+<li><p>the meaning of a variant ID</p></li>
+<li><p>eligibility rules</p></li>
+<li><p>selector or preference policy</p></li>
+<li><p>tuning methodology</p></li>
+<li><p>metadata used by selection</p></li>
+<li><p>declaration order, unless selection and tuning are explicitly
+order-independent</p></li>
+</ul>
+<p>For example:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="n">KernelFamily</span><span class="p">::</span><span class="n">try_new</span><span class="p">(</span><span class="s">"vector-copy"</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">variants_v1</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+<span class="n">KernelFamily</span><span class="p">::</span><span class="n">try_new</span><span class="p">(</span><span class="s">"vector-copy"</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">variants_v2</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Changing the revision prevents decisions made under the first contract from
+being interpreted under the second contract.</p>
+<p>The family name should describe the logical operation and specialization axis:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>image-filter/radius
+gemm/output-tile
+reduction/block-size
+attention/head-dimension
+</pre></div>
+</div>
+<p>Avoid names based on transient implementation locations or process-specific
+state.</p>
+</section>
+<section id="eligibility-with-kernelproblem">
+<h2>Eligibility with <code class="docutils literal notranslate"><span class="pre">KernelProblem</span></code><a class="headerlink" href="#eligibility-with-kernelproblem" title="链接到此标题。">#</a></h2>
+<p>Eligibility answers whether a specific variant can safely handle a problem.</p>
+<p>Implement:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">pub</span><span class="w"> </span><span class="k">trait</span><span class="w"> </span><span class="n">KernelProblem</span><span class="o">&lt;</span><span class="n">Variant</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">type</span><span class="w"> </span><span class="nc">Rejection</span><span class="p">:</span><span class="w"> </span><span class="nc">std</span><span class="p">::</span><span class="n">error</span><span class="p">::</span><span class="n">Error</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">Send</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">Sync</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="o">'</span><span class="nb">static</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">fn</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">variant</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="nc">Variant</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nb">Result</span><span class="o">&lt;</span><span class="p">(),</span><span class="w"> </span><span class="bp">Self</span><span class="p">::</span><span class="n">Rejection</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The problem type should contain every fact required to validate the launch.</p>
+<p>For example:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="cp">#[derive(Clone, Copy, Debug)]</span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">CopyProblem</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">len</span><span class="p">:</span><span class="w"> </span><span class="kt">usize</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Validation may consider:</p>
+<ul class="simple">
+<li><p>problem dimensions</p></li>
+<li><p>divisibility requirements</p></li>
+<li><p>buffer alignment</p></li>
+<li><p>data type</p></li>
+<li><p>device compute capability</p></li>
+<li><p>shared-memory capacity</p></li>
+<li><p>grid and block limits</p></li>
+<li><p>cooperative-launch support</p></li>
+<li><p>cluster-launch support</p></li>
+<li><p>integer conversion and allocation overflow</p></li>
+<li><p>application-specific semantic constraints</p></li>
+</ul>
+<p>Implementations should be deterministic and free of side effects.</p>
+<p>Eligibility is a safety and correctness boundary. It should not encode only
+performance preference.</p>
+<p>For example, a variant requiring a length divisible by 256 should reject an
+incompatible problem even if another layer is expected to avoid selecting it.</p>
+</section>
+<section id="preference-with-kernelselector">
+<h2>Preference with <code class="docutils literal notranslate"><span class="pre">KernelSelector</span></code><a class="headerlink" href="#preference-with-kernelselector" title="链接到此标题。">#</a></h2>
+<p>A selector chooses among variants that have already passed eligibility
+validation:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">pub</span><span class="w"> </span><span class="k">trait</span><span class="w"> </span><span class="n">KernelSelector</span><span class="o">&lt;</span><span class="n">Problem</span><span class="p">,</span><span class="w"> </span><span class="n">Variant</span><span class="p">,</span><span class="w"> </span><span class="n">Id</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">type</span><span class="w"> </span><span class="nc">Error</span><span class="p">:</span><span class="w"> </span><span class="nc">std</span><span class="p">::</span><span class="n">error</span><span class="p">::</span><span class="n">Error</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">Send</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">Sync</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="o">'</span><span class="nb">static</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">fn</span><span class="w"> </span><span class="nf">select</span><span class="p">(</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="bp">self</span><span class="p">,</span>
+<span class="w">        </span><span class="n">family</span><span class="p">:</span><span class="w"> </span><span class="nc">KernelFamilyId</span><span class="p">,</span>
+<span class="w">        </span><span class="n">problem</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="nc">Problem</span><span class="p">,</span>
+<span class="w">        </span><span class="n">eligible</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="o">&amp;</span><span class="n">Variant</span><span class="p">],</span>
+<span class="w">    </span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nb">Result</span><span class="o">&lt;</span><span class="n">Id</span><span class="p">,</span><span class="w"> </span><span class="bp">Self</span><span class="p">::</span><span class="n">Error</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">eligible</span></code> slice has two guarantees:</p>
+<ol class="arabic simple">
+<li><p>It is not empty.</p></li>
+<li><p>It preserves family declaration order.</p></li>
+</ol>
+<p>The selector returns a stable variant ID, not an array index or entry reference.</p>
+<p>Selectors can implement policies such as:</p>
+<ul class="simple">
+<li><p>choose the largest tile supported by the problem</p></li>
+<li><p>choose a small-input kernel below a threshold</p></li>
+<li><p>choose using offline benchmark results</p></li>
+<li><p>choose using hardware generation</p></li>
+<li><p>choose the first eligible variant</p></li>
+<li><p>choose from an application configuration</p></li>
+<li><p>invoke an external tuning service</p></li>
+</ul>
+<p>A selector must return an ID from the provided eligible slice. <code class="docutils literal notranslate"><span class="pre">KernelFamily</span></code>
+checks this requirement and rejects invalid selector output.</p>
+<p>Closures can also act as selectors when their signature matches the trait.
+Annotate every closure parameter type. Without the annotations, closure
+lifetime inference can fix the borrows to one specific call and rustc rejects
+the closure with &quot;implementation of <code class="docutils literal notranslate"><span class="pre">FnMut</span></code> is not general enough&quot;. A
+selector that cannot fail can use <code class="docutils literal notranslate"><span class="pre">std::convert::Infallible</span></code> as its error
+type:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">selector</span><span class="w"> </span><span class="o">=</span>
+<span class="w">    </span><span class="o">|</span><span class="n">_</span><span class="p">:</span><span class="w"> </span><span class="nc">KernelFamilyId</span><span class="p">,</span><span class="w"> </span><span class="n">_</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="nc">CopyProblem</span><span class="p">,</span><span class="w"> </span><span class="n">eligible</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="o">&amp;</span><span class="n">Variant</span><span class="p">]</span><span class="o">|</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nb">Ok</span><span class="p">::</span><span class="o">&lt;</span><span class="n">_</span><span class="p">,</span><span class="w"> </span><span class="n">Infallible</span><span class="o">&gt;</span><span class="p">(</span><span class="o">*</span><span class="n">eligible</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">id</span><span class="p">())</span>
+<span class="w">    </span><span class="p">};</span>
+</pre></div>
+</div>
+</section>
+<section id="automatic-selection">
+<h2>Automatic selection<a class="headerlink" href="#automatic-selection" title="链接到此标题。">#</a></h2>
+<p>Automatic selection uses:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="n">SelectionMode</span><span class="p">::</span><span class="n">Auto</span>
+</pre></div>
+</div>
+<p>The full call is:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="n">selected</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">family</span><span class="p">.</span><span class="n">select</span><span class="p">(</span>
+<span class="w">    </span><span class="o">&amp;</span><span class="n">problem</span><span class="p">,</span>
+<span class="w">    </span><span class="n">SelectionMode</span><span class="p">::</span><span class="n">Auto</span><span class="p">,</span>
+<span class="w">    </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">selector</span><span class="p">,</span>
+<span class="w">    </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">cache</span><span class="p">,</span>
+<span class="p">)</span><span class="o">?</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>The automatic path performs these operations:</p>
+<ol class="arabic simple">
+<li><p>Ask the cache for a stable variant ID.</p></li>
+<li><p>Resolve the cached ID within the family.</p></li>
+<li><p>Revalidate the cached variant against the current problem.</p></li>
+<li><p>Return a valid cache hit immediately.</p></li>
+<li><p>Otherwise, validate every family member.</p></li>
+<li><p>Preserve eligible variants in declaration order.</p></li>
+<li><p>Fail if no variant is eligible.</p></li>
+<li><p>Ask the selector to choose from the eligible slice.</p></li>
+<li><p>Verify that the selector returned a family member.</p></li>
+<li><p>Verify that the returned member was in the eligible slice.</p></li>
+<li><p>Store the validated selected ID in the cache.</p></li>
+<li><p>Return the selected variant with <code class="docutils literal notranslate"><span class="pre">SelectionSource::Selector</span></code>.</p></li>
+</ol>
+<p>Cached IDs are hints, not authority.</p>
+<p>A cache entry may become invalid because:</p>
+<ul class="simple">
+<li><p>the cache was written by an older application version</p></li>
+<li><p>eligibility depends on hardware</p></li>
+<li><p>problem constraints changed</p></li>
+<li><p>a persistent cache is corrupted</p></li>
+<li><p>a variant was removed</p></li>
+<li><p>a previous policy used a different revision incorrectly</p></li>
+</ul>
+<p>For these reasons, every cached ID is resolved and validated before use.</p>
+</section>
+<section id="forced-selection">
+<h2>Forced selection<a class="headerlink" href="#forced-selection" title="链接到此标题。">#</a></h2>
+<p>Use:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="n">SelectionMode</span><span class="p">::</span><span class="n">Force</span><span class="p">(</span><span class="n">id</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>when a caller explicitly requests a variant.</p>
+<p>Typical sources include:</p>
+<ul class="simple">
+<li><p>command-line options</p></li>
+<li><p>environment variables</p></li>
+<li><p>test configuration</p></li>
+<li><p>debugging controls</p></li>
+<li><p>performance experiments</p></li>
+<li><p>operator policy</p></li>
+</ul>
+<p>Example:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="n">selected</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">family</span><span class="p">.</span><span class="n">select</span><span class="p">(</span>
+<span class="w">    </span><span class="o">&amp;</span><span class="n">problem</span><span class="p">,</span>
+<span class="w">    </span><span class="n">SelectionMode</span><span class="p">::</span><span class="n">Force</span><span class="p">(</span><span class="n">VariantId</span><span class="p">::</span><span class="n">Scalar</span><span class="p">),</span>
+<span class="w">    </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">selector</span><span class="p">,</span>
+<span class="w">    </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">cache</span><span class="p">,</span>
+<span class="p">)</span><span class="o">?</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Forced selection:</p>
+<ul class="simple">
+<li><p>bypasses cache lookup</p></li>
+<li><p>bypasses selector invocation</p></li>
+<li><p>does not update the cache</p></li>
+<li><p>verifies that the requested ID belongs to the family</p></li>
+<li><p>validates that the requested variant is eligible</p></li>
+</ul>
+<p>An unknown forced ID returns <code class="docutils literal notranslate"><span class="pre">UnknownForcedVariant</span></code>.</p>
+<p>A known but incompatible variant returns <code class="docutils literal notranslate"><span class="pre">IneligibleForcedVariant</span></code>.</p>
+<p>A manual override therefore cannot silently bypass launch requirements.</p>
+</section>
+<section id="selection-results">
+<h2>Selection results<a class="headerlink" href="#selection-results" title="链接到此标题。">#</a></h2>
+<p>A successful call returns a borrowed <code class="docutils literal notranslate"><span class="pre">SelectedVariant</span></code>:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">pub</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">SelectedVariant</span><span class="o">&lt;'</span><span class="na">family</span><span class="p">,</span><span class="w"> </span><span class="n">Id</span><span class="p">,</span><span class="w"> </span><span class="n">Entry</span><span class="p">,</span><span class="w"> </span><span class="n">Meta</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Private fields</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Access the variant and provenance with:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="n">variant</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">selected</span><span class="p">.</span><span class="n">variant</span><span class="p">();</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">selected</span><span class="p">.</span><span class="n">source</span><span class="p">();</span>
+
+<span class="fm">println!</span><span class="p">(</span><span class="s">"selected {:?} from {}"</span><span class="p">,</span><span class="w"> </span><span class="n">variant</span><span class="p">.</span><span class="n">id</span><span class="p">(),</span><span class="w"> </span><span class="n">source</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The selected value borrows from the family. It does not copy or move the
+variant entry or metadata.</p>
+<p>The variant provides:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="n">variant</span><span class="p">.</span><span class="n">id</span><span class="p">();</span>
+<span class="n">variant</span><span class="p">.</span><span class="n">entry</span><span class="p">();</span>
+<span class="n">variant</span><span class="p">.</span><span class="n">metadata</span><span class="p">();</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">SelectionSource</span></code> implements <code class="docutils literal notranslate"><span class="pre">Display</span></code>:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>override
+cache
+selector
+</pre></div>
+</div>
+</section>
+<section id="complete-example">
+<h2>Complete example<a class="headerlink" href="#complete-example" title="链接到此标题。">#</a></h2>
+<p>The following example uses ordinary CPU functions as entries. The same
+selection structure applies when entries are typed wrappers around compiled
+CUDA kernels.</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_host</span><span class="p">::{</span>
+<span class="w">    </span><span class="n">KernelFamily</span><span class="p">,</span><span class="w"> </span><span class="n">KernelFamilyBuildError</span><span class="p">,</span><span class="w"> </span><span class="n">KernelFamilyId</span><span class="p">,</span><span class="w"> </span><span class="n">KernelProblem</span><span class="p">,</span><span class="w"> </span><span class="n">KernelSelector</span><span class="p">,</span>
+<span class="w">    </span><span class="n">KernelVariant</span><span class="p">,</span><span class="w"> </span><span class="n">NoKernelSelectionCache</span><span class="p">,</span><span class="w"> </span><span class="n">SelectionMode</span><span class="p">,</span><span class="w"> </span><span class="n">SelectionSource</span><span class="p">,</span>
+<span class="p">};</span>
+<span class="k">use</span><span class="w"> </span><span class="n">std</span><span class="p">::</span><span class="n">convert</span><span class="p">::</span><span class="n">Infallible</span><span class="p">;</span>
+<span class="k">use</span><span class="w"> </span><span class="n">std</span><span class="p">::</span><span class="n">error</span><span class="p">::</span><span class="n">Error</span><span class="p">;</span>
+<span class="k">use</span><span class="w"> </span><span class="n">std</span><span class="p">::</span><span class="n">fmt</span><span class="p">;</span>
+
+<span class="cp">#[derive(Clone, Copy, Debug, PartialEq, Eq)]</span>
+<span class="k">enum</span><span class="w"> </span><span class="nc">VariantId</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Scalar</span><span class="p">,</span>
+<span class="w">    </span><span class="n">Chunked</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="k">type</span><span class="w"> </span><span class="nc">Entry</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">fn</span><span class="p">(</span><span class="o">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span><span class="w"> </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="p">[</span><span class="kt">f32</span><span class="p">]);</span>
+
+<span class="cp">#[derive(Clone, Copy, Debug, PartialEq, Eq)]</span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">VariantMetadata</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">min_len</span><span class="p">:</span><span class="w"> </span><span class="kt">usize</span><span class="p">,</span>
+<span class="w">    </span><span class="n">chunk_width</span><span class="p">:</span><span class="w"> </span><span class="kt">usize</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="k">type</span><span class="w"> </span><span class="nc">Variant</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">KernelVariant</span><span class="o">&lt;</span><span class="n">VariantId</span><span class="p">,</span><span class="w"> </span><span class="n">Entry</span><span class="p">,</span><span class="w"> </span><span class="n">VariantMetadata</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="k">type</span><span class="w"> </span><span class="nc">CopyFamily</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">KernelFamily</span><span class="o">&lt;</span><span class="n">VariantId</span><span class="p">,</span><span class="w"> </span><span class="n">Entry</span><span class="p">,</span><span class="w"> </span><span class="n">VariantMetadata</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="o">&gt;</span><span class="p">;</span>
+
+<span class="k">fn</span><span class="w"> </span><span class="nf">scalar_copy</span><span class="p">(</span><span class="n">input</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span><span class="w"> </span><span class="n">output</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="nc">mut</span><span class="w"> </span><span class="p">[</span><span class="kt">f32</span><span class="p">])</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">output</span><span class="p">.</span><span class="n">copy_from_slice</span><span class="p">(</span><span class="n">input</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">fn</span><span class="w"> </span><span class="nf">chunked_copy</span><span class="p">(</span><span class="n">input</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span><span class="w"> </span><span class="n">output</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="nc">mut</span><span class="w"> </span><span class="p">[</span><span class="kt">f32</span><span class="p">])</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">WIDTH</span><span class="p">:</span><span class="w"> </span><span class="kt">usize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">256</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">input_chunk</span><span class="p">,</span><span class="w"> </span><span class="n">output_chunk</span><span class="p">)</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">input</span>
+<span class="w">        </span><span class="p">.</span><span class="n">chunks_exact</span><span class="p">(</span><span class="n">WIDTH</span><span class="p">)</span>
+<span class="w">        </span><span class="p">.</span><span class="n">zip</span><span class="p">(</span><span class="n">output</span><span class="p">.</span><span class="n">chunks_exact_mut</span><span class="p">(</span><span class="n">WIDTH</span><span class="p">))</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">        </span><span class="n">output_chunk</span><span class="p">.</span><span class="n">copy_from_slice</span><span class="p">(</span><span class="n">input_chunk</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">fn</span><span class="w"> </span><span class="nf">copy_family</span><span class="p">()</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nb">Result</span><span class="o">&lt;</span><span class="n">CopyFamily</span><span class="p">,</span><span class="w"> </span><span class="n">KernelFamilyBuildError</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">KernelFamily</span><span class="p">::</span><span class="n">try_new</span><span class="p">(</span>
+<span class="w">        </span><span class="s">"book/vector-copy"</span><span class="p">,</span>
+<span class="w">        </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">        </span><span class="p">[</span>
+<span class="w">            </span><span class="n">KernelVariant</span><span class="p">::</span><span class="n">new</span><span class="p">(</span>
+<span class="w">                </span><span class="n">VariantId</span><span class="p">::</span><span class="n">Scalar</span><span class="p">,</span>
+<span class="w">                </span><span class="n">scalar_copy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">Entry</span><span class="p">,</span>
+<span class="w">                </span><span class="n">VariantMetadata</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="n">min_len</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">                    </span><span class="n">chunk_width</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">                </span><span class="p">},</span>
+<span class="w">            </span><span class="p">),</span>
+<span class="w">            </span><span class="n">KernelVariant</span><span class="p">::</span><span class="n">new</span><span class="p">(</span>
+<span class="w">                </span><span class="n">VariantId</span><span class="p">::</span><span class="n">Chunked</span><span class="p">,</span>
+<span class="w">                </span><span class="n">chunked_copy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">Entry</span><span class="p">,</span>
+<span class="w">                </span><span class="n">VariantMetadata</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="n">min_len</span><span class="p">:</span><span class="w"> </span><span class="mi">1024</span><span class="p">,</span>
+<span class="w">                    </span><span class="n">chunk_width</span><span class="p">:</span><span class="w"> </span><span class="mi">256</span><span class="p">,</span>
+<span class="w">                </span><span class="p">},</span>
+<span class="w">            </span><span class="p">),</span>
+<span class="w">        </span><span class="p">],</span>
+<span class="w">    </span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="cp">#[derive(Clone, Copy, Debug)]</span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">CopyProblem</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">len</span><span class="p">:</span><span class="w"> </span><span class="kt">usize</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="cp">#[derive(Clone, Copy, Debug, PartialEq, Eq)]</span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">CopyVariantRejection</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">variant</span><span class="p">:</span><span class="w"> </span><span class="nc">VariantId</span><span class="p">,</span>
+<span class="w">    </span><span class="n">required_min_len</span><span class="p">:</span><span class="w"> </span><span class="kt">usize</span><span class="p">,</span>
+<span class="w">    </span><span class="n">required_multiple</span><span class="p">:</span><span class="w"> </span><span class="kt">usize</span><span class="p">,</span>
+<span class="w">    </span><span class="n">actual_len</span><span class="p">:</span><span class="w"> </span><span class="kt">usize</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="k">impl</span><span class="w"> </span><span class="n">fmt</span><span class="p">::</span><span class="n">Display</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">CopyVariantRejection</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">fn</span><span class="w"> </span><span class="nf">fmt</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">formatter</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="nc">mut</span><span class="w"> </span><span class="n">fmt</span><span class="p">::</span><span class="n">Formatter</span><span class="o">&lt;'</span><span class="nb">_</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nc">fmt</span><span class="p">::</span><span class="nb">Result</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="fm">write!</span><span class="p">(</span>
+<span class="w">            </span><span class="n">formatter</span><span class="p">,</span>
+<span class="w">            </span><span class="s">"{:?} requires len &gt;= {} and len divisible by {}, but len is {}"</span><span class="p">,</span>
+<span class="w">            </span><span class="bp">self</span><span class="p">.</span><span class="n">variant</span><span class="p">,</span>
+<span class="w">            </span><span class="bp">self</span><span class="p">.</span><span class="n">required_min_len</span><span class="p">,</span>
+<span class="w">            </span><span class="bp">self</span><span class="p">.</span><span class="n">required_multiple</span><span class="p">,</span>
+<span class="w">            </span><span class="bp">self</span><span class="p">.</span><span class="n">actual_len</span><span class="p">,</span>
+<span class="w">        </span><span class="p">)</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">impl</span><span class="w"> </span><span class="n">Error</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">CopyVariantRejection</span><span class="w"> </span><span class="p">{}</span>
+
+<span class="k">impl</span><span class="w"> </span><span class="n">KernelProblem</span><span class="o">&lt;</span><span class="n">Variant</span><span class="o">&gt;</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">CopyProblem</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">type</span><span class="w"> </span><span class="nc">Rejection</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CopyVariantRejection</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">fn</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">variant</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="nc">Variant</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nb">Result</span><span class="o">&lt;</span><span class="p">(),</span><span class="w"> </span><span class="bp">Self</span><span class="p">::</span><span class="n">Rejection</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">metadata</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">variant</span><span class="p">.</span><span class="n">metadata</span><span class="p">();</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="n">len</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">min_len</span>
+<span class="w">            </span><span class="o">||</span><span class="w"> </span><span class="o">!</span><span class="bp">self</span><span class="p">.</span><span class="n">len</span><span class="p">.</span><span class="n">is_multiple_of</span><span class="p">(</span><span class="n">metadata</span><span class="p">.</span><span class="n">chunk_width</span><span class="p">)</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="nb">Err</span><span class="p">(</span><span class="n">CopyVariantRejection</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">variant</span><span class="p">:</span><span class="w"> </span><span class="o">*</span><span class="n">variant</span><span class="p">.</span><span class="n">id</span><span class="p">(),</span>
+<span class="w">                </span><span class="n">required_min_len</span><span class="p">:</span><span class="w"> </span><span class="nc">metadata</span><span class="p">.</span><span class="n">min_len</span><span class="p">,</span>
+<span class="w">                </span><span class="n">required_multiple</span><span class="p">:</span><span class="w"> </span><span class="nc">metadata</span><span class="p">.</span><span class="n">chunk_width</span><span class="p">,</span>
+<span class="w">                </span><span class="n">actual_len</span><span class="p">:</span><span class="w"> </span><span class="nc">self</span><span class="p">.</span><span class="n">len</span><span class="p">,</span>
+<span class="w">            </span><span class="p">});</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="nb">Ok</span><span class="p">(())</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">struct</span><span class="w"> </span><span class="nc">CopySelector</span><span class="p">;</span>
+
+<span class="k">impl</span><span class="w"> </span><span class="n">KernelSelector</span><span class="o">&lt;</span><span class="n">CopyProblem</span><span class="p">,</span><span class="w"> </span><span class="n">Variant</span><span class="p">,</span><span class="w"> </span><span class="n">VariantId</span><span class="o">&gt;</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">CopySelector</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">type</span><span class="w"> </span><span class="nc">Error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Infallible</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">fn</span><span class="w"> </span><span class="nf">select</span><span class="p">(</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="bp">self</span><span class="p">,</span>
+<span class="w">        </span><span class="n">_family</span><span class="p">:</span><span class="w"> </span><span class="nc">KernelFamilyId</span><span class="p">,</span>
+<span class="w">        </span><span class="n">_problem</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="nc">CopyProblem</span><span class="p">,</span>
+<span class="w">        </span><span class="n">eligible</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="o">&amp;</span><span class="n">Variant</span><span class="p">],</span>
+<span class="w">    </span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nb">Result</span><span class="o">&lt;</span><span class="n">VariantId</span><span class="p">,</span><span class="w"> </span><span class="bp">Self</span><span class="p">::</span><span class="n">Error</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">preferred</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">eligible</span>
+<span class="w">            </span><span class="p">.</span><span class="n">iter</span><span class="p">()</span>
+<span class="w">            </span><span class="p">.</span><span class="n">copied</span><span class="p">()</span>
+<span class="w">            </span><span class="p">.</span><span class="n">max_by_key</span><span class="p">(</span><span class="o">|</span><span class="n">variant</span><span class="o">|</span><span class="w"> </span><span class="n">variant</span><span class="p">.</span><span class="n">metadata</span><span class="p">().</span><span class="n">chunk_width</span><span class="p">)</span>
+<span class="w">            </span><span class="p">.</span><span class="n">expect</span><span class="p">(</span><span class="s">"eligible is guaranteed to be non-empty"</span><span class="p">);</span>
+
+<span class="w">        </span><span class="nb">Ok</span><span class="p">(</span><span class="o">*</span><span class="n">preferred</span><span class="p">.</span><span class="n">id</span><span class="p">())</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">fn</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nb">Result</span><span class="o">&lt;</span><span class="p">(),</span><span class="w"> </span><span class="nb">Box</span><span class="o">&lt;</span><span class="k">dyn</span><span class="w"> </span><span class="n">Error</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">family</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">copy_family</span><span class="p">()</span><span class="o">?</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">input</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="fm">vec!</span><span class="p">[</span><span class="mf">1.0</span><span class="k">f32</span><span class="p">;</span><span class="w"> </span><span class="mi">4096</span><span class="p">];</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="fm">vec!</span><span class="p">[</span><span class="mf">0.0</span><span class="k">f32</span><span class="p">;</span><span class="w"> </span><span class="n">input</span><span class="p">.</span><span class="n">len</span><span class="p">()];</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">problem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CopyProblem</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">len</span><span class="p">:</span><span class="w"> </span><span class="nc">input</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="p">};</span>
+
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">selector</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CopySelector</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">cache</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NoKernelSelectionCache</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">selected</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">family</span><span class="p">.</span><span class="n">select</span><span class="p">(</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="n">problem</span><span class="p">,</span>
+<span class="w">        </span><span class="n">SelectionMode</span><span class="p">::</span><span class="n">Auto</span><span class="p">,</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">selector</span><span class="p">,</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">cache</span><span class="p">,</span>
+<span class="w">    </span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+
+<span class="w">    </span><span class="fm">println!</span><span class="p">(</span>
+<span class="w">        </span><span class="s">"selected {:?} from {}"</span><span class="p">,</span>
+<span class="w">        </span><span class="n">selected</span><span class="p">.</span><span class="n">variant</span><span class="p">().</span><span class="n">id</span><span class="p">(),</span>
+<span class="w">        </span><span class="n">selected</span><span class="p">.</span><span class="n">source</span><span class="p">(),</span>
+<span class="w">    </span><span class="p">);</span>
+
+<span class="w">    </span><span class="fm">assert_eq!</span><span class="p">(</span><span class="n">selected</span><span class="p">.</span><span class="n">variant</span><span class="p">().</span><span class="n">id</span><span class="p">(),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">VariantId</span><span class="p">::</span><span class="n">Chunked</span><span class="p">);</span>
+<span class="w">    </span><span class="fm">assert_eq!</span><span class="p">(</span><span class="n">selected</span><span class="p">.</span><span class="n">source</span><span class="p">(),</span><span class="w"> </span><span class="n">SelectionSource</span><span class="p">::</span><span class="n">Selector</span><span class="p">);</span>
+
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">entry</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="n">selected</span><span class="p">.</span><span class="n">variant</span><span class="p">().</span><span class="n">entry</span><span class="p">();</span>
+<span class="w">    </span><span class="n">entry</span><span class="p">(</span><span class="o">&amp;</span><span class="n">input</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">output</span><span class="p">);</span>
+
+<span class="w">    </span><span class="fm">assert_eq!</span><span class="p">(</span><span class="n">input</span><span class="p">,</span><span class="w"> </span><span class="n">output</span><span class="p">);</span>
+
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">forced</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">family</span><span class="p">.</span><span class="n">select</span><span class="p">(</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="n">problem</span><span class="p">,</span>
+<span class="w">        </span><span class="n">SelectionMode</span><span class="p">::</span><span class="n">Force</span><span class="p">(</span><span class="n">VariantId</span><span class="p">::</span><span class="n">Scalar</span><span class="p">),</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">selector</span><span class="p">,</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">cache</span><span class="p">,</span>
+<span class="w">    </span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+
+<span class="w">    </span><span class="fm">assert_eq!</span><span class="p">(</span><span class="n">forced</span><span class="p">.</span><span class="n">variant</span><span class="p">().</span><span class="n">id</span><span class="p">(),</span><span class="w"> </span><span class="o">&amp;</span><span class="n">VariantId</span><span class="p">::</span><span class="n">Scalar</span><span class="p">);</span>
+<span class="w">    </span><span class="fm">assert_eq!</span><span class="p">(</span><span class="n">forced</span><span class="p">.</span><span class="n">source</span><span class="p">(),</span><span class="w"> </span><span class="n">SelectionSource</span><span class="p">::</span><span class="n">Override</span><span class="p">);</span>
+
+<span class="w">    </span><span class="nb">Ok</span><span class="p">(())</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>For an input length of 4096, both variants are eligible. The selector prefers
+the variant with the larger <code class="docutils literal notranslate"><span class="pre">chunk_width</span></code>.</p>
+<p>For an input length of 1000, only <code class="docutils literal notranslate"><span class="pre">Scalar</span></code> is eligible because <code class="docutils literal notranslate"><span class="pre">Chunked</span></code>
+requires at least 1024 elements and a length divisible by 256.</p>
+<p>The selection mechanism does not know what <code class="docutils literal notranslate"><span class="pre">chunk_width</span></code> means. Eligibility and
+preference semantics belong entirely to the application.</p>
+</section>
+<section id="adding-a-cache">
+<h2>Adding a cache<a class="headerlink" href="#adding-a-cache" title="链接到此标题。">#</a></h2>
+<p>Use <code class="docutils literal notranslate"><span class="pre">NoKernelSelectionCache</span></code> when selection should run every time:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">cache</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NoKernelSelectionCache</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>For repeated problem classes, implement <code class="docutils literal notranslate"><span class="pre">KernelSelectionCache</span></code>:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">pub</span><span class="w"> </span><span class="k">trait</span><span class="w"> </span><span class="n">KernelSelectionCache</span><span class="o">&lt;</span><span class="n">Problem</span><span class="p">,</span><span class="w"> </span><span class="n">Id</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">type</span><span class="w"> </span><span class="nc">Error</span><span class="p">:</span><span class="w"> </span><span class="nc">std</span><span class="p">::</span><span class="n">error</span><span class="p">::</span><span class="n">Error</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">Send</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">Sync</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="o">'</span><span class="nb">static</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">fn</span><span class="w"> </span><span class="nf">lookup</span><span class="p">(</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="bp">self</span><span class="p">,</span>
+<span class="w">        </span><span class="n">family</span><span class="p">:</span><span class="w"> </span><span class="nc">KernelFamilyId</span><span class="p">,</span>
+<span class="w">        </span><span class="n">problem</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="nc">Problem</span><span class="p">,</span>
+<span class="w">    </span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nb">Result</span><span class="o">&lt;</span><span class="nb">Option</span><span class="o">&lt;</span><span class="n">Id</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="bp">Self</span><span class="p">::</span><span class="n">Error</span><span class="o">&gt;</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">fn</span><span class="w"> </span><span class="nf">store</span><span class="p">(</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="bp">self</span><span class="p">,</span>
+<span class="w">        </span><span class="n">family</span><span class="p">:</span><span class="w"> </span><span class="nc">KernelFamilyId</span><span class="p">,</span>
+<span class="w">        </span><span class="n">problem</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="nc">Problem</span><span class="p">,</span>
+<span class="w">        </span><span class="n">variant</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="nc">Id</span><span class="p">,</span>
+<span class="w">    </span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nb">Result</span><span class="o">&lt;</span><span class="p">(),</span><span class="w"> </span><span class="bp">Self</span><span class="p">::</span><span class="n">Error</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>A simple in-memory cache for the previous example can use problem length as
+part of its key:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_host</span><span class="p">::{</span><span class="n">KernelFamilyId</span><span class="p">,</span><span class="w"> </span><span class="n">KernelSelectionCache</span><span class="p">};</span>
+<span class="k">use</span><span class="w"> </span><span class="n">std</span><span class="p">::</span><span class="n">collections</span><span class="p">::</span><span class="n">HashMap</span><span class="p">;</span>
+<span class="k">use</span><span class="w"> </span><span class="n">std</span><span class="p">::</span><span class="n">convert</span><span class="p">::</span><span class="n">Infallible</span><span class="p">;</span>
+
+<span class="cp">#[derive(Default)]</span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">MemoryCache</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">values</span><span class="p">:</span><span class="w"> </span><span class="nc">HashMap</span><span class="o">&lt;</span><span class="p">(</span><span class="n">KernelFamilyId</span><span class="p">,</span><span class="w"> </span><span class="kt">usize</span><span class="p">),</span><span class="w"> </span><span class="n">VariantId</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="k">impl</span><span class="w"> </span><span class="n">KernelSelectionCache</span><span class="o">&lt;</span><span class="n">CopyProblem</span><span class="p">,</span><span class="w"> </span><span class="n">VariantId</span><span class="o">&gt;</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">MemoryCache</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">type</span><span class="w"> </span><span class="nc">Error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Infallible</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">fn</span><span class="w"> </span><span class="nf">lookup</span><span class="p">(</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="bp">self</span><span class="p">,</span>
+<span class="w">        </span><span class="n">family</span><span class="p">:</span><span class="w"> </span><span class="nc">KernelFamilyId</span><span class="p">,</span>
+<span class="w">        </span><span class="n">problem</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="nc">CopyProblem</span><span class="p">,</span>
+<span class="w">    </span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nb">Result</span><span class="o">&lt;</span><span class="nb">Option</span><span class="o">&lt;</span><span class="n">VariantId</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="bp">Self</span><span class="p">::</span><span class="n">Error</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nb">Ok</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">values</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="o">&amp;</span><span class="p">(</span><span class="n">family</span><span class="p">,</span><span class="w"> </span><span class="n">problem</span><span class="p">.</span><span class="n">len</span><span class="p">)).</span><span class="n">copied</span><span class="p">())</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">fn</span><span class="w"> </span><span class="nf">store</span><span class="p">(</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="bp">self</span><span class="p">,</span>
+<span class="w">        </span><span class="n">family</span><span class="p">:</span><span class="w"> </span><span class="nc">KernelFamilyId</span><span class="p">,</span>
+<span class="w">        </span><span class="n">problem</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="nc">CopyProblem</span><span class="p">,</span>
+<span class="w">        </span><span class="n">variant</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="nc">VariantId</span><span class="p">,</span>
+<span class="w">    </span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nb">Result</span><span class="o">&lt;</span><span class="p">(),</span><span class="w"> </span><span class="bp">Self</span><span class="p">::</span><span class="n">Error</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="bp">self</span><span class="p">.</span><span class="n">values</span><span class="p">.</span><span class="n">insert</span><span class="p">((</span><span class="n">family</span><span class="p">,</span><span class="w"> </span><span class="n">problem</span><span class="p">.</span><span class="n">len</span><span class="p">),</span><span class="w"> </span><span class="o">*</span><span class="n">variant</span><span class="p">);</span>
+<span class="w">        </span><span class="nb">Ok</span><span class="p">(())</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The application decides which problem properties define cache equivalence.</p>
+<p>For example, a GEMM cache key may include:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>family name
+family revision
+compute capability
+M
+N
+K
+input type
+output type
+layout
+alignment class
+</pre></div>
+</div>
+<p>Do not omit a property when it can change eligibility or preference.</p>
+<p>A cache implementation may be:</p>
+<ul class="simple">
+<li><p>an in-memory map</p></li>
+<li><p>a process-wide cache</p></li>
+<li><p>a database</p></li>
+<li><p>a configuration file</p></li>
+<li><p>a benchmark result store</p></li>
+<li><p>a remote tuning service</p></li>
+</ul>
+<p>Cache errors are explicit. If <code class="docutils literal notranslate"><span class="pre">lookup</span></code> or <code class="docutils literal notranslate"><span class="pre">store</span></code> returns an error, selection
+stops and returns <code class="docutils literal notranslate"><span class="pre">CacheLookupFailed</span></code> or <code class="docutils literal notranslate"><span class="pre">CacheStoreFailed</span></code>.</p>
+<p>A best-effort cache may internally translate storage failures into misses or
+no-op stores when that policy is appropriate.</p>
+</section>
+<section id="error-handling">
+<h2>Error handling<a class="headerlink" href="#error-handling" title="链接到此标题。">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">KernelFamily::select</span></code> can report errors from four layers:</p>
+<ol class="arabic simple">
+<li><p>forced selection</p></li>
+<li><p>eligibility validation</p></li>
+<li><p>selector execution or output validation</p></li>
+<li><p>cache operations</p></li>
+</ol>
+<p>The principal variants are:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Error</p></th>
+<th class="head text-left"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">UnknownForcedVariant</span></code></p></td>
+<td class="text-left"><p>A forced ID is not a family member</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">IneligibleForcedVariant</span></code></p></td>
+<td class="text-left"><p>A forced family member cannot handle the problem</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">NoEligibleVariants</span></code></p></td>
+<td class="text-left"><p>Every family member failed validation</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">SelectorFailed</span></code></p></td>
+<td class="text-left"><p>The selector returned its own policy error</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">SelectorReturnedUnknownVariant</span></code></p></td>
+<td class="text-left"><p>The selector returned an ID outside the family</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">SelectorReturnedIneligibleVariant</span></code></p></td>
+<td class="text-left"><p>The selector returned a family member that was not eligible</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">CacheLookupFailed</span></code></p></td>
+<td class="text-left"><p>Cache lookup returned an error</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">CacheStoreFailed</span></code></p></td>
+<td class="text-left"><p>Cache storage returned an error</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Unknown or ineligible cached IDs are not selection errors. They are treated as
+cache misses because cache contents are untrusted hints.</p>
+<p>Selector mistakes are errors because the selector receives the authoritative
+eligible slice during the current selection call.</p>
+</section>
+<section id="declaration-order">
+<h2>Declaration order<a class="headerlink" href="#declaration-order" title="链接到此标题。">#</a></h2>
+<p>Family variants retain declaration order:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="n">KernelFamily</span><span class="p">::</span><span class="n">try_new</span><span class="p">(</span>
+<span class="w">    </span><span class="s">"operation"</span><span class="p">,</span>
+<span class="w">    </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">    </span><span class="p">[</span>
+<span class="w">        </span><span class="n">fallback</span><span class="p">,</span>
+<span class="w">        </span><span class="n">medium</span><span class="p">,</span>
+<span class="w">        </span><span class="n">aggressive</span><span class="p">,</span>
+<span class="w">    </span><span class="p">],</span>
+<span class="p">)</span><span class="o">?</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>The selector receives eligible variants in this same relative order.</p>
+<p>This supports deterministic policies such as:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="nb">Ok</span><span class="p">(</span><span class="o">*</span><span class="n">eligible</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">id</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>or priority encoded through declaration order.</p>
+<p>If declaration order affects selection or tuning, changing the order requires a
+family revision bump.</p>
+<p>Prefer explicit metadata when the policy is more complex than a simple ordered
+fallback. Metadata makes the policy easier to inspect, test, and evolve.</p>
+</section>
+<section id="testing-a-family">
+<h2>Testing a family<a class="headerlink" href="#testing-a-family" title="链接到此标题。">#</a></h2>
+<p>Kernel-family policy is host-side logic and can be tested without a CUDA
+device.</p>
+<p>Tests should verify at least:</p>
+<ul class="simple">
+<li><p>empty families are rejected</p></li>
+<li><p>blank names are rejected</p></li>
+<li><p>duplicate IDs are rejected</p></li>
+<li><p>forced selection bypasses selector and cache</p></li>
+<li><p>forced selection still validates eligibility</p></li>
+<li><p>valid cache hits bypass the selector</p></li>
+<li><p>unknown cache IDs fall back to the selector</p></li>
+<li><p>newly ineligible cache IDs fall back to the selector</p></li>
+<li><p>stale cache entries are replaced</p></li>
+<li><p>selectors receive only eligible variants</p></li>
+<li><p>declaration order is preserved</p></li>
+<li><p>unknown selector output is rejected</p></li>
+<li><p>ineligible selector output is rejected</p></li>
+<li><p>no eligible variants produces an error</p></li>
+<li><p>cache lookup failures propagate</p></li>
+<li><p>cache store failures propagate</p></li>
+<li><p>family revisions isolate cached decisions</p></li>
+</ul>
+<p>The repository integration tests provide executable examples:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>crates/cuda-host/tests/kernel_family.rs
+</pre></div>
+</div>
+<p>Run them with:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>cargo test -p cuda-host --test kernel_family
+</pre></div>
+</div>
+</section>
+<section id="using-generated-cuda-launchers">
+<h2>Using generated CUDA launchers<a class="headerlink" href="#using-generated-cuda-launchers" title="链接到此标题。">#</a></h2>
+<p>In a real application, <code class="docutils literal notranslate"><span class="pre">Entry</span></code> commonly represents a concrete typed launcher.</p>
+<p>For example:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">type</span><span class="w"> </span><span class="nc">KernelLauncher</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">unsafe</span><span class="w"> </span><span class="k">fn</span><span class="p">(</span>
+<span class="w">    </span><span class="o">&amp;</span><span class="n">kernels</span><span class="p">::</span><span class="n">LoadedModule</span><span class="p">,</span>
+<span class="w">    </span><span class="o">&amp;</span><span class="n">CudaStream</span><span class="p">,</span>
+<span class="w">    </span><span class="n">LaunchConfig</span><span class="p">,</span>
+<span class="w">    </span><span class="o">&amp;</span><span class="n">DeviceBuffer</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="w">    </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">DeviceBuffer</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nb">Result</span><span class="o">&lt;</span><span class="p">(),</span><span class="w"> </span><span class="n">cuda_core</span><span class="p">::</span><span class="n">DriverError</span><span class="o">&gt;</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>The family then stores one launcher per compiled specialization:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">type</span><span class="w"> </span><span class="nc">Family</span><span class="w"> </span><span class="o">=</span>
+<span class="w">    </span><span class="n">KernelFamily</span><span class="o">&lt;</span><span class="n">VariantId</span><span class="p">,</span><span class="w"> </span><span class="n">KernelLauncher</span><span class="p">,</span><span class="w"> </span><span class="n">VariantMetadata</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="o">&gt;</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Selection returns the launcher and its metadata:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="n">selected</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">family</span><span class="p">.</span><span class="n">select</span><span class="p">(</span>
+<span class="w">    </span><span class="o">&amp;</span><span class="n">problem</span><span class="p">,</span>
+<span class="w">    </span><span class="n">mode</span><span class="p">,</span>
+<span class="w">    </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">selector</span><span class="p">,</span>
+<span class="w">    </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">cache</span><span class="p">,</span>
+<span class="p">)</span><span class="o">?</span><span class="p">;</span>
+
+<span class="kd">let</span><span class="w"> </span><span class="n">launch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="n">selected</span><span class="p">.</span><span class="n">variant</span><span class="p">().</span><span class="n">entry</span><span class="p">();</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">metadata</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">selected</span><span class="p">.</span><span class="n">variant</span><span class="p">().</span><span class="n">metadata</span><span class="p">();</span>
+
+<span class="fm">println!</span><span class="p">(</span>
+<span class="w">    </span><span class="s">"launching {:?} from {}"</span><span class="p">,</span>
+<span class="w">    </span><span class="n">selected</span><span class="p">.</span><span class="n">variant</span><span class="p">().</span><span class="n">id</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">selected</span><span class="p">.</span><span class="n">source</span><span class="p">(),</span>
+<span class="p">);</span>
+
+<span class="k">unsafe</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">launch</span><span class="p">(</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="n">module</span><span class="p">,</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="n">stream</span><span class="p">,</span>
+<span class="w">        </span><span class="n">launch_config</span><span class="p">,</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="n">input</span><span class="p">,</span>
+<span class="w">        </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">output</span><span class="p">,</span>
+<span class="w">    </span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">KernelFamily</span></code> validates variant selection. It does not make an otherwise unsafe
+raw launch safe.</p>
+<p>Launch geometry, pointer validity, buffer sizes, context identity, and kernel
+ABI obligations still belong to the launch API. Prefer prepared launch
+contracts when the kernel geometry can be expressed statically. See
+<a class="reference internal" href="launching-kernels.html"><span class="std std-doc">Launching Kernels</span></a>.</p>
+</section>
+<section id="real-world-example">
+<h2>Real-world example<a class="headerlink" href="#real-world-example" title="链接到此标题。">#</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">gemm_sol_final</span></code> example uses a two-entry family for two Blackwell GEMM
+output-tile specializations:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>M256xN256
+M512xN256
+</pre></div>
+</div>
+<p>Its family metadata includes:</p>
+<ul class="simple">
+<li><p>kernel name</p></li>
+<li><p>output tile</p></li>
+<li><p>M tile size</p></li>
+<li><p>N tile size</p></li>
+<li><p>K tile multiple</p></li>
+<li><p>problem-size preference threshold</p></li>
+</ul>
+<p>Eligibility checks validate matrix dimensions, tile divisibility, integer
+ranges, allocation-size overflow, and CUDA grid limits.</p>
+<p>The selector chooses the largest preferred tile whose threshold is compatible
+with the problem.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">GEMM_SOL_VARIANT</span></code> environment variable exposes:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>auto
+m256xn256
+m512xn256
+</pre></div>
+</div>
+<p>The forced values remain validated overrides. They cannot select a tile whose
+compiled shape is incompatible with the matrix dimensions.</p>
+<p>See:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/NVlabs/cuda-oxide/tree/main/crates/rustc-codegen-cuda/examples/gemm_sol_final"><code class="docutils literal notranslate"><span class="pre">gemm_sol_final</span></code></a></p></li>
+<li><p><a class="reference external" href="https://github.com/NVlabs/cuda-oxide/blob/main/crates/cuda-host/tests/kernel_family.rs"><code class="docutils literal notranslate"><span class="pre">KernelFamily</span></code> integration tests</a></p></li>
+<li><p><a class="reference external" href="https://github.com/NVlabs/cuda-oxide/blob/main/crates/cuda-host/src/kernel_family.rs"><code class="docutils literal notranslate"><span class="pre">cuda-host</span></code> kernel-family implementation</a></p></li>
+<li><p><a class="reference external" href="https://github.com/NVlabs/cuda-oxide/blob/main/crates/cuda-host/README.md"><code class="docutils literal notranslate"><span class="pre">cuda-host</span></code> README</a></p></li>
+</ul>
+</section>
+<section id="design-guidelines">
+<h2>Design guidelines<a class="headerlink" href="#design-guidelines" title="链接到此标题。">#</a></h2>
+<p>Use the following rules when introducing a new family.</p>
+<section id="keep-the-family-bounded">
+<h3>Keep the family bounded<a class="headerlink" href="#keep-the-family-bounded" title="链接到此标题。">#</a></h3>
+<p>Prefer a small set of meaningful compiled variants.</p>
+<p>A large dynamically changing set usually indicates that a registry, generated
+dispatch table, or tuning database is a better abstraction.</p>
+</section>
+<section id="make-ids-semantic">
+<h3>Make IDs semantic<a class="headerlink" href="#make-ids-semantic" title="链接到此标题。">#</a></h3>
+<p>The ID should describe which compiled contract is selected, not where it happens
+to appear in an array.</p>
+</section>
+<section id="put-correctness-in-eligibility">
+<h3>Put correctness in eligibility<a class="headerlink" href="#put-correctness-in-eligibility" title="链接到此标题。">#</a></h3>
+<p>Any condition required for safe or correct execution belongs in
+<code class="docutils literal notranslate"><span class="pre">KernelProblem::validate</span></code>.</p>
+<p>Do not rely on the selector to avoid unsafe variants.</p>
+</section>
+<section id="put-performance-in-preference">
+<h3>Put performance in preference<a class="headerlink" href="#put-performance-in-preference" title="链接到此标题。">#</a></h3>
+<p>The selector should decide among already valid choices.</p>
+<p>This keeps tuning policy independent from safety validation.</p>
+</section>
+<section id="treat-cache-entries-as-untrusted">
+<h3>Treat cache entries as untrusted<a class="headerlink" href="#treat-cache-entries-as-untrusted" title="链接到此标题。">#</a></h3>
+<p>Always allow <code class="docutils literal notranslate"><span class="pre">KernelFamily</span></code> to resolve and revalidate cached IDs.</p>
+<p>Do not launch directly from a cached ID without family validation.</p>
+</section>
+<section id="version-policy-changes">
+<h3>Version policy changes<a class="headerlink" href="#version-policy-changes" title="链接到此标题。">#</a></h3>
+<p>Increment the family revision when a cached choice may have different meaning
+under the new code.</p>
+</section>
+<section id="preserve-observability">
+<h3>Preserve observability<a class="headerlink" href="#preserve-observability" title="链接到此标题。">#</a></h3>
+<p>Record <code class="docutils literal notranslate"><span class="pre">SelectionSource</span></code>, family identity, selected ID, and relevant problem
+facts in diagnostics.</p>
+<p>This is particularly useful when comparing operator overrides, cached tuning,
+and current selector behavior.</p>
+</section>
+</section>
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="链接到此标题。">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">KernelFamily</span></code> provides a bounded and validated dispatch layer for
+ahead-of-time compiled kernel specializations.</p>
+<p>Its core properties are:</p>
+<ul class="simple">
+<li><p>fixed family membership</p></li>
+<li><p>stable semantic variant IDs</p></li>
+<li><p>caller-defined entries and metadata</p></li>
+<li><p>explicit eligibility validation</p></li>
+<li><p>independent preference selection</p></li>
+<li><p>validated manual overrides</p></li>
+<li><p>revalidated cache entries</p></li>
+<li><p>explicit family revisioning</p></li>
+<li><p>observable selection provenance</p></li>
+<li><p>CPU-only, device-independent policy logic</p></li>
+</ul>
+<p>The abstraction does not decide how kernels should be tuned. It provides the
+invariants required to make that tuning policy explicit, testable, and safe to
+integrate with compiled CUDA launchers.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="launching-kernels.html"
+       title="上一页">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">上一页</p>
+        <p class="prev-next-title">Launching Kernels</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="closures-and-generics.html"
+       title="下一页">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">下一页</p>
+        <p class="prev-next-title">Closures and Generics</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> 当前页面
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#when-to-use-a-kernel-family">When to use a kernel family</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#selection-model">Selection model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#family-anatomy">Family anatomy</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#defining-stable-variant-ids">Defining stable variant IDs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#constructing-a-family">Constructing a family</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#family-identity-and-revisioning">Family identity and revisioning</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#eligibility-with-kernelproblem">Eligibility with <code class="docutils literal notranslate"><span class="pre">KernelProblem</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preference-with-kernelselector">Preference with <code class="docutils literal notranslate"><span class="pre">KernelSelector</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#automatic-selection">Automatic selection</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#forced-selection">Forced selection</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#selection-results">Selection results</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#complete-example">Complete example</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-a-cache">Adding a cache</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#error-handling">Error handling</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#declaration-order">Declaration order</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#testing-a-family">Testing a family</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-generated-cuda-launchers">Using generated CUDA launchers</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#real-world-example">Real-world example</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#design-guidelines">Design guidelines</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#keep-the-family-bounded">Keep the family bounded</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#make-ids-semantic">Make IDs semantic</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#put-correctness-in-eligibility">Put correctness in eligibility</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#put-performance-in-preference">Put performance in preference</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#treat-cache-entries-as-untrusted">Treat cache entries as untrusted</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#version-policy-changes">Version policy changes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#preserve-observability">Preserve observability</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#summary">Summary</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+    <div class="footer-items__center">
+      
+        <div class="footer-item"><!--
+SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<footer class="bd-footer-content">
+  <div class="footer-container" style="padding: 1rem 0 2rem 0; border-top: 1px solid var(--pst-color-border); text-align: left;">
+    
+    <!-- NVIDIA Logo -->
+    <div style="margin-bottom: 1rem;">
+      <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem; filter: brightness(0);"
+           class="only-light">
+      <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem;"
+           class="only-dark pst-js-only">
+    </div>
+    
+    <!-- Footer Links - single line, left aligned -->
+    <div style="font-size: 0.8125rem; margin-bottom: 0.5rem; color: var(--pst-color-text-muted);">
+      <a href="https://www.nvidia.com/en-us/about-nvidia/privacy-policy/" target="_blank" style="color: inherit; text-decoration: none;">Privacy Policy</a> | 
+      <a href="https://www.nvidia.com/en-us/preferences/email-preferences/" target="_blank" style="color: inherit; text-decoration: none;">Your Privacy Choices</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/terms-of-service/" target="_blank" style="color: inherit; text-decoration: none;">Terms of Service</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/accessibility/" target="_blank" style="color: inherit; text-decoration: none;">Accessibility</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/company-policies/" target="_blank" style="color: inherit; text-decoration: none;">Corporate Policies</a> | 
+      <a href="https://www.nvidia.com/en-us/product-security/" target="_blank" style="color: inherit; text-decoration: none;">Product Security</a> | 
+      <a href="https://www.nvidia.com/en-us/contact/" target="_blank" style="color: inherit; text-decoration: none;">Contact</a>
+    </div>
+    
+    <!-- Copyright -->
+    <div style="font-size: 0.8125rem; color: var(--pst-color-text-muted);">
+      Copyright &copy; 2025-2026, NVIDIA.
+    </div>
+    
+  </div>
+</footer></div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>

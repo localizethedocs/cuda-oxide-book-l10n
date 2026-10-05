@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Catalog-Generated Intrinsics &#8212; cuda-oxide</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/nvidia-sphinx-theme.css?v=5d97cc0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=3fa0529b" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/lightbox.css?v=9a4ecef8" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=64cc4de3f052d77215f0"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
+
+    <script src="../_static/documentation_options.js?v=d786bb5c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/translations.js?v=540d3cec"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'compiler/catalog-generated-intrinsics';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../_static/js/lightbox.js?v=dda6eb66"></script>
+    <script src="../_static/js/spa-nav.js?v=793c9294"></script>
+    <link rel="canonical" href="https://projects.localizethedocs.org/cuda-oxide-book-l10n/compiler/catalog-generated-intrinsics.html" />
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜索" href="../search.html" />
+    <link rel="next" title="Fuzzing and Differential Testing" href="fuzzing-and-differential-testing.html" />
+    <link rel="prev" title="Adding New Intrinsics" href="adding-new-intrinsics.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="zh-CN"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+<script type="text/javascript" src="../ltd-provenance.js"></script>
+<script type="text/javascript" src="../ltd-current.js"></script>
+<script type="text/javascript" src="../../../ltd-config.js"></script>
+<script type="text/javascript" src="../../../ltd-flyout.js"></script>
+
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">跳转至主要内容</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>回到顶部</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="版本警告"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="网页导航">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">cuda-oxide</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<button type="button" class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="亮色"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="暗色"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>亮色</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>暗色</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+    <button type="button" class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="当前页面">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<button type="button" class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜索" aria-label="搜索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="亮色"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="暗色"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>亮色</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>暗色</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><!--
+SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<div class="sidebar-tree">
+    <p class="sidebar-tree-title">
+        Table of Contents
+    </p>
+    <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/hello-gpu.html">Writing Your First Kernel</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Writing GPU Programs</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/execution-model.html">The CUDA Execution Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/kernels-and-device-functions.html">Kernels and Device Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/memory-and-data-movement.html">Memory and Data Movement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/virtual-memory-and-peer-access.html">Virtual Memory Management and Peer Access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/launching-kernels.html">Launching Kernels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/kernel-families.html">Kernel Families</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/closures-and-generics.html">Closures and Generics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/error-handling-and-debugging.html">Error Handling and Debugging</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Safety on the GPU</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-safety/the-safety-model.html">The Safety Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-safety/bounds-checks.html">Bounds Checks: Pay Once or Opt Out</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Async GPU Programming</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/the-device-operation-model.html">The DeviceOperation Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/combinators-and-composition.html">Combinators and Composition</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/scheduling-and-streams.html">Scheduling and Streams</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/concurrent-execution.html">Concurrent Execution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/overlapping-transfers-and-compute.html">Overlapping Transfers and Compute</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Building a Real Application</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../projects/async-mlp-pipeline.html">Project: Async MLP Pipeline</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Advanced GPU Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/shared-memory-and-synchronization.html">Shared Memory and Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/warp-level-programming.html">Warp-Level Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/tensor-memory-accelerator.html">Tensor Memory Accelerator (TMA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/matrix-multiply-accelerators.html">Matrix Multiply Accelerators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cluster-programming.html">Cluster Programming</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Inside the Compiler</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="architecture-overview.html">Architecture Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pliron.html">Pliron -- Pliron IR (MLIR-like)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rustc-public.html">rustc_public -- Stable MIR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rustc-codegen-cuda.html">The Code Generator: rustc-codegen-cuda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mir-importer.html">The MIR Importer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compiler-optimizations.html">Compiler Optimizations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mlir-dialects.html">Pliron Dialects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lowering-pipeline.html">The Lowering Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="adding-new-intrinsics.html">Adding New Intrinsics</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Catalog-Generated Intrinsics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="fuzzing-and-differential-testing.html">Fuzzing and Differential Testing</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Appendix</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/building-from-source.html">Building from Source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/api-quick-reference.html">API Quick Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/supported-features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/cuda-cpp-comparison.html">cuda-oxide vs CUDA C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/ecosystem.html">The Rust + GPU Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/glossary.html">Glossary</a></li>
+</ul>
+
+</div></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="初始页面">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Catalog-Generated Intrinsics</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="catalog-generated-intrinsics">
+<h1>Catalog-Generated Intrinsics<a class="headerlink" href="#catalog-generated-intrinsics" title="链接到此标题。">#</a></h1>
+<p>Most cuda-oxide device intrinsics are not implemented by editing compiler
+stages independently. They are described as reviewed catalog inputs and
+<code class="docutils literal notranslate"><span class="pre">cuda-intrinsics-gen</span></code> generates the repetitive API, dialect, importer,
+lowering, target, reference, and probe surfaces from that contract.</p>
+<p>Use this workflow when the intrinsic fits the generated catalog model. For an
+operation that requires bespoke verification or lowering that the catalog
+cannot express, use <a class="reference internal" href="adding-new-intrinsics.html"><span class="std std-doc">Adding New Intrinsics</span></a> instead.</p>
+<hr class="docutils" />
+<section id="choose-the-right-path-first">
+<h2>Choose the Right Path First<a class="headerlink" href="#choose-the-right-path-first" title="链接到此标题。">#</a></h2>
+<p>Before editing anything, find the nearest existing intrinsic with the same
+semantic and lowering shape.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Does an existing catalog family model the intrinsic?
+    |
+    +-- yes -&gt; extend that overlay family and the ABI ledger
+    |
+    +-- no  -&gt; determine whether the generator needs a new family/shape
+               or whether the operation is genuinely hand-written
+</pre></div>
+</div>
+<p>An LLVM declaration by itself is not enough to admit an intrinsic. The catalog
+also records cuda-oxide policy such as its Rust API, safety and effects,
+expected PTX form, target requirements, ABI identity, and lowering evidence.</p>
+<p>The normal contribution path is therefore to extend an existing reviewed
+family, not to edit generated Rust files or <code class="docutils literal notranslate"><span class="pre">intrinsics/catalog.json</span></code> directly.</p>
+</section>
+<hr class="docutils" />
+<section id="sources-of-truth">
+<h2>Sources of Truth<a class="headerlink" href="#sources-of-truth" title="链接到此标题。">#</a></h2>
+<p>The generated intrinsic pipeline is assembled from reviewed inputs and resolved
+into a generated catalog:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>intrinsics/upstream.lock -&gt; intrinsics/imported.json ----\
+intrinsics/overlay.toml -&gt; intrinsics/overlay/*.toml -----+
+intrinsics/abi-v1.toml -----------------------------------+--&gt; resolve
+intrinsics/evidence/*.json -------------------------------/       |
+                                                                  v
+                                                     intrinsics/catalog.json
+                                                            GENERATED
+                                                                  |
+                                                                  v
+                                                        generated outputs
+</pre></div>
+</div>
+<p>Their roles are different:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>File / artifact</p></th>
+<th class="head text-left"><p>Role</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">intrinsics/upstream.lock</span></code></p></td>
+<td class="text-left"><p>Pins the LLVM source/extraction identity used by the imported facts, and the rustc commit whose <code class="docutils literal notranslate"><span class="pre">llc</span></code> the evidence probe must run under.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">intrinsics/imported.json</span></code></p></td>
+<td class="text-left"><p>Records what the pinned LLVM/NVPTX source declares. Normal intrinsic additions consume this committed file; they do not rerun extraction.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">intrinsics/overlay.toml</span></code></p></td>
+<td class="text-left"><p>Explicitly indexes the admitted overlay shards.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">intrinsics/overlay/*.toml</span></code></p></td>
+<td class="text-left"><p>Records cuda-oxide policy for reviewed intrinsic families.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">intrinsics/abi-v1.toml</span></code></p></td>
+<td class="text-left"><p>Append-only stable intrinsic ABI ledger.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">intrinsics/evidence/*.json</span></code></p></td>
+<td class="text-left"><p>Records reviewed lowering evidence when the route requires it.</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">intrinsics/catalog.json</span></code></p></td>
+<td class="text-left"><p>Resolved generated plan. Do not edit it by hand.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Generated sources and probe/reference outputs carry a <code class="docutils literal notranslate"><span class="pre">DO</span> <span class="pre">NOT</span> <span class="pre">EDIT</span></code> marker.
+Change their source inputs and regenerate instead.</p>
+<section id="catalog-metadata">
+<h3>Catalog Metadata<a class="headerlink" href="#catalog-metadata" title="链接到此标题。">#</a></h3>
+<p>The overlay manifest carries version and backend metadata for the resolved
+catalog. These values describe the catalog contract; they are not
+per-intrinsic knobs.</p>
+<p>There are two distinct <code class="docutils literal notranslate"><span class="pre">schema</span></code> numbers in play, one per side of the
+generator:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>intrinsics/overlay.toml   schema = 44   (overlay input format)
+        | cuda-intrinsics-gen
+        v
+intrinsics/catalog.json   "schema": 46  (serialized catalog format)
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">schema</span></code> (in <code class="docutils literal notranslate"><span class="pre">overlay.toml</span></code>) identifies the overlay <strong>input</strong> format the
+generator accepts (<code class="docutils literal notranslate"><span class="pre">OVERLAY_SCHEMA</span></code> in
+<code class="docutils literal notranslate"><span class="pre">crates/cuda-intrinsics-gen/src/resolve/overlay.rs</span></code>); the resolver rejects
+a mismatched manifest. It is not the catalog format version.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">catalog_version</span></code> identifies the reviewed catalog contract.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">intrinsic_abi</span></code> identifies the intrinsic ABI generation whose stable entries
+are recorded in <code class="docutils literal notranslate"><span class="pre">intrinsics/abi-v1.toml</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">backend_profile</span></code> selects the reviewed backend profile used while resolving
+lowering evidence.</p></li>
+</ul>
+<p>Contributors normally change these values only as part of a deliberate catalog,
+ABI, or backend-profile transition. Do not synthesize or edit corresponding
+metadata directly in generated <code class="docutils literal notranslate"><span class="pre">intrinsics/catalog.json</span></code>.</p>
+</section>
+<section id="catalog-json-header-fields">
+<h3>catalog.json Header Fields<a class="headerlink" href="#catalog-json-header-fields" title="链接到此标题。">#</a></h3>
+<p>The generated catalog stamps its own header at resolve time. For reference,
+since the file is generated and otherwise undocumented:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">schema</span></code>: version of the <strong>serialized catalog</strong> format (<code class="docutils literal notranslate"><span class="pre">CATALOG_SCHEMA</span></code> in
+the same <code class="docutils literal notranslate"><span class="pre">resolve/overlay.rs</span></code>). Distinct from the overlay's <code class="docutils literal notranslate"><span class="pre">schema</span></code>; see
+the sketch above.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">catalog_version</span></code>: the reviewed catalog contract, copied from
+<code class="docutils literal notranslate"><span class="pre">overlay.toml</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">intrinsic_abi</span></code>: the ABI generation, copied from <code class="docutils literal notranslate"><span class="pre">overlay.toml</span></code>; its stable
+entries live in <code class="docutils literal notranslate"><span class="pre">intrinsics/abi-v1.toml</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">generator_version</span></code>: the <code class="docutils literal notranslate"><span class="pre">cuda-intrinsics-gen</span></code> crate version that produced
+the catalog (its Cargo package version). The same value appears in the
+<code class="docutils literal notranslate"><span class="pre">&#64;generated</span> <span class="pre">by</span> <span class="pre">cuda-intrinsics-gen</span> <span class="pre">&lt;version&gt;</span></code> banner of every generated
+file.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="the-normal-workflow-extend-an-existing-family">
+<h2>The Normal Workflow: Extend an Existing Family<a class="headerlink" href="#the-normal-workflow-extend-an-existing-family" title="链接到此标题。">#</a></h2>
+<section id="find-the-nearest-sibling">
+<h3>1. Find the nearest sibling<a class="headerlink" href="#find-the-nearest-sibling" title="链接到此标题。">#</a></h3>
+<p>Start in <code class="docutils literal notranslate"><span class="pre">intrinsics/overlay/</span></code>, not in generated Rust code and not by scrolling
+<code class="docutils literal notranslate"><span class="pre">intrinsics/imported.json</span></code>.</p>
+<p>Find an existing entry with the same family and lowering shape, then use the
+imported LLVM facts only for the fields that must agree with upstream.</p>
+<p>For example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>grep<span class="w"> </span>-R<span class="w"> </span><span class="s1">'id = "&lt;nearest-sibling&gt;"'</span><span class="w"> </span>intrinsics/overlay
+rg<span class="w"> </span><span class="s1">'&lt;llvm-or-record-name&gt;'</span><span class="w"> </span>intrinsics/imported.json
+</pre></div>
+</div>
+<p>Prefer copying a proven sibling over constructing an entry from scratch. The
+resolver is intentionally fail-closed, but matching the established family
+shape keeps the review small and makes unexpected generated diffs easier to
+spot.</p>
+</section>
+<section id="add-or-extend-the-overlay-entry">
+<h3>2. Add or extend the overlay entry<a class="headerlink" href="#add-or-extend-the-overlay-entry" title="链接到此标题。">#</a></h3>
+<p>Edit the appropriate file under:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>intrinsics/overlay/&lt;family&gt;.toml
+</pre></div>
+</div>
+<p>The overlay is the hand-edited policy input. Do not edit the corresponding
+operation under <code class="docutils literal notranslate"><span class="pre">crates/dialect-nvvm/src/ops/generated/</span></code>, the generated
+importer dispatch, generated lowering tables, or <code class="docutils literal notranslate"><span class="pre">intrinsics/catalog.json</span></code>.</p>
+<p>If the contribution requires a <strong>new overlay shard</strong>, also add that shard to
+the sorted <code class="docutils literal notranslate"><span class="pre">shards</span></code> list in:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>intrinsics/overlay.toml
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">generate</span></code> and <code class="docutils literal notranslate"><span class="pre">check</span></code> reconcile the index with the overlay directory and
+reject an unindexed shard.</p>
+</section>
+<section id="append-the-abi-ledger-entry">
+<h3>3. Append the ABI ledger entry<a class="headerlink" href="#append-the-abi-ledger-entry" title="链接到此标题。">#</a></h3>
+<p>Add the new stable identity at the end of:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>intrinsics/abi-v1.toml
+</pre></div>
+</div>
+<p>The ledger is append-only. Existing entries must not be reordered, deleted,
+renumbered, or repurposed. The catalog identity, operation key, and raw Rust
+signature must agree with the overlay entry.</p>
+<p>Treat the ABI ID as a merge-time resource. If another intrinsic PR lands first,
+rebase onto the latest <code class="docutils literal notranslate"><span class="pre">main</span></code>, append after the new ledger tail, and regenerate.
+Do not preserve an obsolete numeric range merely because the branch used it
+earlier.</p>
+</section>
+<section id="handle-lowering-evidence-only-when-needed">
+<h3>4. Handle lowering evidence only when needed<a class="headerlink" href="#handle-lowering-evidence-only-when-needed" title="链接到此标题。">#</a></h3>
+<p>If the new intrinsic uses an already-reviewed lowering/evidence shape, follow
+the existing sibling contract. A normal catalog addition does not necessarily
+need a new evidence file.</p>
+<p>If the backend route is new and needs candidate evidence, use an explicit
+candidate probe:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">HOST</span><span class="o">=</span><span class="s2">"</span><span class="k">$(</span>rustc<span class="w"> </span>-vV<span class="w"> </span><span class="p">|</span><span class="w"> </span>sed<span class="w"> </span>-n<span class="w"> </span><span class="s1">'s/^host: //p'</span><span class="k">)</span><span class="s2">"</span>
+<span class="nv">LLC</span><span class="o">=</span><span class="s2">"</span><span class="k">$(</span>rustc<span class="w"> </span>--print<span class="w"> </span>sysroot<span class="k">)</span><span class="s2">/lib/rustlib/</span><span class="nv">$HOST</span><span class="s2">/bin/llc"</span>
+
+cargo<span class="w"> </span>run<span class="w"> </span>-p<span class="w"> </span>cuda-intrinsics-gen<span class="w"> </span>--<span class="w"> </span>probe<span class="w"> </span>--candidate<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--intrinsic<span class="w"> </span>&lt;catalog-id&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--llc<span class="w"> </span><span class="s2">"</span><span class="nv">$LLC</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--gpu-target<span class="w"> </span>&lt;sm-target&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--ptx-feature<span class="w"> </span>&lt;ptx-feature&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--ptxas<span class="w"> </span>&lt;path-to-ptxas&gt;
+</pre></div>
+</div>
+<p>On a system where terminal assembly is deliberately unavailable, replace
+<code class="docutils literal notranslate"><span class="pre">--ptxas</span> <span class="pre">&lt;path-to-ptxas&gt;</span></code> with the explicit <code class="docutils literal notranslate"><span class="pre">--skip-terminal</span></code> flag. Candidate
+mode requires one of those choices; it does not silently fall back.</p>
+<p>Review candidate output before promoting any evidence into the committed
+contract.</p>
+</section>
+<section id="regenerate">
+<h3>5. Regenerate<a class="headerlink" href="#regenerate" title="链接到此标题。">#</a></h3>
+<p>Run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cargo<span class="w"> </span>run<span class="w"> </span>-p<span class="w"> </span>cuda-intrinsics-gen<span class="w"> </span>--<span class="w"> </span>generate
+</pre></div>
+</div>
+<p>Then inspect the working tree and diff before running broader checks:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>status<span class="w"> </span>--short
+git<span class="w"> </span>diff<span class="w"> </span>--stat
+git<span class="w"> </span>diff<span class="w"> </span>--<span class="w"> </span>intrinsics<span class="w"> </span>crates/cuda-intrinsics<span class="w"> </span>crates/cuda-device<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>crates/dialect-nvvm<span class="w"> </span>crates/mir-importer<span class="w"> </span>crates/mir-lower<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>crates/cuda-oxide-codegen<span class="w"> </span>crates/rustc-codegen-cuda
+</pre></div>
+</div>
+<p>Check <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">status</span> <span class="pre">--short</span></code> as well: newly created overlay or evidence files are
+untracked until staged and therefore do not appear in <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">diff</span></code>.</p>
+<p>For an addition that fits an existing family, generated changes should follow
+the sibling pattern. Unexpected unrelated changes are a reason to stop and
+recheck the overlay, ledger, evidence, or branch base.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="validate-before-pushing">
+<h2>Validate Before Pushing<a class="headerlink" href="#validate-before-pushing" title="链接到此标题。">#</a></h2>
+<p>The repository provides one local entry point for the generated-intrinsics CI
+contract:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>just<span class="w"> </span>check-intrinsics<span class="w"> </span>upstream/main
+</pre></div>
+</div>
+<p>Use the actual PR base if it is not <code class="docutils literal notranslate"><span class="pre">upstream/main</span></code>.</p>
+<p>That recipe mirrors the generated-intrinsics CI job and currently covers the
+three load-bearing checks:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>cuda-intrinsics-gen check
+cuda-intrinsics-gen probe --all --skip-terminal --per-target
+cuda-intrinsics-gen check-abi-history --base-ref &lt;base&gt;
+</pre></div>
+</div>
+<p>Use <code class="docutils literal notranslate"><span class="pre">just</span> <span class="pre">check-intrinsics</span> <span class="pre">...</span></code> as the normal contributor interface rather than
+copying the underlying commands into scripts. The recipe can evolve when the
+CI contract gains additional coverage.</p>
+<p>Two environment requirements the gates carry with them:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">check-abi-history</span></code> walks git history back to the base ref, so it needs a
+full clone. CI checks out with <code class="docutils literal notranslate"><span class="pre">fetch-depth:</span> <span class="pre">0</span></code>; a shallow local clone can
+fail to resolve the base.</p></li>
+<li><p>The generator shells out to <code class="docutils literal notranslate"><span class="pre">rustfmt</span></code> when it writes generated sources.
+That is why <code class="docutils literal notranslate"><span class="pre">rust-toolchain.toml</span></code> pins the <code class="docutils literal notranslate"><span class="pre">rustfmt</span></code> component; no extra
+install is needed on a normal checkout.</p></li>
+</ul>
+<p>For a focused probe while developing one intrinsic, you can also run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cargo<span class="w"> </span>run<span class="w"> </span>-p<span class="w"> </span>cuda-intrinsics-gen<span class="w"> </span>--<span class="w"> </span>probe<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--intrinsic<span class="w"> </span>&lt;catalog-id&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--skip-terminal
+</pre></div>
+</div>
+<p>Finally, run the normal checks required by the files you changed. For changes
+that also update the book:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>just<span class="w"> </span>book
+bash<span class="w"> </span>scripts/check-book-api-names.sh
+git<span class="w"> </span>diff<span class="w"> </span>--check
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="when-the-existing-catalog-cannot-express-it">
+<h2>When the Existing Catalog Cannot Express It<a class="headerlink" href="#when-the-existing-catalog-cannot-express-it" title="链接到此标题。">#</a></h2>
+<p>A missing sibling is a design signal. If the intrinsic requires a lowering
+shape, operand adapter, result contract, or family structure the generator does
+not model, the change is no longer a small catalog admission.</p>
+<p>A new generated shape typically involves generator code such as:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>crates/cuda-intrinsics-gen/src/model/
+crates/cuda-intrinsics-gen/src/resolve/
+crates/cuda-intrinsics-gen/src/render/
+</pre></div>
+</div>
+<p>and may also require real compiler lowering changes under <code class="docutils literal notranslate"><span class="pre">crates/mir-lower/</span></code>
+or <code class="docutils literal notranslate"><span class="pre">crates/dialect-nvvm/</span></code>.</p>
+<p>Keep that work separate from routine catalog admission when possible. The ABI
+ledger and generated-intrinsics validation contract still apply.</p>
+<p>If the operation instead needs bespoke verification or lowering by design and
+should remain outside the catalog, follow the hand-written workflow in
+<a class="reference internal" href="adding-new-intrinsics.html"><span class="std std-doc">Adding New Intrinsics</span></a>.</p>
+</section>
+<hr class="docutils" />
+<section id="extraction-is-not-part-of-a-normal-addition">
+<h2>Extraction Is Not Part of a Normal Addition<a class="headerlink" href="#extraction-is-not-part-of-a-normal-addition" title="链接到此标题。">#</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">extract</span></code> command refreshes imported LLVM facts. It is for an LLVM source or
+pin update, not for adding an intrinsic that already exists in the committed
+<code class="docutils literal notranslate"><span class="pre">intrinsics/imported.json</span></code>.</p>
+<p>Normal additions consume the committed imported facts. This keeps routine
+intrinsic work independent of an LLVM checkout and makes the reviewed overlay,
+ABI ledger, and evidence the explicit cuda-oxide policy layer.</p>
+</section>
+<hr class="docutils" />
+<section id="what-not-to-edit-by-hand">
+<h2>What Not to Edit by Hand<a class="headerlink" href="#what-not-to-edit-by-hand" title="链接到此标题。">#</a></h2>
+<p>For a catalog-generated intrinsic, do not directly edit:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">intrinsics/catalog.json</span></code>;</p></li>
+<li><p>generated files under <code class="docutils literal notranslate"><span class="pre">crates/cuda-intrinsics/src/generated/</span></code>;</p></li>
+<li><p>generated files under <code class="docutils literal notranslate"><span class="pre">crates/cuda-device/src/generated/</span></code>;</p></li>
+<li><p>generated files under <code class="docutils literal notranslate"><span class="pre">crates/dialect-nvvm/src/ops/generated/</span></code>;</p></li>
+<li><p>generated intrinsic dispatch in <code class="docutils literal notranslate"><span class="pre">mir-importer</span></code>;</p></li>
+<li><p>generated intrinsic conversion tables in <code class="docutils literal notranslate"><span class="pre">mir-lower</span></code>;</p></li>
+<li><p>generated target/collector metadata;</p></li>
+<li><p>generated probe/reference outputs.</p></li>
+</ul>
+<p>If regeneration overwrites a hand edit, the edit was made at the wrong layer.
+The source of truth is the reviewed catalog input, ABI, evidence, or generator
+logic that owns that output.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="adding-new-intrinsics.html"
+       title="上一页">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">上一页</p>
+        <p class="prev-next-title">Adding New Intrinsics</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="fuzzing-and-differential-testing.html"
+       title="下一页">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">下一页</p>
+        <p class="prev-next-title">Fuzzing and Differential Testing</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> 当前页面
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choose-the-right-path-first">Choose the Right Path First</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sources-of-truth">Sources of Truth</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#catalog-metadata">Catalog Metadata</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#catalog-json-header-fields">catalog.json Header Fields</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-normal-workflow-extend-an-existing-family">The Normal Workflow: Extend an Existing Family</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#find-the-nearest-sibling">1. Find the nearest sibling</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#add-or-extend-the-overlay-entry">2. Add or extend the overlay entry</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#append-the-abi-ledger-entry">3. Append the ABI ledger entry</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#handle-lowering-evidence-only-when-needed">4. Handle lowering evidence only when needed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#regenerate">5. Regenerate</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#validate-before-pushing">Validate Before Pushing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#when-the-existing-catalog-cannot-express-it">When the Existing Catalog Cannot Express It</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#extraction-is-not-part-of-a-normal-addition">Extraction Is Not Part of a Normal Addition</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-not-to-edit-by-hand">What Not to Edit by Hand</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+    <div class="footer-items__center">
+      
+        <div class="footer-item"><!--
+SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<footer class="bd-footer-content">
+  <div class="footer-container" style="padding: 1rem 0 2rem 0; border-top: 1px solid var(--pst-color-border); text-align: left;">
+    
+    <!-- NVIDIA Logo -->
+    <div style="margin-bottom: 1rem;">
+      <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem; filter: brightness(0);"
+           class="only-light">
+      <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem;"
+           class="only-dark pst-js-only">
+    </div>
+    
+    <!-- Footer Links - single line, left aligned -->
+    <div style="font-size: 0.8125rem; margin-bottom: 0.5rem; color: var(--pst-color-text-muted);">
+      <a href="https://www.nvidia.com/en-us/about-nvidia/privacy-policy/" target="_blank" style="color: inherit; text-decoration: none;">Privacy Policy</a> | 
+      <a href="https://www.nvidia.com/en-us/preferences/email-preferences/" target="_blank" style="color: inherit; text-decoration: none;">Your Privacy Choices</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/terms-of-service/" target="_blank" style="color: inherit; text-decoration: none;">Terms of Service</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/accessibility/" target="_blank" style="color: inherit; text-decoration: none;">Accessibility</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/company-policies/" target="_blank" style="color: inherit; text-decoration: none;">Corporate Policies</a> | 
+      <a href="https://www.nvidia.com/en-us/product-security/" target="_blank" style="color: inherit; text-decoration: none;">Product Security</a> | 
+      <a href="https://www.nvidia.com/en-us/contact/" target="_blank" style="color: inherit; text-decoration: none;">Contact</a>
+    </div>
+    
+    <!-- Copyright -->
+    <div style="font-size: 0.8125rem; color: var(--pst-color-text-muted);">
+      Copyright &copy; 2025-2026, NVIDIA.
+    </div>
+    
+  </div>
+</footer></div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>
