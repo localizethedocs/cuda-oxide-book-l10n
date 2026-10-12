@@ -1,0 +1,1577 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025-2026, NVIDIA Corporation
+# This file is distributed under the same license as the cuda-oxide package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: cuda-oxide \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-21 14:41+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../../gpu-safety/the-safety-model.md:1
+msgid "The Safety Model"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:3
+msgid ""
+"A GPU kernel runs thousands of threads that all see the same memory at the "
+"same time. On a CPU, Rust prevents data races through ownership and "
+"borrowing -- one mutable reference, no aliases, enforced at compile time. On "
+"a GPU, you have 2048 threads per SM, all launched from the same function, "
+"all pointing at the same output buffer. The borrow checker was not designed "
+"for this."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:10
+msgid ""
+"cuda-oxide solves the problem in layers. The common case -- one thread "
+"writes one element under a checked launch contract -- is safe by "
+"construction. Uncommon cases -- shared memory, warp shuffles, hardware "
+"intrinsics -- require `unsafe` with documented contracts. And the frontier "
+"cases -- TMA, tensor cores, cluster-level communication -- are fully manual, "
+"matching the complexity of the hardware they control."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:17
+msgid ""
+"This chapter explains the model, walks through each layer, and tells you "
+"exactly when you need `unsafe` and why."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:22
+msgid "Three tiers"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:24
+msgid ""
+"cuda-oxide organizes kernel safety into three tiers based on how much the "
+"compiler can verify:"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+msgid "Tier"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+msgid "Description"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+msgid "`unsafe` Required?"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+msgid "**Tier 1**"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+msgid "Safe kernel body plus a checked `PreparedLaunch`"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+msgid "No"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+msgid "**Tier 2**"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+msgid "Explicit `unsafe` with clear safety contracts"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+msgid "Yes, scoped"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+msgid "**Tier 3**"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+msgid "Raw hardware intrinsics -- full user responsibility"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+msgid "Yes, pervasive"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:33
+msgid ""
+"Most application kernels live entirely in Tier 1 or straddle Tier 1 and 2. "
+"Tier 3 is for performance engineers building at the level of CUTLASS or "
+"Triton IR. If you are writing a vecadd, a GEMM, or a reduction, you will "
+"rarely leave Tier 2."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:40
+msgid "Tier 1: safe by default"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:42
+msgid "The core idea: `DisjointSlice<T>` + `ThreadIndex`"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:44
+msgid ""
+"The primary device-side safety abstraction is a pair of types that together "
+"support race-free parallel writes:"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:47
+msgid ""
+"**`ThreadIndex<'kernel, IndexSpace>`** -- an opaque witness around a "
+"`usize`, with no public constructor. The only way to obtain one is through "
+"trusted functions (`index_1d`, `index_2d::<S>`) that derive the value from "
+"**hardware built-in variables** (`threadIdx`, `blockIdx`, `blockDim`) -- "
+"read-only special registers the runtime fills in at launch. `ThreadIndex` is "
+"`!Send + !Sync + !Copy + !Clone`, and the `'kernel` lifetime ties it to a "
+"stack-local scope inside the kernel body, so it cannot be smuggled across "
+"threads via shared memory or outlive the kernel."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:56
+msgid ""
+"**`DisjointSlice<T, IndexSpace>`** -- a slice-like type whose `get_mut()` "
+"method only accepts a `ThreadIndex` whose `IndexSpace` matches its own. "
+"Returns `Option<&mut T>` -- `None` for out-of-bounds indices."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:61
+msgid "Put them together and you get a kernel body with zero `unsafe`:"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:63
+msgid ""
+"use cuda_device::{DisjointSlice, kernel};\n"
+"\n"
+"#[kernel]\n"
+"pub fn vecadd(a: &[f32], b: &[f32], mut c: DisjointSlice<f32>) {\n"
+"    if let Some((c_elem, idx)) = c.get_mut_indexed() {\n"
+"        let i = idx.get();\n"
+"        *c_elem = a[i] + b[i];\n"
+"    }\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:75
+msgid ""
+"`get_mut_indexed` is the one-call form: it mints the per-thread witness and "
+"resolves it to a `&mut T` in a single shot. The explicit two-step form is "
+"also available when you need the index for parallel arithmetic on multiple "
+"slices:"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:80
+msgid ""
+"#[kernel]\n"
+"pub fn vecadd(a: &[f32], b: &[f32], mut c: DisjointSlice<f32>) {\n"
+"    let idx = thread::index_1d();\n"
+"    if let Some(c_elem) = c.get_mut(idx) {\n"
+"        let i = idx.get();\n"
+"        *c_elem = a[i] + b[i];\n"
+"    }\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:91
+msgid "Safety follows from five facts:"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:93
+msgid ""
+"`index_1d()` uses only X coordinates. Its value is unique when block and "
+"grid Y/Z dimensions are all 1. A `domain = 1` prepared launch proves that; "
+"without that typed proof, the device checks Y/Z and marks the witness "
+"invalid when either axis is active. Safe slice access then returns `None`."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:97
+msgid "`get_mut()` is bounds-checked -- out-of-range threads get `None`."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:98
+msgid ""
+"The `IndexSpace` parameter ties each witness to its layout: a "
+"`DisjointSlice<T, Index2D<128>>` will not accept a `ThreadIndex<'_, "
+"Index2D<256>>` -- mixing strides is a compile error."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:101
+msgid ""
+"The witness is `!Send + !Sync + !Copy + !Clone` and `'kernel`-scoped, so "
+"threads cannot launder each other's indices through shared memory."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:103
+msgid ""
+"A checked `PreparedLaunch<K>` ties the host geometry to the exact kernel."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:105
+msgid ""
+"The borrow checker sees a single `&mut T` per thread. The hardware provides "
+"the coordinates; the launch proof makes their linearization disjoint. The "
+"type system ties the device and host proofs together."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:109
+msgid ""
+"1D prepared launch: Y=Z=1 -> index_1d values are unique -> safe get_mut\n"
+"raw 2D launch:       active Y/Z -> invalid witness -> safe get_mut returns "
+"None\n"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:114
+msgid ""
+"A raw launch is still `unsafe`: the host must uphold its other memory and "
+"launch obligations even though this rank check fails closed on the device."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:117
+msgid "Trusted index functions"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:119
+msgid ""
+"`ThreadIndex` is only as trustworthy as the functions that create it. Here "
+"are the constructors cuda-oxide provides:"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+msgid "Function"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+msgid "Formula"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+msgid "Return Type"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+msgid "Notes"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+msgid "`index_1d()`"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+msgid "`blockIdx.x * blockDim.x + threadIdx.x`"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+msgid "`ThreadIndex<'kernel, Index1D>`"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+msgid "Invalid when an untyped launch has active Y/Z"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+msgid "`index_2d::<S>()`"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+msgid "`row * S + col`"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+msgid "`Option<ThreadIndex<'kernel, Index2D<S>>>`"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+msgid "Const stride; mixing strides is a compile error"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+msgid "`index_2d_runtime(&slice)`"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+msgid "`row * width + col`"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+msgid "`Option<ThreadIndex<'kernel, Runtime2DIndex>>`"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+msgid "Row width read from the slice, bound by the host"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+msgid "`index_2d_row()`"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+msgid "`blockIdx.y * blockDim.y + threadIdx.y`"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+msgid "`usize`"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+msgid "Component accessor, not a witness constructor"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+msgid "`index_2d_col()`"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:130
+msgid ""
+"`index_2d_row()` and `index_2d_col()` return plain `usize` -- they give you "
+"the components for arithmetic, but cannot be used to index into a "
+"`DisjointSlice`. Only the linearized result earns a `ThreadIndex`. Likewise, "
+"2D uniqueness assumes the launch has no active Z dimension. A `domain = 2` "
+"prepared launch proves that. Without a typed proof, the device checks Z and "
+"returns `None` when it is active."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:138
+msgid "Check a tile once"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:140
+msgid ""
+"For a small fixed tile, one bounds check can cover every element in that "
+"tile:"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:142
+msgid ""
+"use cuda_device::{DisjointSlice, LinearTiles, kernel, launch_contract, "
+"thread};\n"
+"\n"
+"#[kernel(launch_context = launch_context)]\n"
+"#[launch_contract(\n"
+"    domain = 1,\n"
+"    coordinates = u32,\n"
+"    block = (64, 1, 1),\n"
+")]\n"
+"pub fn add_one(mut values: DisjointSlice<u32, LinearTiles<4>>) {\n"
+"    let thread_index = thread::index_1d_u32(launch_context);\n"
+"\n"
+"    if let Some(mut tile) = values.tile_thread32(thread_index) {\n"
+"        let first = tile.at_const::<0>().read();\n"
+"        tile.at_const::<0>().write(first + 1);\n"
+"\n"
+"        let second = tile.at_const::<1>().read();\n"
+"        tile.at_const::<1>().write(second + 1);\n"
+"    }\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:164
+msgid ""
+"`LinearTiles<4>` gives thread 0 elements 0--3, thread 1 elements 4--7, and "
+"so on. `tile_thread32` checks the complete four-element tile once. If only "
+"part of a tile fits, it returns `None`. Constant positions such as "
+"`at_const::<0>()` need no further runtime bounds check; an invalid constant "
+"fails compilation."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:170
+msgid "The two annotations provide the checked facts:"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:172
+msgid ""
+"`#[kernel(launch_context = launch_context)]` creates a local device value "
+"carrying facts about this launch. It is not a kernel argument."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:174
+msgid "`domain = 1` says only the X axis is active."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:175
+msgid ""
+"`coordinates = u32` allows `thread::index_1d_u32(launch_context)`, which "
+"returns this thread's unique index across the full 1-D launch as a `u32`."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:177
+msgid ""
+"`block = (64, 1, 1)` requires exactly 64 threads in each block. The launch "
+"may still contain many blocks."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:180
+msgid ""
+"An exact `block` is checked twice, in two places that fail independently. "
+"Preparation rejects a mismatched launch configuration on the host, before "
+"any driver call. The shape also reaches the device compiler, which emits `."
+"reqntid 64, 1, 1`, so the CUDA driver refuses any launch whose block differs "
+"on any axis. The second check covers the paths the first one cannot see: an "
+"`unsafe` raw launch, and a module whose loaded PTX is not the artifact the "
+"generated Rust markers describe."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:188
+msgid ""
+"`.reqntid` replaces `.maxntid` for a contracted kernel. ptxas rejects an "
+"entry declaring both, and an exact shape already bounds the thread count. A "
+"kernel carrying only `#[launch_bounds]` keeps `.maxntid`, which bounds the "
+"product `x * y * z` and admits every shape reaching it. That difference is "
+"the reason a thread bound cannot stand in for a block shape: under `.maxntid "
+"64, 1, 1` the driver accepts `(8, 8, 1)` and `(4, 4, 4)` alongside `(64, 1, "
+"1)`."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:195
+msgid ""
+"For 2-D tiles, use `thread::coord_2d_u32(launch_context)` with "
+"`RowMajorTiles<ROWS, COLS, ROW_STRIDE>`. `ROW_STRIDE` is the logical row "
+"width in elements and must match the buffer's layout. The buffer length does "
+"not have to be a multiple of the row width; only complete tiles are returned."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:200
+msgid ""
+"See the runnable [`proof_carrying_views`](https://github.com/NVlabs/cuda-"
+"oxide/tree/main/crates/rustc-codegen-cuda/examples/proof_carrying_views) "
+"example for 1-D and 2-D versions."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:204
+msgid "How `index_2d` is type-safe"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:206
+msgid ""
+"`index_2d::<S>()` is const-generic over the row stride. The witness comes "
+"back as `ThreadIndex<'kernel, Index2D<S>>`, and a `DisjointSlice<T, "
+"Index2D<S>>` only accepts that exact `S`. Two threads cannot mint witnesses "
+"with different strides and feed them into the same slice -- the type system "
+"rejects it:"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:212
+msgid ""
+"#[kernel]\n"
+"pub fn ok(mut out: DisjointSlice<u32, Index2D<128>>) {\n"
+"    if let Some(idx) = thread::index_2d::<128>() {  // matches\n"
+"        if let Some(slot) = out.get_mut(idx) { *slot = 1; }\n"
+"    }\n"
+"}\n"
+"\n"
+"#[kernel]\n"
+"pub fn rejected(mut out: DisjointSlice<u32, Index2D<128>>) {\n"
+"    if let Some(idx) = thread::index_2d::<256>() { // ⛔ Index2D<256> != "
+"Index2D<128>\n"
+"        if let Some(slot) = out.get_mut(idx) { *slot = 1; }\n"
+"    }\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:228
+msgid ""
+"The witness is also `!Send + !Sync + !Copy + !Clone`, and its `'kernel` "
+"lifetime is borrowed from a stack-local scope the macros inject -- so a "
+"thread can't park its `ThreadIndex` in shared memory and have a neighbour "
+"pick it up later, and the witness can't outlive the kernel body."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:233
+msgid "Truly runtime strides: `index_2d_runtime`"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:235
+msgid ""
+"Some kernels really do receive their stride at launch time (e.g. matrix "
+"dimensions known only on the host). For those cases there is a corresponding "
+"witness `Runtime2DIndex`, minted from the slice the index will address:"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:240
+msgid "let idx = thread::index_2d_runtime(&c)?;\n"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:244
+msgid ""
+"No `unsafe`, because there is no per-call stride to disagree about. The row "
+"width travels inside the slice, written once by the host into the launch "
+"packet, so every thread that indexes `c` uses the same row width by "
+"construction. Passing the stride separately could not give that: two "
+"`ThreadIndex<'_, Runtime2DIndex>` values produced under different runtime "
+"strides have the same type, so the type system cannot tell them apart. If "
+"you can pin the stride at compile time, prefer `index_2d::<S>()`."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:252
+msgid ""
+"One consequence shapes the witness itself. Two `Runtime2DIndex` slices in "
+"one kernel may carry different row widths, and their witnesses share a type, "
+"so safe code can mint a witness from each and hand either one to either "
+"slice. The witness therefore stores the thread's raw `(row, col)` "
+"coordinates rather than a flat index, and `get_mut` resolves them against "
+"the **addressed** slice's own row width (`row * width + col`, requiring `col "
+"< width`). Distinct threads hold distinct coordinates and every thread reads "
+"the same host-bound width from the slice it addresses, so the mapping stays "
+"injective per slice no matter which slice minted the witness. A flat index "
+"baked in at minting time would instead smuggle the minting slice's grid "
+"across: `(1, 0)` flattened at width 5 and `(0, 5)` flattened at width 100 "
+"both name element 5."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:264
+msgid "Where a runtime row width lives"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:266
+msgid ""
+"The *launch* establishes \"every thread saw the same value\": the host "
+"marshals one word into the launch packet, and every thread of every block "
+"reads those same bytes. A kernel body has no comparable way to establish it "
+"about one of its own locals."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:271
+msgid ""
+"So a slice whose index space carries a runtime row width receives that width "
+"the same way. On the host, `RowWidth` binds it:"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:274
+msgid ""
+"module.write_c(&stream, &prepared, cuda_host::RowWidth::new(&mut c, n))?;\n"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:278
+msgid ""
+"and on the device the accessor reads it back with no argument of its own:"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:280
+msgid ""
+"#[kernel(launch_context = lc)]\n"
+"#[launch_contract(domain = 2, coordinates = u32, block = (16, 16, 1))]\n"
+"pub fn write_c(mut c: DisjointSlice<f32, RuntimeRowMajorTiles<1, 1>>) {\n"
+"    let coord = thread::coord_2d_u32(lc);\n"
+"    // No `unsafe`: the row width came from the host, bound to `c`.\n"
+"    if let Some(mut cell) = c.tile_2d32_rt(coord) {\n"
+"        cell.at_const::<0, 0>().write(1.0);\n"
+"    }\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:292
+msgid ""
+"Why this is enough: under one row width per slice the `last_col < stride` "
+"check keeps each tile inside one logical row, which makes the coordinate-to-"
+"offset mapping injective, so distinct threads own disjoint elements. Two "
+"threads disagreeing about the width is exactly the case that breaks it. With "
+"1x1 tiles, thread `(1, 0)` at stride 5 resolves flat index 5, and thread "
+"`(0, 5)` at stride 100 also resolves 5: one element, two `&mut`."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:300
+msgid ""
+"A width supplied per call cannot rule that out even when each candidate "
+"value is itself launch-uniform, because safe code can select between two of "
+"them under a thread-varying condition, or pass different ones at two call "
+"sites on one slice. Binding at the host boundary removes the choice."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:305
+msgid ""
+"The bound value still has to be the row width the buffer actually uses for "
+"the kernel to compute the intended result. That is a correctness requirement "
+"rather than a safety one; a width that misdescribes the layout gives wrong "
+"answers inside the slice, never aliasing or an out-of-bounds access."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:310
+msgid "Launch-uniform scalars: `Uniform<T>`"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:312
+msgid ""
+"The same reasoning applies to any scalar a kernel needs to be the same in "
+"every thread, not only to a row width. `Uniform<T>` is that fact as a type. "
+"Declare the parameter and the obligation is discharged by the kernel ABI:"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:316
+msgid ""
+"#[kernel(launch_context = lc)]\n"
+"#[launch_contract(domain = 2, coordinates = u32, block = (16, 16, 1))]\n"
+"pub fn write_c(rows: Uniform<u32>, mut c: DisjointSlice<f32, "
+"RuntimeRowMajorTiles<1, 1>>) {\n"
+"    let coord = thread::coord_2d_u32(lc);\n"
+"    if coord.row() >= rows.get() {\n"
+"        return;\n"
+"    }\n"
+"    if let Some(mut cell) = c.tile_2d32_rt(coord) {\n"
+"        cell.at_const::<0, 0>().write(1.0);\n"
+"    }\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:330
+msgid ""
+"The host method still takes a plain `u32`; `#[cuda_module]` wraps it, and "
+"`#[repr(transparent)]` keeps the launch packet byte-identical. There is no "
+"constructor, so device code cannot promote a per-thread value into a "
+"witness. `Uniform::new_unchecked` remains for a value proven uniform some "
+"other way, and `block_dim_x()` and its siblings return witnesses directly, "
+"since a launch has one block shape."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:337
+msgid ""
+"Uniformity is closed under arithmetic whose operands are all uniform, so a "
+"derived value keeps the witness. It is not closed under selection: choosing "
+"between two uniform values on a thread-varying condition gives a value that "
+"differs between threads, which is why a witness of this kind cannot carry a "
+"proof that has to hold across a whole slice."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:343
+msgid "The GEMM pattern"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:345
+msgid ""
+"For const-stride 2D kernels (the common case -- tiled GEMM, stencil kernels, "
+"image kernels with a fixed channel count), the const-generic form is the "
+"safe default:"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:349
+msgid ""
+"const STRIDE: usize = 1024;     // C is M x STRIDE\n"
+"\n"
+"#[kernel]\n"
+"pub fn gemm(a: &[f32], b: &[f32], mut c: DisjointSlice<f32, "
+"Index2D<STRIDE>>, m: u32) {\n"
+"    let row = thread::index_2d_row();\n"
+"    if let Some((c_elem, _)) = c.get_mut_indexed() {\n"
+"        // col < STRIDE is guaranteed by `Some` -- no manual check needed\n"
+"        if row < m as usize {\n"
+"            // ... compute dot product into a local accumulator `sum` ...\n"
+"            *c_elem = alpha * sum + beta * (*c_elem);\n"
+"        }\n"
+"    }\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:365
+msgid ""
+"For runtime strides, the same shape works and stays safe; the row width "
+"comes from the output slice rather than from a const generic:"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:368
+msgid ""
+"#[kernel]\n"
+"pub fn gemm_runtime(a: &[f32], b: &[f32], mut c: DisjointSlice<f32, "
+"Runtime2DIndex>, m: u32, n: u32) {\n"
+"    let row = thread::index_2d_row();\n"
+"\n"
+"    // The row width comes from `c`, bound once by the host. No `unsafe`.\n"
+"    if let Some(c_idx) = thread::index_2d_runtime(&c) {\n"
+"        if row < m as usize {\n"
+"            // ... compute dot product ...\n"
+"            if let Some(c_elem) = c.get_mut(c_idx) {\n"
+"                *c_elem = alpha * sum + beta * (*c_elem);\n"
+"            }\n"
+"        }\n"
+"    }\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:385
+msgid ""
+"The `if let Some` from `index_2d_runtime` replaces the manual `col < n` "
+"guard you'd write in CUDA C++. The `row < m` check remains because it guards "
+"against reading garbage from the input matrices."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:389
+msgid ""
+"That covers writing the output. The *input* side of GEMM -- and the cost of "
+"the bounds checks on every `a[...]` read -- has its own chapter: [Bounds "
+"Checks: Pay Once or Opt Out](bounds-checks.md)."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:393
+msgid "What makes a kernel Tier 1"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:395
+msgid "A kernel and its launch are fully safe -- Tier 1 -- when:"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:397
+msgid ""
+"All mutable output access goes through `DisjointSlice::get_mut(ThreadIndex)`"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:398
+msgid "All inputs are shared immutable references (`&[T]`)"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:399
+msgid "No shared memory, no raw pointers, no intrinsics beyond thread indexing"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:400
+msgid "The host uses a matching checked `PreparedLaunch<K>`"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:402
+msgid ""
+"Examples in this tier include `vecadd`, `helper_fn`, `generic`, "
+"`host_closure`, and the naive GEMM kernels in the `gemm` and `async_mlp` "
+"examples when launched through matching contracts. Their raw `LaunchConfig` "
+"paths remain unsafe."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:408
+msgid "Tier 2: scoped `unsafe`"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:410
+msgid ""
+"Not every kernel fits the \"one thread, one output element\" pattern. When "
+"threads need to cooperate -- sharing data through fast on-chip memory, "
+"communicating across lanes in a warp, or performing atomic updates -- you "
+"need `unsafe`. The key property of Tier 2 is that the `unsafe` is *scoped* "
+"and *auditable*: each block has a documented safety contract, and the rest "
+"of the kernel remains safe."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:417
+#: ../../../gpu-safety/the-safety-model.md:547
+msgid "Shared memory"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:419
+msgid ""
+"Shared memory is fast, on-chip, and visible to every thread in a block. That "
+"last property is exactly why it requires `unsafe` -- the borrow checker "
+"cannot reason about 256 threads writing to the same `static mut` array:"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:423
+msgid ""
+"static mut TILE: SharedArray<f32, 256> = SharedArray::UNINIT;\n"
+"\n"
+"unsafe { TILE[ty * TILE_SIZE + tx] = value; }\n"
+"\n"
+"thread::sync_threads();\n"
+"\n"
+"let neighbor = unsafe { TILE[other_idx] };\n"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:433
+msgid ""
+"The contract: ensure no conflicting writes from concurrent threads without "
+"synchronization. The `sync_threads()` barrier is the tool that makes this "
+"work -- it guarantees all threads have finished writing before any thread "
+"reads."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:443
+#: ../../../gpu-safety/the-safety-model.md:463
+msgid "API"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:443
+#: ../../../gpu-safety/the-safety-model.md:463
+msgid "Safety Obligation"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+msgid "`SharedArray<T, N>`"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+msgid ""
+"Accessed via `static mut`. No conflicting writes without synchronization."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+msgid "`DynamicSharedArray<T>`"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:0
+msgid ""
+"Same rules, but size is set at launch time via `LaunchConfig::"
+"shared_mem_bytes`."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:444
+msgid ""
+"[Shared Memory and Synchronization](../advanced/shared-memory-and-"
+"synchronization.md) for the full treatment: tiling, bank conflicts, dynamic "
+"allocation, and double-buffered pipelines."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:449
+msgid "Warp intrinsics"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:451
+msgid ""
+"Warp-level primitives let threads within a warp exchange data without "
+"touching memory at all -- register-to-register transfers, coordinated in "
+"hardware. They are `unsafe` because the hardware does not check thread "
+"convergence: if you pass a mask that includes a diverged thread, you get "
+"undefined behavior (typically a silent hang, which is worse than a crash)."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:443
+msgid "`shfl_sync`, `shfl_up_sync`, `shfl_down_sync`, `shfl_xor_sync`"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:443
+msgid "Source lane must be active; mask must include calling thread"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:443
+msgid "`ballot_sync`, `any_sync`, `all_sync`"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:443
+msgid "All threads in mask must be converged"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:443
+msgid "`activemask`"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:443
+msgid "Result is only meaningful at the point of call"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:464
+msgid ""
+"[Warp-Level Programming](../advanced/warp-level-programming.md) for shuffle "
+"patterns, reductions, and prefix sums using warp intrinsics."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:468
+msgid "Barriers and lifecycle"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:470
+msgid ""
+"The `ManagedBarrier` typestate API encodes the barrier lifecycle (`Uninit` -"
+"> `Ready` -> `Invalidated`) in the type system, so you cannot wait on a "
+"barrier that was never initialized or use one that has been invalidated. The "
+"`init()` and `inval()` transitions still require `unsafe` because they "
+"interact with the hardware, but the type states prevent the most common "
+"mistakes at compile time."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:463
+msgid "`mbarrier_init`"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:463
+msgid "Must be called by exactly one thread; barrier must be in shared memory"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:463
+msgid "`mbarrier_arrive` / `mbarrier_wait`"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:463
+msgid "Barrier must be initialized; token must match"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:463
+msgid "`ManagedBarrier` (typestate)"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:463
+msgid ""
+"`init()` and `inval()` require `unsafe`; state machine enforced at compile "
+"time"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:483
+#: ../../../gpu-safety/the-safety-model.md:547
+msgid "Atomics"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:485
+msgid ""
+"Atomic operations are safe to *call* once you have a valid atomic reference. "
+"The `unsafe` surface is at construction -- creating a `DeviceAtomicU32` from "
+"a raw pointer requires the caller to guarantee that the pointer is valid and "
+"properly aligned:"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:490
+msgid ""
+"use cuda_device::atomic::{AtomicOrdering, DeviceAtomicU32};\n"
+"\n"
+"// `from_ptr` is the unsafe constructor: it reinterprets existing memory.\n"
+"// `DeviceAtomicU32::new(value)` is the safe one, for an owned static.\n"
+"let atom = unsafe { DeviceAtomicU32::from_ptr(ptr) };\n"
+"atom.fetch_add(1, AtomicOrdering::Relaxed);  // safe call\n"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:499
+msgid "Unchecked slice access"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:501
+msgid ""
+"When the \"one thread, one element\" model does not fit -- for instance, in "
+"a warp-level reduction where only lane 0 writes the result -- "
+"`DisjointSlice::get_unchecked_mut(usize)` provides an escape hatch:"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:505
+msgid ""
+"if warp::lane_id() == 0 {\n"
+"    let warp_idx = gid.get() / 32;\n"
+"    // SAFETY: Only lane 0 of each warp writes; warp indices are unique\n"
+"    unsafe { *out.get_unchecked_mut(warp_idx) = sum; }\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:513
+msgid ""
+"The safety obligation is the same as the `ThreadIndex` system enforces "
+"automatically: index in bounds, no two threads share the same index. The "
+"difference is that you prove it yourself instead of letting the type system "
+"do it for you."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:518
+msgid ""
+"This is per-access. To remove the checks behind ordinary `a[i]` indexing for "
+"a whole kernel at once, see the `unchecked_indexing` flag in [Bounds Checks: "
+"Pay Once or Opt Out](bounds-checks.md)."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:524
+msgid "Tier 3: raw hardware"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:526
+msgid ""
+"At the bottom of the stack are the raw hardware intrinsics -- the APIs that "
+"talk directly to specific functional units on specific GPU architectures. "
+"Every call is `unsafe`, the safety contracts are complex and architecture-"
+"dependent, and the documentation lives in the PTX ISA manual more than in "
+"Rust doc comments."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:463
+msgid "Feature"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:463
+msgid "Key APIs"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:463
+msgid "Architectures"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:463
+msgid "**TMA** (Tensor Memory Accelerator)"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:463
+msgid "`tma_load_2d`, `tma_store_2d`, `TmaDescriptor`"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:463
+msgid "sm_90+ (Hopper)"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:463
+msgid "**tcgen05** (Tensor Core Gen 5)"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:463
+msgid "`tcgen05_mma`, `tcgen05_commit`, `TensorMemoryHandle`"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:463
+msgid "sm_100a (Blackwell DC)"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:463
+msgid "**WGMMA** (Warpgroup MMA)"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:463
+msgid "`wgmma_mma_async`, `wgmma_commit_group`, `wgmma_wait_group`"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:463
+msgid "**Cluster**"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:463
+msgid "`cluster_rank`, `map_shared_rank`, `cluster_barrier_arrive`"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:463
+msgid "**CLC** (Cluster Launch Control)"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:463
+msgid "`clc_prefetch`, `clc_query_channel`"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:463
+msgid "sm_100+ (Blackwell)"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:463
+msgid "**TMEM** (Tensor Memory)"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:463
+msgid "`TmemGuard` (typestate), `tmem_alloc`, `tmem_dealloc`"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:541
+msgid ""
+"If you are writing application-level kernels, you should not need Tier 3 "
+"APIs. They exist for the people building the next CUTLASS -- and for those "
+"people, cuda-oxide provides the same hardware access as inline PTX in CUDA C+"
+"+, with Rust's type system available (but not enforced) as a guardrail."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:548
+msgid ""
+"[Tensor Memory Accelerator](../advanced/tensor-memory-accelerator.md), "
+"[Matrix Multiply Accelerators](../advanced/matrix-multiply-accelerators.md), "
+"and [Cluster Programming](../advanced/cluster-programming.md) for detailed "
+"coverage of Tier 3 features."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:556
+msgid "What the borrow checker gives you"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:558
+msgid ""
+"cuda-oxide is not a DSL or a macro system -- it runs the real `rustc` "
+"frontend on your kernel code. That means every safety guarantee Rust "
+"provides on the CPU is also enforced on the GPU:"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:547
+msgid "Guarantee"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:547
+msgid "How It Works"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:547
+msgid "**Ownership and borrowing**"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:547
+msgid ""
+"Lifetime errors, use-after-free, and aliasing violations caught at compile "
+"time"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:547
+msgid "**Safe parallel writes**"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:547
+msgid ""
+"`DisjointSlice<T>` + `ThreadIndex` + matching prepared geometry prove that "
+"writes do not race"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:547
+msgid "**Explicit `unsafe` scoping**"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:547
+msgid ""
+"Raw pointer access requires `unsafe`, making obligations visible and "
+"auditable"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:547
+msgid "**Convergent attribute enforcement**"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:547
+msgid ""
+"Sync primitives (barriers, fences, shuffles) marked `convergent` in the IR, "
+"preventing the optimizer from moving or duplicating them across control flow"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:569
+msgid ""
+"The first three are standard Rust. The fourth is GPU-specific: CUDA's `bar."
+"sync`, fence, and warp shuffle instructions must not be duplicated or "
+"reordered by the compiler. cuda-oxide marks them `convergent` in the IR so "
+"that LLVM's optimization passes leave them alone."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:576
+msgid "The hard problems"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:578
+msgid ""
+"Rust's borrow checker was designed for single-threaded ownership with `Send`/"
+"`Sync` for CPU concurrency. SIMT execution introduces patterns that the "
+"borrow checker was never taught to reason about. Here is an honest "
+"accounting of what cuda-oxide does *not* enforce today -- and why these "
+"problems are solvable."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:584
+msgid "Thread-divergent control flow"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:586
+msgid ""
+"Rustc's JumpThreading MIR optimization duplicates function calls into both "
+"branches of an if-statement -- a perfectly sound optimization on CPUs, but "
+"it breaks GPU barrier semantics where all threads in a block must converge "
+"at the same `bar.sync` instruction. cuda-oxide currently disables "
+"JumpThreading for device code (`-Z mir-enable-passes=-JumpThreading`). A "
+"proper solution would teach the compiler about convergence requirements so "
+"it can optimize around them instead of disabling the pass entirely."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:594
+msgid "Shared memory access patterns"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:596
+msgid ""
+"The borrow checker cannot reason about whether thread 0 writing `smem[0]` "
+"and thread 1 writing `smem[1]` is safe -- it sees `&mut smem` and rejects "
+"it. `DisjointSlice` solves the unique-index-write pattern, but not "
+"cooperative patterns like reductions, scans, or producer/consumer pipelines "
+"where multiple threads intentionally access overlapping regions with "
+"synchronization between phases."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:603
+msgid "Warp-level convergence"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:605
+msgid ""
+"Operations like `shfl_sync` and `ballot_sync` require that all threads named "
+"in the participation mask are actually converged at the call site. The type "
+"system cannot enforce this today. If threads have diverged and you pass a "
+"full mask, you get a silent hang -- the worst kind of bug, because there is "
+"no crash and no error message, just a kernel that never finishes."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:611
+msgid "Memory space awareness"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:613
+msgid ""
+"GPU memory has distinct address spaces -- global, shared, local, TMEM. A "
+"`&mut` to shared memory is visible to every thread in the block; a `&mut` to "
+"local memory is private to one thread. The borrow checker treats them "
+"identically. This is conservative (it rejects some safe programs) but never "
+"unsound (it does not accept unsafe ones). Still, a memory-space-aware borrow "
+"checker could accept more programs without `unsafe`."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:620
+msgid "Why these are solvable"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:622
+msgid ""
+"The building blocks already exist in Rust's type system. They need to be "
+"extended, not reinvented:"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:547
+msgid "Idea"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:547
+msgid "What It Solves"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:547
+msgid "**Execution-resource-aware types**"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:547
+msgid ""
+"Functions annotated with their execution level (grid / block / warp / "
+"thread). A barrier call inside a divergent branch becomes a compile-time "
+"error."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:547
+msgid "**Memory views**"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:547
+msgid ""
+"Generalized parallel access patterns -- like `DisjointSlice` but covering "
+"blocked, striped, transposed, and composed layouts. Type-checked race-"
+"freedom at scale."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:547
+msgid "**Extended borrow checking for sync**"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:547
+msgid ""
+"Statically enforce that barriers cannot be forgotten, placed at divergent "
+"control flow, or duplicated by the optimizer. Convergence in the type system."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:631
+msgid ""
+"The first pieces of the memory-views idea have landed: row and column read "
+"views over runtime-sized matrices, and runtime-width output tiles. [Bounds "
+"Checks: Pay Once or Opt Out](bounds-checks.md) covers them."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:635
+msgid ""
+"All of this is compile-time analysis. The generated PTX is identical to what "
+"you would write by hand -- the safety net disappears at code generation. "
+"Zero runtime cost."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:639
+msgid ""
+"cuda-oxide is well-positioned to deliver this incrementally. The real "
+"`rustc` borrow checker already runs on device code. The IR infrastructure "
+"(pliron dialects) supports GPU-aware analysis passes. The full compilation "
+"pipeline from MIR to PTX is under our control. And each new safety check is "
+"additive -- existing kernels keep compiling while new ones get stronger "
+"guarantees."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:647
+msgid "Writing safe kernels: a cheat sheet"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:649
+msgid "The default path"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:651
+msgid "For most kernels, start here:"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:653
+msgid ""
+"#[kernel]\n"
+"pub fn my_kernel(input: &[f32], mut output: DisjointSlice<f32>) {\n"
+"    if let Some((out, idx)) = output.get_mut_indexed() {\n"
+"        *out = transform(input[idx.get()]);\n"
+"    }\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:662
+msgid ""
+"For const-stride 2D, parameterise the slice and ask for the const index:"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:664
+msgid ""
+"#[kernel]\n"
+"pub fn tile_kernel(mut output: DisjointSlice<f32, Index2D<1024>>) {\n"
+"    if let Some((out, _idx)) = output.get_mut_indexed() {\n"
+"        *out = ...;\n"
+"    }\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:673
+msgid "The rules:"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:675
+msgid "Use `DisjointSlice` for all mutable outputs."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:676
+msgid "Use `&[T]` for all read-only inputs."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:677
+msgid ""
+"For 1D grids, declare `launch_contract(domain = 1, ...)` and use a prepared "
+"launch. Inside the kernel, default to `get_mut_indexed()`. If you need the "
+"index for arithmetic against multiple slices, fall back to the explicit "
+"pair: `let idx = thread::index_1d(); slice.get_mut(idx)`."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:681
+msgid ""
+"For const-stride 2D grids, parameterise the slice as `DisjointSlice<T, "
+"Index2D<S>>` and use `get_mut_indexed()` or `thread::index_2d::<S>()`. "
+"Mismatched strides are a compile error."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:684
+msgid ""
+"For runtime strides, reach for `thread::index_2d_runtime(&slice)` with a "
+"`Runtime2DIndex`-tagged slice. The row width travels inside the slice, bound "
+"once by the host, so no `unsafe` and no per-call stride to disagree about."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:688
+msgid ""
+"Always bounds-check via `get_mut()` / `get_mut_indexed()` (both return "
+"`Option`)."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:691
+msgid ""
+"If the kernel body compiles without `unsafe`, it satisfies the device-side "
+"part of the proof. Race freedom also requires a matching prepared launch, or "
+"an explicit unsafe proof for a raw configuration."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:695
+msgid "When you need `unsafe`"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:547
+msgid "Pattern"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:547
+msgid "Why"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:547
+msgid "Mitigation"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:547
+msgid "Multiple threads access the same `static mut`"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:547
+msgid "Synchronize with `sync_threads()` before cross-thread reads"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:547
+msgid "Warp shuffles"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:547
+msgid "Thread convergence is not compiler-checked"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:547
+msgid "Use `FULL_MASK` for full-warp operations; document partial masks"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:547
+msgid "Construction from a raw pointer"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:547
+msgid "Wrap in a helper; the atomic operations themselves are safe"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:547
+msgid "Non-uniform writes"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:547
+msgid "Not every thread writes to its own index"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:547
+msgid "Use `get_unchecked_mut` with a documented uniqueness argument"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:547
+msgid "Hardware intrinsics"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:547
+msgid "Complex, architecture-specific contracts"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:547
+msgid "Follow the PTX ISA documentation; test on target hardware"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:705
+msgid "The `SAFETY` comment"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:707
+msgid ""
+"For every `unsafe` block, document *why* the invariants hold. Not what the "
+"code does -- the code already says that -- but why this particular usage is "
+"safe:"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:711
+msgid ""
+"// SAFETY: Only lane 0 of each warp executes this branch.\n"
+"// Warp indices (gid / 32) are unique across warps, so no two\n"
+"// threads write to the same output element.\n"
+"if warp::lane_id() == 0 {\n"
+"    let warp_idx = gid.get() / 32;\n"
+"    unsafe { *partial_sums.get_unchecked_mut(warp_idx) = warp_sum; }\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:721
+msgid ""
+"This is not ceremony. When a kernel data-races at 2 AM and you are staring "
+"at a `compute-sanitizer` log, past-you's safety comments are the fastest "
+"path to the bug."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:726
+msgid ""
+"If you cannot write a convincing `SAFETY` comment for an `unsafe` block, "
+"that is a signal that the invariant is not actually maintained. Restructure "
+"the code until the argument is obvious, or use a safe API instead."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:733
+msgid "Summary"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:725
+msgid "Property"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:725
+msgid "Status"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:725
+msgid "Borrow checker on device code"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:725
+msgid "Enforced (real `rustc` frontend)"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:725
+msgid "Safe 1D parallel writes (`DisjointSlice + index_1d`)"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:725
+msgid "Enforced with a `domain = 1` prepared launch"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:725
+msgid "Safe 2D parallel writes -- const stride"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:725
+msgid "Enforced (`Index2D<S>` mismatch is a compile error)"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:725
+msgid "Safe 2D parallel writes -- runtime stride"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:725
+msgid "Enforced (host-bound row width, per-slice resolution)"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:725
+msgid "`ThreadIndex` non-transferable across threads (smem laundering)"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:725
+msgid "Enforced (`!Send + !Sync + !Copy + !Clone + 'kernel`)"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:725
+msgid "`&mut [T]` kernel parameter"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:725
+msgid "NOT enforced -- treat any `&mut` arg as `unsafe`"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:725
+msgid "Explicit `unsafe` for shared memory, intrinsics"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:725
+msgid "Enforced (Rust language rules)"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:725
+msgid "Convergent attribute on sync primitives"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:725
+msgid "Enforced (IR-level `convergent` marking)"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:725
+msgid "Thread convergence for warp ops"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:725
+msgid "NOT enforced (runtime obligation)"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:725
+msgid "Memory space awareness (shared vs global)"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:725
+msgid "NOT enforced (future work)"
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:748
+msgid ""
+"`&mut [T]` as a kernel parameter is the next outstanding gap: the macro "
+"accepts the type today but the runtime layout (every thread sees the same "
+"backing pointer) means a write through `&mut data[i]` from two different "
+"threads is the same kind of aliasing that `DisjointSlice` exists to prevent. "
+"Until the macro rejects `&mut [T]` outright (or rewrites it to "
+"`DisjointSlice`), treat any kernel that takes one as if every line in it "
+"were `unsafe`."
+msgstr ""
+
+#: ../../../gpu-safety/the-safety-model.md:756
+msgid ""
+"The safety model is designed to make the common case safe through a kernel "
+"body plus a prepared launch, while providing explicit escape hatches for "
+"everything else. Use `unsafe` only when you are supplying a proof that the "
+"compiler and launch contract do not carry."
+msgstr ""

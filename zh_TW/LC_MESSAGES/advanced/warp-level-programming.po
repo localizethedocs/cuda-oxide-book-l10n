@@ -1,0 +1,732 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025-2026, NVIDIA Corporation
+# This file is distributed under the same license as the cuda-oxide package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: cuda-oxide \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-21 14:41+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: zh_TW\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../../advanced/warp-level-programming.md:1
+msgid "Warp-Level Programming"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:3
+msgid ""
+"A **warp** is CUDA's fundamental scheduling unit: 32 threads that execute in "
+"lockstep on the same SM. Because all 32 threads share an instruction "
+"pointer, they can exchange data directly through **warp shuffle** "
+"instructions — register-to-register transfers that cost roughly one cycle "
+"and require no shared memory, no barriers, and no synchronization."
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:9
+msgid ""
+"cuda-oxide exposes the full warp intrinsic set through `cuda_device::warp`. "
+"This chapter covers shuffle, vote, and the patterns they unlock: warp "
+"reductions, broadcasts, scans, and ballot-based filtering."
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:14
+msgid ""
+"[CUDA Programming Guide — Warp Shuffle Functions](https://docs.nvidia.com/"
+"cuda/cuda-programming-guide/#warp-shuffle-functions) for PTX encoding "
+"details and the full set of width variants."
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:20
+msgid "Lane and warp identity"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:22
+msgid "Every thread in a block has a **lane ID** (0–31) within its warp:"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:24
+msgid ""
+"use cuda_device::warp;\n"
+"\n"
+"let lane = warp::lane_id();     // 0..31, hardware register %laneid\n"
+"let warp = warp::warp_id();     // threadIdx.x / 32\n"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:31
+msgid ""
+"`warp_id()` is derived from `threadIdx.x / 32`. For multi-dimensional "
+"blocks, this only accounts for the x dimension — which is usually fine, "
+"since most kernels that care about lane identity use 1D blocks."
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:37
+msgid "Shuffle: register-to-register data exchange"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:39
+msgid ""
+"The four shuffle variants let a thread read another thread's register "
+"without going through memory:"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:13
+#: ../../../advanced/warp-level-programming.md:109
+msgid "Function"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:13
+msgid "What it does"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:13
+msgid "Source lane"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:13
+msgid "`shuffle(val, src)`"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:13
+msgid "Read from a specific lane"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:13
+msgid "`src`"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:13
+msgid "`shuffle_xor(val, mask)`"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:13
+msgid "Read from `lane_id ^ mask`"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:13
+msgid "`lane_id ^ mask`"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:13
+msgid "`shuffle_down(val, delta)`"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:13
+msgid "Read from `lane_id + delta`"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:13
+msgid "`lane_id + delta`"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:13
+msgid "`shuffle_up(val, delta)`"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:13
+msgid "Read from `lane_id - delta`"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:13
+msgid "`lane_id - delta`"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:49
+msgid "Each variant exists for both `u32` and `f32`:"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:51
+msgid ""
+"let partner_val = warp::shuffle_xor_f32(my_val, 1);\n"
+"let broadcast   = warp::shuffle_f32(my_val, 0);     // lane 0's value to "
+"all\n"
+"let neighbor    = warp::shuffle_down_f32(my_val, 1); // next lane's value\n"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:57
+msgid ""
+"All shuffles are **warp-synchronous** — they implicitly synchronize the "
+"warp. No `sync_threads()` is needed, and in fact calling `sync_threads()` "
+"inside a shuffle pattern would be both unnecessary and wasteful."
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:63
+msgid "Warp reduction"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:65
+msgid ""
+"The most common shuffle pattern is a **butterfly reduction**: in ⌈log₂(32)⌉ "
+"= 5 steps, every lane accumulates the sum (or min, max, etc.) of all 32 "
+"values. No shared memory, no barriers, five shuffle steps."
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:73
+msgid ""
+"Butterfly reduction using `shuffle_xor`. At each step, lanes exchange values "
+"with their XOR partner and add. After 5 steps (masks 16, 8, 4, 2, 1), lane 0 "
+"holds the sum of all 32 values."
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:78
+msgid ""
+"use cuda_device::warp;\n"
+"\n"
+"fn warp_reduce_sum(mut val: f32) -> f32 {\n"
+"    val += warp::shuffle_xor_f32(val, 16);\n"
+"    val += warp::shuffle_xor_f32(val, 8);\n"
+"    val += warp::shuffle_xor_f32(val, 4);\n"
+"    val += warp::shuffle_xor_f32(val, 2);\n"
+"    val += warp::shuffle_xor_f32(val, 1);\n"
+"    val\n"
+"}\n"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:91
+msgid ""
+"After the reduction, **all 32 lanes** hold the sum (because XOR is symmetric "
+"— both partners accumulate). If you only need the result in lane 0, you can "
+"use `shuffle_down` instead:"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:95
+msgid ""
+"fn warp_reduce_sum_lane0(mut val: f32) -> f32 {\n"
+"    val += warp::shuffle_down_f32(val, 16);\n"
+"    val += warp::shuffle_down_f32(val, 8);\n"
+"    val += warp::shuffle_down_f32(val, 4);\n"
+"    val += warp::shuffle_down_f32(val, 2);\n"
+"    val += warp::shuffle_down_f32(val, 1);\n"
+"    val\n"
+"}\n"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:106
+msgid ""
+"With `shuffle_down`, only lane 0 holds the correct result — the others hold "
+"partial sums. This is fine when only lane 0 writes the output."
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:110
+msgid ""
+"Need a block-wide reduction? Reduce within each warp using shuffles, write "
+"the 32 per-warp results to shared memory, `sync_threads()`, then reduce the "
+"warp-level results with one final warp. This hybrid approach is faster than "
+"a pure shared memory tree because it eliminates 5 levels of barriers."
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:116
+msgid "Integers on Ampere: one instruction instead of ten"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:118
+msgid ""
+"Every reduction above -- the hand-written butterflies, and the generic "
+"`cooperative_groups::warp_reduce` -- costs five shuffles plus five combines. "
+"For **integer** reductions on `sm_80` and newer there is a single hardware "
+"instruction, `redux.sync`, exposed one function per operation:"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "function"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "reduces"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "`warp::redux_sync_add(mask, v)`"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "wrapping sum, `u32`"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "`warp::redux_sync_min_u32` / `_min_i32`"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "minimum"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "`warp::redux_sync_max_u32` / `_max_i32`"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "maximum"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "`warp::redux_sync_and` / `_or` / `_xor`"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "bitwise"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:130
+msgid ""
+"use cuda_device::warp;\n"
+"\n"
+"const FULL_MASK: u32 = 0xffff_ffff;\n"
+"\n"
+"// The whole reduction. One instruction, every lane holds the result.\n"
+"let total = warp::redux_sync_add(FULL_MASK, my_value);\n"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:139
+msgid ""
+"Measured on an A10G (`sm_86`), 1M threads each performing 64 full-warp `u32` "
+"sum reductions: the butterfly form takes 159.4 µs per launch, the `redux."
+"sync` form 33.6 µs -- **4.74x**, with bit-identical results. Wrapping `u32` "
+"addition is associative modulo 2³² and min/max/and/or/xor are exact, so "
+"reduction order cannot change the answer."
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:145
+msgid ""
+"That figure is the primitive measured in isolation: the probe kernel does "
+"almost nothing but reduce. A kernel that reduces once at the end of a memory-"
+"bound pass will see very little. Reach for this where reductions sit in an "
+"inner loop."
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:150
+msgid "Three constraints:"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:152
+msgid ""
+"**Integers only on Ampere.** There is an `f32` form, but it needs Blackwell; "
+"see the next subsection. `f64` has no `redux.sync` form at all, so `f64` "
+"reductions keep the butterfly everywhere."
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:155
+msgid ""
+"**A full, converged warp.** All 32 lanes must be live and must reach the "
+"same call with the same mask -- the same contract the shuffle reductions "
+"already require. Sub-warp tiles and short tail warps keep the shuffle path "
+"(see `reduce_sum_f32_partial` and friends for the tail case)."
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:159
+msgid ""
+"**It will not assemble below `sm_80`.** Gate the call the way the "
+"`redux_sum` example does, on `ctx.compute_capability()`, or restrict the "
+"build to Ampere and newer."
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:163
+msgid ""
+"`warp_reduce` does not select this form for you today; making it do so "
+"automatically needs a way for device code to know its target architecture, "
+"which is the open question in [#811](https://github.com/NVlabs/cuda-oxide/"
+"issues/811)."
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:168
+msgid "Floats on Blackwell: `redux.sync` for `f32`"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:170
+msgid ""
+"`redux.sync` gained an `f32` min/max form, exposed as eight functions. Each "
+"takes `(mask: u32, value: f32)` and returns `f32`, like the integer ones:"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "`warp::redux_sync_min_f32` / `warp::redux_sync_max_f32`"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "minimum / maximum, NaN inputs ignored"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "`warp::redux_sync_min_abs_f32` / `warp::redux_sync_max_abs_f32`"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "same, over the absolute values (`.abs`)"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "`warp::redux_sync_min_nan_f32` / `warp::redux_sync_max_nan_f32`"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "NaN-propagating (`.NaN`)"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "`warp::redux_sync_min_abs_nan_f32` / `warp::redux_sync_max_abs_nan_f32`"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "both modifiers"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:180
+msgid ""
+"So unlike the integer family this is not one function per operation: `.abs` "
+"and `.NaN` are independent instruction modifiers, and each combination is "
+"its own entry point."
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:184
+msgid ""
+"The `.NaN` forms matter for reductions that must not lose a NaN. The plain "
+"and `.abs` forms *ignore* NaN inputs; the `.NaN` forms propagate NaN when "
+"any lane contributes one. Pick deliberately. The two differ only when a lane "
+"holds a NaN, and that is when the choice matters."
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:189
+msgid ""
+"Say one lane holds `NaN` and the smallest ordinary value in the warp is "
+"`-1.0`:"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:191
+msgid "`redux_sync_min_f32(mask, v)` returns `-1.0` (the NaN is ignored)"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:192
+msgid "`redux_sync_min_nan_f32(mask, v)` returns `NaN` (the NaN propagates)"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:194
+msgid ""
+"**This is Blackwell-only, and narrower than \"sm_100+\".** The f32 forms "
+"need PTX 8.6 and exist only on `sm_100a`, `sm_100f`, `sm_103a`, and "
+"`sm_103f`. They are not available on `sm_110a` or `sm_120a`, so consumer "
+"Blackwell is out. Build for one of those four targets or compilation fails."
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:199
+msgid ""
+"The `redux_f32` example is the working reference. It builds for `sm_100a`, "
+"so CI compiles it and checks the emitted PTX rather than running it. Its "
+"`main` skips unless the device reports `sm_100` and nothing else."
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:205
+msgid "Broadcast"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:207
+msgid "Broadcasting lane 0's value to all lanes is a single shuffle:"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:209
+msgid "let leader_val = warp::shuffle_f32(my_val, 0);\n"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:213
+msgid ""
+"Any lane can be the source. This replaces the shared-memory pattern of "
+"\"lane 0 writes to shared, sync, all lanes read\" — one instruction instead "
+"of three operations."
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:219
+msgid "Inclusive prefix sum (scan)"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:221
+msgid ""
+"An **inclusive scan** computes a running total: lane `i` holds the sum of "
+"values from lanes 0 through `i`. The pattern uses `shuffle_up`:"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:224
+msgid ""
+"fn warp_inclusive_scan(mut val: f32) -> f32 {\n"
+"    let mut offset = 1u32;\n"
+"    while offset < 32 {\n"
+"        let n = warp::shuffle_up_f32(val, offset);\n"
+"        if warp::lane_id() >= offset {\n"
+"            val += n;\n"
+"        }\n"
+"        offset *= 2;\n"
+"    }\n"
+"    val\n"
+"}\n"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:238
+msgid ""
+"After 5 steps, each lane holds the prefix sum up to and including its own "
+"value. This is the building block for stream compaction, histogram building, "
+"and parallel scan algorithms."
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:244
+msgid "Vote: warp-wide predicates"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:246
+msgid "Vote operations let the warp collectively evaluate a boolean condition:"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "Returns"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "`warp::all(pred)`"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "`true` if *every* active lane's `pred` is `true`"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "`warp::any(pred)`"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "`true` if *any* active lane's `pred` is `true`"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "`warp::ballot(pred)`"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "A `u32` bitmask — bit `i` is set if lane `i`'s `pred` is `true`"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "`warp::popc(pred)`"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "Population count: how many active lanes have `pred == true`"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:255
+msgid "Filtering with ballot"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:257
+msgid ""
+"A common pattern is to compact an array, keeping only elements that pass a "
+"predicate. `ballot` + `popc` gives you the count and the per-lane write "
+"offset:"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:261
+msgid ""
+"use cuda_device::{DisjointSlice, kernel, thread, warp};\n"
+"\n"
+"#[kernel]\n"
+"pub fn compact_positive(\n"
+"    input: &[f32],\n"
+"    mut output: DisjointSlice<f32>,\n"
+"    mut count: DisjointSlice<u32>,\n"
+") {\n"
+"    let idx = thread::index_1d();\n"
+"    let val = input[idx.get()];\n"
+"    let is_positive = val > 0.0;\n"
+"\n"
+"    let mask = warp::ballot(is_positive);\n"
+"    let lane = warp::lane_id();\n"
+"\n"
+"    // Count bits below this lane to get the write position\n"
+"    let offset = (mask & ((1u32 << lane) - 1)).count_ones();\n"
+"\n"
+"    if is_positive {\n"
+"        unsafe {\n"
+"            *output.get_unchecked_mut(offset as usize) = val;\n"
+"        }\n"
+"    }\n"
+"\n"
+"    // Lane 0 records total count for this warp\n"
+"    if lane == 0 {\n"
+"        unsafe {\n"
+"            *count.get_unchecked_mut(warp::warp_id() as usize) = mask."
+"count_ones();\n"
+"        }\n"
+"    }\n"
+"}\n"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:295
+msgid ""
+"The `ballot` mask encodes the entire warp's predicate result in one "
+"register. No communication, no shared memory — the hardware computes it in a "
+"single cycle."
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:301
+msgid "When to use warp primitives vs. shared memory"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "Task"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "Warp shuffle"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "Shared memory"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "Reduce 32 values"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "5 shuffles, ~5 cycles"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "5 loads + 5 syncs, ~50 cycles"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "Reduce 256 values"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "Shuffle + 1 sync + shuffle"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "Tree reduction, ~10 syncs"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "Stencil (neighbor access)"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "`shuffle_up`/`shuffle_down`"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "Good for 2D stencils"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "Data visible to other warps"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "Not possible"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "Required"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "Random access patterns"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "Not supported"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "Index freely"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "Persists across warp"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "Not applicable"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:109
+msgid "Persists for block lifetime"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:312
+msgid ""
+"The rule of thumb: if the data fits in a single warp (32 elements) and the "
+"access pattern is regular, shuffle is faster. If you need cross-warp "
+"communication, larger data sets, or random access, shared memory is the tool."
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:319
+msgid "A complete example: warp-level dot product"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:321
+msgid ""
+"Putting shuffles and votes together, here is a kernel that computes the dot "
+"product of two vectors using warp reduction:"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:324
+msgid ""
+"use cuda_device::{DisjointSlice, kernel, thread, warp};\n"
+"\n"
+"#[kernel]\n"
+"pub fn warp_dot_product(\n"
+"    a: &[f32],\n"
+"    b: &[f32],\n"
+"    n: u32,\n"
+"    mut result: DisjointSlice<f32>,\n"
+") {\n"
+"    let idx = thread::index_1d();\n"
+"\n"
+"    // Each thread computes one element of the pointwise product\n"
+"    let product = if idx.get() < n as usize {\n"
+"        a[idx.get()] * b[idx.get()]\n"
+"    } else {\n"
+"        0.0f32\n"
+"    };\n"
+"\n"
+"    // Warp-level reduction\n"
+"    let mut sum = product;\n"
+"    sum += warp::shuffle_xor_f32(sum, 16);\n"
+"    sum += warp::shuffle_xor_f32(sum, 8);\n"
+"    sum += warp::shuffle_xor_f32(sum, 4);\n"
+"    sum += warp::shuffle_xor_f32(sum, 2);\n"
+"    sum += warp::shuffle_xor_f32(sum, 1);\n"
+"\n"
+"    // Lane 0 of each warp writes its partial sum\n"
+"    if warp::lane_id() == 0 {\n"
+"        unsafe {\n"
+"            *result.get_unchecked_mut(warp::warp_id() as usize) = sum;\n"
+"        }\n"
+"    }\n"
+"}\n"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:360
+msgid ""
+"For a full dot product, launch a second pass that reduces the per-warp "
+"results — either with another warp kernel or with atomics. The first pass "
+"eliminates the vast majority of the work using only register shuffles."
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:365
+msgid ""
+"[Shared Memory and Synchronization](shared-memory-and-synchronization.md) — "
+"the block-wide counterpart for larger-than-warp operations"
+msgstr ""
+
+#: ../../../advanced/warp-level-programming.md:367
+msgid ""
+"[Tensor Memory Accelerator](tensor-memory-accelerator.md) — hardware that "
+"accelerates the global→shared data movement that feeds these patterns"
+msgstr ""
