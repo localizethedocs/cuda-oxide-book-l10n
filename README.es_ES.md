@@ -62,7 +62,7 @@
 The goal of this project is to translate The CUDA Oxide Book into multiple languages. Translations are contributed via the Crowdin platform, automatically synchronized with the GitHub repository, and can be previewed on GitHub Pages.
 
 > [!NOTE]
-> The translation is <strong>unofficial</strong> and <strong>community-driven</strong>. If you find any inaccuracies, always refer to the <a href="https://nvlabs.github.io/cuda-oxide/">official documentation</a> or the <a href="https://github.com/NVlabs/cuda-oxide">source repository</a> of the upstream project for the most reliable information.
+> The translation is <strong>unofficial</strong> and <strong>community-driven</strong>. If you find any inaccuracies, always refer to the <a href="https://nvidia.github.io/cuda-rust/cuda-oxide/">official documentation</a> or the <a href="https://github.com/NVIDIA/cuda-rust">source repository</a> of the upstream project for the most reliable information.
 
 <div align="center">
 <table>
@@ -491,7 +491,7 @@ Maintenance of the projects is made possible by the generous support of our spon
 
 <h2 id="licenses"><a href="#table-of-contents">Licenses</a></h2>
 
-All original and translated text in the <code>.pot</code> and<code>.po</code> files stored in the <code>l10n</code> branch is made available under the same license as <a href="https://github.com/NVlabs/cuda-oxide">the upstream project</a>.
+All original and translated text in the <code>.pot</code> and<code>.po</code> files stored in the <code>l10n</code> branch is made available under the same license as <a href="https://github.com/NVIDIA/cuda-rust">the upstream project</a>.
 
 All CMake script files (e.g., <code>CMakeLists.txt</code>, <code>CMakePresets.json</code>, and <code>cmake/\*\*/\*</code> files), GitHub workflow files (e.g., <code>.github/workflows/\*.yml</code> files), and configuration files (e.g., <code>versions.json</code>, <code>languages.json</code>, <code>crowdin.yml</code>, and so on) of this project are licensed under <a href="https://opensource.org/license/bsd-3-clause/">3-Clause BSD</a> license. See <a href="./LICENSE-BSD">LICENSE-BSD</a> for details.
 

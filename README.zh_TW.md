@@ -62,7 +62,7 @@
 The goal of this project is to translate The CUDA Oxide Book into multiple languages. 翻譯是在 Crowdin 平臺上進行貢獻，然後會自動與 GitHub 儲存庫進行同步，並且可以在 GitHub Pages 上進行預覽。
 
 > [!NOTE]
-> The translation is <strong>unofficial</strong> and <strong>community-driven</strong>. If you find any inaccuracies, always refer to the <a href="https://nvlabs.github.io/cuda-oxide/">official documentation</a> or the <a href="https://github.com/NVlabs/cuda-oxide">source repository</a> of the upstream project for the most reliable information.
+> The translation is <strong>unofficial</strong> and <strong>community-driven</strong>. If you find any inaccuracies, always refer to the <a href="https://nvidia.github.io/cuda-rust/cuda-oxide/">official documentation</a> or the <a href="https://github.com/NVIDIA/cuda-rust">source repository</a> of the upstream project for the most reliable information.
 
 <div align="center">
 <table>
@@ -491,7 +491,7 @@ This project is currently maintained by:
 
 <h2 id="licenses"><a href="#table-of-contents">授權條款</a></h2>
 
-All original and translated text in the <code>.pot</code> and<code>.po</code> files stored in the <code>l10n</code> branch is made available under the same license as <a href="https://github.com/NVlabs/cuda-oxide">the upstream project</a>.
+All original and translated text in the <code>.pot</code> and<code>.po</code> files stored in the <code>l10n</code> branch is made available under the same license as <a href="https://github.com/NVIDIA/cuda-rust">the upstream project</a>.
 
 本專案中所有的 CMake 腳本檔案（例如：<code>CMakeLists.txt</code>、<code>CMakePresets.json</code> 和 <code>cmake/\*\*/\*</code> 檔案）、工作流檔案（例如：<code>.github/workflows/\*.yml</code> 檔案）以及組態檔（<code>versions.json</code>、<code>languages.json</code>、<code>crowdin.yml</code> 等等）皆採用 <a href="https://opensource.org/license/bsd-3-clause/">3-Clause BSD</a> 授權。詳情請參見 <a href="./LICENSE-BSD">LICENSE-BSD</a>。
 
