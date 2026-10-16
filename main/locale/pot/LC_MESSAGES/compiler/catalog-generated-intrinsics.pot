@@ -8,10 +8,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-21 14:41+0000\n"
+"POT-Creation-Date: 2026-10-16 04:35+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -202,9 +203,9 @@ msgstr ""
 #: ../../../compiler/catalog-generated-intrinsics.md:86
 msgid ""
 "`schema` (in `overlay.toml`) identifies the overlay **input** format the "
-"generator accepts (`OVERLAY_SCHEMA` in `crates/cuda-intrinsics-gen/src/"
-"resolve/overlay.rs`); the resolver rejects a mismatched manifest. It is not "
-"the catalog format version."
+"generator accepts (`OVERLAY_SCHEMA` in `cuda-oxide/crates/cuda-intrinsics-"
+"gen/src/resolve/overlay.rs`); the resolver rejects a mismatched manifest. It "
+"is not the catalog format version."
 msgstr ""
 
 #: ../../../compiler/catalog-generated-intrinsics.md:90
@@ -318,8 +319,9 @@ msgstr ""
 #: ../../../compiler/catalog-generated-intrinsics.md:149
 msgid ""
 "The overlay is the hand-edited policy input. Do not edit the corresponding "
-"operation under `crates/dialect-nvvm/src/ops/generated/`, the generated "
-"importer dispatch, generated lowering tables, or `intrinsics/catalog.json`."
+"operation under `cuda-oxide/crates/dialect-nvvm/src/ops/generated/`, the "
+"generated importer dispatch, generated lowering tables, or `intrinsics/"
+"catalog.json`."
 msgstr ""
 
 #: ../../../compiler/catalog-generated-intrinsics.md:153
@@ -428,9 +430,11 @@ msgstr ""
 msgid ""
 "git status --short\n"
 "git diff --stat\n"
-"git diff -- intrinsics crates/cuda-intrinsics crates/cuda-device \\\n"
-"  crates/dialect-nvvm crates/mir-importer crates/mir-lower \\\n"
-"  crates/cuda-oxide-codegen crates/rustc-codegen-cuda\n"
+"git diff -- intrinsics cuda-oxide/crates/cuda-intrinsics cuda-oxide/crates/"
+"cuda-device \\\n"
+"  cuda-oxide/crates/dialect-nvvm cuda-oxide/crates/mir-importer cuda-oxide/"
+"crates/mir-lower \\\n"
+"  cuda-oxide/crates/cuda-oxide-codegen cuda-oxide/crates/rustc-codegen-cuda\n"
 msgstr ""
 
 #: ../../../compiler/catalog-generated-intrinsics.md:226
@@ -457,7 +461,7 @@ msgid ""
 msgstr ""
 
 #: ../../../compiler/catalog-generated-intrinsics.md:240
-msgid "just check-intrinsics upstream/main\n"
+msgid "just -f cuda-oxide/Justfile check-intrinsics upstream/main\n"
 msgstr ""
 
 #: ../../../compiler/catalog-generated-intrinsics.md:244
@@ -479,9 +483,10 @@ msgstr ""
 
 #: ../../../compiler/catalog-generated-intrinsics.md:255
 msgid ""
-"Use `just check-intrinsics ...` as the normal contributor interface rather "
-"than copying the underlying commands into scripts. The recipe can evolve "
-"when the CI contract gains additional coverage."
+"Use `just -f cuda-oxide/Justfile check-intrinsics ...` as the normal "
+"contributor interface rather than copying the underlying commands into "
+"scripts. The recipe can evolve when the CI contract gains additional "
+"coverage."
 msgstr ""
 
 #: ../../../compiler/catalog-generated-intrinsics.md:259
@@ -521,8 +526,8 @@ msgstr ""
 
 #: ../../../compiler/catalog-generated-intrinsics.md:279
 msgid ""
-"just book\n"
-"bash scripts/check-book-api-names.sh\n"
+"just -f cuda-oxide/Justfile book\n"
+"bash cuda-oxide/scripts/check-book-api-names.sh\n"
 "git diff --check\n"
 msgstr ""
 
@@ -543,15 +548,15 @@ msgstr ""
 
 #: ../../../compiler/catalog-generated-intrinsics.md:295
 msgid ""
-"crates/cuda-intrinsics-gen/src/model/\n"
-"crates/cuda-intrinsics-gen/src/resolve/\n"
-"crates/cuda-intrinsics-gen/src/render/\n"
+"cuda-oxide/crates/cuda-intrinsics-gen/src/model/\n"
+"cuda-oxide/crates/cuda-intrinsics-gen/src/resolve/\n"
+"cuda-oxide/crates/cuda-intrinsics-gen/src/render/\n"
 msgstr ""
 
 #: ../../../compiler/catalog-generated-intrinsics.md:301
 msgid ""
-"and may also require real compiler lowering changes under `crates/mir-lower/"
-"` or `crates/dialect-nvvm/`."
+"and may also require real compiler lowering changes under `cuda-oxide/crates/"
+"mir-lower/` or `cuda-oxide/crates/dialect-nvvm/`."
 msgstr ""
 
 #: ../../../compiler/catalog-generated-intrinsics.md:304
@@ -598,15 +603,17 @@ msgid "`intrinsics/catalog.json`;"
 msgstr ""
 
 #: ../../../compiler/catalog-generated-intrinsics.md:330
-msgid "generated files under `crates/cuda-intrinsics/src/generated/`;"
+msgid ""
+"generated files under `cuda-oxide/crates/cuda-intrinsics/src/generated/`;"
 msgstr ""
 
 #: ../../../compiler/catalog-generated-intrinsics.md:331
-msgid "generated files under `crates/cuda-device/src/generated/`;"
+msgid "generated files under `cuda-oxide/crates/cuda-device/src/generated/`;"
 msgstr ""
 
 #: ../../../compiler/catalog-generated-intrinsics.md:332
-msgid "generated files under `crates/dialect-nvvm/src/ops/generated/`;"
+msgid ""
+"generated files under `cuda-oxide/crates/dialect-nvvm/src/ops/generated/`;"
 msgstr ""
 
 #: ../../../compiler/catalog-generated-intrinsics.md:333

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-21 14:41+0000\n"
+"POT-Creation-Date: 2026-10-16 04:35+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -92,8 +92,8 @@ msgstr ""
 
 #: ../../../projects/async-mlp-pipeline.md:57
 msgid ""
-"The example lives at `crates/rustc-codegen-cuda/examples/async_mlp/` and is "
-"a standalone Cargo workspace member:"
+"The example lives at `cuda-oxide/crates/rustc-codegen-cuda/examples/"
+"async_mlp/` and is a standalone Cargo workspace member:"
 msgstr ""
 
 #: ../../../projects/async-mlp-pipeline.md:60
