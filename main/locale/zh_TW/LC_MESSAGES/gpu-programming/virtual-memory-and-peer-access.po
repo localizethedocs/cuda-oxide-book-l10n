@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-21 14:41+0000\n"
+"POT-Creation-Date: 2026-10-16 04:35+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -83,8 +83,8 @@ msgstr ""
 #: ../../../gpu-programming/virtual-memory-and-peer-access.md:28
 msgid ""
 "The complete integration test is available in [`cuda-core/tests/simt_vmm_p2p."
-"rs` in cutile-rs](https://github.com/NVlabs/cutile-rs/blob/main/cuda-core/"
-"tests/simt_vmm_p2p.rs)."
+"rs`](https://github.com/NVIDIA/cuda-rust/blob/main/cuda-core/tests/"
+"simt_vmm_p2p.rs)."
 msgstr ""
 
 #: ../../../gpu-programming/virtual-memory-and-peer-access.md:31
@@ -93,14 +93,14 @@ msgstr ""
 
 #: ../../../gpu-programming/virtual-memory-and-peer-access.md:33
 msgid ""
-"[`cuda-core/src/simt/vmm.rs` in cutile-rs](https://github.com/NVlabs/cutile-"
-"rs/blob/main/cuda-core/src/simt/vmm.rs)"
+"[`cuda-core/src/simt/vmm.rs`](https://github.com/NVIDIA/cuda-rust/blob/main/"
+"cuda-core/src/simt/vmm.rs)"
 msgstr ""
 
 #: ../../../gpu-programming/virtual-memory-and-peer-access.md:34
 msgid ""
-"[`cuda-core/src/simt/peer.rs` in cutile-rs](https://github.com/NVlabs/cutile-"
-"rs/blob/main/cuda-core/src/simt/peer.rs)"
+"[`cuda-core/src/simt/peer.rs`](https://github.com/NVIDIA/cuda-rust/blob/main/"
+"cuda-core/src/simt/peer.rs)"
 msgstr ""
 
 #: ../../../gpu-programming/virtual-memory-and-peer-access.md:37

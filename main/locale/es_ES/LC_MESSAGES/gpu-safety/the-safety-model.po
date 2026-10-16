@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-21 14:41+0000\n"
+"POT-Creation-Date: 2026-10-16 04:35+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -442,9 +442,9 @@ msgstr ""
 
 #: ../../../gpu-safety/the-safety-model.md:200
 msgid ""
-"See the runnable [`proof_carrying_views`](https://github.com/NVlabs/cuda-"
-"oxide/tree/main/crates/rustc-codegen-cuda/examples/proof_carrying_views) "
-"example for 1-D and 2-D versions."
+"See the runnable [`proof_carrying_views`](https://github.com/NVIDIA/cuda-"
+"rust/tree/main/cuda-oxide/crates/rustc-codegen-cuda/examples/"
+"proof_carrying_views) example for 1-D and 2-D versions."
 msgstr ""
 
 #: ../../../gpu-safety/the-safety-model.md:204

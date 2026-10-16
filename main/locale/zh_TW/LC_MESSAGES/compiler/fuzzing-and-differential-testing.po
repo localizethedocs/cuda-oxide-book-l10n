@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-21 14:41+0000\n"
+"POT-Creation-Date: 2026-10-16 04:35+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -121,7 +121,7 @@ msgid "Role"
 msgstr ""
 
 #: ../../../compiler/fuzzing-and-differential-testing.md:53
-msgid "`crates/fuzzer`"
+msgid "`cuda-oxide/crates/fuzzer`"
 msgstr ""
 
 #: ../../../compiler/fuzzing-and-differential-testing.md:53
@@ -129,7 +129,7 @@ msgid "Shared trace API and vendored rustlantis"
 msgstr ""
 
 #: ../../../compiler/fuzzing-and-differential-testing.md:53
-msgid "`crates/fuzzer/tools/mir_generator.py`"
+msgid "`cuda-oxide/crates/fuzzer/tools/mir_generator.py`"
 msgstr ""
 
 #: ../../../compiler/fuzzing-and-differential-testing.md:53
@@ -137,7 +137,7 @@ msgid "Seed-to-`generated_case.rs` adapter"
 msgstr ""
 
 #: ../../../compiler/fuzzing-and-differential-testing.md:53
-msgid "`crates/fuzzer/tools/run_seed.py`"
+msgid "`cuda-oxide/crates/fuzzer/tools/run_seed.py`"
 msgstr ""
 
 #: ../../../compiler/fuzzing-and-differential-testing.md:53
@@ -154,23 +154,24 @@ msgstr ""
 
 #: ../../../compiler/fuzzing-and-differential-testing.md:72
 msgid ""
-"`crates/fuzzer` is a normal workspace crate, but its library surface is "
-"`no_std`. Device code imports `trace_reset`, `trace_finish`, and the generic "
-"`dump_var` from there. The actual rustlantis source is vendored under "
-"`crates/fuzzer/rustlantis`; it is invoked as an external generator, not used "
-"as a Rust library dependency."
+"`cuda-oxide/crates/fuzzer` is a normal workspace crate, but its library "
+"surface is `no_std`. Device code imports `trace_reset`, `trace_finish`, and "
+"the generic `dump_var` from there. The actual rustlantis source is vendored "
+"under `cuda-oxide/crates/fuzzer/rustlantis`; it is invoked as an external "
+"generator, not used as a Rust library dependency."
 msgstr ""
 
 #: ../../../compiler/fuzzing-and-differential-testing.md:78
 msgid ""
-"The `rustlantis-smoke` example lives under `crates/rustc-codegen-cuda/"
-"examples/`. It owns the host/GPU launch logic and a small hand-written "
+"The `rustlantis-smoke` example lives under `cuda-oxide/crates/rustc-codegen-"
+"cuda/examples/`. It owns the host/GPU launch logic and a small hand-written "
 "sanity test, then includes one generated file:"
 msgstr ""
 
 #: ../../../compiler/fuzzing-and-differential-testing.md:82
 msgid ""
-"crates/rustc-codegen-cuda/examples/rustlantis-smoke/src/generated_case.rs\n"
+"cuda-oxide/crates/rustc-codegen-cuda/examples/rustlantis-smoke/src/"
+"generated_case.rs\n"
 msgstr ""
 
 #: ../../../compiler/fuzzing-and-differential-testing.md:86
@@ -257,7 +258,7 @@ msgid "Run one seed:"
 msgstr ""
 
 #: ../../../compiler/fuzzing-and-differential-testing.md:132
-msgid "python3 crates/fuzzer/tools/run_seed.py --seed 192\n"
+msgid "python3 cuda-oxide/crates/fuzzer/tools/run_seed.py --seed 192\n"
 msgstr ""
 
 #: ../../../compiler/fuzzing-and-differential-testing.md:136
@@ -266,7 +267,8 @@ msgstr ""
 
 #: ../../../compiler/fuzzing-and-differential-testing.md:138
 msgid ""
-"python3 crates/fuzzer/tools/run_seed.py --start 0 --count 20 --keep-going\n"
+"python3 cuda-oxide/crates/fuzzer/tools/run_seed.py --start 0 --count 20 --"
+"keep-going\n"
 msgstr ""
 
 #: ../../../compiler/fuzzing-and-differential-testing.md:142
@@ -434,7 +436,7 @@ msgid "Per-seed logs live under:"
 msgstr ""
 
 #: ../../../compiler/fuzzing-and-differential-testing.md:225
-msgid "crates/fuzzer/artifacts/\n"
+msgid "cuda-oxide/crates/fuzzer/artifacts/\n"
 msgstr ""
 
 #: ../../../compiler/fuzzing-and-differential-testing.md:229

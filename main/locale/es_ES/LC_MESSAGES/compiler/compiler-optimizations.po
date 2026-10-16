@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-21 14:41+0000\n"
+"POT-Creation-Date: 2026-10-16 04:35+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -180,7 +180,7 @@ msgid ""
 msgstr ""
 
 #: ../../../compiler/compiler-optimizations.md:92
-#: ../../../compiler/compiler-optimizations.md:329
+#: ../../../compiler/compiler-optimizations.md:331
 msgid "cargo oxide build <example> --verbose\n"
 msgstr ""
 
@@ -488,17 +488,14 @@ msgstr ""
 
 #: ../../../compiler/compiler-optimizations.md:275
 msgid ""
-"The current pass intentionally recognizes a conservative set of loop shapes:"
-msgstr ""
-
-#: ../../../compiler/compiler-optimizations.md:277
-msgid ""
-"Both forms need a counter the pass can follow: a compile-time-constant "
-"starting value, the same fixed step on every path back to the header, and a "
-"simple, side-effect-free test that directly compares the counter with its "
-"bound. The loop must also have one ordinary entry before its header. For "
-"unusual or irreducible control flow, the compiler warns and does not unroll "
-"the loop."
+"The current pass intentionally recognizes a conservative set of loop shapes. "
+"A counted `while` loop and a range `for` loop (`for i in a..b` and `(a..b)."
+"rev()`, over any integer counter including `isize`) need a counter the pass "
+"can follow: a compile-time-constant starting value, the same fixed step on "
+"every path back to the header, and a simple, side-effect-free test that "
+"directly compares the counter with its bound. The loop must also have one "
+"ordinary entry before its header. For unusual or irreducible control flow, "
+"the compiler warns and does not unroll the loop."
 msgstr ""
 
 #: ../../../compiler/compiler-optimizations.md:243
@@ -514,15 +511,21 @@ msgid "Explicit counted `while` loop"
 msgstr ""
 
 #: ../../../compiler/compiler-optimizations.md:243
-msgid "Supported when the requirements above hold"
+msgid ""
+"Supported, over any integer counter including `isize`, when the requirements "
+"above hold"
 msgstr ""
 
 #: ../../../compiler/compiler-optimizations.md:243
-msgid "Range-based `for` loop"
+msgid "Range `for` loop (`for i in a..b` and `(a..b).rev()`)"
 msgstr ""
 
 #: ../../../compiler/compiler-optimizations.md:243
-msgid "Not yet recognized"
+msgid "Other iterator `for` loops (`a..=b`, `.step_by(k)`, `.iter()`)"
+msgstr ""
+
+#: ../../../compiler/compiler-optimizations.md:243
+msgid "Not yet recognized; warns"
 msgstr ""
 
 #: ../../../compiler/compiler-optimizations.md:243
@@ -573,13 +576,13 @@ msgstr ""
 msgid "Only the annotated loop is unrolled"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:294
+#: ../../../compiler/compiler-optimizations.md:296
 msgid ""
 "Partial unrolling also requires `N >= 2`, a positive counter step, a `<` or "
 "`<=` comparison, and a limit that does not change inside the loop."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:297
+#: ../../../compiler/compiler-optimizations.md:299
 msgid ""
 "When an annotated outer loop contains an unannotated inner loop, each outer "
 "copy receives an intact clone of that inner loop; the inner loop remains a "
@@ -587,82 +590,82 @@ msgid ""
 "first."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:302
+#: ../../../compiler/compiler-optimizations.md:304
 msgid ""
 "To bound compile time and memory, one annotation may create at most 1,024 "
 "body copies, 8,192 cloned basic blocks, and 65,536 cloned operations. A "
 "request over one of those limits warns and is not unrolled."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:306
+#: ../../../compiler/compiler-optimizations.md:308
 msgid ""
 "For the complete kernel-author reference, see {ref}`Loop unrolling <loop-"
 "unrolling>`."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:310
+#: ../../../compiler/compiler-optimizations.md:312
 msgid "When should you unroll?"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:312
+#: ../../../compiler/compiler-optimizations.md:314
 msgid "Good candidates are:"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:314
+#: ../../../compiler/compiler-optimizations.md:316
 msgid "small loops with a fixed trip count;"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:315
+#: ../../../compiler/compiler-optimizations.md:317
 msgid "hot counted loops where branch overhead matters;"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:316
+#: ../../../compiler/compiler-optimizations.md:318
 msgid ""
 "software pipelines whose stage selection becomes constant after unrolling;"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:317
+#: ../../../compiler/compiler-optimizations.md:319
 msgid ""
 "loops where several independent copies expose instruction-level parallelism."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:319
+#: ../../../compiler/compiler-optimizations.md:321
 msgid ""
 "Be cautious when the body is large or already uses many registers. Extra "
 "code can increase register pressure, reduce occupancy, or put more pressure "
 "on the instruction cache."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:323
+#: ../../../compiler/compiler-optimizations.md:325
 msgid ""
 "Choose a factor that matches the structure of the algorithm—often a pipeline "
 "depth or another small natural group—and benchmark the result. Removing "
 "`#[unroll]` should always remain an easy comparison."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:327
+#: ../../../compiler/compiler-optimizations.md:329
 msgid "To inspect the pass's analysis, build verbosely:"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:333
+#: ../../../compiler/compiler-optimizations.md:335
 msgid ""
 "Verbose mode prints the requested factor and the loop facts the pass found. "
 "If a request is skipped, a warning explains why. Loop numbers and analysis "
 "fields are internal details and may change."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:339
-msgid "A home for future transforms"
-msgstr ""
-
 #: ../../../compiler/compiler-optimizations.md:341
-msgid ""
-"The `mir-transforms` crate keeps reusable analysis separate from IR mutation:"
+msgid "A home for future transforms"
 msgstr ""
 
 #: ../../../compiler/compiler-optimizations.md:343
 msgid ""
-"crates/mir-transforms/src/\n"
+"The `mir-transforms` crate keeps reusable analysis separate from IR mutation:"
+msgstr ""
+
+#: ../../../compiler/compiler-optimizations.md:345
+msgid ""
+"cuda-oxide/crates/mir-transforms/src/\n"
 "├── analyses/\n"
 "│   ├── loop_info.rs      # which blocks belong to each loop?\n"
 "│   └── induction.rs      # what are the counter, step, bound, and trip "
@@ -671,7 +674,7 @@ msgid ""
 "└── unroll.rs             # prove, clone, reconnect, and clean up loops\n"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:352
+#: ../../../compiler/compiler-optimizations.md:354
 msgid ""
 "This separation gives future optimizations a predictable place to live: "
 "analyses gather facts, canonicalization normalizes equivalent shapes, and "
@@ -679,22 +682,22 @@ msgid ""
 "rs` controls when each pass runs."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:357
+#: ../../../compiler/compiler-optimizations.md:359
 msgid ""
 "Every transform should follow the same rule as the unroller: prove the "
 "rewrite is safe, bound its resource use, and fall back without changing "
 "behavior when a program is outside the supported shape."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:361
+#: ../../../compiler/compiler-optimizations.md:363
 msgid "The focused test suite runs with:"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:363
+#: ../../../compiler/compiler-optimizations.md:365
 msgid "cargo test -p mir-transforms --all-targets\n"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:367
+#: ../../../compiler/compiler-optimizations.md:369
 msgid ""
 "From here, [The Lowering Pipeline](lowering-pipeline.md) explains how the "
 "optimized `dialect-mir` becomes the LLVM dialect and, eventually, PTX."

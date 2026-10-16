@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-21 14:41+0000\n"
+"POT-Creation-Date: 2026-10-16 04:35+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -337,7 +337,7 @@ msgstr ""
 #: ../../../compiler/mlir-dialects.md:86
 msgid ""
 "`dialect-mir` defines 62 operations across 12 categories, one per module "
-"under `crates/dialect-mir/src/ops/`:"
+"under `cuda-oxide/crates/dialect-mir/src/ops/`:"
 msgstr ""
 
 #: ../../../compiler/mlir-dialects.md:0
@@ -818,12 +818,12 @@ msgstr ""
 
 #: ../../../compiler/mlir-dialects.md:229
 msgid ""
-"The crown jewel of `llvm-export` is its export module (`crates/llvm-export/"
-"src/export/`) -- the code that converts a pliron IR module into valid "
-"textual LLVM IR. This is the part cuda-oxide keeps local: pliron-llvm only "
-"emits real `.ll` via an `llvm-sys` bridge, which cuda-oxide avoids. This is "
-"not just \"print each operation\"; several non-trivial transformations "
-"happen during export:"
+"The crown jewel of `llvm-export` is its export module (`cuda-oxide/crates/"
+"llvm-export/src/export/`) -- the code that converts a pliron IR module into "
+"valid textual LLVM IR. This is the part cuda-oxide keeps local: pliron-llvm "
+"only emits real `.ll` via an `llvm-sys` bridge, which cuda-oxide avoids. "
+"This is not just \"print each operation\"; several non-trivial "
+"transformations happen during export:"
 msgstr ""
 
 #: ../../../compiler/mlir-dialects.md:236
@@ -925,19 +925,19 @@ msgstr ""
 
 #: ../../../compiler/mlir-dialects.md:306
 msgid ""
-"At catalog SHA-256 `3df52944` (the stamp in every `ops/generated/` file "
+"At catalog SHA-256 `c243e568` (the stamp in every `ops/generated/` file "
 "header), the dialect holds 576 operations across 42 modules, and they come "
 "from two different places. The split is the first thing to know about it, "
 "because it decides where -- and whether -- you would add one. If the header "
-"stamp no longer starts with `3df52944`, the counts on this page predate the "
+"stamp no longer starts with `c243e568`, the counts on this page predate the "
 "catalog you are reading."
 msgstr ""
 
 #: ../../../compiler/mlir-dialects.md:313
 msgid ""
-"**Hand-written**, directly under `crates/dialect-nvvm/src/ops/`. These are "
-"the ops with bespoke verification or lowering that the intrinsic catalog "
-"does not describe. There are seven modules and 26 operations:"
+"**Hand-written**, directly under `cuda-oxide/crates/dialect-nvvm/src/ops/`. "
+"These are the ops with bespoke verification or lowering that the intrinsic "
+"catalog does not describe. There are seven modules and 26 operations:"
 msgstr ""
 
 #: ../../../compiler/mlir-dialects.md:0
@@ -1015,7 +1015,7 @@ msgid ""
 "**Generated**, under `ops/generated/`, from `intrinsics/catalog.json` by "
 "`cuda-intrinsics-gen`. Every file there opens with `// @generated ... DO NOT "
 "EDIT.`, and editing one by hand is undone by the next generator run. This is "
-"the large majority -- 35 modules and 550 operations, resolved from 1025 "
+"the large majority -- 35 modules and 550 operations, resolved from 1029 "
 "catalog entries, since several intrinsics can share one structural op:"
 msgstr ""
 

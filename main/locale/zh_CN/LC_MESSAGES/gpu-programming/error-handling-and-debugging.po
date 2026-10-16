@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-21 14:41+0000\n"
+"POT-Creation-Date: 2026-10-16 04:35+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -830,7 +830,7 @@ msgstr ""
 #: ../../../gpu-programming/error-handling-and-debugging.md:392
 msgid ""
 "End-to-end behavior (breakpoint binds, backtrace, `info args`/`info locals`) "
-"is checked on real hardware by `scripts/debug-smoketest.sh`."
+"is checked on real hardware by `cuda-oxide/scripts/debug-smoketest.sh`."
 msgstr ""
 
 #: ../../../gpu-programming/error-handling-and-debugging.md:395
