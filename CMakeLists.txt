@@ -103,7 +103,7 @@ set(BRANCH_OF_WORKTREE "l10n"
 set(REMOTE_URL_OF_L10N "https://github.com/localizethedocs/cuda-oxide-book-l10n.git"
     CACHE STRING "The remote URL of the 'l10n' repository.")
 
-set(REMOTE_URL_OF_DOCS "https://github.com/NVlabs/cuda-oxide.git"
+set(REMOTE_URL_OF_DOCS "https://github.com/NVIDIA/cuda-rust.git"
     CACHE STRING "The remote URL of the 'docs' repository.")
 
 set(BASEURL_HREF "file://${PROJECT_SOURCE_DIR}/out/$CACHE{SPHINX_BUILDER}"
@@ -125,7 +125,7 @@ set(PROJ_CMAKE_TARGETS_DIR          "${PROJ_SOURCE_DIR}/cmake/targets")
 set(PROJ_CONDA_DIR                  "${PROJ_SOURCE_DIR}/.conda")
 set(PROJ_OUT_DIR                    "${PROJ_SOURCE_DIR}/out")
 set(PROJ_OUT_REPO_DIR               "${PROJ_OUT_DIR}/repo")
-set(PROJ_OUT_REPO_DOCS_DIR          "${PROJ_OUT_REPO_DIR}/cuda-oxide-book")
+set(PROJ_OUT_REPO_DOCS_DIR          "${PROJ_OUT_REPO_DIR}/cuda-oxide/cuda-oxide-book")
 set(PROJ_OUT_REPO_DOCS_CONFIG_DIR   "${PROJ_OUT_REPO_DOCS_DIR}")
 set(PROJ_OUT_REPO_DOCS_SOURCE_DIR   "${PROJ_OUT_REPO_DOCS_DIR}")
 set(PROJ_OUT_REPO_DOCS_LOCALE_DIR   "${PROJ_OUT_REPO_DOCS_DIR}/locale")

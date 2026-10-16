@@ -208,8 +208,8 @@ restore_cmake_message_indent()
 #]============================================================]
 
 
-set(UPSTREAM_DOCS   "https://nvlabs.github.io/cuda-oxide/")
-set(UPSTREAM_REPO   "https://github.com/NVlabs/cuda-oxide")
+set(UPSTREAM_DOCS   "https://nvidia.github.io/cuda-rust/cuda-oxide/")
+set(UPSTREAM_REPO   "https://github.com/NVIDIA/cuda-rust")
 set(INSERT_POINT    "article[class=\"bd-article\"]")
 
 
