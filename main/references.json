@@ -47,9 +47,9 @@
     "branch" : "main",
     "commit" : 
     {
-      "date" : "2026-09-20 16:22:57 +0530",
-      "hash" : "b0f961df3af0ff140b3b006fa2b6750b71f43f62",
-      "title" : "fix(tests): use the upstream volatility interface"
+      "date" : "2026-10-15 17:26:01 +0530",
+      "hash" : "6d47ae49cb256a07948fb499c20c3eb9b2a96268",
+      "title" : "feat(unroll): recognize range `for` loops (#1346)"
     }
   },
   "type" : "branch",

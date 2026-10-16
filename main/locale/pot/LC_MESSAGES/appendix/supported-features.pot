@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-21 14:41+0000\n"
+"POT-Creation-Date: 2026-10-16 04:35+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -421,11 +421,13 @@ msgstr ""
 #: ../../../appendix/supported-features.md:0
 msgid ""
 "`#[unroll]` and `#[unroll(N)]` request unrolling of explicit counted `while` "
-"loops. Nested loops and multiple `continue` paths work; full unrolling "
-"preserves `break` paths and multiple exit targets, while partial unrolling "
-"requires a positive-step `<`/`<=` loop with an invariant limit and only the "
-"normal header exit. Requests are capped at 1,024 copies, 8,192 cloned "
-"blocks, and 65,536 cloned operations."
+"loops and range `for` loops (`for i in a..b` and `(a..b).rev()`) over any "
+"integer counter, including `isize`. Other iterator loops, such as `a..=b` or "
+"`.step_by(k)`, are not yet recognized. Nested loops and multiple `continue` "
+"paths work; full unrolling preserves `break` paths and multiple exit "
+"targets, while partial unrolling requires a positive-step `<`/`<=` loop with "
+"an invariant limit and only the normal header exit. Requests are capped at "
+"1,024 copies, 8,192 cloned blocks, and 65,536 cloned operations."
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
@@ -518,10 +520,10 @@ msgstr ""
 #: ../../../appendix/supported-features.md:0
 msgid ""
 "Inter-kernel interop works today: a [cutile-rs Tile kernel](https://github."
-"com/NVlabs/cutile-rs) and a cuda-oxide SIMT PTX kernel can run in one host "
-"process on the same CUDA stream over shared device tensors. Intra-kernel "
-"Tile interop is work in progress and tracked in [#96](https://github.com/"
-"NVlabs/cuda-oxide/issues/96)."
+"com/NVIDIA/cuda-rust/tree/main/cutile-rs) and a cuda-oxide SIMT PTX kernel "
+"can run in one host process on the same CUDA stream over shared device "
+"tensors. Intra-kernel Tile interop is work in progress and tracked in [#96]"
+"(https://github.com/NVlabs/cuda-oxide/issues/96)."
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
@@ -978,8 +980,9 @@ msgstr ""
 
 #: ../../../appendix/supported-features.md:0
 msgid ""
-"`ThreadBlock::tiled_partition::<N>()` carves a sub-warp `WarpTile<N>`. "
-"`coalesced_threads()` materialises the active-lane group."
+"`ThreadBlock::tiled_partition::<N>()` partitions a block into fixed-size "
+"`WarpTile<N>` groups; the block thread count must be evenly divisible by "
+"`N`. `coalesced_threads()` materialises the active-lane group."
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
@@ -1008,8 +1011,9 @@ msgstr ""
 
 #: ../../../appendix/supported-features.md:0
 msgid ""
-"`block_reduce`, `block_scan` (inclusive). Const-generic over `NUM_WARPS`; "
-"same op/type matrix as warp variants; uses `__shared__` scratch."
+"`block_reduce`, `block_scan` (inclusive). `NUM_WARPS` is the shared-memory "
+"capacity in warp totals and must be at least `ceil(block_threads / 32)`; "
+"partial final warps are supported. Same op/type matrix as warp variants."
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
