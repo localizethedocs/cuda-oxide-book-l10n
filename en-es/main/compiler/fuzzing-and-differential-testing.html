@@ -1,0 +1,736 @@
+
+<!DOCTYPE html>
+
+
+<html lang="es-ES" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Fuzzing and Differential Testing &#8212; cuda-oxide</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/nvidia-sphinx-theme.css?v=5d97cc0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=196aea71" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/lightbox.css?v=31fdf494" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../_static/documentation_options.js?v=4730b09f"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'compiler/fuzzing-and-differential-testing';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../_static/js/lightbox.js?v=8cf6bc2b"></script>
+    <script src="../_static/js/spa-nav.js?v=9a4d0bbe"></script>
+    <link rel="canonical" href="https://projects.localizethedocs.org/cuda-oxide-book-l10n/compiler/fuzzing-and-differential-testing.html" />
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="next" title="Building from Source" href="../appendix/building-from-source.html" />
+    <link rel="prev" title="Adding New Intrinsics" href="adding-new-intrinsics.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="es-ES"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+<script type="text/javascript" src="../ltd-provenance.js"></script>
+<script type="text/javascript" src="../ltd-current.js"></script>
+<script type="text/javascript" src="../../../ltd-config.js"></script>
+<script type="text/javascript" src="../../../ltd-flyout.js"></script>
+
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Saltar al contenido principal</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Volver arriba</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Advertencia de versión"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Navegación del sitio">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">cuda-oxide</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Búsqueda" aria-label="Búsqueda" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Tema">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Tema" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Claro"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Oscuro"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="Sistema"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>Sistema</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Claro</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Oscuro</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="En esta página">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Búsqueda" aria-label="Búsqueda" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Tema">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Tema" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Claro"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Oscuro"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="Sistema"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>Sistema</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Claro</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Oscuro</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><div class="sidebar-tree">
+    <p class="sidebar-tree-title">
+        Table of Contents
+    </p>
+    <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/hello-gpu.html">Writing Your First Kernel</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Writing GPU Programs</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/execution-model.html">The CUDA Execution Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/kernels-and-device-functions.html">Kernels and Device Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/memory-and-data-movement.html">Memory and Data Movement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/launching-kernels.html">Launching Kernels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/closures-and-generics.html">Closures and Generics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/error-handling-and-debugging.html">Error Handling and Debugging</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Safety on the GPU</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-safety/the-safety-model.html">The Safety Model</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Async GPU Programming</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/the-device-operation-model.html">The DeviceOperation Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/combinators-and-composition.html">Combinators and Composition</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/scheduling-and-streams.html">Scheduling and Streams</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/concurrent-execution.html">Concurrent Execution</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Building a Real Application</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../projects/async-mlp-pipeline.html">Project: Async MLP Pipeline</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Advanced GPU Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/shared-memory-and-synchronization.html">Shared Memory and Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/warp-level-programming.html">Warp-Level Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/tensor-memory-accelerator.html">Tensor Memory Accelerator (TMA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/matrix-multiply-accelerators.html">Matrix Multiply Accelerators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cluster-programming.html">Cluster Programming</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Inside the Compiler</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="architecture-overview.html">Architecture Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pliron.html">Pliron – Pliron IR (MLIR-like)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rustc-public.html">rustc_public – Stable MIR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rustc-codegen-cuda.html">The Code Generator: rustc-codegen-cuda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mir-importer.html">The MIR Importer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compiler-optimizations.html">Compiler Optimizations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="mlir-dialects.html">Pliron Dialects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lowering-pipeline.html">The Lowering Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="adding-new-intrinsics.html">Adding New Intrinsics</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Fuzzing and Differential Testing</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Appendix</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/building-from-source.html">Building from Source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/api-quick-reference.html">API Quick Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/supported-features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/cuda-cpp-comparison.html">cuda-oxide vs CUDA C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/ecosystem.html">The Rust + GPU Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/glossary.html">Glossary</a></li>
+</ul>
+
+</div></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Miga de pan" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Inicio">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Fuzzing and Differential Testing</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="fuzzing-and-differential-testing">
+<h1>Fuzzing and Differential Testing<a class="headerlink" href="#fuzzing-and-differential-testing" title="Link to this heading">#</a></h1>
+<p>The happy path through cuda-oxide is easy to test with examples: <code class="docutils literal notranslate"><span class="pre">vecadd</span></code>,
+<code class="docutils literal notranslate"><span class="pre">gemm</span></code>, <code class="docutils literal notranslate"><span class="pre">sharedmem</span></code>, and friends prove that known programs still work. But
+compilers do not only fail on known programs. They fail on the weird little
+corners no one thought to write by hand – the cast after the branch, the tuple
+inside the call terminator, the integer width that nobody invited to the party.</p>
+<p>That is where fuzzing enters the picture.</p>
+<p>cuda-oxide uses a small rustlantis-based harness to generate random custom MIR
+programs, run them through both the normal Rust CPU backend and cuda-oxide’s GPU
+backend, and compare a compact trace of intermediate values. The aim is not to
+prove all of Rust correct on GPUs. The aim is more modest, and more useful:
+stress the MIR importer, lowering pipeline, LLVM export, PTX generation, and
+runtime execution with programs we did not hand-author.</p>
+<hr class="docutils" />
+<section id="what-we-are-comparing">
+<h2>What We Are Comparing<a class="headerlink" href="#what-we-are-comparing" title="Link to this heading">#</a></h2>
+<p>At first glance, «compare CPU and GPU execution» sounds suspicious. CPUs and
+GPUs have different execution models: one scalar thread versus thousands of
+SIMT lanes, divergent control flow, different memory spaces, different
+synchronization rules. A general CPU-vs-GPU semantic comparison would be a very
+fancy way to lie to ourselves.</p>
+<p>So the harness deliberately avoids that.</p>
+<p>It runs generated MIR as a scalar GPU program:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&lt;&lt;&lt;1, 1&gt;&gt;&gt;
+</pre></div>
+</div>
+<p>One block. One thread. No inter-thread communication. No scheduling drama. The
+GPU is being used as a second codegen target for the same scalar MIR, not as a
+parallel programming model.</p>
+<p>The comparison is:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>same generated MIR
+  -&gt; normal rustc/LLVM CPU execution
+  -&gt; cuda-oxide -&gt; LLVM IR -&gt; PTX -&gt; CUDA execution
+  -&gt; compare trace hash
+</pre></div>
+</div>
+<p>If the hashes match, the generated program observed the same sequence of
+intermediate values on both paths. If they differ, something in the cuda-oxide
+path deserves attention.</p>
+<div class="admonition note">
+<p class="admonition-title">Nota</p>
+<p>The trace is intentionally compact. Instead of copying every intermediate value
+back to the host, each <code class="docutils literal notranslate"><span class="pre">dump_var(...)</span></code> call folds values into one <code class="docutils literal notranslate"><span class="pre">u64</span></code> using a
+byte-wise hash. This makes generated tests cheap to run and easy to compare.</p>
+</div>
+</section>
+<hr class="docutils" />
+<section id="the-moving-pieces">
+<h2>The Moving Pieces<a class="headerlink" href="#the-moving-pieces" title="Link to this heading">#</a></h2>
+<p>The fuzzing setup is split into four parts:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Piece</p></th>
+<th class="head text-left"><p>Role</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">crates/fuzzer</span></code></p></td>
+<td class="text-left"><p>Shared trace API and vendored rustlantis</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">crates/fuzzer/tools/mir_generator.py</span></code></p></td>
+<td class="text-left"><p>Seed-to-<code class="docutils literal notranslate"><span class="pre">generated_case.rs</span></code> adapter</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">crates/fuzzer/tools/run_seed.py</span></code></p></td>
+<td class="text-left"><p>Batch runner and artifact recorder</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">rustlantis-smoke</span></code></p></td>
+<td class="text-left"><p>Stable CPU/GPU execution harness</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">crates/fuzzer</span></code> is a normal workspace crate, but its library surface is
+<code class="docutils literal notranslate"><span class="pre">no_std</span></code>. Device code imports <code class="docutils literal notranslate"><span class="pre">trace_reset</span></code>, <code class="docutils literal notranslate"><span class="pre">trace_finish</span></code>, and the generic
+<code class="docutils literal notranslate"><span class="pre">dump_var</span></code> from there. The actual rustlantis source is vendored under
+<code class="docutils literal notranslate"><span class="pre">crates/fuzzer/rustlantis</span></code>; it is invoked as an external generator, not used as
+a Rust library dependency.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">rustlantis-smoke</span></code> example lives under
+<code class="docutils literal notranslate"><span class="pre">crates/rustc-codegen-cuda/examples/</span></code>. It owns the host/GPU launch logic and a
+small hand-written sanity test, then includes one generated file:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>crates/rustc-codegen-cuda/examples/rustlantis-smoke/src/generated_case.rs
+</pre></div>
+</div>
+<p>The fuzzer tools rewrite that file for each seed. Everything else in the
+example stays stable. This keeps the harness easy to review: if a seed fails,
+the generated MIR is isolated in one place.</p>
+</section>
+<hr class="docutils" />
+<section id="the-seed-pipeline">
+<h2>The Seed Pipeline<a class="headerlink" href="#the-seed-pipeline" title="Link to this heading">#</a></h2>
+<p>One seed follows this path:</p>
+<ol class="arabic simple">
+<li><p><strong>Generate.</strong> rustlantis receives a numeric seed and a small config. Same
+seed plus same config means the same custom-MIR program.</p></li>
+<li><p><strong>Extract.</strong> <code class="docutils literal notranslate"><span class="pre">mir_generator.py</span></code> pulls out the first generated <code class="docutils literal notranslate"><span class="pre">#[custom_mir]</span></code>
+function.</p></li>
+<li><p><strong>Adapt.</strong> rustlantis emits calls like <code class="docutils literal notranslate"><span class="pre">dump_var(a,</span> <span class="pre">b,</span> <span class="pre">c)</span></code>. The adapter
+rewrites those into tuple locals and one generic <code class="docutils literal notranslate"><span class="pre">fuzzer::dump_var(...)</span></code>
+call, because custom MIR call operands are picky about tuple expressions.</p></li>
+<li><p><strong>Inject.</strong> The adapted function and a small wrapper are written to
+<code class="docutils literal notranslate"><span class="pre">src/generated_case.rs</span></code>.</p></li>
+<li><p><strong>Run.</strong> <code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">oxide</span> <span class="pre">run</span> <span class="pre">rustlantis-smoke</span></code> executes the CPU oracle and GPU
+kernel.</p></li>
+<li><p><strong>Classify.</strong> <code class="docutils literal notranslate"><span class="pre">run_seed.py</span></code> records whether the seed passed, mismatched,
+failed to compile, or exceeded the adapter’s current support surface.</p></li>
+</ol>
+<p>The checked-in generated case currently uses seed <code class="docutils literal notranslate"><span class="pre">19</span></code>, because it shows the
+important property we want from the harness: multiple intermediate dumps, not
+just one final value.</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="n">__rl_dump0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Move</span><span class="p">(</span><span class="n">_1</span><span class="p">),</span><span class="w"> </span><span class="n">Move</span><span class="p">(</span><span class="n">_2</span><span class="p">),</span><span class="w"> </span><span class="n">Move</span><span class="p">(</span><span class="n">_3</span><span class="p">),</span><span class="w"> </span><span class="n">Move</span><span class="p">(</span><span class="n">_4</span><span class="p">));</span>
+<span class="n">Call</span><span class="p">(</span><span class="n">_9</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dump_var</span><span class="p">(</span><span class="n">Move</span><span class="p">(</span><span class="n">__rl_dump0</span><span class="p">)),</span><span class="w"> </span><span class="n">ReturnTo</span><span class="p">(</span><span class="n">bb4</span><span class="p">),</span><span class="w"> </span><span class="n">UnwindUnreachable</span><span class="p">())</span>
+
+<span class="n">__rl_dump1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">Move</span><span class="p">(</span><span class="n">_6</span><span class="p">),);</span>
+<span class="n">Call</span><span class="p">(</span><span class="n">_9</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dump_var</span><span class="p">(</span><span class="n">Move</span><span class="p">(</span><span class="n">__rl_dump1</span><span class="p">)),</span><span class="w"> </span><span class="n">ReturnTo</span><span class="p">(</span><span class="n">bb5</span><span class="p">),</span><span class="w"> </span><span class="n">UnwindUnreachable</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>That means the final trace hash includes several values from one point in the
+program and another value from a later point. It is still compact, but it is no
+longer merely «did the return value match?»</p>
+</section>
+<hr class="docutils" />
+<section id="running-it">
+<h2>Running It<a class="headerlink" href="#running-it" title="Link to this heading">#</a></h2>
+<p>Run one seed:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>crates/fuzzer/tools/run_seed.py<span class="w"> </span>--seed<span class="w"> </span><span class="m">192</span>
+</pre></div>
+</div>
+<p>Run a batch:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>crates/fuzzer/tools/run_seed.py<span class="w"> </span>--start<span class="w"> </span><span class="m">0</span><span class="w"> </span>--count<span class="w"> </span><span class="m">20</span><span class="w"> </span>--keep-going
+</pre></div>
+</div>
+<p>Useful flags:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">--keep-going</span></code>: continue after a failing seed.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--keep-logs</span></code>: write logs for passing seeds too.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--no-build</span></code>: reuse an already-built rustlantis generator.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--append-summary</span></code>: append to the existing summary instead of replacing it.</p></li>
+</ul>
+<p>By default, <code class="docutils literal notranslate"><span class="pre">summary.jsonl</span></code> is replaced at the start of each run. This makes it
+answer the obvious question: «what happened in the run I just did?» If you want
+history, opt in with <code class="docutils literal notranslate"><span class="pre">--append-summary</span></code>.</p>
+</section>
+<hr class="docutils" />
+<section id="reading-results">
+<h2>Reading Results<a class="headerlink" href="#reading-results" title="Link to this heading">#</a></h2>
+<p>The runner prints one line per seed and then a full summary:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>results:
+  seed 0: UNSUPPORTED [adapter] unsupported dumped type for Stage 2 adapter: u128 (...)
+  seed 1: COMPILE_FAIL [backend] Unsupported construct: Type translation not yet implemented for: RigidTy(Char) (...)
+summary: COMPILE_FAIL=1, UNSUPPORTED=1
+</pre></div>
+</div>
+<p>The statuses mean:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Status</p></th>
+<th class="head text-left"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">PASS</span></code></p></td>
+<td class="text-left"><p>CPU and GPU traces matched</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">MISMATCH</span></code></p></td>
+<td class="text-left"><p>CPU and GPU traces differed</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">COMPILE_FAIL</span> <span class="pre">[backend]</span></code></p></td>
+<td class="text-left"><p>The adapter produced a case, but cuda-oxide failed it</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">UNSUPPORTED</span> <span class="pre">[adapter]</span></code></p></td>
+<td class="text-left"><p>rustlantis generated MIR, but the adapter declined it</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">MISMATCH</span></code> is the result to take most seriously. Both paths compiled and ran,
+but observed different values. That is a potential backend correctness bug.</p>
+<p><code class="docutils literal notranslate"><span class="pre">COMPILE_FAIL</span> <span class="pre">[backend]</span></code> means the generated case made it past the adapter and
+into cuda-oxide. The failure may still be expected – for example, a currently
+unsupported MIR type – but the backend is the component that rejected it.</p>
+<p><code class="docutils literal notranslate"><span class="pre">UNSUPPORTED</span> <span class="pre">[adapter]</span></code> means rustlantis produced a program, but our adapter
+refused to turn it into a smoke case. For example:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>unsupported dumped type for Stage 2 adapter: u128
+</pre></div>
+</div>
+<p>That usually means the generated MIR had a <code class="docutils literal notranslate"><span class="pre">dump_var(...)</span></code> containing a type
+our trace API does not yet know how to hash. Today the trace supports:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>bool, i8, i16, i32, i64, u8, u16, u32, u64
+</pre></div>
+</div>
+<p>It does not yet support <code class="docutils literal notranslate"><span class="pre">u128</span></code>, <code class="docutils literal notranslate"><span class="pre">i128</span></code>, <code class="docutils literal notranslate"><span class="pre">usize</span></code>, <code class="docutils literal notranslate"><span class="pre">isize</span></code>, or <code class="docutils literal notranslate"><span class="pre">char</span></code>. Many
+adapter-level unsupported cases are therefore not «bad MIR» and not cuda-oxide
+bugs. They are simply places where the fuzzer harness has not grown up yet.
+Compilers, like people, need snacks before they can handle <code class="docutils literal notranslate"><span class="pre">u128</span></code>.</p>
+</section>
+<hr class="docutils" />
+<section id="artifacts">
+<h2>Artifacts<a class="headerlink" href="#artifacts" title="Link to this heading">#</a></h2>
+<p>Per-seed logs live under:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>crates/fuzzer/artifacts/
+</pre></div>
+</div>
+<p>Failure logs include:</p>
+<ul class="simple">
+<li><p>the seed</p></li>
+<li><p>status and stage</p></li>
+<li><p>reason</p></li>
+<li><p>return code</p></li>
+<li><p>command</p></li>
+<li><p>full command output</p></li>
+<li><p>the generated <code class="docutils literal notranslate"><span class="pre">generated_case.rs</span></code> snapshot, when one exists</p></li>
+</ul>
+<p>The generated snapshot matters. If a backend failure appears in CI or a long
+batch run, the log is enough to see the exact MIR-shaped program that triggered
+it. The seed lets you regenerate it, but the snapshot saves you a round trip.</p>
+</section>
+<hr class="docutils" />
+<section id="current-limits">
+<h2>Current Limits<a class="headerlink" href="#current-limits" title="Link to this heading">#</a></h2>
+<p>The current config is intentionally small. It keeps the first stage focused on
+scalar custom MIR and backend plumbing rather than every Rust construct at once.
+That is why many early seeds classify as <code class="docutils literal notranslate"><span class="pre">UNSUPPORTED</span> <span class="pre">[adapter]</span></code>.</p>
+<p>The widening plan is incremental:</p>
+<ol class="arabic simple">
+<li><p>Add trace support for more scalar types (<code class="docutils literal notranslate"><span class="pre">u128</span></code>, <code class="docutils literal notranslate"><span class="pre">i128</span></code>, <code class="docutils literal notranslate"><span class="pre">usize</span></code>, <code class="docutils literal notranslate"><span class="pre">isize</span></code>).</p></li>
+<li><p>Decide whether and how to support <code class="docutils literal notranslate"><span class="pre">char</span></code> in cuda-oxide’s type translation.</p></li>
+<li><p>Expand control-flow and cast coverage.</p></li>
+<li><p>Add arrays, tuples, and eventually structs/enums.</p></li>
+<li><p>Add minimization for failing seeds.</p></li>
+</ol>
+<p>That order is deliberate. A fuzzer that generates everything on day one mostly
+generates noise. A fuzzer that grows one axis at a time tells you what broke,
+and why. Much friendlier.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="adding-new-intrinsics.html"
+       title="página anterior">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">anterior</p>
+        <p class="prev-next-title">Adding New Intrinsics</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../appendix/building-from-source.html"
+       title="siguiente página">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">siguiente</p>
+        <p class="prev-next-title">Building from Source</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> En esta página
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-we-are-comparing">What We Are Comparing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-moving-pieces">The Moving Pieces</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-seed-pipeline">The Seed Pipeline</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#running-it">Running It</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reading-results">Reading Results</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#artifacts">Artifacts</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#current-limits">Current Limits</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+    <div class="footer-items__center">
+      
+        <div class="footer-item"><footer class="bd-footer-content">
+  <div class="footer-container" style="padding: 1rem 0 2rem 0; border-top: 1px solid var(--pst-color-border); text-align: left;">
+    
+    <!-- NVIDIA Logo -->
+    <div style="margin-bottom: 1rem;">
+      <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem; filter: brightness(0);"
+           class="only-light">
+      <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem;"
+           class="only-dark pst-js-only">
+    </div>
+    
+    <!-- Footer Links - single line, left aligned -->
+    <div style="font-size: 0.8125rem; margin-bottom: 0.5rem; color: var(--pst-color-text-muted);">
+      <a href="https://www.nvidia.com/en-us/about-nvidia/privacy-policy/" target="_blank" style="color: inherit; text-decoration: none;">Privacy Policy</a> | 
+      <a href="https://www.nvidia.com/en-us/preferences/email-preferences/" target="_blank" style="color: inherit; text-decoration: none;">Your Privacy Choices</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/terms-of-service/" target="_blank" style="color: inherit; text-decoration: none;">Terms of Service</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/accessibility/" target="_blank" style="color: inherit; text-decoration: none;">Accessibility</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/company-policies/" target="_blank" style="color: inherit; text-decoration: none;">Corporate Policies</a> | 
+      <a href="https://www.nvidia.com/en-us/product-security/" target="_blank" style="color: inherit; text-decoration: none;">Product Security</a> | 
+      <a href="https://www.nvidia.com/en-us/contact/" target="_blank" style="color: inherit; text-decoration: none;">Contact</a>
+    </div>
+    
+    <!-- Copyright -->
+    <div style="font-size: 0.8125rem; color: var(--pst-color-text-muted);">
+      Copyright &copy; 2025-2026, NVIDIA.
+    </div>
+    
+  </div>
+</footer></div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>
