@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-16 04:35+0000\n"
+"POT-Creation-Date: 2026-10-19 15:08+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -740,17 +740,34 @@ msgid ""
 "\"recover\" from a logic error mid-kernel."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:381
+#: ../../../compiler/mir-importer.md:379
+msgid ""
+"Drop glue follows the same rule. The importer erases a destructor call only "
+"when its proof shows that the destructor does nothing visible and returns. A "
+"destructor that loops forever, or calls back into an instance already under "
+"proof, keeps its call, so the code after it never runs, as in the Rust "
+"source."
+msgstr ""
+
+#: ../../../compiler/mir-importer.md:388
+msgid ""
+"The drop no-op proof requires that the destructor returns. Before, the call "
+"to a `loop {}` destructor was erased and the store after it ran. Now the "
+"call stays, so the PTX stores once and spins, while an `if`/`else` "
+"destructor that joins back is still erased."
+msgstr ""
+
+#: ../../../compiler/mir-importer.md:395
 msgid "Putting It All Together"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:383
+#: ../../../compiler/mir-importer.md:397
 msgid ""
 "Let's trace a simple kernel through the full pipeline to see how all the "
 "pieces connect. Here is a vector addition kernel:"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:386
+#: ../../../compiler/mir-importer.md:400
 msgid ""
 "#[kernel]\n"
 "pub fn vecadd(a: &[f32], b: &[f32], mut c: DisjointSlice<f32>) {\n"
@@ -761,7 +778,7 @@ msgid ""
 "}\n"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:396
+#: ../../../compiler/mir-importer.md:410
 msgid ""
 "After `mir-importer` translates the Stable MIR into `dialect-mir` (and "
 "`pliron::opts::mem2reg` has promoted the alloca slots back into SSA), the "
@@ -769,7 +786,7 @@ msgid ""
 "clarity):"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:401
+#: ../../../compiler/mir-importer.md:415
 msgid ""
 "mir.func @vecadd(%a: mir.slice<f32>, %b: mir.slice<f32>,\n"
 "                 %c: mir.disjoint_slice<f32>) {\n"
@@ -791,24 +808,24 @@ msgid ""
 "}\n"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:422
+#: ../../../compiler/mir-importer.md:436
 msgid "A few things to notice:"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:424
+#: ../../../compiler/mir-importer.md:438
 msgid ""
 "**`thread::index_1d()`** was dispatched as an intrinsic and became `nvvm."
 "read_ptx_sreg_tid_x` -- a direct GPU register read, not a function call."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:427
+#: ../../../compiler/mir-importer.md:441
 msgid ""
 "**`DisjointSlice::get_mut()`** turned into a bounds check (`mir.lt`) and a "
 "conditional branch. The `if let Some` pattern in Rust became explicit "
 "control flow."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:430
+#: ../../../compiler/mir-importer.md:444
 msgid ""
 "**Block arguments** are absent here. Remember that `mir-importer` itself "
 "emits *every* branch terminator with zero operands and every non-entry block "
@@ -821,57 +838,57 @@ msgid ""
 "after `mem2reg`, which is pliron's spelling of phi nodes."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:440
+#: ../../../compiler/mir-importer.md:454
 msgid ""
 "**No unwind paths.** The original MIR had unwind targets on every operation "
 "that could panic. They are gone."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:443
+#: ../../../compiler/mir-importer.md:457
 msgid "From here, the pipeline takes over:"
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:445
+#: ../../../compiler/mir-importer.md:459
 msgid ""
 "**Verify** -- pliron checks that every operation's types match, every "
 "block's arguments are correct, and dominance holds."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:447
+#: ../../../compiler/mir-importer.md:461
 msgid ""
 "**Optimize** -- `mir-transforms` rewrites supported annotated loops and "
 "cleans up the control flow it changes."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:449
+#: ../../../compiler/mir-importer.md:463
 msgid ""
 "**Lower** -- `lower_mir_to_llvm` transforms `mir.add` into `llvm.fadd`, `mir."
 "load` into `llvm.load`, `mir.slice` into an LLVM struct of pointer and "
 "length, and so on."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:452
+#: ../../../compiler/mir-importer.md:466
 msgid ""
 "**Prepare NVVM IR when needed** -- `nvvm-transforms` converts operations to "
 "the LLVM form accepted by the selected libNVVM target. Ordinary PTX builds "
 "skip this step."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:455
+#: ../../../compiler/mir-importer.md:469
 msgid ""
 "**Export** -- the LLVM dialect is printed as a textual `.ll` file with the "
 "appropriate `!nvvm.annotations` metadata marking `vecadd` as a kernel entry "
 "point."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:458
+#: ../../../compiler/mir-importer.md:472
 msgid ""
 "**Compile** -- LLVM's NVPTX backend normally compiles the `.ll` to `.ptx`. "
 "NVVM builds instead use libNVVM and nvJitLink. The result is written next to "
 "the host binary."
 msgstr ""
 
-#: ../../../compiler/mir-importer.md:462
+#: ../../../compiler/mir-importer.md:476
 msgid ""
 "`dialect-mir` captures Rust semantics faithfully. Before lowering it, cuda-"
 "oxide can perform targeted, behavior-preserving rewrites. The first is "
