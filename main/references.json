@@ -47,9 +47,9 @@
     "branch" : "main",
     "commit" : 
     {
-      "date" : "2026-10-15 17:26:01 +0530",
-      "hash" : "6d47ae49cb256a07948fb499c20c3eb9b2a96268",
-      "title" : "feat(unroll): recognize range `for` loops (#1346)"
+      "date" : "2026-10-19 20:16:03 +0530",
+      "hash" : "717432490ccf85f0a9166401be6de362d6c622b2",
+      "title" : "feat(cuda-oxide): carry inline intent through the device pipeline (#1511)"
     }
   },
   "type" : "branch",
