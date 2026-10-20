@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-16 04:35+0000\n"
+"POT-Creation-Date: 2026-10-19 15:08+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -313,6 +313,20 @@ msgstr ""
 
 #: ../../../appendix/supported-features.md:109
 msgid ""
+"A union field that holds a shared-memory pointer, directly or through "
+"structs and bounded arrays, uses generic-pointer storage, so the union's "
+"byte image is the same on every target and its integer view equals `ptr as "
+"usize`. Use `cvta_generic_to_shared_offset` or `cvta_generic_to_shared_u32` "
+"when the shared-window offset (the pointer's position inside the block's "
+"shared memory) is wanted instead. A field whose fixed arrays expand to more "
+"than 16 shared-memory pointers is rejected; pointers held directly or "
+"through structs do not count toward that bound. Taking the in-place address "
+"of such a field (`u.ptr = p`, `&u.ptr`, `&mut u.ptr`) is refused with a "
+"diagnostic; build the union by value and read its fields by value."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:120
+msgid ""
 "Enum constants preserve payload relocations to device statics, including non-"
 "zero byte addends. This includes niche-encoded `Option<&T>` and direct-"
 "tagged enum layouts, both for direct thin-reference payloads and for "
@@ -321,7 +335,7 @@ msgid ""
 "constants. Anonymous promoted allocations remain unsupported."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:116
+#: ../../../appendix/supported-features.md:127
 msgid "Compiler: Closures"
 msgstr ""
 
@@ -366,7 +380,7 @@ msgid ""
 "device functions."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:125
+#: ../../../appendix/supported-features.md:136
 msgid "Compiler: Control Flow"
 msgstr ""
 
@@ -445,7 +459,7 @@ msgid ""
 "general constant-propagation pass."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:137
+#: ../../../appendix/supported-features.md:148
 msgid "Compiler: Arithmetic and Casting"
 msgstr ""
 
@@ -479,7 +493,7 @@ msgid ""
 "per `u32`. sm_80+."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:145
+#: ../../../appendix/supported-features.md:156
 msgid "Compiler: Interop"
 msgstr ""
 
@@ -522,8 +536,13 @@ msgid ""
 "Inter-kernel interop works today: a [cutile-rs Tile kernel](https://github."
 "com/NVIDIA/cuda-rust/tree/main/cutile-rs) and a cuda-oxide SIMT PTX kernel "
 "can run in one host process on the same CUDA stream over shared device "
-"tensors. Intra-kernel Tile interop is work in progress and tracked in [#96]"
-"(https://github.com/NVlabs/cuda-oxide/issues/96)."
+"tensors. Intra-kernel interop is built as a [tile library](../advanced/tile-"
+"libraries.md): `#[tile_export]` and `cargo oxide tilelib` produce the LTOIR "
+"and the Tile IR descriptions today (at the installed assembler's current "
+"bytecode version, 13.5 or newer), packaging them into a `.tilelib` needs the "
+"CUDA 13.5 or newer `tileiras`, and the caller is cuTile Python's "
+"`foreign_call`. Tracked in [#96](https://github.com/NVlabs/cuda-oxide/"
+"issues/96)."
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
@@ -536,7 +555,7 @@ msgid ""
 "at the binary crate use site."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:155
+#: ../../../appendix/supported-features.md:166
 msgid "Compiler: Functions"
 msgstr ""
 
@@ -556,9 +575,16 @@ msgstr ""
 
 #: ../../../appendix/supported-features.md:0
 msgid ""
-"Device-side helper functions callable from kernels. `#[inline(always)]` is "
-"preserved as the LLVM `alwaysinline` attribute (emitted alongside the "
-"convergent group and any `!dbg` scope), so `opt` honors the inline intent."
+"Device-side helper functions callable from kernels. The `#[inline]` family "
+"reaches LLVM as the matching function attribute, as in rustc's own backend: "
+"`#[inline]` becomes `inlinehint`, `#[inline(always)]` becomes `alwaysinline` "
+"and `#[inline(never)]` becomes `noinline` (emitted alongside the convergent "
+"group and any `!dbg` scope), so `opt` and libNVVM honor the request. An "
+"`#[inline(never)]` helper is a real PTX function call. The one exception is "
+"the `#[inline(never)]` that `#[device]` adds to a helper with its own type "
+"or const parameters: it only keeps each copy visible to the device collector "
+"on the host side and is not carried to device code, so const-generic "
+"arguments keep folding into their kernels."
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
@@ -581,7 +607,7 @@ msgid ""
 "PTX module."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:164
+#: ../../../appendix/supported-features.md:175
 msgid "Compiler: Compilation Pipeline"
 msgstr ""
 
@@ -705,7 +731,7 @@ msgid ""
 "gpu-programming/error-handling-and-debugging.md) for current limits."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:180
+#: ../../../appendix/supported-features.md:191
 msgid "Compiler: Inline PTX"
 msgstr ""
 
@@ -726,10 +752,12 @@ msgid ""
 "current control flow. Use `options(register_only, may_diverge)` only for "
 "pure snippets that are safe to move across divergent control flow; **never** "
 "use it for `.sync` instructions or collectives. More than 16 output operands "
-"are not implemented yet."
+"are not implemented yet. For how each option orders against "
+"`sync_threads()`, see {ref}`Compiler ordering around the barrier <compiler-"
+"ordering-around-the-barrier>`."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:188
+#: ../../../appendix/supported-features.md:199
 msgid "Runtime Library: Safety"
 msgstr ""
 
@@ -786,7 +814,7 @@ msgid ""
 "transitions are compile errors."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:198
+#: ../../../appendix/supported-features.md:209
 msgid "Runtime Library: Atomics"
 msgstr ""
 
@@ -826,7 +854,7 @@ msgstr ""
 msgid "Standard library atomic types lowered to PTX `atom.sys` instructions."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:207
+#: ../../../appendix/supported-features.md:218
 msgid "Runtime Library: Shared Memory"
 msgstr ""
 
@@ -860,7 +888,7 @@ msgid ""
 "`map_shared_rank()` for address mapping. sm_90+."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:215
+#: ../../../appendix/supported-features.md:226
 msgid "Runtime Library: Thread and Synchronization"
 msgstr ""
 
@@ -910,7 +938,7 @@ msgstr ""
 msgid "`fence_proxy_async_shared_cta()` for TMA visibility, `nanosleep(ns)`."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:225
+#: ../../../appendix/supported-features.md:236
 msgid "Runtime Library: Warp"
 msgstr ""
 
@@ -937,7 +965,9 @@ msgid "Lane/Warp ID"
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
-msgid "`lane_id()` (0–31), `warp_id()`. Direct register reads."
+msgid ""
+"`lane_id()` (0–31) reads `%laneid`; `warp_id()` is `threadIdx.x / 32`, valid "
+"for 1D blocks only."
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
@@ -952,7 +982,7 @@ msgid ""
 "No `f64` form."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:234
+#: ../../../appendix/supported-features.md:245
 msgid "Runtime Library: Cooperative Groups"
 msgstr ""
 
@@ -1027,7 +1057,7 @@ msgid ""
 "grid-wide barriers."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:246
+#: ../../../appendix/supported-features.md:257
 msgid "Runtime Library: Debug"
 msgstr ""
 
@@ -1060,7 +1090,7 @@ msgid ""
 "`clock()`, `clock64()`, `trap()`, `breakpoint()`, `prof_trigger::<N>()`."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:254
+#: ../../../appendix/supported-features.md:265
 msgid "Runtime Library: Kernel Launch"
 msgstr ""
 
@@ -1117,7 +1147,7 @@ msgstr ""
 msgid "Compile-time cluster dimensions. Emits `.reqnctapercluster` in PTX."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:265
+#: ../../../appendix/supported-features.md:276
 msgid "Runtime Library: TMA"
 msgstr ""
 
@@ -1148,7 +1178,7 @@ msgid ""
 "completion tracking."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:275
+#: ../../../appendix/supported-features.md:286
 msgid "Runtime Library: Matrix and Tensor Cores"
 msgstr ""
 
@@ -1219,7 +1249,7 @@ msgid ""
 "carried as packed bit patterns and converted before use."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:288
+#: ../../../appendix/supported-features.md:299
 msgid "Not Yet Implemented"
 msgstr ""
 
@@ -1287,7 +1317,11 @@ msgid ""
 "`panic=abort`). NVIDIA has an active project to add C++ exception support to "
 "CUDA for automotive safety; the current cuda-oxide design is forward-"
 "compatible with that work. Use `gpu_assert!()` + `trap()` for explicit "
-"runtime checks today."
+"runtime checks today. A device function declared `-> !` with a real body, "
+"such as an error store followed by `loop {}`, is called normally and the "
+"call is followed by `unreachable`; only panic entry points, `-> !` bodies "
+"that are nothing but a panic, and calls through function pointers lower to "
+"the trap."
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0

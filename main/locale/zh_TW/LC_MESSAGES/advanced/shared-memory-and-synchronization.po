@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-21 14:41+0000\n"
+"POT-Creation-Date: 2026-10-19 15:08+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -190,7 +190,7 @@ msgstr ""
 
 #: ../../../advanced/shared-memory-and-synchronization.md:38
 msgid ""
-"Byte alignment (default 0 = natural alignment; use 128 for TMA destinations)"
+"Byte alignment: 0 (natural) or a power of two; use 128 for TMA destinations"
 msgstr ""
 
 #: ../../../advanced/shared-memory-and-synchronization.md:129
@@ -202,16 +202,55 @@ msgid ""
 msgstr ""
 
 #: ../../../advanced/shared-memory-and-synchronization.md:135
-msgid "The API surface"
+msgid "Alignment rules"
 msgstr ""
 
 #: ../../../advanced/shared-memory-and-synchronization.md:137
+msgid ""
+"`ALIGN` is `0` (natural alignment) or a non-zero power of two. Any other "
+"value is a compile error that names the use site."
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:140
+msgid ""
+"Storage is never declared below `align_of::<T>()`. A smaller request is "
+"raised silently, the way `#[repr(align(N))]` raises a struct; a larger "
+"request is honored. `SharedArray<u64, 2, 1>` is therefore declared at 8 "
+"bytes, and a `#[repr(C, align(16))]` element at natural alignment is "
+"declared at 16. Without the raise, a `u64` array declared at 1 byte could be "
+"packed right behind a byte array and fault with `misaligned address`."
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:147
+msgid ""
+"Aggregate, nested-array and `f16` elements at natural alignment declare "
+"their natural alignment in PTX (`.align 4` for `[f32; N]`, `.align 2` for "
+"`f16`). Older releases printed a blanket `.align 8` for them."
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:155
+msgid ""
+"Shared-memory storage alignment. The verifier rejects an `ALIGN` that is not "
+"a non-zero power of two at the use site, and lowering declares every static "
+"array and the dynamic pool at the larger of the request and the element's "
+"ABI alignment. `SharedArray<u64, 2, 1>` is declared `.align 8` and a "
+"`#[repr(C, align(16))]` element at natural alignment `.align 16`, where "
+"older releases declared `.align 1` and `.align 8` and the kernel could fault "
+"with `misaligned address`."
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:162
+msgid "The API surface"
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:164
 msgid ""
 "impl<T, const N: usize, const ALIGN: usize> SharedArray<T, N, ALIGN> {\n"
 "    pub const UNINIT: Self;\n"
 "    pub const fn len() -> usize;\n"
 "    pub fn as_ptr(&self) -> *const T;\n"
 "    pub fn as_mut_ptr(&mut self) -> *mut T;\n"
+"    pub unsafe fn as_raw_mut_ptr(shared: *mut Self) -> *mut T;\n"
 "}\n"
 "\n"
 "// Indexing (unsafe access via static mut)\n"
@@ -219,18 +258,18 @@ msgid ""
 "impl IndexMut<usize> for SharedArray<T, N, ALIGN> { ... }\n"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:150
+#: ../../../advanced/shared-memory-and-synchronization.md:178
 msgid ""
 "Indexing is bounds-checked in debug builds. In release (and on the GPU), the "
 "bounds check is elided. If you index out of bounds, you get undefined "
 "behavior — the same rules as any `static mut` access in Rust."
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:156
+#: ../../../advanced/shared-memory-and-synchronization.md:184
 msgid "DynamicSharedArray — runtime-sized allocation"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:158
+#: ../../../advanced/shared-memory-and-synchronization.md:186
 msgid ""
 "Sometimes you do not know the tile size at compile time, or you want to "
 "share a single shared memory pool across multiple logical arrays. "
@@ -238,7 +277,7 @@ msgid ""
 "size is set at launch time via `LaunchConfig::shared_mem_bytes`:"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:163
+#: ../../../advanced/shared-memory-and-synchronization.md:191
 msgid ""
 "use cuda_device::{DisjointSlice, DynamicSharedArray, kernel, thread};\n"
 "\n"
@@ -283,11 +322,11 @@ msgid ""
 "}\n"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:206
+#: ../../../advanced/shared-memory-and-synchronization.md:234
 msgid "Launch with:"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:208
+#: ../../../advanced/shared-memory-and-synchronization.md:236
 msgid ""
 "let config = LaunchConfig {\n"
 "    grid_dim: ((n + 255) / 256, 1, 1),\n"
@@ -296,15 +335,15 @@ msgid ""
 "};\n"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:216
+#: ../../../advanced/shared-memory-and-synchronization.md:244
 msgid "Partitioning dynamic shared memory"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:218
+#: ../../../advanced/shared-memory-and-synchronization.md:246
 msgid "If you need multiple arrays from the same dynamic pool, use `offset()`:"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:220
+#: ../../../advanced/shared-memory-and-synchronization.md:248
 msgid ""
 "let pool_a: *mut f32 = DynamicSharedArray::<f32>::get();\n"
 "let pool_b: *mut f32 = DynamicSharedArray::<f32>::offset(\n"
@@ -312,45 +351,57 @@ msgid ""
 ");\n"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:227
+#: ../../../advanced/shared-memory-and-synchronization.md:255
 msgid ""
 "`offset` takes a **byte offset** from the start of the pool. Make sure the "
 "total does not exceed `shared_mem_bytes` — there are no runtime guards."
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:230
+#: ../../../advanced/shared-memory-and-synchronization.md:258
 msgid "Alignment"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:232
+#: ../../../advanced/shared-memory-and-synchronization.md:260
 msgid ""
 "`DynamicSharedArray` defaults to 16-byte alignment. For TMA operations "
 "(Hopper+), use `DynamicSharedArray<f32, 128>` to get the required 128-byte "
 "alignment. The alignment is encoded in the PTX `.align` directive."
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:238
+#: ../../../advanced/shared-memory-and-synchronization.md:264
+msgid ""
+"`ALIGN` must be a non-zero power of two; `0` is a compile error that names "
+"the use site. A kernel has one dynamic pool, and the compiler declares it at "
+"the strongest typed requirement over the kernel's `get`, `get_raw` and "
+"`offset` uses, each taken as the larger of its `ALIGN` and `align_of::"
+"<T>()`, combined with the launch contract's alignment. `DynamicSharedArray::"
+"<u64, 1>::get()` alone declares the pool at 8 bytes. The declaration aligns "
+"the pool base only; keeping an `offset(byte_offset)` result aligned for `T` "
+"is still the caller's job."
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:275
 msgid "Synchronization: sync_threads()"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:240
+#: ../../../advanced/shared-memory-and-synchronization.md:277
 msgid ""
 "`thread::sync_threads()` is a **block-wide barrier**. It compiles to PTX "
 "`bar.sync 0` and guarantees two things:"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:243
+#: ../../../advanced/shared-memory-and-synchronization.md:280
 msgid ""
 "**All threads in the block** have reached the barrier before any proceed."
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:244
+#: ../../../advanced/shared-memory-and-synchronization.md:281
 msgid ""
 "**All memory writes** by those threads are visible to all threads after the "
 "barrier (it acts as a memory fence for shared memory)."
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:247
+#: ../../../advanced/shared-memory-and-synchronization.md:284
 msgid ""
 "Without `sync_threads()` between the load and compute phases, some threads "
 "might read a shared memory location before another thread has written it. "
@@ -359,63 +410,65 @@ msgid ""
 "barrier."
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:253
+#: ../../../advanced/shared-memory-and-synchronization.md:290
 msgid "When to sync"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:255
+#: ../../../advanced/shared-memory-and-synchronization.md:292
 msgid "The rule is simple: **sync before reading what another thread wrote**."
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:128
+#: ../../../advanced/shared-memory-and-synchronization.md:151
 msgid "Situation"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:128
+#: ../../../advanced/shared-memory-and-synchronization.md:151
 msgid "Need sync?"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:128
+#: ../../../advanced/shared-memory-and-synchronization.md:151
 msgid "Thread A writes `TILE[i]`, Thread B reads `TILE[i]`"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:128
+#: ../../../advanced/shared-memory-and-synchronization.md:151
+#: ../../../advanced/shared-memory-and-synchronization.md:305
 msgid "Yes"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:128
+#: ../../../advanced/shared-memory-and-synchronization.md:151
 msgid "Thread A writes `TILE[i]`, Thread A reads `TILE[i]`"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:128
+#: ../../../advanced/shared-memory-and-synchronization.md:151
 msgid "No (same thread)"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:128
+#: ../../../advanced/shared-memory-and-synchronization.md:151
 msgid "Overwriting a tile for the next loop iteration"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:128
+#: ../../../advanced/shared-memory-and-synchronization.md:151
 msgid ""
 "Yes (before the new load overwrites data threads might still be reading)"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:128
+#: ../../../advanced/shared-memory-and-synchronization.md:151
 msgid "Reading from `DisjointSlice` (each thread reads its own index)"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:128
+#: ../../../advanced/shared-memory-and-synchronization.md:151
+#: ../../../advanced/shared-memory-and-synchronization.md:305
 msgid "No"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:264
+#: ../../../advanced/shared-memory-and-synchronization.md:301
 msgid ""
 "The tiled GEMM above has two sync points per iteration: one after loading "
 "(before computing) and one after computing (before the next load overwrites "
 "the tile). Missing either one is a data race."
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:269
+#: ../../../advanced/shared-memory-and-synchronization.md:306
 msgid ""
 "A common mistake is putting `sync_threads()` inside a conditional branch "
 "that not all threads take. Every thread in the block must reach the same "
@@ -423,87 +476,334 @@ msgid ""
 "control flow, restructure so the barrier is outside the branch."
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:277
+#: ../../../advanced/shared-memory-and-synchronization.md:314
+msgid "Compiler ordering around the barrier"
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:316
+msgid ""
+"The hardware guarantee above covers visibility between threads. A second "
+"question is whether the compiler keeps your own accesses on the side of the "
+"barrier where you wrote them. Both backends emit the barrier as an operation "
+"that the compiler treats as reading and writing all memory:"
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:321
+msgid ""
+"The LLVM NVPTX route calls `llvm.nvvm.barrier.cta.sync.aligned.all`. The "
+"call is `convergent` and has no `memory(...)` attribute."
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:323
+msgid ""
+"The libNVVM route emits `bar.sync 0;` as `asm sideeffect` with a `~{memory}` "
+"clobber."
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:305
+msgid "Access form"
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:305
+msgid "Kept on its side of `sync_threads()`"
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:305
+msgid "Notes"
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:305
+msgid "`SharedArray` indexing, `S[i]`"
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:305
+msgid "A plain load or store in address space 3."
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:305
+msgid "`SharedArray::as_raw_mut_ptr(&raw mut S)`"
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:305
+msgid ""
+"The same instructions as indexing. Prefer it to `as_mut_ptr()` and "
+"`as_ptr()`. Those methods borrow `S`, and the `static_mut_refs` lint rejects "
+"a borrow of a `static mut` under edition 2024."
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:305
+msgid "`DynamicSharedArray::<T>::get()` and `offset()`"
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:305
+msgid "A plain load or store through the returned pointer."
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:305
+msgid "`ptx_asm!` with no options"
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:305
+msgid ""
+"The call is `asm sideeffect` with no memory attribute. The PTX keeps it in "
+"order against the barrier, plain loads and stores, and other side-effecting "
+"asm. ptxas may drop a snippet with an unused result from the SASS."
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:305
+msgid "`ptx_asm!` with `clobber(\"memory\")`"
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:305
+msgid ""
+"Adds `~{memory}` to the constraint string. The order matches the row above "
+"in the current lowering. Without the clobber that order comes from the "
+"`sideeffect` flag alone. That flag does not tell the compiler that the "
+"snippet touches memory. Add it to every snippet that loads or stores through "
+"an address."
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:305
+msgid "`ptx_asm!` with `options(register_only)`"
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:305
+msgid ""
+"The call has no `sideeffect` flag. The compiler may move it across memory "
+"operations and the barrier, and deletes it when its result is unused. Use it "
+"for snippets that touch registers only."
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:305
+msgid ""
+"`cp_async_*` copies, `cp_async_commit_group()`, `cp_async_wait_group(n)`"
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:305
+msgid "Yes, but see below"
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:305
+msgid ""
+"Issue, commit and wait stay in order. The barrier does not wait for the copy "
+"to land."
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:305
+msgid ""
+"A `&T` or `&[T]` to slots another thread writes, live across the barrier"
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:305
+msgid "rustc merges reads through it before either backend runs. See below."
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:305
+msgid "A `&UnsafeCell<T>` to such a slot"
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:305
+msgid ""
+"A plain load that is re-read after each barrier. Two adjacent reads with "
+"nothing between them may still become one load."
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:305
+msgid "A reference to a `BlockAtomic*` type"
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:305
+msgid ""
+"Each `load()` is side-effecting asm with a memory clobber. The compiler "
+"keeps every one."
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:339
+msgid ""
+"The indexing, `as_raw_mut_ptr`, `DynamicSharedArray` and both side-effecting "
+"`ptx_asm!` rows were checked on both backends with a producer and consumer "
+"kernel: store, barrier, load, barrier, store, barrier, load. The PTX keeps "
+"that order for each of them. It keeps the same order when the loads sit in a "
+"loop whose trip count is a kernel argument. A run on an RTX 5060 Laptop "
+"(sm_120) read the expected neighbour values. A `register_only` `ld.shared` "
+"whose result is unused leaves no instruction in the PTX. The same snippet "
+"with no options stays. The `cp.async` and reference rows have their own "
+"tests below."
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:348
+msgid ""
+"The table covers compiler ordering only. The rule under \"When to sync\" "
+"still decides where the barriers belong."
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:351
+msgid "Raw pointers across the barrier"
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:353
+msgid ""
+"Each thread derives its pointer from the raw address of the allocation and "
+"creates no reference to the whole array. A thread writes its own slot before "
+"the barrier and reads a neighbour's slot after it:"
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:357
+msgid ""
+"static mut TILE: SharedArray<u32, 128> = SharedArray::UNINIT;\n"
+"\n"
+"let tid = thread::threadIdx_x() as usize;\n"
+"let tile = unsafe { SharedArray::as_raw_mut_ptr(&raw mut TILE) };\n"
+"unsafe { tile.add(tid).write(tid as u32 + 1) }; // this thread's slot\n"
+"thread::sync_threads();\n"
+"let next = unsafe { tile.add((tid + 1) % 128).read() }; // a neighbour's "
+"slot\n"
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:367
+msgid ""
+"A kernel built from this snippet read the neighbour's value in all 128 "
+"threads on both backends."
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:370
+msgid "`cp.async` needs a wait before the barrier"
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:372
+msgid ""
+"`bar.sync` does not wait for a pending `cp.async`. Each thread waits for its "
+"own copies and then every thread meets at the barrier:"
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:375
+msgid ""
+"unsafe {\n"
+"    cp_async_ca_4(dst, src);\n"
+"    cp_async_commit_group();\n"
+"    cp_async_wait_group(0); // this thread's copies have landed\n"
+"}\n"
+"thread::sync_threads(); // other threads may now read `dst`\n"
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:384
+msgid ""
+"Reading the destination before the copy completes is undefined behaviour. A "
+"test kernel that drops `cp_async_wait_group(0)` and reads a neighbour's slot "
+"after the barrier can return the stale value: in a plain run on sm_120 all "
+"128 threads did, and under compute-sanitizer every copy had landed first. "
+"The same kernel with the wait returned the copied value in all 128 threads."
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:390
+msgid "Share a slot through a reference only with `UnsafeCell`"
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:392
+msgid ""
+"When `T` has no interior mutability, a `&T` into shared memory tells rustc "
+"that the target does not change while the reference is live. rustc merges "
+"two reads through it into one load before either backend runs. In a test "
+"kernel each thread read its neighbour's slot through a `&u32`, passed two "
+"barriers while the neighbour wrote a new value, and read again. The second "
+"read returned the old value in all 128 threads on both backends. A `&[T]` "
+"built over the tile with `from_raw_parts` is the same case: two indexed "
+"reads across the barrier compile to one load. Keeping such a reference live "
+"across a barrier while another thread writes the target is undefined "
+"behaviour. So is a `&mut T` to such a slot: the other thread's write breaks "
+"its exclusive access, even though no pass merges reads through it today."
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:404
+msgid ""
+"A `&UnsafeCell<T>` is re-read after each barrier, and every `BlockAtomic*` "
+"load is an instruction the compiler keeps. The same kernel with either form "
+"read the new value in all 128 threads. Share a slot through one of these, or "
+"read through a raw pointer after each barrier. The tip under \"Declaration "
+"rules\" gives the same reason for `SharedArray` wrapping `UnsafeCell`."
+msgstr ""
+
+#: ../../../advanced/shared-memory-and-synchronization.md:413
 msgid "Shared memory vs. other approaches"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:268
+#: ../../../advanced/shared-memory-and-synchronization.md:305
 msgid "Approach"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:268
+#: ../../../advanced/shared-memory-and-synchronization.md:305
 msgid "Latency"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:268
+#: ../../../advanced/shared-memory-and-synchronization.md:305
 msgid "Capacity"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:268
+#: ../../../advanced/shared-memory-and-synchronization.md:305
 msgid "Programmer effort"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:268
+#: ../../../advanced/shared-memory-and-synchronization.md:305
 msgid "Global memory (naive)"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:268
+#: ../../../advanced/shared-memory-and-synchronization.md:305
 msgid "~500 cycles"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:268
+#: ../../../advanced/shared-memory-and-synchronization.md:305
 msgid "GBs"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:268
+#: ../../../advanced/shared-memory-and-synchronization.md:305
 msgid "None"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:268
+#: ../../../advanced/shared-memory-and-synchronization.md:305
 msgid "L1/L2 cache (implicit)"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:268
+#: ../../../advanced/shared-memory-and-synchronization.md:305
 msgid "~30–100 cycles"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:268
+#: ../../../advanced/shared-memory-and-synchronization.md:305
 msgid "128 KB–40 MB"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:268
+#: ../../../advanced/shared-memory-and-synchronization.md:305
 msgid "**Shared memory (explicit)**"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:268
+#: ../../../advanced/shared-memory-and-synchronization.md:305
 msgid "**~5 cycles**"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:268
+#: ../../../advanced/shared-memory-and-synchronization.md:305
 msgid "**48–228 KB per SM**"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:268
+#: ../../../advanced/shared-memory-and-synchronization.md:305
 msgid "**Tiling, sync, bank awareness**"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:268
+#: ../../../advanced/shared-memory-and-synchronization.md:305
 msgid "Registers"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:268
+#: ../../../advanced/shared-memory-and-synchronization.md:305
 msgid "~1 cycle"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:268
+#: ../../../advanced/shared-memory-and-synchronization.md:305
 msgid "64K × 32-bit per SM"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:268
+#: ../../../advanced/shared-memory-and-synchronization.md:305
 msgid "Compiler-managed"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:286
+#: ../../../advanced/shared-memory-and-synchronization.md:422
 msgid ""
 "Shared memory is the programmer's tool for when the cache is not enough. The "
 "L1 and L2 caches help automatically, but they are at the mercy of the access "
@@ -511,11 +811,11 @@ msgid ""
 "decide what to load, when to load it, and how long to keep it."
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:293
+#: ../../../advanced/shared-memory-and-synchronization.md:429
 msgid "Bank conflicts"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:295
+#: ../../../advanced/shared-memory-and-synchronization.md:431
 msgid ""
 "Shared memory is divided into 32 **banks** (one per warp lane). If two "
 "threads in the same warp access different addresses that map to the same "
@@ -523,105 +823,105 @@ msgid ""
 "latency for a 2-way conflict, up to 32× for a 32-way conflict."
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:300
+#: ../../../advanced/shared-memory-and-synchronization.md:436
 msgid ""
 "The mapping is straightforward: consecutive 32-bit words map to consecutive "
 "banks. So `TILE[0]` is in bank 0, `TILE[1]` is in bank 1, ..., `TILE[32]` is "
 "back in bank 0. A common conflict-free access pattern is:"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:304
+#: ../../../advanced/shared-memory-and-synchronization.md:440
 msgid ""
 "// Each thread reads a different column: thread k reads TILE[row + k]\n"
 "// If TILE_WIDTH = 32 (or a multiple), add padding: SharedArray<f32, 33 * "
 "16>\n"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:309
+#: ../../../advanced/shared-memory-and-synchronization.md:445
 msgid ""
 "For the 16×16 tiled GEMM, there are no bank conflicts in the inner loop "
 "because `TILE_A[ty * 16 + i]` reads a row (consecutive elements = different "
 "banks) and `TILE_B[i * 16 + tx]` reads a column with stride 16."
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:314
+#: ../../../advanced/shared-memory-and-synchronization.md:450
 msgid ""
 "[CUDA Programming Guide — Shared Memory Bank Conflicts](https://docs.nvidia."
 "com/cuda/cuda-programming-guide/#shared-memory-5-x) for a detailed treatment "
 "of bank conflict rules and padding strategies."
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:320
+#: ../../../advanced/shared-memory-and-synchronization.md:456
 msgid "Putting it all together"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:322
+#: ../../../advanced/shared-memory-and-synchronization.md:458
 msgid ""
 "Here is the progression from naive to tiled, applied to the GEMM from our "
 "MLP pipeline:"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:313
+#: ../../../advanced/shared-memory-and-synchronization.md:449
 msgid "Version"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:313
+#: ../../../advanced/shared-memory-and-synchronization.md:449
 msgid "Global loads per thread (64×64)"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:313
+#: ../../../advanced/shared-memory-and-synchronization.md:449
 msgid "Shared loads per thread"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:313
+#: ../../../advanced/shared-memory-and-synchronization.md:449
 msgid "Speedup"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:313
+#: ../../../advanced/shared-memory-and-synchronization.md:449
 msgid "Naive (`sgemm_naive`)"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:313
+#: ../../../advanced/shared-memory-and-synchronization.md:449
 msgid "128"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:313
+#: ../../../advanced/shared-memory-and-synchronization.md:449
 msgid "0"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:313
+#: ../../../advanced/shared-memory-and-synchronization.md:449
 msgid "1×"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:313
+#: ../../../advanced/shared-memory-and-synchronization.md:449
 msgid "Tiled (16×16 tiles)"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:313
+#: ../../../advanced/shared-memory-and-synchronization.md:449
 msgid "8 (4 iterations × 2 tiles)"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:313
+#: ../../../advanced/shared-memory-and-synchronization.md:449
 msgid "~4–10×"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:313
+#: ../../../advanced/shared-memory-and-synchronization.md:449
 msgid "Tiled + double buffering"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:313
+#: ../../../advanced/shared-memory-and-synchronization.md:449
 msgid "8"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:313
+#: ../../../advanced/shared-memory-and-synchronization.md:449
 msgid "128 (overlapped)"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:313
+#: ../../../advanced/shared-memory-and-synchronization.md:449
 msgid "~6–15×"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:331
+#: ../../../advanced/shared-memory-and-synchronization.md:467
 msgid ""
 "The tiled version trades global memory bandwidth for shared memory bandwidth "
 "and computation — a good trade when the kernel is memory-bound. The double-"
@@ -630,13 +930,13 @@ msgid ""
 "matrix and more complex synchronization."
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:338
+#: ../../../advanced/shared-memory-and-synchronization.md:474
 msgid ""
 "[Warp-Level Programming](warp-level-programming.md) — shuffle-based "
 "reduction as an alternative to shared memory for small reductions"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:340
+#: ../../../advanced/shared-memory-and-synchronization.md:476
 msgid ""
 "[Tensor Memory Accelerator](tensor-memory-accelerator.md) — hardware- "
 "accelerated global→shared copies that replace the manual load loop"

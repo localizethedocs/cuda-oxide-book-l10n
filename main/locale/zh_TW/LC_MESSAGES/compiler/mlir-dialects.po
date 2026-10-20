@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-16 04:35+0000\n"
+"POT-Creation-Date: 2026-10-19 15:08+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -704,7 +704,7 @@ msgid ""
 msgstr ""
 
 #: ../../../compiler/mlir-dialects.md:198
-msgid "At the pinned `pliron` revision the dialect defines 69 operations:"
+msgid "The pinned `pliron-llvm` 0.20.0 release defines 69 operations:"
 msgstr ""
 
 #: ../../../compiler/mlir-dialects.md:0
@@ -800,9 +800,10 @@ msgstr ""
 
 #: ../../../compiler/mlir-dialects.md:219
 msgid ""
-"Because the dialect is upstream, this table moves when the `pliron` pin "
-"moves rather than when this repository changes; `pliron-llvm`'s `src/ops.rs` "
-"is the list it is counting."
+"The operation inventory follows the pinned upstream release. This table "
+"counts the operations in [`pliron-llvm`'s `src/ops.rs`](https://github.com/"
+"pliron-org/pliron/blob/435536c8611af34c48c8f73d78e77894a05d103d/pliron-llvm/"
+"src/ops.rs), the source revision recorded in the 0.20.0 crate."
 msgstr ""
 
 #: ../../../compiler/mlir-dialects.md:223
@@ -925,11 +926,11 @@ msgstr ""
 
 #: ../../../compiler/mlir-dialects.md:306
 msgid ""
-"At catalog SHA-256 `c243e568` (the stamp in every `ops/generated/` file "
-"header), the dialect holds 576 operations across 42 modules, and they come "
+"At catalog SHA-256 `31b52388` (the stamp in every `ops/generated/` file "
+"header), the dialect holds 580 operations across 42 modules, and they come "
 "from two different places. The split is the first thing to know about it, "
 "because it decides where -- and whether -- you would add one. If the header "
-"stamp no longer starts with `c243e568`, the counts on this page predate the "
+"stamp no longer starts with `31b52388`, the counts on this page predate the "
 "catalog you are reading."
 msgstr ""
 
@@ -1015,7 +1016,7 @@ msgid ""
 "**Generated**, under `ops/generated/`, from `intrinsics/catalog.json` by "
 "`cuda-intrinsics-gen`. Every file there opens with `// @generated ... DO NOT "
 "EDIT.`, and editing one by hand is undone by the next generator run. This is "
-"the large majority -- 35 modules and 550 operations, resolved from 1029 "
+"the large majority -- 35 modules and 554 operations, resolved from 1033 "
 "catalog entries, since several intrinsics can share one structural op:"
 msgstr ""
 
@@ -1072,7 +1073,7 @@ msgid "`packed_alu`, `packed_conversion`, `packed_atomic`"
 msgstr ""
 
 #: ../../../compiler/mlir-dialects.md:0
-msgid "51"
+msgid "55"
 msgstr ""
 
 #: ../../../compiler/mlir-dialects.md:0

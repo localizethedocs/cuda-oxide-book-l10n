@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-16 04:35+0000\n"
+"POT-Creation-Date: 2026-10-19 15:08+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -180,7 +180,7 @@ msgid ""
 msgstr ""
 
 #: ../../../compiler/compiler-optimizations.md:92
-#: ../../../compiler/compiler-optimizations.md:331
+#: ../../../compiler/compiler-optimizations.md:334
 msgid "cargo oxide build <example> --verbose\n"
 msgstr ""
 
@@ -594,76 +594,79 @@ msgstr ""
 msgid ""
 "To bound compile time and memory, one annotation may create at most 1,024 "
 "body copies, 8,192 cloned basic blocks, and 65,536 cloned operations. A "
-"request over one of those limits warns and is not unrolled."
+"request over one of those limits warns and is not unrolled. Every warning "
+"about a loop that was not unrolled names the `#[unroll]` attribute it refers "
+"to as `file:line:column` on a `-->` line, so a kernel with several annotated "
+"loops shows which one was left alone."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:308
+#: ../../../compiler/compiler-optimizations.md:311
 msgid ""
 "For the complete kernel-author reference, see {ref}`Loop unrolling <loop-"
 "unrolling>`."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:312
+#: ../../../compiler/compiler-optimizations.md:315
 msgid "When should you unroll?"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:314
+#: ../../../compiler/compiler-optimizations.md:317
 msgid "Good candidates are:"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:316
+#: ../../../compiler/compiler-optimizations.md:319
 msgid "small loops with a fixed trip count;"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:317
+#: ../../../compiler/compiler-optimizations.md:320
 msgid "hot counted loops where branch overhead matters;"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:318
+#: ../../../compiler/compiler-optimizations.md:321
 msgid ""
 "software pipelines whose stage selection becomes constant after unrolling;"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:319
+#: ../../../compiler/compiler-optimizations.md:322
 msgid ""
 "loops where several independent copies expose instruction-level parallelism."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:321
+#: ../../../compiler/compiler-optimizations.md:324
 msgid ""
 "Be cautious when the body is large or already uses many registers. Extra "
 "code can increase register pressure, reduce occupancy, or put more pressure "
 "on the instruction cache."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:325
+#: ../../../compiler/compiler-optimizations.md:328
 msgid ""
 "Choose a factor that matches the structure of the algorithm—often a pipeline "
 "depth or another small natural group—and benchmark the result. Removing "
 "`#[unroll]` should always remain an easy comparison."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:329
+#: ../../../compiler/compiler-optimizations.md:332
 msgid "To inspect the pass's analysis, build verbosely:"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:335
+#: ../../../compiler/compiler-optimizations.md:338
 msgid ""
 "Verbose mode prints the requested factor and the loop facts the pass found. "
 "If a request is skipped, a warning explains why. Loop numbers and analysis "
 "fields are internal details and may change."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:341
+#: ../../../compiler/compiler-optimizations.md:344
 msgid "A home for future transforms"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:343
+#: ../../../compiler/compiler-optimizations.md:346
 msgid ""
 "The `mir-transforms` crate keeps reusable analysis separate from IR mutation:"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:345
+#: ../../../compiler/compiler-optimizations.md:348
 msgid ""
 "cuda-oxide/crates/mir-transforms/src/\n"
 "├── analyses/\n"
@@ -674,7 +677,7 @@ msgid ""
 "└── unroll.rs             # prove, clone, reconnect, and clean up loops\n"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:354
+#: ../../../compiler/compiler-optimizations.md:357
 msgid ""
 "This separation gives future optimizations a predictable place to live: "
 "analyses gather facts, canonicalization normalizes equivalent shapes, and "
@@ -682,22 +685,22 @@ msgid ""
 "rs` controls when each pass runs."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:359
+#: ../../../compiler/compiler-optimizations.md:362
 msgid ""
 "Every transform should follow the same rule as the unroller: prove the "
 "rewrite is safe, bound its resource use, and fall back without changing "
 "behavior when a program is outside the supported shape."
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:363
+#: ../../../compiler/compiler-optimizations.md:366
 msgid "The focused test suite runs with:"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:365
+#: ../../../compiler/compiler-optimizations.md:368
 msgid "cargo test -p mir-transforms --all-targets\n"
 msgstr ""
 
-#: ../../../compiler/compiler-optimizations.md:369
+#: ../../../compiler/compiler-optimizations.md:372
 msgid ""
 "From here, [The Lowering Pipeline](lowering-pipeline.md) explains how the "
 "optimized `dialect-mir` becomes the LLVM dialect and, eventually, PTX."

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-21 14:41+0000\n"
+"POT-Creation-Date: 2026-10-19 15:08+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -41,11 +41,11 @@ msgstr ""
 msgid "Advanced GPU Features"
 msgstr ""
 
-#: ../../../index.md:183
+#: ../../../index.md:184
 msgid "Inside the Compiler"
 msgstr ""
 
-#: ../../../index.md:201
+#: ../../../index.md:202
 msgid "Appendix"
 msgstr ""
 
