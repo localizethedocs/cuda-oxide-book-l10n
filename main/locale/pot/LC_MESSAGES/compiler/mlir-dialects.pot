@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-19 15:08+0000\n"
+"POT-Creation-Date: 2026-10-26 14:41+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -384,9 +384,9 @@ msgstr ""
 
 #: ../../../compiler/mlir-dialects.md:0
 msgid ""
-"`mir.alloca`, `mir.load`, `mir.store`, `mir.assign`, `mir.ref`, `mir."
-"ptr_offset`, `mir.memcpy`, `mir.memmove`, `mir.shared_alloc`, `mir."
-"global_alloc`, `mir.extern_shared`"
+"`mir.alloca`, `mir.load`, `mir.store`, `mir.assign`, `mir.ref`, "
+"`mir.ptr_offset`, `mir.memcpy`, `mir.memmove`, `mir.shared_alloc`, "
+"`mir.global_alloc`, `mir.extern_shared`"
 msgstr ""
 
 #: ../../../compiler/mlir-dialects.md:0
@@ -400,8 +400,8 @@ msgstr ""
 #: ../../../compiler/mlir-dialects.md:0
 msgid ""
 "`mir.add`, `mir.sub`, `mir.mul`, `mir.div`, `mir.rem`, `mir.checked_add`, "
-"`mir.checked_sub`, `mir.checked_mul`, `mir.neg`, `mir.not`, `mir.shr`, `mir."
-"shl`, `mir.bitand`, `mir.bitor`, `mir.bitxor`"
+"`mir.checked_sub`, `mir.checked_mul`, `mir.neg`, `mir.not`, `mir.shr`, "
+"`mir.shl`, `mir.bitand`, `mir.bitor`, `mir.bitxor`"
 msgstr ""
 
 #: ../../../compiler/mlir-dialects.md:0
@@ -426,10 +426,10 @@ msgstr ""
 
 #: ../../../compiler/mlir-dialects.md:0
 msgid ""
-"`mir.extract_field`, `mir.insert_field`, `mir.construct_struct`, `mir."
-"construct_tuple`, `mir.construct_array`, `mir.construct_slice`, `mir."
-"construct_disjoint_slice`, `mir.extract_array_element`, `mir.field_addr`, "
-"`mir.array_element_addr`"
+"`mir.extract_field`, `mir.insert_field`, `mir.construct_struct`, "
+"`mir.construct_tuple`, `mir.construct_array`, `mir.construct_slice`, "
+"`mir.construct_disjoint_slice`, `mir.extract_array_element`, "
+"`mir.field_addr`, `mir.array_element_addr`"
 msgstr ""
 
 #: ../../../compiler/mlir-dialects.md:0
@@ -442,8 +442,8 @@ msgstr ""
 
 #: ../../../compiler/mlir-dialects.md:0
 msgid ""
-"`mir.get_discriminant`, `mir.set_discriminant`, `mir.construct_enum`, `mir."
-"enum_payload`"
+"`mir.get_discriminant`, `mir.set_discriminant`, `mir.construct_enum`, "
+"`mir.enum_payload`"
 msgstr ""
 
 #: ../../../compiler/mlir-dialects.md:0
@@ -794,8 +794,9 @@ msgstr ""
 
 #: ../../../compiler/mlir-dialects.md:216
 msgid ""
-"`llvm-export` adds one operation of its own on top of those, `llvm."
-"dbg_value`, alongside the address-space and fp16 helpers mentioned above."
+"`llvm-export` adds one operation of its own on top of those, "
+"`llvm.dbg_value`, alongside the address-space and fp16 helpers mentioned "
+"above."
 msgstr ""
 
 #: ../../../compiler/mlir-dialects.md:219
@@ -926,11 +927,11 @@ msgstr ""
 
 #: ../../../compiler/mlir-dialects.md:306
 msgid ""
-"At catalog SHA-256 `31b52388` (the stamp in every `ops/generated/` file "
-"header), the dialect holds 580 operations across 42 modules, and they come "
+"At catalog SHA-256 `63f8d327` (the stamp in every `ops/generated/` file "
+"header), the dialect holds 589 operations across 42 modules, and they come "
 "from two different places. The split is the first thing to know about it, "
 "because it decides where -- and whether -- you would add one. If the header "
-"stamp no longer starts with `31b52388`, the counts on this page predate the "
+"stamp no longer starts with `63f8d327`, the counts on this page predate the "
 "catalog you are reading."
 msgstr ""
 
@@ -938,7 +939,7 @@ msgstr ""
 msgid ""
 "**Hand-written**, directly under `cuda-oxide/crates/dialect-nvvm/src/ops/`. "
 "These are the ops with bespoke verification or lowering that the intrinsic "
-"catalog does not describe. There are seven modules and 26 operations:"
+"catalog does not describe. There are seven modules and 27 operations:"
 msgstr ""
 
 #: ../../../compiler/mlir-dialects.md:0
@@ -994,7 +995,7 @@ msgid "`memory`"
 msgstr ""
 
 #: ../../../compiler/mlir-dialects.md:0
-msgid "Generic-to-shared address conversion with a byte offset"
+msgid "Generic-to-shared address conversion and global stores"
 msgstr ""
 
 #: ../../../compiler/mlir-dialects.md:0
@@ -1016,7 +1017,7 @@ msgid ""
 "**Generated**, under `ops/generated/`, from `intrinsics/catalog.json` by "
 "`cuda-intrinsics-gen`. Every file there opens with `// @generated ... DO NOT "
 "EDIT.`, and editing one by hand is undone by the next generator run. This is "
-"the large majority -- 35 modules and 554 operations, resolved from 1033 "
+"the large majority -- 35 modules and 562 operations, resolved from 1042 "
 "catalog entries, since several intrinsics can share one structural op:"
 msgstr ""
 
@@ -1049,7 +1050,7 @@ msgid "`tma`"
 msgstr ""
 
 #: ../../../compiler/mlir-dialects.md:0
-msgid "111"
+msgid "116"
 msgstr ""
 
 #: ../../../compiler/mlir-dialects.md:0
@@ -1085,7 +1086,7 @@ msgid "`cp_async`, `mbarrier_extended`, `mbarrier_basic`, `sync`"
 msgstr ""
 
 #: ../../../compiler/mlir-dialects.md:0
-msgid "35"
+msgid "38"
 msgstr ""
 
 #: ../../../compiler/mlir-dialects.md:0
@@ -1251,8 +1252,9 @@ msgid ""
 "what `llvm-export` emits (after the underscore-to-dot transformation). The "
 "third is what `llc` produces. You never have to write any of these by hand: "
 "`mir-importer` emits the operation when it translates a call to a `cuda-"
-"device` intrinsic such as `thread::threadIdx_x()` or `warp::"
-"shuffle_xor_sync()`, and the later stages derive the other two forms from it."
+"device` intrinsic such as `thread::threadIdx_x()` or "
+"`warp::shuffle_xor_sync()`, and the later stages derive the other two forms "
+"from it."
 msgstr ""
 
 #: ../../../compiler/mlir-dialects.md:380
@@ -1325,8 +1327,8 @@ msgstr ""
 #: ../../../compiler/mlir-dialects.md:428
 msgid ""
 "Rust source:   let tid = thread::threadIdx_x();\n"
-"                ↓  (mir-importer matches \"cuda_device::thread::"
-"threadIdx_x\")\n"
+"                ↓  (mir-importer matches "
+"\"cuda_device::thread::threadIdx_x\")\n"
 "dialect-nvvm:  %v2 = nvvm.read_ptx_sreg_tid_x : i32\n"
 "                ↓  (mir-lower, then llvm-export)\n"
 "LLVM IR:       %v2 = call i32 @llvm.nvvm.read.ptx.sreg.tid.x() #0\n"

@@ -1,0 +1,288 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025-2026, NVIDIA Corporation
+# This file is distributed under the same license as the cuda-oxide package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: cuda-oxide \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-26 14:41+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../../cute/support-matrix.md:1
+msgid "Support Matrix (preview)"
+msgstr ""
+
+#: ../../../cute/support-matrix.md:3
+msgid ""
+"cute-rs is a **preview**. It compiles Rust CuTe kernels ahead of time "
+"through the pinned CUTLASS 4.7 compiler for two targets, `sm_100a` and "
+"`sm_120a`, and covers a validated subset of what CuTeDSL 4.7 offers on them. "
+"This page lists what the subset holds, what it does not, and what cute-rs "
+"adds. Status at commit `5eaa6cbda`, 2026-10-22."
+msgstr ""
+
+#: ../../../cute/support-matrix.md:9
+msgid ""
+"One glance: CuTeDSL 4.7 across its architectures against the cute-rs preview "
+"on its two targets."
+msgstr ""
+
+#: ../../../cute/support-matrix.md:12
+msgid "Targets"
+msgstr ""
+
+#: ../../../cute/support-matrix.md:18
+msgid "The two targets the preview compiles for, and the ones it rejects."
+msgstr ""
+
+#: ../../../cute/support-matrix.md:0
+msgid "Text version"
+msgstr ""
+
+#: ../../../cute/support-matrix.md:35
+msgid ""
+"The target check runs before any MLIR is built, and the error names the "
+"target. Within the pair, `tcgen05` operations need `sm_100a` and MXF4 "
+"register MMA needs `sm_120a`. `cargo oxide run` uses the detected GPU, so an "
+"RTX 5090 gets `sm_120a`; `cargo oxide build` needs `--arch`. Every CuTe "
+"kernel needs `CUDA_OXIDE_DEVICE_BACKEND=cutlass-mlir`; the native backend "
+"has no CuTe lowering."
+msgstr ""
+
+#: ../../../cute/support-matrix.md:37
+msgid "Feature areas"
+msgstr ""
+
+#: ../../../cute/support-matrix.md:39
+msgid ""
+"The figure at the top of the page is the feature table, with the cute-rs "
+"column split by target. Where each row is proven:"
+msgstr ""
+
+#: ../../../cute/support-matrix.md:41
+msgid ""
+"Layout algebra, static: cute-layout tests, elementwise_cute, "
+"blockscale_gemm_cute"
+msgstr ""
+
+#: ../../../cute/support-matrix.md:42
+msgid ""
+"Dynamic layouts, runtime shapes: fmha_prefill_sm120a_cute, "
+"fmha_decode_sm120a_cute"
+msgstr ""
+
+#: ../../../cute/support-matrix.md:43
+msgid ""
+"Tensors, partitions, tiled atoms: elementwise_cute, nvfp4_gemv_cute, "
+"blockscale_gemm_cute"
+msgstr ""
+
+#: ../../../cute/support-matrix.md:44
+msgid ""
+"TMA copies: blockscale_gemm_cute, fp16_gemm_256x352_cute, "
+"sm100_fmha_prefill_cute"
+msgstr ""
+
+#: ../../../cute/support-matrix.md:45
+msgid "cp.async, bulk, DSMEM copies: fmha_prefill_sm120a_cute"
+msgstr ""
+
+#: ../../../cute/support-matrix.md:46
+msgid ""
+"ldmatrix, stmatrix, atomics: blockscale_gemm_cute, ffn_cute, "
+"sm100_mla_decode_fp16_cute"
+msgstr ""
+
+#: ../../../cute/support-matrix.md:47
+msgid ""
+"tcgen05 MMA kinds: fp16_gemm_256x352_cute, sm100_fmha_prefill_cute, "
+"sm100_mla_decode_fp16_cute"
+msgstr ""
+
+#: ../../../cute/support-matrix.md:48
+msgid ""
+"Warp MMA kinds (mma.sync): blockscale_gemm_cute, ffn_cute, "
+"fmha_prefill_sm120a_cute"
+msgstr ""
+
+#: ../../../cute/support-matrix.md:49
+msgid ""
+"NVFP4 tensor cores (E4M3 scales): qwen3_8b_cute uses the CUDA-core path; no "
+"tensor-core producer"
+msgstr ""
+
+#: ../../../cute/support-matrix.md:50
+msgid "wgmma (Hopper): none"
+msgstr ""
+
+#: ../../../cute/support-matrix.md:51
+msgid "TMEM: fp16_gemm_256x352_cute, sm100_fmha_prefill_cute"
+msgstr ""
+
+#: ../../../cute/support-matrix.md:52
+msgid ""
+"Pipelines and barriers: blockscale_gemm_cute, fp16_gemm_256x352_cute, "
+"sm100_mla_decode_fp16_cute"
+msgstr ""
+
+#: ../../../cute/support-matrix.md:53
+msgid ""
+"Schedulers, persistence, PDL: blockscale_gemm_cute, sm100_fmha_prefill_cute"
+msgstr ""
+
+#: ../../../cute/support-matrix.md:54
+msgid ""
+"Clusters and multicast: fp16_gemm_256x352_cute, sm100_mla_decode_fp16_cute"
+msgstr ""
+
+#: ../../../cute/support-matrix.md:55
+msgid ""
+"Epilogue fusion (EFC): blockscale_gemm_cute, fp16_gemm_256x352_cute, "
+"swiglu_cute"
+msgstr ""
+
+#: ../../../cute/support-matrix.md:56
+msgid "Numerics and intrinsics: rmsnorm_cute, swiglu_cute, qwen_decoder_cute"
+msgstr ""
+
+#: ../../../cute/support-matrix.md:57
+msgid "Control flow, printf, debugging: every example"
+msgstr ""
+
+#: ../../../cute/support-matrix.md:58
+msgid ""
+"Host: JIT, torch, JAX, AOT export: every example; fp16_gemm_256x352_cute for "
+"CUDA graphs"
+msgstr ""
+
+#: ../../../cute/support-matrix.md:59
+msgid "Autotuning, Task Scheduling, IKET: none"
+msgstr ""
+
+#: ../../../cute/support-matrix.md:60
+msgid ""
+"Verification before codegen: dialect-cute verify tests, 48 cute-rs and 30 "
+"ctm-rs compile-fail cases"
+msgstr ""
+
+#: ../../../cute/support-matrix.md:61
+msgid "Grouped, MoE, mixed-input, FP8: none"
+msgstr ""
+
+#: ../../../cute/support-matrix.md:62
+msgid "Shipped kernel examples: the 14 crates under cute-rs-preview/examples"
+msgstr ""
+
+#: ../../../cute/support-matrix.md:63
+msgid "End-to-end models: qwen_decoder_cute, qwen3_8b_cute"
+msgstr ""
+
+#: ../../../cute/support-matrix.md:0
+msgid "Text version of the feature table"
+msgstr ""
+
+#: ../../../cute/support-matrix.md:67
+msgid ""
+"\"partial\" means a fixed or narrower form of the feature exists; \"n/a\" "
+"means the feature does not apply to those targets."
+msgstr ""
+
+#: ../../../cute/support-matrix.md:97
+msgid "Feature additions in CuTeDSL 4.4 to 4.7"
+msgstr ""
+
+#: ../../../cute/support-matrix.md:103
+msgid ""
+"What a CuTeDSL user relies on beyond the per-architecture atoms, and what "
+"the preview has instead. Epilogue fusion is the row most often asked about."
+msgstr ""
+
+#: ../../../cute/support-matrix.md:0
+msgid "Text version, with the full comparison"
+msgstr ""
+
+#: ../../../cute/support-matrix.md:135
+msgid "What cute-rs adds"
+msgstr ""
+
+#: ../../../cute/support-matrix.md:137
+msgid ""
+"Ahead-of-time compilation with no Python runtime: one Rust binary carries "
+"the cubin."
+msgstr ""
+
+#: ../../../cute/support-matrix.md:138
+msgid ""
+"Layouts, swizzles, operand roles and pipeline states are Rust types, decoded "
+"by the compiler and checked at compile time."
+msgstr ""
+
+#: ../../../cute/support-matrix.md:139
+msgid ""
+"A whole-module verifier runs before any MLIR is built: tensor provenance, "
+"pipeline lifecycle, operand roles, TMA encodability and swizzle alignment."
+msgstr ""
+
+#: ../../../cute/support-matrix.md:140
+msgid ""
+"Two end-to-end models, Qwen3-TTS 1.7B and Qwen3-8B on sm_120a, with "
+"reference comparisons. CuTeDSL 4.7 ships component kernels only."
+msgstr ""
+
+#: ../../../cute/support-matrix.md:142
+msgid "What the compiler does not prove"
+msgstr ""
+
+#: ../../../cute/support-matrix.md:144
+msgid ""
+"The verifier checks what it can see in types and in the module. These stay "
+"with the author at every `unsafe` boundary:"
+msgstr ""
+
+#: ../../../cute/support-matrix.md:146
+msgid "Thread convergence and lane participation at collective operations."
+msgstr ""
+
+#: ../../../cute/support-matrix.md:147
+msgid "Barrier phases and asynchronous completion before a buffer is reused."
+msgstr ""
+
+#: ../../../cute/support-matrix.md:148
+msgid "Pointer lifetimes behind raw views and descriptors."
+msgstr ""
+
+#: ../../../cute/support-matrix.md:149
+msgid "Disjoint writes across threads."
+msgstr ""
+
+#: ../../../cute/support-matrix.md:151
+msgid "Sources"
+msgstr ""
+
+#: ../../../cute/support-matrix.md:153
+msgid ""
+"CuTeDSL 4.7 at tag `v4.7.0` of the public CUTLASS repository: the `python/"
+"CuTeDSL/cutlass` package, the `examples/python/CuTeDSL` tree and the Python "
+"DSL documentation. CuTeDSL calls itself a public beta."
+msgstr ""
+
+#: ../../../cute/support-matrix.md:154
+msgid ""
+"The target gate: `crates/cuda-oxide-mlir-export/src/profile.rs`. The pinned "
+"compiler: `cargo oxide toolchain install cutlass` installs CUTLASS 4.7.0 and "
+"checks its digest."
+msgstr ""
+
+#: ../../../cute/support-matrix.md:155
+msgid ""
+"The figure is generated from the same row data as this table; regenerate "
+"both when the compiler surface changes."
+msgstr ""

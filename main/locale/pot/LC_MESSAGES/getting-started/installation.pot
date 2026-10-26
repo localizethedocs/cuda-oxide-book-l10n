@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-19 15:08+0000\n"
+"POT-Creation-Date: 2026-10-26 14:41+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -107,7 +107,7 @@ msgid ""
 "the error message names the library files the loader tried. A driver whose "
 "CUDA major version is older than the toolkit's (a 12.x driver with a 13.x "
 "build) fails the same way with a \"driver too old\" message. | "
-"**Rust**         | Nightly (pinned)    | Pinned in `cuda-oxide/rust-"
+"**Rust**         | 1.99.1 (pinned)     | Pinned in `cuda-oxide/rust-"
 "toolchain.toml`                    |"
 msgstr ""
 
@@ -121,10 +121,10 @@ msgstr ""
 
 #: ../../../getting-started/installation.md:33
 msgid ""
-"The repository includes a cuda-oxide devcontainer in `cuda-oxide/."
-"devcontainer/`. Using it is the quickest way to get a reproducible "
+"The repository includes a cuda-oxide devcontainer in `cuda-"
+"oxide/.devcontainer/`. Using it is the quickest way to get a reproducible "
 "development environment with CUDA Toolkit 13.0, LLVM 21, Clang 21, and the "
-"pinned Rust nightly already installed."
+"pinned Rust toolchain already installed."
 msgstr ""
 
 #: ../../../getting-started/installation.md:38
@@ -196,9 +196,9 @@ msgstr ""
 #: ../../../getting-started/installation.md:78
 msgid ""
 "The repository also ships `cuda-oxide/flake.nix`, providing a reproducible "
-"dev shell (CUDA 13, LLVM 22, Clang, pinned Rust nightly). Requires [Nix]"
-"(https://nixos.org/download/) with flakes enabled, an NVIDIA driver on the "
-"host, and Linux (x86\\_64 or aarch64)."
+"dev shell (CUDA 13, Clang/libclang, and the pinned Rust toolchain with LLVM "
+"23 `llvm-tools`). Requires [Nix](https://nixos.org/download/) with flakes "
+"enabled, an NVIDIA driver on the host, and Linux (x86\\_64 or aarch64)."
 msgstr ""
 
 #: ../../../getting-started/installation.md:83
@@ -256,8 +256,9 @@ msgstr ""
 
 #: ../../../getting-started/installation.md:118
 msgid ""
-"Install the CUDA Toolkit from the [NVIDIA CUDA Downloads](https://developer."
-"nvidia.com/cuda-downloads) page, then make sure it is on your `PATH`:"
+"Install the CUDA Toolkit from the [NVIDIA CUDA Downloads](https://"
+"developer.nvidia.com/cuda-downloads) page, then make sure it is on your "
+"`PATH`:"
 msgstr ""
 
 #: ../../../getting-started/installation.md:120
@@ -355,64 +356,98 @@ msgid ""
 msgstr ""
 
 #: ../../../getting-started/installation.md:181
-msgid "LLVM 21+ (optional)"
+msgid "Official CUTLASS compiler (optional)"
 msgstr ""
 
 #: ../../../getting-started/installation.md:183
+msgid ""
+"The high-level CuTe translation backend uses NVIDIA's official CUTLASS 4.7 "
+"compiler library. Install the repository-pinned archive with:"
+msgstr ""
+
+#: ../../../getting-started/installation.md:186
+msgid "cargo oxide toolchain install cutlass\n"
+msgstr ""
+
+#: ../../../getting-started/installation.md:190
+msgid ""
+"The installer verifies the archive and compiler-library SHA-256 digests and "
+"stores the toolchain in Cargo's managed data directory. Select it per build:"
+msgstr ""
+
+#: ../../../getting-started/installation.md:193
+msgid ""
+"CUDA_OXIDE_DEVICE_BACKEND=cutlass-mlir \\\n"
+"  cargo oxide build elementwise_cute --arch sm_120a\n"
+msgstr ""
+
+#: ../../../getting-started/installation.md:198
+msgid ""
+"Set `CUDA_OXIDE_CUTLASS_COMPILER` to an absolute `libCutlassCompiler.so` "
+"path only when intentionally overriding the managed installation. The CuTe "
+"chapter's [Build with the CUTLASS Compiler](../cute/build-with-cutlass.md) "
+"page lists the two supported targets, the options and the failure rules."
+msgstr ""
+
+#: ../../../getting-started/installation.md:205
+msgid "LLVM 21+ (optional)"
+msgstr ""
+
+#: ../../../getting-started/installation.md:207
 msgid "cuda-oxide uses LLVM's NVPTX backend to lower LLVM IR to PTX."
 msgstr ""
 
-#: ../../../getting-started/installation.md:185
+#: ../../../getting-started/installation.md:209
 msgid "Usually `llc` in Rust toolchain is enough."
 msgstr ""
 
-#: ../../../getting-started/installation.md:187
+#: ../../../getting-started/installation.md:211
 msgid ""
 "Install LLVM 21 or newer and make sure `llc-21` (or `llc-22`) is on your "
 "`PATH`:"
 msgstr ""
 
-#: ../../../getting-started/installation.md:189
+#: ../../../getting-started/installation.md:213
 msgid ""
 "# Ubuntu / Debian\n"
 "sudo apt install llvm-21\n"
 msgstr ""
 
-#: ../../../getting-started/installation.md:194
+#: ../../../getting-started/installation.md:218
 msgid ""
 "If your distro packages do not provide `llvm-21`, use LLVM's apt helper:"
 msgstr ""
 
-#: ../../../getting-started/installation.md:196
+#: ../../../getting-started/installation.md:220
 msgid ""
 "sudo apt-get install -y lsb-release wget software-properties-common gnupg\n"
 "wget https://apt.llvm.org/llvm.sh && chmod +x llvm.sh\n"
 "sudo ./llvm.sh 21\n"
 msgstr ""
 
-#: ../../../getting-started/installation.md:202
+#: ../../../getting-started/installation.md:226
 msgid "Verify that the NVPTX target is present:"
 msgstr ""
 
-#: ../../../getting-started/installation.md:204
+#: ../../../getting-started/installation.md:228
 msgid "llc-21 --version | grep nvptx\n"
 msgstr ""
 
-#: ../../../getting-started/installation.md:208
+#: ../../../getting-started/installation.md:232
 msgid ""
 "You should see a line containing `nvptx64` in the registered targets. The "
 "pipeline auto-discovers `llc-23`, `llc-22`, and `llc-21` in that order; pin "
 "a specific binary with `CUDA_OXIDE_LLC=/usr/bin/llc-21` if needed."
 msgstr ""
 
-#: ../../../getting-started/installation.md:213
+#: ../../../getting-started/installation.md:237
 msgid ""
 "A stock LLVM build without the NVPTX backend will not work. The `llvm-21` "
 "Ubuntu package includes it by default, but if you build LLVM from source you "
 "must pass `-DLLVM_TARGETS_TO_BUILD=\"X86;NVPTX\"` to CMake."
 msgstr ""
 
-#: ../../../getting-started/installation.md:217
+#: ../../../getting-started/installation.md:241
 msgid ""
 "**Why LLVM 21?** We emit TMA / tcgen05 / WGMMA intrinsics that `llc` from "
 "LLVM 20 and earlier can't handle. Simple kernels might still work with an "
@@ -420,11 +455,11 @@ msgid ""
 "Blackwell needs 21+."
 msgstr ""
 
-#: ../../../getting-started/installation.md:222
+#: ../../../getting-started/installation.md:246
 msgid "Clang (host `cuda-bindings`)"
 msgstr ""
 
-#: ../../../getting-started/installation.md:224
+#: ../../../getting-started/installation.md:248
 msgid ""
 "The host `cuda-bindings` crate runs [`bindgen`](https://github.com/rust-lang/"
 "rust-bindgen), which loads `libclang.so` at runtime and needs clang's own "
@@ -432,18 +467,18 @@ msgid ""
 "packages cover both halves:"
 msgstr ""
 
-#: ../../../getting-started/installation.md:226
+#: ../../../getting-started/installation.md:250
 msgid ""
 "sudo apt install libclang-21-dev libclang-cpp21-dev libclang-common-21-dev\n"
 msgstr ""
 
-#: ../../../getting-started/installation.md:230
+#: ../../../getting-started/installation.md:254
 msgid ""
 "`cargo oxide doctor` catches this up front; the symptom otherwise is "
 "`'stddef.h' file not found` during the host build."
 msgstr ""
 
-#: ../../../getting-started/installation.md:233
+#: ../../../getting-started/installation.md:257
 msgid ""
 "**If doctor still reports clang not found:** The issue may be that the "
 "versioned binary (e.g., clang-21) is installed but not mapped to the "
@@ -452,11 +487,11 @@ msgid ""
 "automatically:"
 msgstr ""
 
-#: ../../../getting-started/installation.md:236
+#: ../../../getting-started/installation.md:260
 msgid "sudo apt install clang libclang-dev\n"
 msgstr ""
 
-#: ../../../getting-started/installation.md:243
+#: ../../../getting-started/installation.md:267
 msgid ""
 "**Fresh Ubuntu 24.04 / DGX-OS:** after installing LLVM 21 via `apt.llvm.org/"
 "llvm.sh` as shown above, the versioned `clang-21` / `clang++-21` binaries "
@@ -464,7 +499,7 @@ msgid ""
 "not. Add them with `update-alternatives`:"
 msgstr ""
 
-#: ../../../getting-started/installation.md:245
+#: ../../../getting-started/installation.md:269
 msgid ""
 "sudo update-alternatives --install /usr/bin/clang   clang   /usr/bin/"
 "clang-21   100\n"
@@ -472,96 +507,95 @@ msgid ""
 "+-21 100\n"
 msgstr ""
 
-#: ../../../getting-started/installation.md:250
+#: ../../../getting-started/installation.md:274
 msgid "Validated on Asus GX10 / NVIDIA DGX Spark."
 msgstr ""
 
-#: ../../../getting-started/installation.md:255
+#: ../../../getting-started/installation.md:279
 msgid "Rust toolchain"
 msgstr ""
 
-#: ../../../getting-started/installation.md:257
+#: ../../../getting-started/installation.md:281
 msgid ""
 "The CUDA Oxide workspace ships `cuda-oxide/rust-toolchain.toml`, which pins "
-"the exact nightly version and required components. When you first run a "
+"the exact stable release and required components. When you first run a "
 "`cargo` command inside `cuda-oxide/`, rustup installs the correct toolchain "
-"automatically. Commands at the repository root and in `cutile-rs/` use "
-"stable."
+"automatically."
 msgstr ""
 
-#: ../../../getting-started/installation.md:262
+#: ../../../getting-started/installation.md:286
 msgid "If you need to install it manually:"
 msgstr ""
 
-#: ../../../getting-started/installation.md:264
+#: ../../../getting-started/installation.md:288
 msgid ""
-"rustup toolchain install nightly-2026-10-11\n"
+"rustup toolchain install 1.99.1\n"
 "rustup component add rust-src rustc-dev rust-analyzer clippy rustfmt llvm-"
-"tools --toolchain nightly-2026-10-11\n"
+"tools --toolchain 1.99.1\n"
 msgstr ""
 
-#: ../../../getting-started/installation.md:269
+#: ../../../getting-started/installation.md:293
 msgid "Three of these components are what the codegen backend and doctor need:"
 msgstr ""
 
-#: ../../../getting-started/installation.md:271
+#: ../../../getting-started/installation.md:295
 msgid ""
 "`rust-src` -- source of the Rust standard library, needed for cross-"
 "compiling to the NVPTX target."
 msgstr ""
 
-#: ../../../getting-started/installation.md:272
+#: ../../../getting-started/installation.md:296
 msgid "`rustc-dev` -- compiler internals that the backend links against."
 msgstr ""
 
-#: ../../../getting-started/installation.md:273
+#: ../../../getting-started/installation.md:297
 msgid ""
 "`llvm-tools` -- toolchain-bundled `llc` used to lower LLVM IR to PTX "
 "(doctor's floor check)."
 msgstr ""
 
-#: ../../../getting-started/installation.md:275
+#: ../../../getting-started/installation.md:299
 msgid ""
 "The other three are not needed to build: `rust-analyzer` powers IDE support, "
 "`clippy` is the lint gate CI runs, and `rustfmt` backs `cargo oxide fmt`."
 msgstr ""
 
-#: ../../../getting-started/installation.md:279
+#: ../../../getting-started/installation.md:303
 msgid "cargo-oxide"
 msgstr ""
 
-#: ../../../getting-started/installation.md:281
+#: ../../../getting-started/installation.md:305
 msgid ""
 "`cargo-oxide` is the cargo subcommand that drives the entire build pipeline "
 "(`cargo oxide run`, `build`, `debug`, `pipeline`, and the rest -- the "
 "Command reference at the end of this section lists all of them)."
 msgstr ""
 
-#: ../../../getting-started/installation.md:283
+#: ../../../getting-started/installation.md:307
 msgid ""
 "**Inside the cuda-oxide repo**, it works out of the box via a workspace "
 "alias -- no extra install step."
 msgstr ""
 
-#: ../../../getting-started/installation.md:285
+#: ../../../getting-started/installation.md:309
 msgid ""
 "**For use outside the repo** (your own projects), install it with the pinned "
-"nightly toolchain:"
+"toolchain:"
 msgstr ""
 
-#: ../../../getting-started/installation.md:287
+#: ../../../getting-started/installation.md:311
 msgid ""
-"cargo +nightly-2026-10-11 install --git https://github.com/NVIDIA/cuda-rust."
-"git cargo-oxide\n"
+"cargo +1.99.1 install --git https://github.com/NVIDIA/cuda-rust.git cargo-"
+"oxide\n"
 msgstr ""
 
-#: ../../../getting-started/installation.md:291
+#: ../../../getting-started/installation.md:315
 msgid ""
 "On first run, `cargo-oxide` will automatically fetch and build the codegen "
 "backend. Subsequent runs reuse the cached build."
 msgstr ""
 
-#: ../../../getting-started/installation.md:297
+#: ../../../getting-started/installation.md:321
 msgid ""
 "Installing the cached backend by rename. Every `rustc` that compiles a "
 "kernel maps the one shared `.so`. The installer copies a new build to a "
@@ -570,27 +604,27 @@ msgid ""
 "file."
 msgstr ""
 
-#: ../../../getting-started/installation.md:302
+#: ../../../getting-started/installation.md:326
 msgid "To discover the examples available in a cuda-oxide checkout:"
 msgstr ""
 
-#: ../../../getting-started/installation.md:304
+#: ../../../getting-started/installation.md:328
 msgid ""
 "cargo oxide list\n"
 "cargo oxide list --json\n"
 msgstr ""
 
-#: ../../../getting-started/installation.md:309
+#: ../../../getting-started/installation.md:333
 msgid ""
 "The command reports each example's purpose and any documented GPU, "
 "architecture, CUDA Toolkit, or external SDK requirements."
 msgstr ""
 
-#: ../../../getting-started/installation.md:312
+#: ../../../getting-started/installation.md:336
 msgid "Useful day-to-day helpers once you are building kernels:"
 msgstr ""
 
-#: ../../../getting-started/installation.md:314
+#: ../../../getting-started/installation.md:338
 msgid ""
 "# Print generated PTX without the full MIR/LLVM pipeline dump\n"
 "cargo oxide inspect vecadd\n"
@@ -600,175 +634,175 @@ msgid ""
 "cargo oxide clean\n"
 msgstr ""
 
-#: ../../../getting-started/installation.md:323
+#: ../../../getting-started/installation.md:347
 msgid ""
 "`inspect` is the lightweight counterpart to `cargo oxide pipeline`. `clean` "
 "only touches project-local outputs; it leaves the shared backend cache at "
 "`~/.cargo/cuda-oxide/` alone."
 msgstr ""
 
-#: ../../../getting-started/installation.md:327
+#: ../../../getting-started/installation.md:351
 msgid "Command reference"
 msgstr ""
 
-#: ../../../getting-started/installation.md:329
+#: ../../../getting-started/installation.md:353
 msgid "The full set, as `cargo oxide --help` reports it:"
 msgstr ""
 
-#: ../../../getting-started/installation.md:293
+#: ../../../getting-started/installation.md:317
 msgid "Command"
 msgstr ""
 
-#: ../../../getting-started/installation.md:293
+#: ../../../getting-started/installation.md:317
 msgid "Description"
 msgstr ""
 
-#: ../../../getting-started/installation.md:293
+#: ../../../getting-started/installation.md:317
 msgid "`run`"
 msgstr ""
 
-#: ../../../getting-started/installation.md:293
+#: ../../../getting-started/installation.md:317
 msgid "Build and run an example or project"
 msgstr ""
 
-#: ../../../getting-started/installation.md:293
+#: ../../../getting-started/installation.md:317
 msgid "`sanitize`"
 msgstr ""
 
-#: ../../../getting-started/installation.md:293
+#: ../../../getting-started/installation.md:317
 msgid "Build and run an example or project under NVIDIA Compute Sanitizer"
 msgstr ""
 
-#: ../../../getting-started/installation.md:293
+#: ../../../getting-started/installation.md:317
 msgid "`build`"
 msgstr ""
 
-#: ../../../getting-started/installation.md:293
+#: ../../../getting-started/installation.md:317
 msgid "Build an example or project (compile only, don't run)"
 msgstr ""
 
-#: ../../../getting-started/installation.md:293
+#: ../../../getting-started/installation.md:317
 msgid "`fuzz-schedule`"
 msgstr ""
 
-#: ../../../getting-started/installation.md:293
+#: ../../../getting-started/installation.md:317
 msgid ""
 "Find schedule-sensitive failures by perturbing an example's generated PTX"
 msgstr ""
 
-#: ../../../getting-started/installation.md:293
+#: ../../../getting-started/installation.md:317
 msgid "`test`"
 msgstr ""
 
-#: ../../../getting-started/installation.md:293
+#: ../../../getting-started/installation.md:317
 msgid "Run Cargo tests through the cuda-oxide backend"
 msgstr ""
 
-#: ../../../getting-started/installation.md:293
+#: ../../../getting-started/installation.md:317
 msgid "`emit-ltoir`"
 msgstr ""
 
-#: ../../../getting-started/installation.md:293
+#: ../../../getting-started/installation.md:317
 msgid "Compile a crate's device code to a binary LTOIR artifact in one step"
 msgstr ""
 
-#: ../../../getting-started/installation.md:293
-msgid "`tilelib`"
-msgstr ""
-
-#: ../../../getting-started/installation.md:293
-msgid "Package a crate's `#[tile_export]` functions as a cuTile tile library"
-msgstr ""
-
-#: ../../../getting-started/installation.md:293
+#: ../../../getting-started/installation.md:317
 msgid "`pipeline`"
 msgstr ""
 
-#: ../../../getting-started/installation.md:293
+#: ../../../getting-started/installation.md:317
 msgid ""
 "Show the full compilation pipeline (MIR -> PTX/NVVM IR) with verbose output"
 msgstr ""
 
-#: ../../../getting-started/installation.md:293
+#: ../../../getting-started/installation.md:317
 msgid "`debug`"
 msgstr ""
 
-#: ../../../getting-started/installation.md:293
+#: ../../../getting-started/installation.md:317
 msgid "Build with debug info and launch `cuda-gdb`"
 msgstr ""
 
-#: ../../../getting-started/installation.md:293
+#: ../../../getting-started/installation.md:317
 msgid "`list`"
 msgstr ""
 
-#: ../../../getting-started/installation.md:293
+#: ../../../getting-started/installation.md:317
 msgid "List the examples bundled with the cuda-oxide workspace"
 msgstr ""
 
-#: ../../../getting-started/installation.md:293
+#: ../../../getting-started/installation.md:317
 msgid "`inspect`"
 msgstr ""
 
-#: ../../../getting-started/installation.md:293
+#: ../../../getting-started/installation.md:317
 msgid "Build an example or project and print the generated PTX"
 msgstr ""
 
-#: ../../../getting-started/installation.md:293
+#: ../../../getting-started/installation.md:317
 msgid "`fmt`"
 msgstr ""
 
-#: ../../../getting-started/installation.md:293
+#: ../../../getting-started/installation.md:317
 msgid "Format all crates (SIMT workspace, codegen backend, examples)"
 msgstr ""
 
-#: ../../../getting-started/installation.md:293
+#: ../../../getting-started/installation.md:317
 msgid "`new`"
 msgstr ""
 
-#: ../../../getting-started/installation.md:293
+#: ../../../getting-started/installation.md:317
 msgid "Scaffold a new standalone cuda-oxide project"
 msgstr ""
 
-#: ../../../getting-started/installation.md:293
+#: ../../../getting-started/installation.md:317
 msgid "`clean`"
 msgstr ""
 
-#: ../../../getting-started/installation.md:293
+#: ../../../getting-started/installation.md:317
 msgid "Remove project-local build outputs and generated cuda-oxide artifacts"
 msgstr ""
 
-#: ../../../getting-started/installation.md:293
+#: ../../../getting-started/installation.md:317
 msgid "`doctor`"
 msgstr ""
 
-#: ../../../getting-started/installation.md:293
+#: ../../../getting-started/installation.md:317
 msgid "Check that your environment is set up correctly"
 msgstr ""
 
-#: ../../../getting-started/installation.md:293
+#: ../../../getting-started/installation.md:317
 msgid "`setup`"
 msgstr ""
 
-#: ../../../getting-started/installation.md:293
+#: ../../../getting-started/installation.md:317
 msgid "Build and cache the codegen backend"
 msgstr ""
 
-#: ../../../getting-started/installation.md:293
+#: ../../../getting-started/installation.md:317
 msgid "`update`"
 msgstr ""
 
-#: ../../../getting-started/installation.md:293
+#: ../../../getting-started/installation.md:317
 msgid ""
 "Refresh the cached codegen backend (or run `setup` inside the workspace)"
 msgstr ""
 
-#: ../../../getting-started/installation.md:351
+#: ../../../getting-started/installation.md:317
+msgid "`toolchain`"
+msgstr ""
+
+#: ../../../getting-started/installation.md:317
+msgid "Install compiler toolchains managed by cargo-oxide"
+msgstr ""
+
+#: ../../../getting-started/installation.md:375
 msgid ""
 "Four of these are worth calling out, because they do something `cargo` "
 "itself cannot:"
 msgstr ""
 
-#: ../../../getting-started/installation.md:354
+#: ../../../getting-started/installation.md:378
 msgid ""
 "# Run the test suite with device code compiled by the cuda-oxide backend.\n"
 "# Arguments after `--` go to cargo; with none it is a plain `cargo test`.\n"
@@ -792,23 +826,23 @@ msgid ""
 "cargo oxide emit-ltoir my_kernels --arch sm_90\n"
 msgstr ""
 
-#: ../../../getting-started/installation.md:375
+#: ../../../getting-started/installation.md:399
 msgid "Every command takes `--help`, which lists the flags each one accepts."
 msgstr ""
 
-#: ../../../getting-started/installation.md:379
+#: ../../../getting-started/installation.md:403
 msgid "Verifying your installation"
 msgstr ""
 
-#: ../../../getting-started/installation.md:381
+#: ../../../getting-started/installation.md:405
 msgid "Run the built-in diagnostics check:"
 msgstr ""
 
-#: ../../../getting-started/installation.md:383
+#: ../../../getting-started/installation.md:407
 msgid "cargo oxide doctor\n"
 msgstr ""
 
-#: ../../../getting-started/installation.md:387
+#: ../../../getting-started/installation.md:411
 msgid ""
 "`cargo oxide doctor` validates your Rust toolchain, CUDA headers (`cuda.h`), "
 "CUDA toolkit (including libNVVM / nvJitLink / libdevice for kernels that use "
@@ -816,7 +850,7 @@ msgid ""
 "backend in one shot."
 msgstr ""
 
-#: ../../../getting-started/installation.md:392
+#: ../../../getting-started/installation.md:416
 msgid ""
 "`cargo-oxide` itself does not need the CUDA toolkit or an NVIDIA driver to "
 "build and run, so `doctor` works even on a machine where nothing is "
@@ -825,46 +859,45 @@ msgid ""
 "`cargo oxide run` needs a GPU, while `build` and `pipeline` work without one."
 msgstr ""
 
-#: ../../../getting-started/installation.md:398
+#: ../../../getting-started/installation.md:422
 msgid "Then build and run an example end-to-end:"
 msgstr ""
 
-#: ../../../getting-started/installation.md:400
+#: ../../../getting-started/installation.md:424
 msgid "cargo oxide run vecadd\n"
 msgstr ""
 
-#: ../../../getting-started/installation.md:404
+#: ../../../getting-started/installation.md:428
 msgid ""
 "If everything is configured correctly, this compiles a Rust kernel to PTX, "
 "launches it on the GPU, and prints a success message."
 msgstr ""
 
-#: ../../../getting-started/installation.md:407
+#: ../../../getting-started/installation.md:431
 msgid "**Common issues:**"
 msgstr ""
 
-#: ../../../getting-started/installation.md:409
+#: ../../../getting-started/installation.md:433
 msgid ""
 "`No working llc found` -- prefer `rustup component add llvm-tools --"
-"toolchain nightly-2026-10-11`, or install LLVM 21+ (`sudo apt install "
-"llvm-21`), add `/usr/lib/llvm-21/bin` to your `PATH`, or set "
-"`CUDA_OXIDE_LLC=/usr/bin/llc-21`."
+"toolchain 1.99.1`, or install LLVM 21+ (`sudo apt install llvm-21`), add `/"
+"usr/lib/llvm-21/bin` to your `PATH`, or set `CUDA_OXIDE_LLC=/usr/bin/llc-21`."
 msgstr ""
 
-#: ../../../getting-started/installation.md:410
+#: ../../../getting-started/installation.md:434
 msgid ""
 "`'stddef.h' file not found` when building host `cuda-bindings` -- install "
 "clang dev headers: `sudo apt install clang-21` (or `libclang-common-21-dev`)."
 msgstr ""
 
-#: ../../../getting-started/installation.md:411
+#: ../../../getting-started/installation.md:435
 msgid ""
 "`cuda.h not found` -- Set `CUDA_TOOLKIT_PATH` to your CUDA install root, or "
 "ensure `/usr/local/cuda/include/cuda.h` exists."
 msgstr ""
 
-#: ../../../getting-started/installation.md:412
+#: ../../../getting-started/installation.md:436
 msgid ""
 "`rust-src` / `llvm-tools` component missing -- Run `rustup component add "
-"rust-src llvm-tools --toolchain nightly-2026-10-11`."
+"rust-src llvm-tools --toolchain 1.99.1`."
 msgstr ""

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-19 15:08+0000\n"
+"POT-Creation-Date: 2026-10-26 14:41+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -151,8 +151,8 @@ msgstr ""
 msgid ""
 "**`dialect-mir` (pliron).** `mir-importer` translates Stable MIR into "
 "`dialect-mir` -- a pliron dialect that models Rust MIR semantics (places, "
-"projections, `Rvalue`, `BinOp`, etc.). The initial form uses per-local `mir."
-"alloca` slots with `mir.load`/`mir.store` for cross-block data flow; "
+"projections, `Rvalue`, `BinOp`, etc.). The initial form uses per-local "
+"`mir.alloca` slots with `mir.load`/`mir.store` for cross-block data flow; "
 "`pliron::opts::mem2reg` then promotes those slots back into SSA values. "
 "[Compiler optimizations](compiler-optimizations.md), beginning with "
 "annotated loop unrolling, run on that SSA form before lowering."
@@ -161,10 +161,10 @@ msgstr ""
 #: ../../../compiler/architecture-overview.md:104
 msgid ""
 "**LLVM dialect (pliron-llvm).** `mir-lower` transforms `dialect-mir` "
-"operations into LLVM dialect operations: `llvm.alloca`, `llvm.load`, `llvm."
-"store`, `llvm.getelementptr`, `llvm.call`, and friends. This is where Rust-"
-"level concepts get flattened to machine-oriented IR. The LLVM dialect itself "
-"is provided by the upstream `pliron-llvm` crate."
+"operations into LLVM dialect operations: `llvm.alloca`, `llvm.load`, "
+"`llvm.store`, `llvm.getelementptr`, `llvm.call`, and friends. This is where "
+"Rust-level concepts get flattened to machine-oriented IR. The LLVM dialect "
+"itself is provided by the upstream `pliron-llvm` crate."
 msgstr ""
 
 #: ../../../compiler/architecture-overview.md:111
@@ -228,6 +228,14 @@ msgid ""
 msgstr ""
 
 #: ../../../compiler/architecture-overview.md:66
+msgid "`dialect-cute`"
+msgstr ""
+
+#: ../../../compiler/architecture-overview.md:66
+msgid "Backend-neutral semantic IR for CuTe tensor programs"
+msgstr ""
+
+#: ../../../compiler/architecture-overview.md:66
 msgid "`mir-transforms`"
 msgstr ""
 
@@ -254,6 +262,14 @@ msgstr ""
 #: ../../../compiler/architecture-overview.md:66
 msgid ""
 "Re-exports `pliron-llvm`'s LLVM dialect + cuda-oxide's textual `.ll` exporter"
+msgstr ""
+
+#: ../../../compiler/architecture-overview.md:66
+msgid "`cuda-oxide-mlir-export`"
+msgstr ""
+
+#: ../../../compiler/architecture-overview.md:66
+msgid "CUTLASS 4.7 mappings and profiles; upstream MLIR printing"
 msgstr ""
 
 #: ../../../compiler/architecture-overview.md:66
@@ -290,6 +306,30 @@ msgstr ""
 msgid ""
 "Device-side API: intrinsics, `DisjointSlice`, barriers, shared memory, warp "
 "ops"
+msgstr ""
+
+#: ../../../compiler/architecture-overview.md:66
+msgid "`cute-layout`"
+msgstr ""
+
+#: ../../../compiler/architecture-overview.md:66
+msgid "CuTe-style layout algebra and coordinate mapping"
+msgstr ""
+
+#: ../../../compiler/architecture-overview.md:66
+msgid "`ctm-rs`"
+msgstr ""
+
+#: ../../../compiler/architecture-overview.md:66
+msgid "Typed instruction-level CUDA primitives"
+msgstr ""
+
+#: ../../../compiler/architecture-overview.md:66
+msgid "`cute-rs`"
+msgstr ""
+
+#: ../../../compiler/architecture-overview.md:66
+msgid "Typed CuTe tensors, tiles, copies, pipelines, and MMA operations"
 msgstr ""
 
 #: ../../../compiler/architecture-overview.md:66
@@ -385,8 +425,8 @@ msgstr ""
 
 #: ../../../compiler/architecture-overview.md:66
 msgid ""
-"`#[tile_export]` descriptions shared by the macro, the backend and `cargo "
-"oxide tilelib`"
+"Export descriptions shared by `cuda-macros`, the backend and `cargo-oxide`; "
+"part of the Tile IR interop work, not released yet"
 msgstr ""
 
 #: ../../../compiler/architecture-overview.md:66
@@ -394,9 +434,7 @@ msgid "`oxide-tilebc`"
 msgstr ""
 
 #: ../../../compiler/architecture-overview.md:66
-msgid ""
-"Tile IR bytecode writer for the tile library descriptions `cargo oxide "
-"tilelib` emits"
+msgid "Tile IR bytecode writer for those export descriptions"
 msgstr ""
 
 #: ../../../compiler/architecture-overview.md:66
@@ -444,7 +482,7 @@ msgid "`cuda-oxide-codegen`"
 msgstr ""
 
 #: ../../../compiler/architecture-overview.md:66
-msgid "Rustc-independent PTX backend"
+msgid "Rustc-independent PTX and CUTLASS cubin backend"
 msgstr ""
 
 #: ../../../compiler/architecture-overview.md:66
@@ -487,48 +525,48 @@ msgstr ""
 msgid "Differential codegen fuzzer support (rustlantis adapter)"
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:163
+#: ../../../compiler/architecture-overview.md:168
 msgid "Dependency flow"
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:165
+#: ../../../compiler/architecture-overview.md:170
 msgid "The compiler crates form a clear pipeline:"
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:171
+#: ../../../compiler/architecture-overview.md:176
 msgid ""
 "How the compiler crates connect. The pipeline flows left to right through "
 "the codegen backend, importer, and lowering passes. Dialect crates sit "
 "underneath, all built on pliron."
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:176
+#: ../../../compiler/architecture-overview.md:181
 msgid ""
 "`pliron` sits underneath the dialect crates as the shared IR framework -- it "
 "provides the `Context`, `Module`, `Region`, `Block`, `Operation`, `Type`, "
 "and `Attribute` infrastructure. The LLVM dialect comes from `pliron-llvm` "
-"(also built on pliron); `llvm-export` re-exports it and adds the textual `."
-"ll` exporter. `rustc_public` provides the stable MIR types that `mir-"
+"(also built on pliron); `llvm-export` re-exports it and adds the textual "
+"`.ll` exporter. `rustc_public` provides the stable MIR types that `mir-"
 "importer` reads from rustc. The user-facing crates (`cuda-device`, `cuda-"
 "macros`, `cuda-host`, `cuda-core`, `cuda-async`) are independent of the "
 "compiler internals and depend only on each other."
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:187
+#: ../../../compiler/architecture-overview.md:192
 msgid "The Two Key Dependencies"
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:189
+#: ../../../compiler/architecture-overview.md:194
 msgid ""
 "Two external projects make cuda-oxide possible. Neither is optional, and "
 "both deserve a brief introduction before the deep-dive chapters that follow."
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:192
+#: ../../../compiler/architecture-overview.md:197
 msgid "pliron -- Pliron IR (MLIR-like)"
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:194
+#: ../../../compiler/architecture-overview.md:199
 msgid ""
 "[pliron](https://github.com/vaivaswatha/pliron) is an extensible compiler IR "
 "framework inspired by LLVM's MLIR, but written entirely in Rust. It provides "
@@ -536,7 +574,7 @@ msgid ""
 "regions, and blocks -- without requiring a C++ toolchain, CMake, or tablegen."
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:199
+#: ../../../compiler/architecture-overview.md:204
 msgid ""
 "cuda-oxide chose pliron over upstream MLIR for a pragmatic reason: we wanted "
 "the entire compiler to build with `cargo`. Depending on MLIR means pulling "
@@ -546,7 +584,7 @@ msgid ""
 "derive macros, and the IR can be inspected with any Rust debugger."
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:206
+#: ../../../compiler/architecture-overview.md:211
 msgid ""
 "cuda-oxide defines four dialects on top of pliron. Two carry the lowering "
 "path: `dialect-mir` (models Rust MIR) and `dialect-nvvm` (NVIDIA GPU "
@@ -556,17 +594,17 @@ msgid ""
 "and adds the textual `.ll` exporter."
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:214
+#: ../../../compiler/architecture-overview.md:219
 msgid ""
 "For a deeper dive into pliron's architecture, see [Pliron -- MLIR in Rust]"
 "(pliron.md)."
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:218
+#: ../../../compiler/architecture-overview.md:223
 msgid "rustc_public -- Stable MIR"
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:220
+#: ../../../compiler/architecture-overview.md:225
 msgid ""
 "`rustc_public` (historically known as Stable MIR or `stable_mir`) is Rust's "
 "official stable interface to the compiler's internals. MIR -- the Mid-level "
@@ -576,7 +614,7 @@ msgid ""
 "point for a GPU backend."
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:227
+#: ../../../compiler/architecture-overview.md:232
 msgid ""
 "The problem: MIR is an *internal* representation. Its data structures change "
 "between nightly versions with no stability guarantees. A backend that reads "
@@ -588,66 +626,66 @@ msgid ""
 "stable MIR types, and hands the result to `mir-importer` for translation."
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:237
+#: ../../../compiler/architecture-overview.md:242
 msgid ""
 "For a deeper dive into rustc_public, see [rustc_public -- Stable MIR](rustc-"
 "public.md)."
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:243
+#: ../../../compiler/architecture-overview.md:248
 msgid "The Host/Device Split"
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:245
+#: ../../../compiler/architecture-overview.md:250
 msgid ""
 "cuda-oxide is a single-source compiler. Host code and device code live in "
 "the same `.rs` files, and a single build command compiles both. Here is how "
 "that works, step by step:"
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:249
+#: ../../../compiler/architecture-overview.md:254
 msgid "**1. cargo-oxide invokes rustc with the custom backend.**"
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:251
+#: ../../../compiler/architecture-overview.md:256
 msgid "cargo oxide run vecadd\n"
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:255
+#: ../../../compiler/architecture-overview.md:260
 msgid ""
 "Under the hood, this sets `-Z codegen-backend=librustc_codegen_cuda.so`, "
 "which tells rustc to route code generation through cuda-oxide's backend "
 "instead of the default LLVM one."
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:259
+#: ../../../compiler/architecture-overview.md:264
 msgid ""
 "**2. rustc calls `codegen_crate()` for every crate in the dependency tree.**"
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:261
+#: ../../../compiler/architecture-overview.md:266
 msgid ""
 "This is not a cuda-oxide-specific step -- it is how rustc works. For every "
 "crate being compiled (your binary, `cuda-device`, any other dependency), "
 "rustc invokes the codegen backend."
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:265
+#: ../../../compiler/architecture-overview.md:270
 msgid "**3. The backend scans for kernel entry points.**"
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:267
+#: ../../../compiler/architecture-overview.md:272
 msgid ""
 "It looks for monomorphized functions whose names contain the reserved "
 "`cuda_oxide_kernel_<hash>_` prefix. These are the functions that `#[kernel]` "
 "created."
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:271
+#: ../../../compiler/architecture-overview.md:276
 msgid "**4. If kernels are found: build the device call graph and emit PTX.**"
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:273
+#: ../../../compiler/architecture-overview.md:278
 msgid ""
 "Starting from each kernel, the backend walks the call graph to collect every "
 "device function the kernel transitively calls. This set of functions is "
@@ -656,11 +694,11 @@ msgid ""
 "the host binary."
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:279
+#: ../../../compiler/architecture-overview.md:284
 msgid "**5. Always: delegate host code to the standard LLVM backend.**"
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:281
+#: ../../../compiler/architecture-overview.md:286
 msgid ""
 "Regardless of whether kernels were found, host code is compiled normally. "
 "cuda-oxide's backend delegates to rustc's default LLVM codegen for "
@@ -668,17 +706,17 @@ msgid ""
 "parsing, your async runtime -- all compiled the usual way."
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:286
+#: ../../../compiler/architecture-overview.md:291
 msgid "**6. Result: a host binary + a `.ptx` file, from one build.**"
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:288
+#: ../../../compiler/architecture-overview.md:293
 msgid ""
 "target/debug/vecadd          ← host binary (loads PTX at runtime)\n"
 "target/debug/vecadd.ptx      ← device code (loaded by CUDA driver)\n"
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:294
+#: ../../../compiler/architecture-overview.md:299
 msgid ""
 "Device code from dependencies (like `cuda-device`) is compiled lazily. "
 "Functions from external crates only get compiled to PTX when a kernel in "
@@ -687,18 +725,18 @@ msgid ""
 "backend reads their Stable MIR on demand."
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:301
+#: ../../../compiler/architecture-overview.md:306
 msgid "A simplified mental model"
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:307
+#: ../../../compiler/architecture-overview.md:312
 msgid ""
 "One build command, two compilation targets. Every function goes through "
 "rustc's frontend. At the codegen boundary, kernels go to cuda-oxide; "
 "everything else goes to LLVM."
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:312
+#: ../../../compiler/architecture-overview.md:317
 msgid ""
 "Every function goes through rustc's frontend. At the codegen boundary, the "
 "backend looks at each function and asks: \"Are you a kernel or called by a "
@@ -707,90 +745,90 @@ msgid ""
 "both host and device will be compiled twice, once per target."
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:320
+#: ../../../compiler/architecture-overview.md:325
 msgid "What rustc Gives Us For Free"
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:322
+#: ../../../compiler/architecture-overview.md:327
 msgid ""
 "One of the nicest things about building on `rustc` rather than inventing a "
 "new language is the sheer volume of work we *do not* have to do. Here is "
 "what rustc handles before cuda-oxide ever sees the code:"
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:303
+#: ../../../compiler/architecture-overview.md:308
 msgid "What"
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:303
+#: ../../../compiler/architecture-overview.md:308
 msgid "Value for GPU Code"
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:303
+#: ../../../compiler/architecture-overview.md:308
 msgid "Type checking"
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:303
+#: ../../../compiler/architecture-overview.md:308
 msgid ""
 "Catch errors before GPU compilation -- no cryptic PTX assembler failures"
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:303
+#: ../../../compiler/architecture-overview.md:308
 msgid "Lifetime tracking"
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:303
+#: ../../../compiler/architecture-overview.md:308
 msgid "Safety guarantees that span the host/device boundary"
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:303
+#: ../../../compiler/architecture-overview.md:308
 msgid "Borrow checking"
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:303
+#: ../../../compiler/architecture-overview.md:308
 msgid ""
 "Enforce ordinary Rust aliasing; GPU-wide writes add `DisjointSlice` and "
 "launch proofs"
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:303
+#: ../../../compiler/architecture-overview.md:308
 msgid "Monomorphization"
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:303
+#: ../../../compiler/architecture-overview.md:308
 msgid ""
 "Generics \"just work\" on the GPU -- `map<f32, _>` becomes a concrete PTX "
 "kernel"
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:303
+#: ../../../compiler/architecture-overview.md:308
 msgid "MIR optimization"
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:303
+#: ../../../compiler/architecture-overview.md:308
 msgid ""
 "Inlining, constant propagation, dead code elimination -- all applied before "
 "we begin"
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:303
+#: ../../../compiler/architecture-overview.md:308
 msgid "Trait resolution"
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:303
+#: ../../../compiler/architecture-overview.md:308
 msgid ""
 "Trait objects are resolved, vtables are gone, everything is static dispatch"
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:303
+#: ../../../compiler/architecture-overview.md:308
 msgid "Pattern matching"
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:303
+#: ../../../compiler/architecture-overview.md:308
 msgid "`match` arms are lowered to optimized `SwitchInt` MIR terminators"
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:336
+#: ../../../compiler/architecture-overview.md:341
 msgid ""
 "We do not reimplement any of this. rustc does the heavy lifting, and we pick "
 "up the fully optimized, monomorphized, borrow-checked MIR at the end. Our "
@@ -799,7 +837,7 @@ msgid ""
 "from scratch."
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:342
+#: ../../../compiler/architecture-overview.md:347
 msgid ""
 "This also means that Rust's error messages work normally. If you make a type "
 "error in a kernel, you get the same helpful `rustc` diagnostic you would get "
@@ -807,56 +845,56 @@ msgid ""
 "\"did you mean?\" hints. No separate GPU compiler error format to learn."
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:350
+#: ../../../compiler/architecture-overview.md:355
 msgid "Where to Go Next"
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:352
+#: ../../../compiler/architecture-overview.md:357
 msgid "The rest of this chapter zooms into each piece of the architecture:"
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:354
+#: ../../../compiler/architecture-overview.md:359
 msgid ""
 "**[Pliron -- Pliron IR (MLIR-like)](pliron.md)** -- the IR framework that "
 "holds the pipeline together."
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:356
+#: ../../../compiler/architecture-overview.md:361
 msgid ""
 "**[rustc_public -- Stable MIR](rustc-public.md)** -- how we read MIR without "
 "breaking on every nightly."
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:358
+#: ../../../compiler/architecture-overview.md:363
 msgid ""
 "**[The Code Generator: rustc-codegen-cuda](rustc-codegen-cuda.md)** -- the "
 "codegen backend that intercepts rustc."
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:360
+#: ../../../compiler/architecture-overview.md:365
 msgid ""
 "**[MIR Importer](mir-importer.md)** -- translating Stable MIR into pliron."
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:361
+#: ../../../compiler/architecture-overview.md:366
 msgid ""
 "**[Compiler Optimizations](compiler-optimizations.md)** -- how `mir-"
 "transforms` analyzes and rewrites `dialect-mir`."
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:363
+#: ../../../compiler/architecture-overview.md:368
 msgid ""
 "**[Pliron Dialects](mlir-dialects.md)** -- the three custom dialects and "
 "their operation sets."
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:365
+#: ../../../compiler/architecture-overview.md:370
 msgid ""
 "**[The Lowering Pipeline](lowering-pipeline.md)** -- `dialect-mir` to the "
 "LLVM dialect, pass by pass."
 msgstr ""
 
-#: ../../../compiler/architecture-overview.md:367
+#: ../../../compiler/architecture-overview.md:372
 msgid ""
 "**[Adding New Intrinsics](adding-new-intrinsics.md)** -- a contributor's "
 "guide to extending the compiler."

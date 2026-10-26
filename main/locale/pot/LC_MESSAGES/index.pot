@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-19 15:08+0000\n"
+"POT-Creation-Date: 2026-10-26 14:41+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,35 +17,39 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../../../index.md:118
+#: ../../../index.md:122
 msgid "Getting Started"
 msgstr ""
 
-#: ../../../index.md:127
+#: ../../../index.md:131
 msgid "Writing GPU Programs"
 msgstr ""
 
-#: ../../../index.md:142
+#: ../../../index.md:146
 msgid "Safety on the GPU"
 msgstr ""
 
-#: ../../../index.md:151
+#: ../../../index.md:155
 msgid "Async GPU Programming"
 msgstr ""
 
-#: ../../../index.md:163
-msgid "Building a Real Application"
+#: ../../../index.md:167
+msgid "Async Host Pipeline Walkthrough"
 msgstr ""
 
-#: ../../../index.md:171
+#: ../../../index.md:175
+msgid "CuTe in Rust (preview)"
+msgstr ""
+
+#: ../../../index.md:189
 msgid "Advanced GPU Features"
 msgstr ""
 
-#: ../../../index.md:184
+#: ../../../index.md:201
 msgid "Inside the Compiler"
 msgstr ""
 
-#: ../../../index.md:202
+#: ../../../index.md:219
 msgid "Appendix"
 msgstr ""
 
@@ -73,9 +77,9 @@ msgstr ""
 
 #: ../../../index.md:22
 msgid ""
-"For a refresher, see [The Rust Programming Language](https://doc.rust-lang."
-"org/book/), [Rust by Example](https://doc.rust-lang.org/rust-by-example/), "
-"or the [Async Book](https://rust-lang.github.io/async-book/)."
+"For a refresher, see [The Rust Programming Language](https://doc.rust-"
+"lang.org/book/), [Rust by Example](https://doc.rust-lang.org/rust-by-"
+"example/), or the [Async Book](https://rust-lang.github.io/async-book/)."
 msgstr ""
 
 #: ../../../index.md:27
@@ -192,4 +196,15 @@ msgstr ""
 msgid ""
 "Compose GPU work as lazy `DeviceOperation` graphs. Schedule across stream "
 "pools. Await results with `.await`."
+msgstr ""
+
+#: ../../../index.md:117
+msgid "🧩  Typed CuTe Kernels (preview)"
+msgstr ""
+
+#: ../../../index.md:118
+msgid ""
+"Encode layouts, swizzles, TMA pipelines, and tensor-core MMA in Rust's type "
+"system with [cute-rs](cute/overview.md), compiled through CUTLASS 4.7 for "
+"`sm_100a` and `sm_120a`. See the [support matrix](cute/support-matrix.md)."
 msgstr ""

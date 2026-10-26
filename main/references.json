@@ -47,9 +47,9 @@
     "branch" : "main",
     "commit" : 
     {
-      "date" : "2026-10-19 20:16:03 +0530",
-      "hash" : "717432490ccf85f0a9166401be6de362d6c622b2",
-      "title" : "feat(cuda-oxide): carry inline intent through the device pipeline (#1511)"
+      "date" : "2026-10-25 17:26:15 +0530",
+      "hash" : "9df9e7cef561e03a066230b3bb433b3d8285da81",
+      "title" : "docs(book): soften dark-mode SVG fill colors across cute and compiler diagrams (#1640)"
     }
   },
   "type" : "branch",
