@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-16 04:35+0000\n"
+"POT-Creation-Date: 2026-10-26 14:41+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -419,13 +419,13 @@ msgstr ""
 
 #: ../../../compiler/rustc-public.md:206
 msgid ""
-"The driver in `rustc-codegen-cuda` opens the scope with `rustc_public::"
-"rustc_internal::run()` and converts instances with `stable()`. The `mir-"
-"importer` translator primarily consumes `rustc_public` types, but some "
-"checks still consult `rustc_middle` through the bridge. For example, grid-"
-"constant validation reads declared reference lifetimes and inlining "
-"ownership from the compiler's internal representation. The importer does not "
-"manage the bridge tables itself."
+"The driver in `rustc-codegen-cuda` opens the scope with "
+"`rustc_public::rustc_internal::run()` and converts instances with "
+"`stable()`. The `mir-importer` translator primarily consumes `rustc_public` "
+"types, but some checks still consult `rustc_middle` through the bridge. For "
+"example, grid-constant validation reads declared reference lifetimes and "
+"inlining ownership from the compiler's internal representation. The importer "
+"does not manage the bridge tables itself."
 msgstr ""
 
 #: ../../../compiler/rustc-public.md:214
@@ -526,71 +526,131 @@ msgid ""
 msgstr ""
 
 #: ../../../compiler/rustc-public.md:280
-msgid "Nightly pinning"
+msgid "Stabilizing the toolchain pin"
 msgstr ""
 
 #: ../../../compiler/rustc-public.md:282
 msgid ""
-"Even with `rustc_public` providing a stable *API*, the bridge layer "
-"(`rustc_public_bridge`) is still compiled against the compiler's internals "
-"and is not independently versioned. In practice, this means a specific "
-"version of cuda-oxide works with a specific nightly."
+"Even with `rustc_public` providing a stable API, the bridge layer "
+"(`rustc_public_bridge`) is compiled against `librustc_driver.so` and is tied "
+"to an exact compiler build. Instead of chasing daily `nightly` snapshots, "
+"cuda-oxide pins an official **stable** Rust release via `rust-"
+"toolchain.toml`:"
 msgstr ""
 
-#: ../../../compiler/rustc-public.md:287
-msgid "cuda-oxide pins to an exact nightly release via `rust-toolchain.toml`:"
-msgstr ""
-
-#: ../../../compiler/rustc-public.md:289
+#: ../../../compiler/rustc-public.md:288
 msgid ""
 "[toolchain]\n"
-"channel = \"nightly-2026-10-11\"\n"
+"channel = \"1.99.1\"\n"
 "components = [\"rust-src\", \"rustc-dev\", \"rust-analyzer\", \"clippy\", "
 "\"rustfmt\", \"llvm-tools\"]\n"
 msgstr ""
 
-#: ../../../compiler/rustc-public.md:295
+#: ../../../compiler/rustc-public.md:294
 msgid ""
-"This pin guarantees reproducible builds: anyone who clones the repository "
-"gets the same compiler, the same MIR shapes, and the same bridge behavior. "
-"When updating the pin, the process is:"
+"When bumping this pin, run `cuda-oxide/scripts/check-toolchain-parity.sh` to "
+"verify that `scaffold.rs`, `.devcontainer/devcontainer.json`, the book, and "
+"the READMEs agree, and run `nix flake update rust-overlay` in `cuda-oxide/` "
+"so `cuda-oxide/flake.lock` carries the new release manifest."
 msgstr ""
 
-#: ../../../compiler/rustc-public.md:299
+#: ../../../compiler/rustc-public.md:303
 msgid ""
-"Bump the nightly date in `cuda-oxide/rust-toolchain.toml`. Rustup walks up "
-"from the standalone `rustc-codegen-cuda` workspace and finds that component "
-"pin, so no nested copy is needed. `cuda-oxide/scripts/check-toolchain-parity."
-"sh` checks the scaffold `cargo oxide new` writes, the devcontainer, and the "
-"blocks and dated commands quoted in this book and the READMEs -- run it to "
-"find the stragglers."
+"How custom Rust compiler backends ship in production, and what lives inside "
+"an official stable rustup release."
 msgstr ""
 
-#: ../../../compiler/rustc-public.md:305
+#: ../../../compiler/rustc-public.md:306
+msgid "Why stable rustc already has rustc_private and rustc_public"
+msgstr ""
+
+#: ../../../compiler/rustc-public.md:308
 msgid ""
-"Fix any `rustc_public` API changes (usually minor -- that is the whole point "
-"of the stable API)."
+"Official stable rustc binaries are compiled from the same source tree as "
+"nightly; nothing is stripped out of the binary. In addition, rustup "
+"publishes the `rustc-dev` component (`librustc_driver.so`, "
+"`librustc_public.rlib`, `librustc_public_bridge.rlib`, and "
+"`librustc_middle.rlib`) for every stable release."
 msgstr ""
 
-#: ../../../compiler/rustc-public.md:307
+#: ../../../compiler/rustc-public.md:314
 msgid ""
-"Run the full test suite to verify that all examples still compile and "
-"produce correct PTX."
+"When cargo-oxide invokes Cargo (and inside the workspace via `cuda-"
+"oxide/.cargo/config.toml`), it sets `RUSTC_BOOTSTRAP=1` in the process "
+"environment. That unlocks `#![feature(rustc_private)]` and `-Z` flags (`-Z "
+"codegen-backend=...`, `-Z mir-enable-passes=-JumpThreading`, `-Z always-"
+"encode-mir`) on the pinned stable compiler while giving developers and users "
+"a compiler that has already completed Rust's 12-week nightly and beta "
+"stabilization cycle."
 msgstr ""
 
-#: ../../../compiler/rustc-public.md:309
-msgid "Celebrate, or revert and try next week's nightly."
-msgstr ""
-
-#: ../../../compiler/rustc-public.md:312
+#: ../../../compiler/rustc-public.md:326
 msgid ""
-"As `rustc_public` matures and moves toward a crates.io release, the coupling "
-"to a specific nightly will loosen. The long-term goal is for cuda-oxide to "
-"work with any sufficiently recent stable Rust toolchain -- but we are not "
-"there yet."
+"Pinning an official stable release (`1.99.1`) in `cuda-oxide/rust-"
+"toolchain.toml` with `RUSTC_BOOTSTRAP=1` managed by cargo-oxide."
 msgstr ""
 
-#: ../../../compiler/rustc-public.md:320
+#: ../../../compiler/rustc-public.md:329
+msgid "Upstreaming to rustc_public without emergency toolchain bumps"
+msgstr ""
+
+#: ../../../compiler/rustc-public.md:331
+msgid ""
+"When a feature requires a new `rustc_public` query that we upstream to `rust-"
+"lang/rust` (such as `ArgAttributes` getters in `rust-lang/rust#163242`), it "
+"takes 6 to 12 weeks for that commit to reach the next stable Rust release."
+msgstr ""
+
+#: ../../../compiler/rustc-public.md:336
+msgid ""
+"Because `rustc_public` only wraps data that already exists inside "
+"`rustc_middle` and `rustc_abi`, `crates/mir-importer/src/translator/"
+"facts.rs` acts as our quarantine boundary:"
+msgstr ""
+
+#: ../../../compiler/rustc-public.md:340
+msgid ""
+"**Day 1 (on the current stable pin):** Land the feature immediately by "
+"reading the underlying `rustc_middle` / `rustc_target` field inside "
+"`facts.rs` via `rustc_internal::internal(tcx, ...)`, while upstreaming the "
+"`rustc_public` getter in parallel."
+msgstr ""
+
+#: ../../../compiler/rustc-public.md:344
+msgid ""
+"**Next scheduled stable upgrade:** Once the new stable Rust release ships "
+"with the upstreamed `rustc_public` API, replace the temporary internal read "
+"in `facts.rs` with the `rustc_public` method call."
+msgstr ""
+
+#: ../../../compiler/rustc-public.md:352
+msgid ""
+"Decoupling feature delivery from toolchain bumps using `facts.rs` and "
+"scheduled stable upgrades."
+msgstr ""
+
+#: ../../../compiler/rustc-public.md:355
+msgid "Self-contained bundling for standalone and CUDA Toolkit distribution"
+msgstr ""
+
+#: ../../../compiler/rustc-public.md:357
+msgid ""
+"For standalone or CUDA Toolkit packaging (following the same model as "
+"Microsoft's `rustc_codegen_utc` and Ferrocene), users do not need `rustc-"
+"dev` (~930 MB of compiler-internal `.rlib`s used only when building the "
+"backend itself). A stripped runtime bundle containing `rustc`, `cargo`, "
+"`cargo-oxide`, `librustc_codegen_cuda.so` (34 MB stripped, 8.6 MB "
+"compressed), `librustc_driver.so`, `libLLVM.so`, and a pre-encoded `core`/"
+"`alloc`/`std` sysroot totals roughly 453 MB on disk (~120 MB compressed)."
+msgstr ""
+
+#: ../../../compiler/rustc-public.md:369
+msgid ""
+"Measured bundle footprint on `x86_64-unknown-linux-gnu` and the two-bucket "
+"maintenance workflow."
+msgstr ""
+
+#: ../../../compiler/rustc-public.md:374
 msgid ""
 "Now that you understand how cuda-oxide talks to the Rust compiler, the next "
 "chapter covers what happens when that conversation reaches the codegen "

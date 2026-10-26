@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-21 14:41+0000\n"
+"POT-Creation-Date: 2026-10-26 14:41+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -102,8 +102,8 @@ msgstr ""
 
 #: ../../../advanced/cluster-programming.md:62
 msgid ""
-"Injects a `__cluster_config<X, Y, Z>()` function that sets the PTX `."
-"reqnctapercluster` directive."
+"Injects a `__cluster_config<X, Y, Z>()` function that sets the PTX "
+"`.reqnctapercluster` directive."
 msgstr ""
 
 #: ../../../advanced/cluster-programming.md:64
@@ -139,10 +139,12 @@ msgid ""
 msgstr ""
 
 #: ../../../advanced/cluster-programming.md:86
-msgid "For the full 3D cluster position:"
+msgid ""
+"For the full 3D position of the block in its cluster, and of the cluster in "
+"the grid:"
 msgstr ""
 
-#: ../../../advanced/cluster-programming.md:88
+#: ../../../advanced/cluster-programming.md:89
 msgid ""
 "let cx = cluster::cluster_ctaidX();     // block's X position in the "
 "cluster\n"
@@ -150,30 +152,32 @@ msgid ""
 "cluster\n"
 "let cz = cluster::cluster_ctaidZ();     // block's Z position in the "
 "cluster\n"
+"let gx = cluster::cluster_idx_x();      // cluster's X position in the grid\n"
+"let nx = cluster::cluster_grid_dim_x(); // clusters along X in the grid\n"
 msgstr ""
 
-#: ../../../advanced/cluster-programming.md:96
+#: ../../../advanced/cluster-programming.md:99
 msgid "Distributed shared memory (DSMEM)"
 msgstr ""
 
-#: ../../../advanced/cluster-programming.md:98
+#: ../../../advanced/cluster-programming.md:101
 msgid ""
 "The core feature of clusters is cross-block shared memory access. There are "
 "two ways to read a remote block's shared memory:"
 msgstr ""
 
-#: ../../../advanced/cluster-programming.md:101
+#: ../../../advanced/cluster-programming.md:104
 msgid "Method 1: map_shared_rank + plain deref (any type)"
 msgstr ""
 
-#: ../../../advanced/cluster-programming.md:103
+#: ../../../advanced/cluster-programming.md:106
 msgid ""
 "`map_shared_rank` takes a local shared memory pointer and returns a real "
 "pointer to the same offset in another block's shared memory. It lives in the "
 "cluster-shared address space, so you can just dereference it:"
 msgstr ""
 
-#: ../../../advanced/cluster-programming.md:107
+#: ../../../advanced/cluster-programming.md:110
 msgid ""
 "use cuda_device::{SharedArray, cluster, thread};\n"
 "\n"
@@ -200,26 +204,26 @@ msgid ""
 "}\n"
 msgstr ""
 
-#: ../../../advanced/cluster-programming.md:133
+#: ../../../advanced/cluster-programming.md:136
 msgid ""
 "That last line is an ordinary Rust read. The compiler keeps the mapped "
-"pointer in the cluster-shared address space, so the deref compiles to `ld."
-"shared::cluster`. Writes work the same way: map with `map_shared_rank_mut`, "
-"assign through the pointer, and the store compiles to `st.shared::cluster`. "
-"This works for any type and needs sm_90+."
+"pointer in the cluster-shared address space, so the deref compiles to "
+"`ld.shared::cluster`. Writes work the same way: map with "
+"`map_shared_rank_mut`, assign through the pointer, and the store compiles to "
+"`st.shared::cluster`. This works for any type and needs sm_90+."
 msgstr ""
 
-#: ../../../advanced/cluster-programming.md:139
+#: ../../../advanced/cluster-programming.md:142
 msgid "Method 2: dsmem_read_u32 (fixed-width u32 reads)"
 msgstr ""
 
-#: ../../../advanced/cluster-programming.md:141
+#: ../../../advanced/cluster-programming.md:144
 msgid ""
 "`dsmem_read_u32` maps and reads one `u32` in a single call. It takes the "
 "*local* pointer plus the target rank and does the rank mapping itself:"
 msgstr ""
 
-#: ../../../advanced/cluster-programming.md:144
+#: ../../../advanced/cluster-programming.md:147
 msgid ""
 "let neighbor_val = unsafe {\n"
 "    cluster::dsmem_read_u32(\n"
@@ -229,7 +233,7 @@ msgid ""
 "};\n"
 msgstr ""
 
-#: ../../../advanced/cluster-programming.md:153
+#: ../../../advanced/cluster-programming.md:156
 msgid ""
 "Both methods emit the same `ld.shared::cluster` PTX instruction. Plain deref "
 "through `map_shared_rank` is the primary method: it works for any type and "
@@ -237,11 +241,11 @@ msgid ""
 "`u32` and you want the map and the load in one call."
 msgstr ""
 
-#: ../../../advanced/cluster-programming.md:160
+#: ../../../advanced/cluster-programming.md:163
 msgid "Synchronization"
 msgstr ""
 
-#: ../../../advanced/cluster-programming.md:162
+#: ../../../advanced/cluster-programming.md:165
 msgid ""
 "Clusters introduce a new synchronization level between block sync and global "
 "sync:"
@@ -291,27 +295,27 @@ msgstr ""
 msgid "Signaling a barrier in a remote block"
 msgstr ""
 
-#: ../../../advanced/cluster-programming.md:171
+#: ../../../advanced/cluster-programming.md:174
 msgid "The correct synchronization sequence for DSMEM access is always:"
 msgstr ""
 
-#: ../../../advanced/cluster-programming.md:173
+#: ../../../advanced/cluster-programming.md:176
 msgid "**Write** to local shared memory"
 msgstr ""
 
-#: ../../../advanced/cluster-programming.md:174
+#: ../../../advanced/cluster-programming.md:177
 msgid "**`sync_threads()`** — ensure all local threads have written"
 msgstr ""
 
-#: ../../../advanced/cluster-programming.md:175
+#: ../../../advanced/cluster-programming.md:178
 msgid "**`cluster_sync()`** — ensure all blocks have reached this point"
 msgstr ""
 
-#: ../../../advanced/cluster-programming.md:176
+#: ../../../advanced/cluster-programming.md:179
 msgid "**Read** from remote shared memory via DSMEM"
 msgstr ""
 
-#: ../../../advanced/cluster-programming.md:178
+#: ../../../advanced/cluster-programming.md:181
 msgid ""
 "Missing either sync is a data race. `sync_threads()` without "
 "`cluster_sync()` means your block is ready but the neighbor might not be. "
@@ -319,18 +323,18 @@ msgid ""
 "but your own block's writes might not be visible yet."
 msgstr ""
 
-#: ../../../advanced/cluster-programming.md:185
+#: ../../../advanced/cluster-programming.md:188
 msgid "TMA multicast with clusters"
 msgstr ""
 
-#: ../../../advanced/cluster-programming.md:187
+#: ../../../advanced/cluster-programming.md:190
 msgid ""
 "Clusters unlock one of TMA's most powerful features: **multicast copies**. A "
 "single TMA load can write the same tile into the shared memory of multiple "
 "blocks simultaneously:"
 msgstr ""
 
-#: ../../../advanced/cluster-programming.md:191
+#: ../../../advanced/cluster-programming.md:194
 msgid ""
 "use cuda_device::tma::cp_async_bulk_tensor_2d_g2s_multicast;\n"
 "\n"
@@ -344,7 +348,7 @@ msgid ""
 "}\n"
 msgstr ""
 
-#: ../../../advanced/cluster-programming.md:204
+#: ../../../advanced/cluster-programming.md:207
 msgid ""
 "Without multicast, each block would issue its own TMA copy — four separate "
 "global memory reads. With multicast, the TMA engine reads the data once and "
@@ -353,17 +357,17 @@ msgid ""
 "cluster."
 msgstr ""
 
-#: ../../../advanced/cluster-programming.md:210
+#: ../../../advanced/cluster-programming.md:213
 msgid ""
 "The `cta_mask` is a bitmask where bit *i* is set if rank *i* should receive "
 "the copy. You can selectively multicast to a subset of the cluster."
 msgstr ""
 
-#: ../../../advanced/cluster-programming.md:215
+#: ../../../advanced/cluster-programming.md:218
 msgid "A practical example: halo exchange"
 msgstr ""
 
-#: ../../../advanced/cluster-programming.md:217
+#: ../../../advanced/cluster-programming.md:220
 msgid ""
 "A common use case for clusters is **halo exchange** in stencil computations. "
 "Each block processes a tile of a grid and needs boundary elements from its "
@@ -371,7 +375,7 @@ msgid ""
 "(or careful stream synchronization). With clusters, it is a local operation:"
 msgstr ""
 
-#: ../../../advanced/cluster-programming.md:222
+#: ../../../advanced/cluster-programming.md:225
 msgid ""
 "use cuda_device::{DisjointSlice, SharedArray, cluster, cluster_launch, "
 "kernel, thread};\n"
@@ -436,7 +440,7 @@ msgid ""
 "}\n"
 msgstr ""
 
-#: ../../../advanced/cluster-programming.md:283
+#: ../../../advanced/cluster-programming.md:286
 msgid ""
 "Without clusters, the halo exchange would require writing boundary elements "
 "to global memory, synchronizing via events or streams, and reading them "
@@ -444,7 +448,7 @@ msgid ""
 "shared memory latency, no global memory."
 msgstr ""
 
-#: ../../../advanced/cluster-programming.md:290
+#: ../../../advanced/cluster-programming.md:293
 msgid "Constraints and best practices"
 msgstr ""
 
@@ -504,7 +508,7 @@ msgstr ""
 msgid "Not supported in the same kernel"
 msgstr ""
 
-#: ../../../advanced/cluster-programming.md:302
+#: ../../../advanced/cluster-programming.md:305
 msgid ""
 "Clusters impose a scheduling constraint: the hardware must co-locate all "
 "blocks on the same GPC. If the cluster is too large relative to the GPC "
@@ -512,19 +516,19 @@ msgid ""
 "measure before scaling up."
 msgstr ""
 
-#: ../../../advanced/cluster-programming.md:309
+#: ../../../advanced/cluster-programming.md:312
 msgid ""
 "[Tensor Memory Accelerator](tensor-memory-accelerator.md) — TMA multicast "
 "requires clusters for cross-CTA delivery"
 msgstr ""
 
-#: ../../../advanced/cluster-programming.md:311
+#: ../../../advanced/cluster-programming.md:314
 msgid ""
 "[Matrix Multiply Accelerators](matrix-multiply-accelerators.md) — CG2 mode "
 "uses cluster pairs for wider MMA tiles"
 msgstr ""
 
-#: ../../../advanced/cluster-programming.md:313
+#: ../../../advanced/cluster-programming.md:316
 msgid ""
 "[Shared Memory and Synchronization](shared-memory-and-synchronization.md) — "
 "the per-block foundation that DSMEM extends"

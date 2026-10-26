@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-19 15:08+0000\n"
+"POT-Creation-Date: 2026-10-26 14:41+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -140,8 +140,8 @@ msgstr ""
 
 #: ../../../appendix/supported-features.md:0
 msgid ""
-"`core::ptr::copy_nonoverlapping` lowers to a `mir.memcpy` op and then `llvm."
-"memcpy`, with the element count scaled to bytes for the pointee. The "
+"`core::ptr::copy_nonoverlapping` lowers to a `mir.memcpy` op and then "
+"`llvm.memcpy`, with the element count scaled to bytes for the pointee. The "
 "intrinsic overload suffix is derived from the operand address spaces and "
 "length width."
 msgstr ""
@@ -327,6 +327,16 @@ msgstr ""
 
 #: ../../../appendix/supported-features.md:120
 msgid ""
+"`SharedPtr<T>`, the typed shared pointer, follows the same limits: a union "
+"or a `MaybeUninit<SharedPtr<T>>` fails closed under these union storage "
+"rules, a `repr(packed)` struct that holds one follows the packed-carrier "
+"limits above, a kernel parameter that holds one bare or inside a struct or "
+"array is refused, and on the libNVVM route a struct that mixes one with a "
+"narrower field is not yet supported in arrays or in shared memory."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:127
+msgid ""
 "Enum constants preserve payload relocations to device statics, including non-"
 "zero byte addends. This includes niche-encoded `Option<&T>` and direct-"
 "tagged enum layouts, both for direct thin-reference payloads and for "
@@ -335,7 +345,7 @@ msgid ""
 "constants. Anonymous promoted allocations remain unsupported."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:127
+#: ../../../appendix/supported-features.md:134
 msgid "Compiler: Closures"
 msgstr ""
 
@@ -380,7 +390,7 @@ msgid ""
 "device functions."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:136
+#: ../../../appendix/supported-features.md:143
 msgid "Compiler: Control Flow"
 msgstr ""
 
@@ -459,7 +469,7 @@ msgid ""
 "general constant-propagation pass."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:148
+#: ../../../appendix/supported-features.md:155
 msgid "Compiler: Arithmetic and Casting"
 msgstr ""
 
@@ -493,7 +503,7 @@ msgid ""
 "per `u32`. sm_80+."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:156
+#: ../../../appendix/supported-features.md:163
 msgid "Compiler: Interop"
 msgstr ""
 
@@ -533,16 +543,11 @@ msgstr ""
 
 #: ../../../appendix/supported-features.md:0
 msgid ""
-"Inter-kernel interop works today: a [cutile-rs Tile kernel](https://github."
-"com/NVIDIA/cuda-rust/tree/main/cutile-rs) and a cuda-oxide SIMT PTX kernel "
-"can run in one host process on the same CUDA stream over shared device "
-"tensors. Intra-kernel interop is built as a [tile library](../advanced/tile-"
-"libraries.md): `#[tile_export]` and `cargo oxide tilelib` produce the LTOIR "
-"and the Tile IR descriptions today (at the installed assembler's current "
-"bytecode version, 13.5 or newer), packaging them into a `.tilelib` needs the "
-"CUDA 13.5 or newer `tileiras`, and the caller is cuTile Python's "
-"`foreign_call`. Tracked in [#96](https://github.com/NVlabs/cuda-oxide/"
-"issues/96)."
+"Inter-kernel interop works today: a [cutile-rs Tile kernel](https://"
+"github.com/NVIDIA/cuda-rust/tree/main/cutile-rs) and a cuda-oxide SIMT PTX "
+"kernel can run in one host process on the same CUDA stream over shared "
+"device tensors. Intra-kernel interop is tracked in [#96](https://github.com/"
+"NVlabs/cuda-oxide/issues/96)."
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
@@ -555,7 +560,7 @@ msgid ""
 "at the binary crate use site."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:166
+#: ../../../appendix/supported-features.md:173
 msgid "Compiler: Functions"
 msgstr ""
 
@@ -607,7 +612,7 @@ msgid ""
 "PTX module."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:175
+#: ../../../appendix/supported-features.md:182
 msgid "Compiler: Compilation Pipeline"
 msgstr ""
 
@@ -691,9 +696,9 @@ msgstr ""
 #: ../../../appendix/supported-features.md:0
 msgid ""
 "`cargo oxide clean` removes project-local `target/` directories and "
-"generated device artifacts (`.ptx`, `.ll`, `.opt.ll`, `.ltoir`, `.cubin`, `."
-"target`, `.options`, `.cubin.target`), never the shared `~/.cargo/cuda-oxide/"
-"` cache."
+"generated device artifacts (`.ptx`, `.ll`, `.opt.ll`, `.ltoir`, `.cubin`, "
+"`.target`, `.options`, `.cubin.target`), never the shared `~/.cargo/cuda-"
+"oxide/` cache."
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
@@ -731,7 +736,7 @@ msgid ""
 "gpu-programming/error-handling-and-debugging.md) for current limits."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:191
+#: ../../../appendix/supported-features.md:198
 msgid "Compiler: Inline PTX"
 msgstr ""
 
@@ -757,7 +762,7 @@ msgid ""
 "ordering-around-the-barrier>`."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:199
+#: ../../../appendix/supported-features.md:206
 msgid "Runtime Library: Safety"
 msgstr ""
 
@@ -814,7 +819,7 @@ msgid ""
 "transitions are compile errors."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:209
+#: ../../../appendix/supported-features.md:216
 msgid "Runtime Library: Atomics"
 msgstr ""
 
@@ -854,7 +859,7 @@ msgstr ""
 msgid "Standard library atomic types lowered to PTX `atom.sys` instructions."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:218
+#: ../../../appendix/supported-features.md:225
 msgid "Runtime Library: Shared Memory"
 msgstr ""
 
@@ -874,8 +879,8 @@ msgstr ""
 
 #: ../../../appendix/supported-features.md:0
 msgid ""
-"`DynamicSharedArray<T, ALIGN>` — runtime-sized, set via `LaunchConfig::"
-"shared_mem_bytes`."
+"`DynamicSharedArray<T, ALIGN>` — runtime-sized, set via "
+"`LaunchConfig::shared_mem_bytes`."
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
@@ -888,7 +893,7 @@ msgid ""
 "`map_shared_rank()` for address mapping. sm_90+."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:226
+#: ../../../appendix/supported-features.md:233
 msgid "Runtime Library: Thread and Synchronization"
 msgstr ""
 
@@ -938,7 +943,7 @@ msgstr ""
 msgid "`fence_proxy_async_shared_cta()` for TMA visibility, `nanosleep(ns)`."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:236
+#: ../../../appendix/supported-features.md:243
 msgid "Runtime Library: Warp"
 msgstr ""
 
@@ -982,7 +987,7 @@ msgid ""
 "No `f64` form."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:245
+#: ../../../appendix/supported-features.md:252
 msgid "Runtime Library: Cooperative Groups"
 msgstr ""
 
@@ -1057,7 +1062,7 @@ msgid ""
 "grid-wide barriers."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:257
+#: ../../../appendix/supported-features.md:264
 msgid "Runtime Library: Debug"
 msgstr ""
 
@@ -1090,7 +1095,7 @@ msgid ""
 "`clock()`, `clock64()`, `trap()`, `breakpoint()`, `prof_trigger::<N>()`."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:265
+#: ../../../appendix/supported-features.md:272
 msgid "Runtime Library: Kernel Launch"
 msgstr ""
 
@@ -1147,7 +1152,7 @@ msgstr ""
 msgid "Compile-time cluster dimensions. Emits `.reqnctapercluster` in PTX."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:276
+#: ../../../appendix/supported-features.md:283
 msgid "Runtime Library: TMA"
 msgstr ""
 
@@ -1178,7 +1183,7 @@ msgid ""
 "completion tracking."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:286
+#: ../../../appendix/supported-features.md:293
 msgid "Runtime Library: Matrix and Tensor Cores"
 msgstr ""
 
@@ -1249,7 +1254,7 @@ msgid ""
 "carried as packed bit patterns and converted before use."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:299
+#: ../../../appendix/supported-features.md:306
 msgid "Not Yet Implemented"
 msgstr ""
 

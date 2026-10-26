@@ -1,0 +1,151 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025-2026, NVIDIA Corporation
+# This file is distributed under the same license as the cuda-oxide package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: cuda-oxide \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-26 14:41+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../../cute/layouts-and-tiling.md:1
+msgid "Layouts, Tiling, and Partitions by Example"
+msgstr ""
+
+#: ../../../cute/layouts-and-tiling.md:3
+msgid ""
+"cute-layout and cute-rs let you describe how logical coordinates map to "
+"physical memory: whether that is a 1D vector split across threads, a row-"
+"wise reduction across warps, or a 2D swizzled shared-memory tile shared by "
+"host TMA encoding and device MMA."
+msgstr ""
+
+#: ../../../cute/layouts-and-tiling.md:7
+msgid "1. Evaluating Layouts with cute-layout"
+msgstr ""
+
+#: ../../../cute/layouts-and-tiling.md:9
+msgid ""
+"cute-layout is a `no_std` crate shared by both cute-rs and the compiler. A "
+"`Layout` pairs a shape `IntTuple` with a stride `IntTuple` and maps logical "
+"coordinates to linear offsets:"
+msgstr ""
+
+#: ../../../cute/layouts-and-tiling.md:11
+msgid ""
+"use cute_layout::{IntTuple, Layout};\n"
+"\n"
+"// Shape (2, 3) with row-major stride (3, 1)\n"
+"let layout: Layout = \"(2,3):(3,1)\".parse().unwrap();\n"
+"assert_eq!(layout.checked_call(&IntTuple::Leaf(1)), Some(3));\n"
+msgstr ""
+
+#: ../../../cute/layouts-and-tiling.md:19
+msgid ""
+"In kernel signatures, you write static layouts as Rust type markers (`C<N>`, "
+"Rust tuples such as `(A, B)` for nested modes, `Layout<Shape, Stride>`, "
+"`RowMajor<R, C>`, `ColMajor<R, C>`, `Swizzle<B, M, S>`, and "
+"`ComposedLayout<Swizzle, Offset, Layout>`)."
+msgstr ""
+
+#: ../../../cute/layouts-and-tiling.md:23
+msgid "2. 1D Tiling and Ragged Tails (zipped_divide and slice)"
+msgstr ""
+
+#: ../../../cute/layouts-and-tiling.md:25
+msgid ""
+"`zipped_divide::<TILE>()` restructures a flat 1D tensor into a 2D view "
+"indexed by `(offset_inside_tile, tile_number)`. Calling `.slice(tid)` "
+"selects the tile owned by thread `tid`. `local_tile::<TILE>(tile)` is the "
+"one-call form, equal to `zipped_divide::<TILE>().slice(tile)`: CuTe's "
+"`local_tile` for a one-dimensional tiler."
+msgstr ""
+
+#: ../../../cute/layouts-and-tiling.md:31
+msgid ""
+"`zipped_divide::<4>()` and `.slice(tid)` partition a 1,003-element vector "
+"across 251 threads: threads `0..249` take the vectorized `cute.copy` path, "
+"while thread `250` runs a scalar loop over the 3-element tail."
+msgstr ""
+
+#: ../../../cute/layouts-and-tiling.md:34
+msgid ""
+"let tid = thread::index_1d().get();\n"
+"let g_a = cute_rs::Tensor::from_slice(a).zipped_divide::<4>();\n"
+"let g_b = cute_rs::Tensor::from_slice(b).zipped_divide::<4>();\n"
+"let g_c = cute_rs::TensorMut::from_disjoint_slice(&mut c).zipped_divide::"
+"<4>();\n"
+"\n"
+"let t_a = g_a.slice(tid);\n"
+"let t_b = g_b.slice(tid);\n"
+"let mut t_c = g_c.slice(tid);\n"
+"\n"
+"if t_a.is_full() {\n"
+"    let sum = unsafe { t_a.load() } + unsafe { t_b.load() };\n"
+"    unsafe { t_c.store(sum) };\n"
+"} else {\n"
+"    let mut k = t_a.base();\n"
+"    while k < a.len() {\n"
+"        unsafe { t_c.store_at(k, a[k] + b[k]) };\n"
+"        k += 1;\n"
+"    }\n"
+"}\n"
+msgstr ""
+
+#: ../../../cute/layouts-and-tiling.md:58
+msgid "3. Shared Host/Device TMA Layout Types"
+msgstr ""
+
+#: ../../../cute/layouts-and-tiling.md:60
+msgid ""
+"For 2D and 3D Tensor Memory Accelerator (TMA) transfers, you define the "
+"swizzled shared-memory layout type **once** and use it on both the host and "
+"the device:"
+msgstr ""
+
+#: ../../../cute/layouts-and-tiling.md:66
+msgid ""
+"A single `ComposedLayout<Swizzle, Offset, Layout>` type alias binds host "
+"`create_tensor_map_tiled` encoding to device `&TensorMap<T, Layout>` and "
+"`Sm100SharedTile`."
+msgstr ""
+
+#: ../../../cute/layouts-and-tiling.md:69
+msgid ""
+"use cute_rs::copy::tma::{TmaEncodeOptions, "
+"create_tensor_map_tiled_with_options};\n"
+"use cute_rs::{ComposedLayout, RowMajor, Swizzle, TensorMap};\n"
+"\n"
+"// Shared layout type: 128x64 tile with a 128-byte swizzle\n"
+"pub type ASmem = ComposedLayout<Swizzle<3, 3, 3>, 0, RowMajor<128, 64>>;\n"
+"\n"
+"// 1. Host: encode the 128-byte hardware CUtensorMap from `ASmem`\n"
+"let a_desc: TensorMap<f16, ASmem> = create_tensor_map_tiled_with_options(\n"
+"    a_dev.as_device_ptr(),\n"
+"    m,\n"
+"    k,\n"
+"    k,\n"
+"    TmaEncodeOptions::default(),\n"
+")?;\n"
+"\n"
+"// 2. Device: receive the descriptor by value via #[grid_constant]\n"
+"#[kernel]\n"
+"pub fn gemm_kernel(#[grid_constant] a: &TensorMap<f16, ASmem>) {\n"
+"    // `a` is guaranteed to carry the exact `ASmem` tile shape and swizzle\n"
+"}\n"
+msgstr ""
+
+#: ../../../cute/layouts-and-tiling.md:92
+msgid ""
+"If a kernel attempts to pass `&TensorMap<f16, ASmem>` into a copy or MMA "
+"expecting a different layout or element type, rustc rejects the program at "
+"compile time before device codegen even runs."
+msgstr ""
