@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-TW" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Tile Libraries &#8212; cuda-oxide</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=18bd87630a240e9c25be" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=18bd87630a240e9c25be" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/nvidia-sphinx-theme.css?v=5d97cc0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=3fa0529b" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/lightbox.css?v=9a4ecef8" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=18bd87630a240e9c25be"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=18bd87630a240e9c25be" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=18bd87630a240e9c25be" />
+
+    <script src="../_static/documentation_options.js?v=a7999bab"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/translations.js?v=cbf116e0"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'advanced/tile-libraries';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../_static/js/lightbox.js?v=dda6eb66"></script>
+    <script src="../_static/js/spa-nav.js?v=793c9294"></script>
+    <link rel="canonical" href="https://projects.localizethedocs.org/cuda-oxide-book-l10n/advanced/tile-libraries.html" />
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="搜尋" href="../search.html" />
+    <link rel="next" title="Architecture Overview" href="../compiler/architecture-overview.html" />
+    <link rel="prev" title="Cluster Programming" href="cluster-programming.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="color-scheme" content="light dark"/>
+  <meta name="docsearch:language" content="zh-TW"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+<script type="text/javascript" src="../ltd-provenance.js"></script>
+<script type="text/javascript" src="../ltd-current.js"></script>
+<script type="text/javascript" src="../../../ltd-config.js"></script>
+<script type="text/javascript" src="../../../ltd-flyout.js"></script>
+
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">跳转至主要内容</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>回到顶部</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="版本警告"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="网页导航">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">cuda-oxide</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVIDIA/cuda-rust" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<button type="button" class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜尋" aria-label="搜尋" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="亮色"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="暗色"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>亮色</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>暗色</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+    <button type="button" class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="当前页面">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVIDIA/cuda-rust" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<button type="button" class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="搜尋" aria-label="搜尋" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="亮色"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="暗色"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>亮色</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>暗色</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><!--
+SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<div class="sidebar-tree">
+    <p class="sidebar-tree-title">
+        Table of Contents
+    </p>
+    <p aria-level="2" class="caption" role="heading"><span class="caption-text">開始使用</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/hello-gpu.html">Writing Your First Kernel</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">編寫 GPU 程式</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/execution-model.html">The CUDA Execution Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/kernels-and-device-functions.html">Kernels and Device Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/memory-and-data-movement.html">Memory and Data Movement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/virtual-memory-and-peer-access.html">Virtual Memory Management and Peer Access</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/launching-kernels.html">Launching Kernels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/kernel-families.html">Kernel Families</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/closures-and-generics.html">Closures and Generics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-programming/error-handling-and-debugging.html">Error Handling and Debugging</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Safety on the GPU</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-safety/the-safety-model.html">The Safety Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-safety/bounds-checks.html">Bounds Checks: Pay Once or Opt Out</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">異步 GPU 程式設計</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/the-device-operation-model.html">The DeviceOperation Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/combinators-and-composition.html">Combinators and Composition</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/scheduling-and-streams.html">Scheduling and Streams</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/concurrent-execution.html">Concurrent Execution</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/overlapping-transfers-and-compute.html">Overlapping Transfers and Compute</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Building a Real Application</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../projects/async-mlp-pipeline.html">Project: Async MLP Pipeline</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Advanced GPU Features</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="shared-memory-and-synchronization.html">Shared Memory and Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="warp-level-programming.html">Warp-Level Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tensor-memory-accelerator.html">張量記憶體加速器（TMA）</a></li>
+<li class="toctree-l1"><a class="reference internal" href="matrix-multiply-accelerators.html">Matrix Multiply Accelerators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cluster-programming.html">Cluster Programming</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tile Libraries</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Inside the Compiler</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/architecture-overview.html">Architecture Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/pliron.html">Pliron -- Pliron IR (MLIR-like)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/rustc-public.html">rustc_public -- Stable MIR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/rustc-codegen-cuda.html">The Code Generator: rustc-codegen-cuda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/mir-importer.html">The MIR Importer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/compiler-optimizations.html">Compiler Optimizations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/mlir-dialects.html">Pliron Dialects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/lowering-pipeline.html">The Lowering Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/adding-new-intrinsics.html">Adding New Intrinsics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/catalog-generated-intrinsics.html">Catalog-Generated Intrinsics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/fuzzing-and-differential-testing.html">Fuzzing and Differential Testing</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">附錄</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/building-from-source.html">Building from Source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/api-quick-reference.html">API Quick Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/supported-features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/cuda-cpp-comparison.html">cuda-oxide vs CUDA C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/ecosystem.html">The Rust + GPU Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/glossary.html">Glossary</a></li>
+</ul>
+
+</div></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="初始页面">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Tile Libraries</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="tile-libraries">
+<h1>Tile Libraries<a class="headerlink" href="#tile-libraries" title="連結到這個標頭">#</a></h1>
+<p>A Tile kernel works on whole tiles and never names a thread. A SIMT function
+works on one element from one thread. A <strong>tile library</strong> joins the two. It
+packages Rust device functions so the Tile compiler can call them from inside
+a cuTile kernel, once per element or once per warp, and link them into the
+kernel's cubin. The Rust side is <code class="docutils literal notranslate"><span class="pre">#[tile_export]</span></code>, the packaging is
+<code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">oxide</span> <span class="pre">tilelib</span></code>, and the caller is cuTile Python's <code class="docutils literal notranslate"><span class="pre">foreign_call</span></code> today,
+with <a class="reference external" href="https://nvidia.github.io/cuda-rust/cutile/">cutile-rs</a> to follow.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>#[tile_export(tile_shape = 128)]
+pub fn relu(x: f32) -&gt; f32 { .. }                     your Rust function
+        |
+        |  cargo oxide tilelib &lt;crate&gt; --arch sm_120
+        v
+&lt;crate&gt;.ltoir          device code     void relu_impl(float x, float *relu_out)
+&lt;crate&gt;.iface.tilebc   declaration     @relu(tile&lt;128xf32&gt; in, tile&lt;128xf32&gt; out) -&gt; tile&lt;128xf32&gt;
+&lt;crate&gt;.impl.tilebc    implementation  @relu_impl implements @relu, one invocation per element
+        |
+        |  tileiras --preview-create-tile-lib       (CUDA 13.5 or newer)
+        v
+&lt;crate&gt;.tilelib
+        |
+        |  tp.foreign_call(symbol_name="relu", ...)   inside a cuTile kernel
+        v
+the Tile compiler links relu_impl into the kernel's cubin
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">請參閱</p>
+<p><a class="reference internal" href="../gpu-programming/kernels-and-device-functions.html"><span class="std std-doc">Kernels and Device Functions</span></a>
+covers <code class="docutils literal notranslate"><span class="pre">#[device]</span></code> and the LTOIR route to CUDA C++. A tile library is the same
+route with the Tile compiler as the caller.</p>
+</div>
+<figure class="align-center" id="id1">
+<a class="reference internal image-reference" href="../_images/tilelib-direct-linkage.svg"><img alt="../_images/tilelib-direct-linkage.svg" src="../_images/tilelib-direct-linkage.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">The direct-linkage path. cuda-oxide ships the code (LTOIR) and two
+descriptions (interface and implementation bytecode); tileiras packs them
+into one <code class="docutils literal notranslate"><span class="pre">.tilelib</span></code>, and a Tile kernel calls the Rust function from inside
+its body.</span><a class="headerlink" href="#id1" title="連結到這個圖片">#</a></p>
+</figcaption>
+</figure>
+<section id="writing-an-export">
+<h2>Writing an export<a class="headerlink" href="#writing-an-export" title="連結到這個標頭">#</a></h2>
+<p>Put <code class="docutils literal notranslate"><span class="pre">#[tile_export(tile_shape</span> <span class="pre">=</span> <span class="pre">N)]</span></code> on an ordinary function. <code class="docutils literal notranslate"><span class="pre">N</span></code> is the tile size
+the caller will pass. The function stays as written, so the rest of your
+device code keeps calling it. The attribute adds two items next to it: an
+<code class="docutils literal notranslate"><span class="pre">extern</span> <span class="pre">&quot;C&quot;</span></code> implementation on the native SIMT ABI, named <code class="docutils literal notranslate"><span class="pre">&lt;name&gt;_impl</span></code> by
+default, and a host-only description that the compiler writes out as JSON.</p>
+<p>The
+<a class="reference external" href="https://github.com/NVIDIA/cuda-rust/tree/main/cuda-oxide/crates/rustc-codegen-cuda/examples/tilelib_relu"><code class="docutils literal notranslate"><span class="pre">tilelib_relu</span></code></a>
+example exports three functions, and this chapter follows them:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::{</span><span class="n">tile_export</span><span class="p">,</span><span class="w"> </span><span class="n">warp</span><span class="p">};</span>
+
+<span class="sd">/// Elementwise `max(x, 0)`.</span>
+<span class="cp">#[tile_export(tile_shape = 128)]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">relu</span><span class="p">(</span><span class="n">x</span><span class="p">:</span><span class="w"> </span><span class="kt">f32</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="kt">f32</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">0.0</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="mf">0.0</span><span class="w"> </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="sd">/// Scale a tile in place. The cuTile side knows it as `scale_in_place`.</span>
+<span class="cp">#[tile_export(</span>
+<span class="cp">    tile_shape = 128,</span>
+<span class="cp">    name = </span><span class="s">"scale_in_place"</span><span class="cp">,</span>
+<span class="cp">    symbol = </span><span class="s">"scale_in_place_impl"</span>
+<span class="cp">)]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">scale</span><span class="p">(</span><span class="n">x</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="nc">mut</span><span class="w"> </span><span class="kt">f32</span><span class="p">,</span><span class="w"> </span><span class="n">factor</span><span class="p">:</span><span class="w"> </span><span class="kt">f32</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="o">*</span><span class="n">x</span><span class="w"> </span><span class="o">*=</span><span class="w"> </span><span class="n">factor</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="sd">/// Sum over the 32 lanes of each warp; every lane gets the warp total.</span>
+<span class="cp">#[tile_export(tile_shape = 128, sync = </span><span class="s">"warp"</span><span class="cp">)]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">warp_sum</span><span class="p">(</span><span class="n">x</span><span class="p">:</span><span class="w"> </span><span class="kt">f32</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="kt">f32</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">total</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">offset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">16</span><span class="p">;</span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="n">offset</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">total</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">warp</span><span class="p">::</span><span class="n">shuffle_xor_f32_sync</span><span class="p">(</span><span class="kt">u32</span><span class="p">::</span><span class="n">MAX</span><span class="p">,</span><span class="w"> </span><span class="n">total</span><span class="p">,</span><span class="w"> </span><span class="n">offset</span><span class="p">);</span>
+<span class="w">        </span><span class="n">offset</span><span class="w"> </span><span class="o">/=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="n">total</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>What each one becomes in the device artifact:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>cuTile name</p></th>
+<th class="head text-left"><p>Rust</p></th>
+<th class="head text-left"><p>Implementation the call resolves to</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">relu</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">fn</span> <span class="pre">relu(x:</span> <span class="pre">f32)</span> <span class="pre">-&gt;</span> <span class="pre">f32</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">void</span> <span class="pre">relu_impl(float</span> <span class="pre">x,</span> <span class="pre">float</span> <span class="pre">*relu_out)</span></code></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">scale_in_place</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">fn</span> <span class="pre">scale(x:</span> <span class="pre">&amp;mut</span> <span class="pre">f32,</span> <span class="pre">factor:</span> <span class="pre">f32)</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">void</span> <span class="pre">scale_in_place_impl(float</span> <span class="pre">*x,</span> <span class="pre">float</span> <span class="pre">factor)</span></code></p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">warp_sum</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">fn</span> <span class="pre">warp_sum(x:</span> <span class="pre">f32)</span> <span class="pre">-&gt;</span> <span class="pre">f32</span></code>, warp sync</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">void</span> <span class="pre">warp_sum_impl(float</span> <span class="pre">x,</span> <span class="pre">float</span> <span class="pre">*warp_sum_out)</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">warp_sum</span></code> uses warp shuffles, which are legal because <code class="docutils literal notranslate"><span class="pre">sync</span> <span class="pre">=</span> <span class="pre">&quot;warp&quot;</span></code> makes
+all 32 lanes of a warp call it together. The
+<a class="reference internal" href="warp-level-programming.html"><span class="std std-doc">Warp-Level Programming</span></a> chapter explains the
+shuffle pattern.</p>
+<section id="attribute-arguments">
+<h3>Attribute arguments<a class="headerlink" href="#attribute-arguments" title="連結到這個標頭">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Argument</p></th>
+<th class="head text-left"><p>Meaning</p></th>
+<th class="head text-left"><p>Default</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">tile_shape</span> <span class="pre">=</span> <span class="pre">N</span></code></p></td>
+<td class="text-left"><p>1-D tile size, an integer literal (required)</p></td>
+<td class="text-left"><p>none</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">name</span> <span class="pre">=</span> <span class="pre">&quot;...&quot;</span></code></p></td>
+<td class="text-left"><p>declaration name the cuTile caller uses</p></td>
+<td class="text-left"><p>the function name</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">symbol</span> <span class="pre">=</span> <span class="pre">&quot;...&quot;</span></code></p></td>
+<td class="text-left"><p>implementation symbol in the device artifact</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">&lt;name&gt;_impl</span></code></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">sync</span> <span class="pre">=</span> <span class="pre">&quot;none&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;warp&quot;</span></code></p></td>
+<td class="text-left"><p>threads that must call the function together</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">&quot;none&quot;</span></code></p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">arch</span> <span class="pre">=</span> <span class="pre">[&quot;sm_120&quot;,</span> <span class="pre">...]</span></code></p></td>
+<td class="text-left"><p>compute capabilities the implementation supports</p></td>
+<td class="text-left"><p>every architecture</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">arch</span></code> is normally omitted, which matches every target. When given, names are
+compared after stripping <code class="docutils literal notranslate"><span class="pre">_</span></code> and lowercasing, so <code class="docutils literal notranslate"><span class="pre">&quot;sm_120&quot;</span></code> also matches the
+<code class="docutils literal notranslate"><span class="pre">sm_120a</span></code> the Tile compiler builds for.</p>
+</section>
+<section id="parameters-and-the-abi">
+<h3>Parameters and the ABI<a class="headerlink" href="#parameters-and-the-abi" title="連結到這個標頭">#</a></h3>
+<p>Every parameter is a plain identifier with one of four types. <code class="docutils literal notranslate"><span class="pre">T</span></code> is one of
+<code class="docutils literal notranslate"><span class="pre">f16</span></code>, <code class="docutils literal notranslate"><span class="pre">f32</span></code>, <code class="docutils literal notranslate"><span class="pre">f64</span></code>, <code class="docutils literal notranslate"><span class="pre">i8</span></code>, <code class="docutils literal notranslate"><span class="pre">i16</span></code>, <code class="docutils literal notranslate"><span class="pre">i32</span></code>, <code class="docutils literal notranslate"><span class="pre">i64</span></code>, <code class="docutils literal notranslate"><span class="pre">u8</span></code>, <code class="docutils literal notranslate"><span class="pre">u16</span></code>, <code class="docutils literal notranslate"><span class="pre">u32</span></code>, <code class="docutils literal notranslate"><span class="pre">u64</span></code>.
+Tile IR has no unsigned integers, so a <code class="docutils literal notranslate"><span class="pre">u32</span></code> parameter is an <code class="docutils literal notranslate"><span class="pre">i32</span></code> tile on the
+Tile side, same bits.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Rust parameter</p></th>
+<th class="head text-left"><p>Access</p></th>
+<th class="head text-left"><p>Footprint</p></th>
+<th class="head text-left"><p>ABI parameter</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">x:</span> <span class="pre">T</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">in</span></code></p></td>
+<td class="text-left"><p>1</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">T</span></code> by value</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">x:</span> <span class="pre">&amp;T</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">in</span></code></p></td>
+<td class="text-left"><p>1</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">*const</span> <span class="pre">T</span></code></p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">x:</span> <span class="pre">&amp;[T;</span> <span class="pre">F]</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">in</span></code></p></td>
+<td class="text-left"><p>F</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">*const</span> <span class="pre">T</span></code></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">x:</span> <span class="pre">&amp;mut</span> <span class="pre">T</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">inout</span></code></p></td>
+<td class="text-left"><p>1</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">*mut</span> <span class="pre">T</span></code></p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">x:</span> <span class="pre">&amp;mut</span> <span class="pre">[T;</span> <span class="pre">F]</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">inout</span></code></p></td>
+<td class="text-left"><p>F</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">*mut</span> <span class="pre">T</span></code></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">-&gt;</span> <span class="pre">T</span></code> (return value)</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">out</span></code></p></td>
+<td class="text-left"><p>1</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">*mut</span> <span class="pre">T</span></code>, appended last as <code class="docutils literal notranslate"><span class="pre">&lt;fn&gt;_out</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The footprint is the number of contiguous tile elements one invocation owns.
+Only an <code class="docutils literal notranslate"><span class="pre">in</span></code> scalar travels by value. Everything else is a pointer to the
+invocation's own elements, and the implementation returns nothing: a return
+value is stored through the trailing <code class="docutils literal notranslate"><span class="pre">out</span></code> pointer. On the Tile side every
+parameter, the return slot included, is one argument of the declaration, typed
+as a tile of the export's size. Slices, raw pointers, tuples, structs, <code class="docutils literal notranslate"><span class="pre">bool</span></code>,
+generics, <code class="docutils literal notranslate"><span class="pre">self</span></code>, and patterns in parameter position are rejected.</p>
+</section>
+<section id="rules-the-tooling-enforces">
+<h3>Rules the tooling enforces<a class="headerlink" href="#rules-the-tooling-enforces" title="連結到這個標頭">#</a></h3>
+<p>The attribute reports these at compile time:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">tile_shape</span></code> is present, an integer literal, and positive. A constant or an
+expression is not accepted: a static library ships one concrete symbol per
+export.</p></li>
+<li><p>The export has an output: a return value, or at least one <code class="docutils literal notranslate"><span class="pre">&amp;mut</span></code> parameter.
+A declaration's results are its <code class="docutils literal notranslate"><span class="pre">out</span></code> and <code class="docutils literal notranslate"><span class="pre">inout</span></code> arguments.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">out</span></code> and <code class="docutils literal notranslate"><span class="pre">inout</span></code> parameters form one contiguous run.
+<code class="docutils literal notranslate"><span class="pre">fn</span> <span class="pre">f(a:</span> <span class="pre">&amp;mut</span> <span class="pre">f32,</span> <span class="pre">b:</span> <span class="pre">f32)</span> <span class="pre">-&gt;</span> <span class="pre">f32</span></code> is <code class="docutils literal notranslate"><span class="pre">[inout,</span> <span class="pre">in,</span> <span class="pre">out]</span></code> and is rejected;
+write <code class="docutils literal notranslate"><span class="pre">fn</span> <span class="pre">f(b:</span> <span class="pre">f32,</span> <span class="pre">a:</span> <span class="pre">&amp;mut</span> <span class="pre">f32)</span> <span class="pre">-&gt;</span> <span class="pre">f32</span></code>, with the <code class="docutils literal notranslate"><span class="pre">in</span></code> parameters first.</p></li>
+<li><p>Every parameter of one export has the same footprint, because the
+fragments of one implementation share their invocation count. A
+<code class="docutils literal notranslate"><span class="pre">&amp;mut</span> <span class="pre">[i32;</span> <span class="pre">4]</span></code> next to a <code class="docutils literal notranslate"><span class="pre">&amp;i32</span></code> would need 32 invocations for one argument
+and 128 for the other, so <code class="docutils literal notranslate"><span class="pre">fn</span> <span class="pre">window(acc:</span> <span class="pre">&amp;mut</span> <span class="pre">[i32;</span> <span class="pre">4],</span> <span class="pre">bias:</span> <span class="pre">&amp;i32)</span></code> is
+rejected and <code class="docutils literal notranslate"><span class="pre">bias:</span> <span class="pre">&amp;[i32;</span> <span class="pre">4]</span></code> is the accepted form.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sync</span> <span class="pre">=</span> <span class="pre">&quot;warp&quot;</span></code> needs a tile size that is a multiple of 32 times the
+footprint, so every invocation fills whole warps.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">name</span></code> and <code class="docutils literal notranslate"><span class="pre">symbol</span></code> are ASCII identifiers outside the reserved
+<code class="docutils literal notranslate"><span class="pre">cuda_oxide_</span></code> prefix.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">oxide</span> <span class="pre">tilelib</span></code> repeats the same checks when it reads the descriptions
+back, so a hand-edited description cannot slip past them.</p>
+</section>
+</section>
+<section id="building-the-library">
+<h2>Building the library<a class="headerlink" href="#building-the-library" title="連結到這個標頭">#</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cargo<span class="w"> </span>oxide<span class="w"> </span>tilelib<span class="w"> </span>tilelib_relu<span class="w"> </span>--arch<span class="w"> </span>sm_120<span class="w"> </span>--print
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">--arch</span></code> is required because the LTOIR inside a library is built for one
+architecture. In a standalone project, such as one made with <code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">oxide</span> <span class="pre">new</span></code>,
+the crate name can be omitted. The command runs <code class="docutils literal notranslate"><span class="pre">emit-ltoir</span></code>, then writes the
+description modules next to the device artifact:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>tilelib_relu.ltoir               device code for sm_120
+tilelib_relu.tileexports.json    one description per export, written by the compiler
+tilelib_relu.iface.tilebc        declarations, Tile IR bytecode at the assembler's version
+tilelib_relu.impl.tilebc         implementations, same version
+tilelib_relu.tilelib.mlir        readable form of both; --print shows it
+tilelib_relu.tilelib             the library, when tileiras can build it
+</pre></div>
+</div>
+<p>Before writing the modules it checks the emitted NVVM IR: every implementation
+symbol must be a <code class="docutils literal notranslate"><span class="pre">define</span> <span class="pre">void</span></code> with the parameter list the ABI table predicts,
+for example <code class="docutils literal notranslate"><span class="pre">define</span> <span class="pre">void</span> <span class="pre">&#64;relu_impl(float,</span> <span class="pre">ptr)</span></code>. The assembler never looks
+inside the code payload, so a missing or misdeclared symbol would otherwise
+surface only when a cuTile program is compiled against the library. The two
+bytecode modules are built by the <code class="docutils literal notranslate"><span class="pre">oxide-tilebc</span></code> crate, cuda-oxide's own
+writer for these two kinds of module; the Tile stack's crates are not
+involved.
+writes its own Tile IR with.</p>
+<section id="reading-the-dump">
+<h3>Reading the dump<a class="headerlink" href="#reading-the-dump" title="連結到這個標頭">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">--print</span></code> shows both modules in Tile IR syntax. The text is the same as
+<code class="docutils literal notranslate"><span class="pre">tilelib_relu.tilelib.mlir</span></code>. For <code class="docutils literal notranslate"><span class="pre">tilelib_relu</span></code>:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>// tilelib_relu.iface.tilebc: the interface a cuTile program calls
+cuda_tile.module @tilelib_relu {
+  cuda_tile.preview$func extern @relu(%x: !cuda_tile.tile&lt;128xf32&gt; {cuda_tile.preview$access = #cuda_tile.preview$access&lt;in&gt;}, %relu_out: !cuda_tile.tile&lt;128xf32&gt; {cuda_tile.preview$access = #cuda_tile.preview$access&lt;out&gt;}) -&gt; !cuda_tile.tile&lt;128xf32&gt;
+  cuda_tile.preview$func extern @scale_in_place(%x: !cuda_tile.tile&lt;128xf32&gt; {cuda_tile.preview$access = #cuda_tile.preview$access&lt;inout&gt;}, %factor: !cuda_tile.tile&lt;128xf32&gt; {cuda_tile.preview$access = #cuda_tile.preview$access&lt;in&gt;}) -&gt; !cuda_tile.tile&lt;128xf32&gt;
+  cuda_tile.preview$func extern @warp_sum(%x: !cuda_tile.tile&lt;128xf32&gt; {cuda_tile.preview$access = #cuda_tile.preview$access&lt;in&gt;}, %warp_sum_out: !cuda_tile.tile&lt;128xf32&gt; {cuda_tile.preview$access = #cuda_tile.preview$access&lt;out&gt;}) -&gt; !cuda_tile.tile&lt;128xf32&gt;
+}
+// tilelib_relu.impl.tilebc: the implementations the LTOIR defines
+cuda_tile.module @tilelib_relu {
+  cuda_tile.preview$extern_impl @relu_impl implements @relu(%x: !cuda_tile.preview$fragment&lt;1xf32, local, mem_layout = #cuda_tile.preview$layout&lt;():()&gt;, fragmap = #cuda_tile.preview$layout&lt;(128, 1, 1):(1, 0, 0)&gt;&gt; {cuda_tile.preview$access = #cuda_tile.preview$access&lt;in&gt;}, %relu_out: !cuda_tile.preview$fragment&lt;1xf32, local, mem_layout = #cuda_tile.preview$layout&lt;(1):(1)&gt;, fragmap = #cuda_tile.preview$layout&lt;(128, 1, 1):(1, 0, 0)&gt;&gt; {cuda_tile.preview$access = #cuda_tile.preview$access&lt;out&gt;})
+  cuda_tile.preview$extern_impl @scale_in_place_impl implements @scale_in_place(%x: !cuda_tile.preview$fragment&lt;1xf32, local, mem_layout = #cuda_tile.preview$layout&lt;(1):(1)&gt;, fragmap = #cuda_tile.preview$layout&lt;(128, 1, 1):(1, 0, 0)&gt;&gt; {cuda_tile.preview$access = #cuda_tile.preview$access&lt;inout&gt;}, %factor: !cuda_tile.preview$fragment&lt;1xf32, local, mem_layout = #cuda_tile.preview$layout&lt;():()&gt;, fragmap = #cuda_tile.preview$layout&lt;(128, 1, 1):(1, 0, 0)&gt;&gt; {cuda_tile.preview$access = #cuda_tile.preview$access&lt;in&gt;})
+  cuda_tile.preview$extern_impl @warp_sum_impl implements @warp_sum(%x: !cuda_tile.preview$fragment&lt;1xf32, local, mem_layout = #cuda_tile.preview$layout&lt;():()&gt;, fragmap = #cuda_tile.preview$layout&lt;(4, 32, 1):(32, 1, 0)&gt;&gt; {cuda_tile.preview$access = #cuda_tile.preview$access&lt;in&gt;}, %warp_sum_out: !cuda_tile.preview$fragment&lt;1xf32, local, mem_layout = #cuda_tile.preview$layout&lt;(1):(1)&gt;, fragmap = #cuda_tile.preview$layout&lt;(4, 32, 1):(32, 1, 0)&gt;&gt; {cuda_tile.preview$access = #cuda_tile.preview$access&lt;out&gt;})
+    synchronization = #cuda_tile.preview$synchronization&lt;warp&gt;
+}
+</pre></div>
+</div>
+<p>How to read it:</p>
+<ul class="simple">
+<li><p>The interface has one <code class="docutils literal notranslate"><span class="pre">preview$func</span> <span class="pre">extern</span></code> per export. Every Rust parameter
+is a <code class="docutils literal notranslate"><span class="pre">tile&lt;128xf32&gt;</span></code> argument with its access, and the results are the
+<code class="docutils literal notranslate"><span class="pre">out</span></code> and <code class="docutils literal notranslate"><span class="pre">inout</span></code> arguments in order. <code class="docutils literal notranslate"><span class="pre">relu</span></code> returns one tile, its
+<code class="docutils literal notranslate"><span class="pre">relu_out</span></code> slot.</p></li>
+<li><p>The implementation has one <code class="docutils literal notranslate"><span class="pre">preview$extern_impl</span></code> per export, naming the
+symbol it <code class="docutils literal notranslate"><span class="pre">implements</span></code>. Every argument is a <code class="docutils literal notranslate"><span class="pre">fragment</span></code>: the piece of the tile
+one invocation sees. <code class="docutils literal notranslate"><span class="pre">mem_layout</span></code> is the buffer's own layout: <code class="docutils literal notranslate"><span class="pre">():()</span></code> for a
+by-value scalar, <code class="docutils literal notranslate"><span class="pre">(1):(1)</span></code> for one element behind a pointer.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fragmap</span></code> maps <code class="docutils literal notranslate"><span class="pre">(invocations,</span> <span class="pre">participants,</span> <span class="pre">footprint)</span></code> onto the tile.
+<code class="docutils literal notranslate"><span class="pre">(128,</span> <span class="pre">1,</span> <span class="pre">1):(1,</span> <span class="pre">0,</span> <span class="pre">0)</span></code> is one invocation per element, 128 of them.
+<code class="docutils literal notranslate"><span class="pre">(4,</span> <span class="pre">32,</span> <span class="pre">1):(32,</span> <span class="pre">1,</span> <span class="pre">0)</span></code> is 4 invocations of 32 lanes each, which is what
+<code class="docutils literal notranslate"><span class="pre">synchronization</span> <span class="pre">=</span> <span class="pre">warp</span></code> requires.</p></li>
+</ul>
+<p>The summary line names the artifacts and their sizes:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>✓ Tile library descriptions written: 3 export(s), Tile IR 13.5 with the preview tag
+</pre></div>
+</div>
+</section>
+<section id="the-tileiras-requirement">
+<h3>The tileiras requirement<a class="headerlink" href="#the-tileiras-requirement" title="連結到這個標頭">#</a></h3>
+<p>The descriptions are Tile IR public-preview content, which exists from
+bytecode 13.5 on. An assembler reads preview content only at the version it
+calls current, the newest numbered version its <code class="docutils literal notranslate"><span class="pre">--list-versions</span></code> prints, so
+the command asks the resolved <code class="docutils literal notranslate"><span class="pre">tileiras</span></code> first and writes the descriptions at
+that version: 13.5 for the CUDA 13.5 assembler, the newer version a newer
+assembler names, and 13.5 when no assembler can read them yet.
+<code class="docutils literal notranslate"><span class="pre">tileiras</span> <span class="pre">--preview-create-tile-lib</span></code> arrives with CUDA 13.5, the first
+assembler whose <code class="docutils literal notranslate"><span class="pre">--list-versions</span></code> names 13.5. When the resolved <code class="docutils literal notranslate"><span class="pre">tileiras</span></code>
+lists 13.5 or newer, the command assembles the interface, the
+implementations, and the LTOIR into <code class="docutils literal notranslate"><span class="pre">tilelib_relu.tilelib</span></code> (or the path given
+with <code class="docutils literal notranslate"><span class="pre">-o</span></code>) and prints the <code class="docutils literal notranslate"><span class="pre">tileiras</span></code> invocation it used.</p>
+<p>On CUDA 13.4 the command stops after the descriptions and says why:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Tile library skipped: /usr/local/cuda/bin/tileiras lists bytecode versions 13.1, 13.2, 13.3, 13.4; the descriptions need 13.5 or newer
+The installed tileiras cannot create tile libraries: the descriptions are Tile IR public-preview content, which exists from bytecode 13.5 on and needs the CUDA 13.5 or newer assembler.
+</pre></div>
+</div>
+<p>It then prints the <code class="docutils literal notranslate"><span class="pre">tileiras</span> <span class="pre">--preview-create-tile-lib</span></code> command that turns the
+written files into the library on a newer toolkit, and exits 2 so a script
+notices the missing library. <code class="docutils literal notranslate"><span class="pre">--library-optional</span></code> makes that outcome exit 0
+when the LTOIR and the descriptions are all you need. Both outcomes print a
+line a script can match: <code class="docutils literal notranslate"><span class="pre">Tile</span> <span class="pre">library</span> <span class="pre">written</span> <span class="pre">to</span></code> on success,
+<code class="docutils literal notranslate"><span class="pre">Tile</span> <span class="pre">library</span> <span class="pre">skipped:</span></code> otherwise. The assembler is resolved from
+<code class="docutils literal notranslate"><span class="pre">CUTILE_TILEIRAS_PATH</span></code> first, then from <code class="docutils literal notranslate"><span class="pre">PATH</span></code>, the configured CUDA toolkit
+root, and the standard install locations. The
+<a class="reference internal" href="../getting-started/installation.html"><span class="std std-doc">installation guide</span></a> covers toolkit
+selection.</p>
+</section>
+</section>
+<section id="calling-it-from-cutile-python">
+<h2>Calling it from cuTile Python<a class="headerlink" href="#calling-it-from-cutile-python" title="連結到這個標頭">#</a></h2>
+<p>A cuTile kernel reaches the export through <code class="docutils literal notranslate"><span class="pre">cuda.tile_preview.foreign_call</span></code>.
+This is the kernel from the example's <code class="docutils literal notranslate"><span class="pre">python/call_from_cutile.py</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">cuda.tile</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ct</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">cuda</span><span class="w"> </span><span class="kn">import</span> <span class="n">tile_preview</span> <span class="k">as</span> <span class="n">tp</span>
+
+<span class="n">TILE</span> <span class="o">=</span> <span class="mi">128</span>
+<span class="n">PROVIDER</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">Tilelib</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s2">"tilelib_relu.tilelib"</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">"0.1.0"</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">relu_tile</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""One block runs `relu` over one 128-float tile of `x` into `y`."""</span>
+    <span class="n">pid</span> <span class="o">=</span> <span class="n">ct</span><span class="o">.</span><span class="n">bid</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">tile</span> <span class="o">=</span> <span class="n">ct</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="p">(</span><span class="n">pid</span><span class="p">,),</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">TILE</span><span class="p">,))</span>
+    <span class="c1"># Every declaration argument needs an input tile, the `out` slot included.</span>
+    <span class="n">result_slot</span> <span class="o">=</span> <span class="n">ct</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">TILE</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">ct</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="p">(</span><span class="n">out</span><span class="p">,)</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">foreign_call</span><span class="p">(</span>
+        <span class="n">tilelibs</span><span class="o">=</span><span class="p">(</span><span class="n">PROVIDER</span><span class="p">,),</span>
+        <span class="n">symbol_name</span><span class="o">=</span><span class="s2">"relu"</span><span class="p">,</span>
+        <span class="n">constant_params</span><span class="o">=</span><span class="p">(),</span>
+        <span class="n">inputs</span><span class="o">=</span><span class="p">(</span><span class="n">tile</span><span class="p">,</span> <span class="n">result_slot</span><span class="p">),</span>
+        <span class="n">output_types</span><span class="o">=</span><span class="p">((</span><span class="n">ct</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="p">(</span><span class="n">TILE</span><span class="p">,)),),</span>
+    <span class="p">)</span>
+    <span class="n">ct</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="p">(</span><span class="n">pid</span><span class="p">,),</span> <span class="n">tile</span><span class="o">=</span><span class="n">out</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Three things to get right:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">symbol_name</span></code> is the declaration name, <code class="docutils literal notranslate"><span class="pre">relu</span></code>, not the implementation symbol
+<code class="docutils literal notranslate"><span class="pre">relu_impl</span></code>. The Tile compiler resolves the call to the implementation when
+it links the library.</p></li>
+<li><p>Every declaration argument takes a tile, the <code class="docutils literal notranslate"><span class="pre">out</span></code> ones included. <code class="docutils literal notranslate"><span class="pre">relu</span></code> has
+two arguments, so <code class="docutils literal notranslate"><span class="pre">inputs</span></code> has two tiles; a zero tile stands in for the
+result slot. A scalar needs a 0-d tile, and a Python literal is rejected.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">output_types</span></code> lists the results, one <code class="docutils literal notranslate"><span class="pre">(dtype,</span> <span class="pre">shape)</span></code> per <code class="docutils literal notranslate"><span class="pre">out</span></code> or <code class="docutils literal notranslate"><span class="pre">inout</span></code>
+argument in declaration order. <code class="docutils literal notranslate"><span class="pre">relu</span></code> has one.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">foreign_call</span></code> reads the library as a compile-time constant, so the <code class="docutils literal notranslate"><span class="pre">Tilelib</span></code>
+is a module global rather than a kernel argument, and its file has to exist
+when the kernel is traced. The script's <code class="docutils literal notranslate"><span class="pre">--dry-run</span></code> compiles the kernel to
+bytecode without <code class="docutils literal notranslate"><span class="pre">tileiras</span></code>, which works on CUDA 13.4 today:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>bytecode: 844 bytes, header 0d050100 (version 13.5, preview flag set)
+PASS: the caller side compiles; the program calls `relu` through preview$call (dry run, no cubin)
+</pre></div>
+</div>
+<p>The full run needs the <code class="docutils literal notranslate"><span class="pre">.tilelib</span></code> from a CUDA 13.5 or newer <code class="docutils literal notranslate"><span class="pre">tileiras</span></code> and
+a cuTile Python that lists that assembler's current bytecode version, because
+preview content is read only at that version.</p>
+</section>
+<section id="calling-it-from-tile-c">
+<h2>Calling it from Tile C++<a class="headerlink" href="#calling-it-from-tile-c" title="連結到這個標頭">#</a></h2>
+<p>The same toolkit that brings the assembler teaches nvcc <code class="docutils literal notranslate"><span class="pre">--enable-tile</span></code> and
+<code class="docutils literal notranslate"><span class="pre">--tile-preview</span> <span class="pre">simt</span></code>, and a Tile C++ kernel calls the library through a
+foreign declaration. The example's <code class="docutils literal notranslate"><span class="pre">cpp/tile_caller.cu</span></code> declares all three
+exports; this is the <code class="docutils literal notranslate"><span class="pre">relu</span></code> one:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>namespace ct = cuda::tiles;
+using tile_f32 = ct::tile&lt;float, ct::shape&lt;128&gt;&gt;;
+
+// @relu(%x: tile&lt;128xf32&gt; in, %relu_out: tile&lt;128xf32&gt; out) -&gt; tile&lt;128xf32&gt;
+__experimental_foreign_decl__ __experimental_foreign_name__("relu")
+    tile_f32 relu(tile_f32 x, [[cutile::experimental_inout]] tile_f32 relu_out);
+
+[[cutile::hint(0, num_worker_warps_per_cta = 4)]] __tile_global__ void kernel(float* x, float* y) {
+    auto xs = ct::partition_view { ct::tensor_span { x, ct::shape&lt;128&gt; {} }, ct::shape&lt;128&gt; {} };
+    auto ys = ct::partition_view { ct::tensor_span { y, ct::shape&lt;128&gt; {} }, ct::shape&lt;128&gt; {} };
+    ys.store(relu(xs.load(0), ys.load(0)), 0);
+}
+</pre></div>
+</div>
+<p>A parameter the library reads carries no attribute; one it writes carries
+<code class="docutils literal notranslate"><span class="pre">[[cutile::experimental_inout]]</span></code> and comes back as the call's result, in
+argument order. The declaration's name is the library's declaration name,
+not the implementation symbol. Compile and run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nvcc<span class="w"> </span>--enable-tile<span class="w"> </span>--tile-preview<span class="w"> </span>simt<span class="w"> </span>-Xtileiras<span class="o">=</span>-l<span class="o">=</span>tilelib_relu.tilelib<span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>-std<span class="o">=</span>c++20<span class="w"> </span>-arch<span class="o">=</span>sm_120<span class="w"> </span>-o<span class="w"> </span>tile_caller<span class="w"> </span>cpp/tile_caller.cu
+./tile_caller
+</pre></div>
+</div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>PASS relu: 128 elements through the tile library
+PASS scale_in_place: 128 elements through the tile library
+PASS warp_sum: 128 elements through the tile library, every lane holding its warp's total
+SUCCESS: 3/3 tile exports called from a Tile C++ kernel
+</pre></div>
+</div>
+<p>Because nvcc, tileiras and the Tile C++ front end come from one toolkit, the
+program and the library always agree on the bytecode version. That is the
+shortest path to a running Tile kernel on top of a Rust library; the cuTile
+Python path needs a cuTile Python that lists the same assembler's version.</p>
+</section>
+<section id="what-happens-at-the-boundary">
+<h2>What happens at the boundary<a class="headerlink" href="#what-happens-at-the-boundary" title="連結到這個標頭">#</a></h2>
+<p>The Tile compiler never hands your function a whole tile. It splits each tile
+argument into fragments, one per invocation, and calls the implementation once
+per fragment. With <code class="docutils literal notranslate"><span class="pre">sync</span> <span class="pre">=</span> <span class="pre">&quot;none&quot;</span></code> a fragment is one element, so a 128-element
+tile means 128 calls, each from one thread. With <code class="docutils literal notranslate"><span class="pre">sync</span> <span class="pre">=</span> <span class="pre">&quot;warp&quot;</span></code> an invocation
+is a whole warp: 32 lanes call together, each with its own element, and warp
+intrinsics are legal inside. The calling thread is a real thread of the Tile
+kernel, and <code class="docutils literal notranslate"><span class="pre">threadIdx.x</span></code> reads the hardware register, so lane and warp
+identity work as in any SIMT kernel (see the
+<a class="reference internal" href="../gpu-programming/execution-model.html"><span class="std std-doc">Execution Model</span></a>).</p>
+<p>The pointers you receive point at the invocation's own buffer and nothing
+else. <code class="docutils literal notranslate"><span class="pre">&amp;mut</span> <span class="pre">f32</span></code> is one element and <code class="docutils literal notranslate"><span class="pre">&amp;mut</span> <span class="pre">[f32;</span> <span class="pre">4]</span></code> is four contiguous
+elements; the function may not reach past them, and nothing outside the
+invocation aliases them during the call. The function cannot allocate shared
+memory, so do not declare a <code class="docutils literal notranslate"><span class="pre">SharedArray</span></code> in an export: the shared memory of a
+Tile kernel is the Tile compiler's to place, and this release has no way to
+request a scratch buffer from it (see
+<a class="reference internal" href="shared-memory-and-synchronization.html"><span class="std std-doc">Shared Memory and Synchronization</span></a>
+for what shared memory means in a SIMT kernel). Keep exports to registers,
+the parameters they receive, and warp traffic.</p>
+</section>
+<section id="not-in-this-release">
+<h2>Not in this release<a class="headerlink" href="#not-in-this-release" title="連結到這個標頭">#</a></h2>
+<ul class="simple">
+<li><p>Parametric tile sizes. <code class="docutils literal notranslate"><span class="pre">tile_shape</span></code> is one integer literal, so a library ships one
+export per tile size.</p></li>
+<li><p>Warpgroup and CTA scope. <code class="docutils literal notranslate"><span class="pre">sync</span></code> accepts <code class="docutils literal notranslate"><span class="pre">&quot;none&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;warp&quot;</span></code> only.</p></li>
+<li><p>Scratch memory. An export cannot ask for a shared-memory buffer.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bf16</span></code> parameters. The attribute accepts <code class="docutils literal notranslate"><span class="pre">f16</span></code> but not <code class="docutils literal notranslate"><span class="pre">bf16</span></code> yet.</p></li>
+<li><p>2-D tiles. <code class="docutils literal notranslate"><span class="pre">tile_shape</span></code> has one extent.</p></li>
+<li><p>Linkage providers, the form of a library that compiles implementations on
+demand while the Tile compiler runs. They are not a public CUDA 13.5
+surface. A static library ships one implementation per declaration.</p></li>
+<li><p>A cutile-rs caller. Only cuTile Python has <code class="docutils literal notranslate"><span class="pre">foreign_call</span></code> today.</p></li>
+</ul>
+<p>The <a class="reference internal" href="../appendix/supported-features.html"><span class="std std-doc">Supported Features</span></a> appendix tracks
+the interop status alongside the rest of the compiler.</p>
+<section id="verifying-the-abi-on-cuda-13-4">
+<h3>Verifying the ABI on CUDA 13.4<a class="headerlink" href="#verifying-the-abi-on-cuda-13-4" title="連結到這個標頭">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">.tilelib</span></code> needs the CUDA 13.5 or newer assembler, but the ABI can be
+proven today. The example's
+host program stands in for the Tile compiler:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cargo<span class="w"> </span>oxide<span class="w"> </span>run<span class="w"> </span>tilelib_relu<span class="w"> </span>--emit-nvvm-ir<span class="w"> </span>--arch<span class="w"> </span>sm_120
+</pre></div>
+</div>
+<p>It reads <code class="docutils literal notranslate"><span class="pre">tilelib_relu.tileexports.json</span></code>, generates <code class="docutils literal notranslate"><span class="pre">mock/caller.cu</span></code> with the
+prototypes the ABI table predicts and one kernel per export, compiles that with
+<code class="docutils literal notranslate"><span class="pre">nvcc</span></code> to LTOIR, links it with the Rust LTOIR through nvJitLink, the same
+two-input link a consumed library gets, and runs one block of 128 threads per
+export on the GPU. Every result is compared bit for bit:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>PASS relu: 128 elements through `relu_impl`, relu of a ramp from -4 to 4
+PASS scale_in_place: 128 elements through `scale_in_place_impl`, the ramp scaled in place by 0.5
+PASS warp_sum: 128 elements through `warp_sum_impl`, 32-lane sums over 0..128, every lane holding its warp's total
+SUCCESS: 3/3 tile exports verified through the native ABI
+</pre></div>
+</div>
+<p>The prototypes in <code class="docutils literal notranslate"><span class="pre">mock/caller.cu</span></code> are derived from the descriptions, not
+written by hand, so the generated file is the ABI as the tooling understands
+it. Without <code class="docutils literal notranslate"><span class="pre">nvcc</span></code>, or on a GPU that does not match <code class="docutils literal notranslate"><span class="pre">--arch</span></code>, the program
+prints <code class="docutils literal notranslate"><span class="pre">skipping:</span></code> with the reason and exits 0.</p>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="cluster-programming.html"
+       title="上一页">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">上一頁</p>
+        <p class="prev-next-title">Cluster Programming</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../compiler/architecture-overview.html"
+       title="下一页">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">下一頁</p>
+        <p class="prev-next-title">Architecture Overview</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> 当前页面
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#writing-an-export">Writing an export</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#attribute-arguments">Attribute arguments</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#parameters-and-the-abi">Parameters and the ABI</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#rules-the-tooling-enforces">Rules the tooling enforces</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#building-the-library">Building the library</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#reading-the-dump">Reading the dump</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-tileiras-requirement">The tileiras requirement</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#calling-it-from-cutile-python">Calling it from cuTile Python</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#calling-it-from-tile-c">Calling it from Tile C++</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-happens-at-the-boundary">What happens at the boundary</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#not-in-this-release">Not in this release</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#verifying-the-abi-on-cuda-13-4">Verifying the ABI on CUDA 13.4</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=18bd87630a240e9c25be"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=18bd87630a240e9c25be"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+    <div class="footer-items__center">
+      
+        <div class="footer-item"><!--
+SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<footer class="bd-footer-content">
+  <div class="footer-container" style="padding: 1rem 0 2rem 0; border-top: 1px solid var(--pst-color-border); text-align: left;">
+    
+    <!-- NVIDIA Logo -->
+    <div style="margin-bottom: 1rem;">
+      <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem; filter: brightness(0);"
+           class="only-light">
+      <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem;"
+           class="only-dark pst-js-only">
+    </div>
+    
+    <!-- Footer Links - single line, left aligned -->
+    <div style="font-size: 0.8125rem; margin-bottom: 0.5rem; color: var(--pst-color-text-muted);">
+      <a href="https://www.nvidia.com/en-us/about-nvidia/privacy-policy/" target="_blank" style="color: inherit; text-decoration: none;">Privacy Policy</a> | 
+      <a href="https://www.nvidia.com/en-us/preferences/email-preferences/" target="_blank" style="color: inherit; text-decoration: none;">Your Privacy Choices</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/terms-of-service/" target="_blank" style="color: inherit; text-decoration: none;">Terms of Service</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/accessibility/" target="_blank" style="color: inherit; text-decoration: none;">Accessibility</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/company-policies/" target="_blank" style="color: inherit; text-decoration: none;">Corporate Policies</a> | 
+      <a href="https://www.nvidia.com/en-us/product-security/" target="_blank" style="color: inherit; text-decoration: none;">Product Security</a> | 
+      <a href="https://www.nvidia.com/en-us/contact/" target="_blank" style="color: inherit; text-decoration: none;">Contact</a>
+    </div>
+    
+    <!-- Copyright -->
+    <div style="font-size: 0.8125rem; color: var(--pst-color-text-muted);">
+      Copyright &copy; 2025-2026, NVIDIA.
+    </div>
+    
+  </div>
+</footer></div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>
