@@ -47,9 +47,9 @@
     "branch" : "main",
     "commit" : 
     {
-      "date" : "2026-10-19 20:16:03 +0530",
-      "hash" : "717432490ccf85f0a9166401be6de362d6c622b2",
-      "title" : "feat(cuda-oxide): carry inline intent through the device pipeline (#1511)"
+      "date" : "2026-11-02 19:15:44 +0530",
+      "hash" : "cced2a35bcc557b30f27209ff3887b4eb728cb63",
+      "title" : "fix(cuda-oxide): order mbarrier init, pre-arrival try_wait, and arrival in shared_memory_helper (#1703)"
     }
   },
   "type" : "branch",

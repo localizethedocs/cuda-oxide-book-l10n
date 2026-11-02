@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-21 14:41+0000\n"
+"POT-Creation-Date: 2026-11-02 17:35+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -210,16 +210,14 @@ msgstr ""
 msgid "`SingleStream` -- one lane, strict order"
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:113
+#: ../../../async-programming/scheduling-and-streams.md:112
 msgid ""
-"`SingleStream` is implemented in the scheduling internals but is **not "
-"currently wired into `GlobalSchedulingPolicy`** or exposed through "
-"`init_device_contexts`. The default setup always uses "
-"`StreamPoolRoundRobin`. This section describes the design intent for a "
-"future API surface."
+"Use `SingleStream::from_stream(stream.clone())` with `.schedule(&policy)` to "
+"run Tile and SIMT operations on the same stream. The default global policy "
+"continues to use `StreamPoolRoundRobin`."
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:119
+#: ../../../async-programming/scheduling-and-streams.md:116
 msgid ""
 "For debugging, or when you need guaranteed ordering across *all* operations, "
 "`SingleStream` routes everything to one stream. Every operation sees the "
@@ -227,14 +225,14 @@ msgid ""
 "related concurrency bugs:"
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:124
+#: ../../../async-programming/scheduling-and-streams.md:121
 msgid ""
 "Operation 1  →  Stream 0  ──► ████████\n"
 "Operation 2  →  Stream 0  ──►          ████████   (waits for 1)\n"
 "Operation 3  →  Stream 0  ──►                  ████████\n"
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:131
+#: ../../../async-programming/scheduling-and-streams.md:128
 msgid ""
 "If you suspect a concurrency bug in your GPU pipeline, switching to "
 "`SingleStream` is the fastest way to check. If the bug disappears, it was a "
@@ -242,24 +240,24 @@ msgid ""
 "the problem is elsewhere."
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:137
+#: ../../../async-programming/scheduling-and-streams.md:134
 msgid "Setting up the runtime"
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:139
+#: ../../../async-programming/scheduling-and-streams.md:136
 msgid ""
 "Before any async operation can run, you initialize the thread-local device "
 "context:"
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:142
+#: ../../../async-programming/scheduling-and-streams.md:139
 msgid ""
-"use cuda_async::simt::device_context::init_device_contexts;\n"
+"use cuda_async::device_context::init_device_contexts;\n"
 "\n"
 "init_device_contexts(0, 1)?;\n"
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:148
+#: ../../../async-programming/scheduling-and-streams.md:145
 msgid ""
 "The first argument is the default GPU ordinal; the second is how many "
 "devices to manage. Under the hood, this registers a thread-local that lazily "
@@ -267,17 +265,17 @@ msgid ""
 "holds four streams by default."
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:153
+#: ../../../async-programming/scheduling-and-streams.md:150
 msgid ""
-"Call this once at the start of your program, before any `.sync()` or `."
-"await`. Calling it twice on the same thread returns an error."
+"Call this once at the start of your program, before any `.sync()` or "
+"`.await`. Calling it twice on the same thread returns an error."
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:156
+#: ../../../async-programming/scheduling-and-streams.md:153
 msgid "What happens when you `.await`"
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:162
+#: ../../../async-programming/scheduling-and-streams.md:159
 msgid ""
 "Left: the DeviceFuture three-state machine. On the first poll, GPU work and "
 "a `cuLaunchHostFunc` callback are submitted — then `Poll::Pending` is "
@@ -287,12 +285,12 @@ msgid ""
 "tasks while the GPU works)."
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:170
+#: ../../../async-programming/scheduling-and-streams.md:167
 msgid ""
 "Here is the full journey of an operation from construction to completion:"
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:172
+#: ../../../async-programming/scheduling-and-streams.md:169
 msgid ""
 "module.kernel_async(&prepared, ...)  ← build a checked recipe (no GPU work)\n"
 "        │\n"
@@ -323,21 +321,21 @@ msgid ""
 "  return Poll::Ready(Ok(()))   ← result delivered to the caller\n"
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:201
+#: ../../../async-programming/scheduling-and-streams.md:198
 msgid ""
 "The key insight is that between the first `poll()` and the callback, **no "
 "host thread is occupied**. The async runtime parks the task and runs other "
 "tasks. The GPU notifies the runtime when it is done, via the "
-"`cuLaunchHostFunc` callback. This is why `.await` scales better than `."
-"sync()` for concurrent workloads -- you can have dozens of in-flight "
+"`cuLaunchHostFunc` callback. This is why `.await` scales better than "
+"`.sync()` for concurrent workloads -- you can have dozens of in-flight "
 "operations without tying up a thread for each one."
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:208
+#: ../../../async-programming/scheduling-and-streams.md:205
 msgid "Manual stream control"
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:210
+#: ../../../async-programming/scheduling-and-streams.md:207
 msgid ""
 "Most of the time, the scheduling policy handles streams for you. But there "
 "are situations where you need direct control -- interop with a CUDA library "
@@ -346,11 +344,11 @@ msgid ""
 "full stream API for these cases."
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:216
+#: ../../../async-programming/scheduling-and-streams.md:213
 msgid "Creating streams"
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:218
+#: ../../../async-programming/scheduling-and-streams.md:215
 msgid ""
 "let ctx = CudaContext::new(0)?;\n"
 "let default = ctx.default_stream();  // the per-context default (null) "
@@ -358,7 +356,7 @@ msgid ""
 "let custom  = ctx.new_stream()?;     // a new non-blocking stream\n"
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:224
+#: ../../../async-programming/scheduling-and-streams.md:221
 msgid ""
 "The default stream has special synchronization semantics in CUDA (it "
 "implicitly serializes with most other streams). Non-blocking streams created "
@@ -366,11 +364,11 @@ msgid ""
 "policy uses them exclusively."
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:229
+#: ../../../async-programming/scheduling-and-streams.md:226
 msgid "Fork and join"
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:231
+#: ../../../async-programming/scheduling-and-streams.md:228
 msgid ""
 "A common pattern is to fork a child stream from a parent, run independent "
 "work on the child, and join the results back. `fork` creates a new stream "
@@ -379,7 +377,7 @@ msgid ""
 "reverse: the parent waits for the child to finish before proceeding."
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:237
+#: ../../../async-programming/scheduling-and-streams.md:234
 msgid ""
 "let main = ctx.default_stream();\n"
 "\n"
@@ -407,11 +405,11 @@ msgid ""
 "unsafe { module.combine(&main, cfg, &buf_a, &buf_b) }?;\n"
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:263
+#: ../../../async-programming/scheduling-and-streams.md:260
 msgid "The GPU timeline for this looks like:"
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:265
+#: ../../../async-programming/scheduling-and-streams.md:262
 msgid ""
 "main:      ██ upload_a ██ upload_b ██ ──fork──────────────── join ──► ██ "
 "combine ██\n"
@@ -421,24 +419,24 @@ msgid ""
 "child_2:                                 └─► ██ process_b ██ ────┘\n"
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:273
+#: ../../../async-programming/scheduling-and-streams.md:270
 msgid ""
 "Under the hood, `fork` and `join` use CUDA events -- `cuEventRecord` on one "
 "stream, `cuStreamWaitEvent` on another. The events are GPU-side "
 "synchronization tokens; no host thread blocks during the fork or the join."
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:277
+#: ../../../async-programming/scheduling-and-streams.md:274
 msgid "Events for fine-grained ordering"
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:279
+#: ../../../async-programming/scheduling-and-streams.md:276
 msgid ""
 "When `fork`/`join` is too coarse, you can use events directly to establish "
 "ordering between specific points in different streams:"
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:282
+#: ../../../async-programming/scheduling-and-streams.md:279
 msgid ""
 "// Record an event on stream A after the kernel finishes\n"
 "let event = stream_a.record_event(None)?;\n"
@@ -447,7 +445,7 @@ msgid ""
 "stream_b.wait(&event)?;\n"
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:290
+#: ../../../async-programming/scheduling-and-streams.md:287
 msgid ""
 "A CUDA event is not owned by a stream -- it is a standalone synchronization "
 "token. `record` stamps it at a specific point on one stream; `wait` inserts "
@@ -455,14 +453,14 @@ msgid ""
 "after the `wait` on stream B runs until the event fires on stream A."
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:295
+#: ../../../async-programming/scheduling-and-streams.md:292
 msgid ""
 "Events are also the standard way to measure GPU execution time. Note that "
 "timing requires events created **without** `CU_EVENT_DISABLE_TIMING` -- pass "
 "explicit flags to enable timing:"
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:299
+#: ../../../async-programming/scheduling-and-streams.md:296
 msgid ""
 "// bindgen flattens the CUDA enums, so the constant is a crate-root item\n"
 "// named after its enum, not a variant inside a module.\n"
@@ -476,14 +474,14 @@ msgid ""
 "println!(\"Kernel took {:.2} ms\", start.elapsed_ms(&end)?);\n"
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:312
+#: ../../../async-programming/scheduling-and-streams.md:309
 msgid ""
 "This measures actual GPU time, not host-side scheduling overhead. "
 "`record_event(None)` creates timing-disabled events by default, which cannot "
 "be used with `elapsed_ms`."
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:315
+#: ../../../async-programming/scheduling-and-streams.md:312
 msgid ""
 "For everyday async pipelines, you never need to create streams, events, or "
 "fork/join manually. The scheduling policy and `and_then` chains handle "
@@ -491,75 +489,75 @@ msgid ""
 "advanced optimization."
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:321
+#: ../../../async-programming/scheduling-and-streams.md:318
 msgid "Choosing the right approach"
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:314
+#: ../../../async-programming/scheduling-and-streams.md:311
 msgid "Situation"
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:314
+#: ../../../async-programming/scheduling-and-streams.md:311
 msgid "Recommended approach"
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:314
+#: ../../../async-programming/scheduling-and-streams.md:311
 msgid "Simple script, one contracted kernel"
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:314
+#: ../../../async-programming/scheduling-and-streams.md:311
 msgid "`module.kernel_async(&prepared, ...).sync()`"
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:314
+#: ../../../async-programming/scheduling-and-streams.md:311
 msgid "Multi-stage pipeline (GEMM → ReLU → D2H)"
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:314
+#: ../../../async-programming/scheduling-and-streams.md:311
 msgid "`and_then` chain, policy picks one stream"
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:314
+#: ../../../async-programming/scheduling-and-streams.md:311
 msgid "Independent batches running concurrently"
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:314
+#: ../../../async-programming/scheduling-and-streams.md:311
 msgid "`tokio::spawn` each batch, round-robin distributes"
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:314
+#: ../../../async-programming/scheduling-and-streams.md:311
 msgid "Debugging a suspected stream-ordering bug"
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:314
+#: ../../../async-programming/scheduling-and-streams.md:311
 msgid "Switch to `SingleStream`"
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:314
+#: ../../../async-programming/scheduling-and-streams.md:311
 msgid "Interop with an existing CUDA library"
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:314
+#: ../../../async-programming/scheduling-and-streams.md:311
 msgid "`.sync_on(&stream)` with their stream"
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:314
+#: ../../../async-programming/scheduling-and-streams.md:311
 msgid "Profiling a kernel in isolation"
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:314
+#: ../../../async-programming/scheduling-and-streams.md:311
 msgid "Explicit events around the launch"
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:314
+#: ../../../async-programming/scheduling-and-streams.md:311
 msgid "Maximum throughput"
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:314
+#: ../../../async-programming/scheduling-and-streams.md:311
 msgid "Profile with Nsight Systems, tune pool size"
 msgstr ""
 
-#: ../../../async-programming/scheduling-and-streams.md:334
+#: ../../../async-programming/scheduling-and-streams.md:331
 msgid ""
 "[CUDA Programming Guide -- Events](https://docs.nvidia.com/cuda/cuda-"
 "programming-guide/#events) for the full specification of CUDA events. The "
