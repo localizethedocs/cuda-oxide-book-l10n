@@ -155,8 +155,8 @@ msgstr ""
 #: ../../../advanced/shared-memory-and-synchronization.md:117
 msgid ""
 "`SharedArray` must be declared as `static mut` inside the kernel function "
-"body. This tells the compiler to allocate it in PTX shared address space (`."
-"shared`). The `UNINIT` constant skips initialization — the contents are "
+"body. This tells the compiler to allocate it in PTX shared address space "
+"(`.shared`). The `UNINIT` constant skips initialization — the contents are "
 "undefined until threads write to them."
 msgstr ""
 
@@ -846,9 +846,9 @@ msgstr ""
 
 #: ../../../advanced/shared-memory-and-synchronization.md:450
 msgid ""
-"[CUDA Programming Guide — Shared Memory Bank Conflicts](https://docs.nvidia."
-"com/cuda/cuda-programming-guide/#shared-memory-5-x) for a detailed treatment "
-"of bank conflict rules and padding strategies."
+"[CUDA Programming Guide — Shared Memory Bank Conflicts](https://"
+"docs.nvidia.com/cuda/cuda-programming-guide/#shared-memory-5-x) for a "
+"detailed treatment of bank conflict rules and padding strategies."
 msgstr ""
 
 #: ../../../advanced/shared-memory-and-synchronization.md:456

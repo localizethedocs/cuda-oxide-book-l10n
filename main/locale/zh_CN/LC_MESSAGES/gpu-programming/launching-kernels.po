@@ -328,8 +328,8 @@ msgid ""
 "Cluster and cooperative attributes may be declared together "
 "(`#[cluster_launch(...)]` + `#[cooperative_launch]`). Preparation proves the "
 "cluster shape with `cuOccupancyMaxActiveClusters`, then requires the whole "
-"grid to fit in that concurrent cluster capacity so a cooperative `grid::"
-"sync()` cannot hang on non-resident blocks. An oversized grid fails "
+"grid to fit in that concurrent cluster capacity so a cooperative "
+"`grid::sync()` cannot hang on non-resident blocks. An oversized grid fails "
 "preparation with `LaunchContractError::CooperativeGridTooLarge` (or a "
 "related cluster residency error) instead of submitting an unsound launch."
 msgstr ""
@@ -576,8 +576,8 @@ msgstr ""
 
 #: ../../../gpu-programming/launching-kernels.md:355
 msgid ""
-"`MIN_BLOCKS` is a compiler occupancy hint represented by PTX `."
-"minnctapersm`. It is not a grid or block dimension and is not enforced as "
+"`MIN_BLOCKS` is a compiler occupancy hint represented by PTX "
+"`.minnctapersm`. It is not a grid or block dimension and is not enforced as "
 "launch geometry."
 msgstr ""
 
@@ -1132,8 +1132,8 @@ msgstr ""
 
 #: ../../../gpu-programming/launching-kernels.md:688
 msgid ""
-"The [Async GPU Programming](../async-programming/the-device-operation-model."
-"md) section covers `DeviceOperation`, scheduling policies, and stream "
+"The [Async GPU Programming](../async-programming/the-device-operation-"
+"model.md) section covers `DeviceOperation`, scheduling policies, and stream "
 "management in depth."
 msgstr ""
 

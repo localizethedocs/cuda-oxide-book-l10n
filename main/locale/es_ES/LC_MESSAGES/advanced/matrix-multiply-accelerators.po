@@ -43,10 +43,10 @@ msgstr ""
 
 #: ../../../advanced/matrix-multiply-accelerators.md:18
 msgid ""
-"[CUDA Programming Guide — Warpgroup Level Matrix Operations](https://docs."
-"nvidia.com/cuda/cuda-programming-guide/#warpgroup-level-matrix-operations) "
-"for the hardware specification of WGMMA shapes, element types, and "
-"synchronization requirements."
+"[CUDA Programming Guide — Warpgroup Level Matrix Operations](https://"
+"docs.nvidia.com/cuda/cuda-programming-guide/#warpgroup-level-matrix-"
+"operations) for the hardware specification of WGMMA shapes, element types, "
+"and synchronization requirements."
 msgstr ""
 
 #: ../../../advanced/matrix-multiply-accelerators.md:25

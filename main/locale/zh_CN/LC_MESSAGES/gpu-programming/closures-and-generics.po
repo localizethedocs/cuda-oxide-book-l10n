@@ -387,8 +387,8 @@ msgstr ""
 msgid ""
 "The closure passes through the launch as one value -- not as a list of "
 "captured fields. The launcher pushes a single driver argument (the whole "
-"closure struct, captures and all), and the kernel receives it as one byval `."
-"param`:"
+"closure struct, captures and all), and the kernel receives it as one byval "
+"`.param`:"
 msgstr ""
 
 #: ../../../gpu-programming/closures-and-generics.md:251
@@ -414,9 +414,9 @@ msgstr ""
 
 #: ../../../gpu-programming/closures-and-generics.md:268
 msgid ""
-"A closure with no captures is a zero-sized type -- the backend drops the `."
-"param` entirely, and the host launcher knows to skip it so the packet stays "
-"aligned."
+"A closure with no captures is a zero-sized type -- the backend drops the "
+"`.param` entirely, and the host launcher knows to skip it so the packet "
+"stays aligned."
 msgstr ""
 
 #: ../../../gpu-programming/closures-and-generics.md:272

@@ -140,8 +140,8 @@ msgstr ""
 
 #: ../../../appendix/supported-features.md:0
 msgid ""
-"`core::ptr::copy_nonoverlapping` lowers to a `mir.memcpy` op and then `llvm."
-"memcpy`, with the element count scaled to bytes for the pointee. The "
+"`core::ptr::copy_nonoverlapping` lowers to a `mir.memcpy` op and then "
+"`llvm.memcpy`, with the element count scaled to bytes for the pointee. The "
 "intrinsic overload suffix is derived from the operand address spaces and "
 "length width."
 msgstr ""
@@ -533,16 +533,16 @@ msgstr ""
 
 #: ../../../appendix/supported-features.md:0
 msgid ""
-"Inter-kernel interop works today: a [cutile-rs Tile kernel](https://github."
-"com/NVIDIA/cuda-rust/tree/main/cutile-rs) and a cuda-oxide SIMT PTX kernel "
-"can run in one host process on the same CUDA stream over shared device "
-"tensors. Intra-kernel interop is built as a [tile library](../advanced/tile-"
-"libraries.md): `#[tile_export]` and `cargo oxide tilelib` produce the LTOIR "
-"and the Tile IR descriptions today (at the installed assembler's current "
-"bytecode version, 13.5 or newer), packaging them into a `.tilelib` needs the "
-"CUDA 13.5 or newer `tileiras`, and the caller is cuTile Python's "
-"`foreign_call`. Tracked in [#96](https://github.com/NVlabs/cuda-oxide/"
-"issues/96)."
+"Inter-kernel interop works today: a [cutile-rs Tile kernel](https://"
+"github.com/NVIDIA/cuda-rust/tree/main/cutile-rs) and a cuda-oxide SIMT PTX "
+"kernel can run in one host process on the same CUDA stream over shared "
+"device tensors. Intra-kernel interop is built as a [tile library](../"
+"advanced/tile-libraries.md): `#[tile_export]` and `cargo oxide tilelib` "
+"produce the LTOIR and the Tile IR descriptions today (at the installed "
+"assembler's current bytecode version, 13.5 or newer), packaging them into a "
+"`.tilelib` needs the CUDA 13.5 or newer `tileiras`, and the caller is cuTile "
+"Python's `foreign_call`. Tracked in [#96](https://github.com/NVlabs/cuda-"
+"oxide/issues/96)."
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
@@ -691,9 +691,9 @@ msgstr ""
 #: ../../../appendix/supported-features.md:0
 msgid ""
 "`cargo oxide clean` removes project-local `target/` directories and "
-"generated device artifacts (`.ptx`, `.ll`, `.opt.ll`, `.ltoir`, `.cubin`, `."
-"target`, `.options`, `.cubin.target`), never the shared `~/.cargo/cuda-oxide/"
-"` cache."
+"generated device artifacts (`.ptx`, `.ll`, `.opt.ll`, `.ltoir`, `.cubin`, "
+"`.target`, `.options`, `.cubin.target`), never the shared `~/.cargo/cuda-"
+"oxide/` cache."
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
@@ -874,8 +874,8 @@ msgstr ""
 
 #: ../../../appendix/supported-features.md:0
 msgid ""
-"`DynamicSharedArray<T, ALIGN>` — runtime-sized, set via `LaunchConfig::"
-"shared_mem_bytes`."
+"`DynamicSharedArray<T, ALIGN>` — runtime-sized, set via "
+"`LaunchConfig::shared_mem_bytes`."
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0

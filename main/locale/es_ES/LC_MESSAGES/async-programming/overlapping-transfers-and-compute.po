@@ -134,8 +134,8 @@ msgstr ""
 msgid ""
 "The complete setup, slot-reuse wait, and final drain are in the "
 "[`run_overlapped` implementation](https://github.com/NVIDIA/cuda-rust/blob/"
-"main/cuda-oxide/crates/rustc-codegen-cuda/examples/pinned_overlap/src/main."
-"rs)."
+"main/cuda-oxide/crates/rustc-codegen-cuda/examples/pinned_overlap/src/"
+"main.rs)."
 msgstr ""
 
 #: ../../../async-programming/overlapping-transfers-and-compute.md:77

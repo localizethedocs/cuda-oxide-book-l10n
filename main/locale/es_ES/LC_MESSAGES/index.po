@@ -73,9 +73,9 @@ msgstr ""
 
 #: ../../../index.md:22
 msgid ""
-"For a refresher, see [The Rust Programming Language](https://doc.rust-lang."
-"org/book/), [Rust by Example](https://doc.rust-lang.org/rust-by-example/), "
-"or the [Async Book](https://rust-lang.github.io/async-book/)."
+"For a refresher, see [The Rust Programming Language](https://doc.rust-"
+"lang.org/book/), [Rust by Example](https://doc.rust-lang.org/rust-by-"
+"example/), or the [Async Book](https://rust-lang.github.io/async-book/)."
 msgstr ""
 
 #: ../../../index.md:27

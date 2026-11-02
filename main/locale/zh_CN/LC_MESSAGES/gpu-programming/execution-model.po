@@ -512,8 +512,8 @@ msgstr ""
 #: ../../../gpu-programming/execution-model.md:227
 msgid ""
 "The grid size follows from the block size and the problem size: `grid_x = (N "
-"+ block_x - 1) / block_x`. This is exactly what `LaunchConfig::"
-"for_num_elems` computes."
+"+ block_x - 1) / block_x`. This is exactly what "
+"`LaunchConfig::for_num_elems` computes."
 msgstr ""
 
 #: ../../../gpu-programming/execution-model.md:231

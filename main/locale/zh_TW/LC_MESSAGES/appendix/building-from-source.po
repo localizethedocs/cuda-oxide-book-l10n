@@ -327,8 +327,8 @@ msgstr ""
 
 #: ../../../appendix/building-from-source.md:161
 msgid ""
-"cargo +nightly-2026-10-11 install --git https://github.com/NVIDIA/cuda-rust."
-"git cargo-oxide\n"
+"cargo +nightly-2026-10-11 install --git https://github.com/NVIDIA/cuda-"
+"rust.git cargo-oxide\n"
 msgstr ""
 
 #: ../../../appendix/building-from-source.md:165
@@ -465,8 +465,8 @@ msgid ""
 "    │   ├── mir-importer/         # MIR → Pliron IR translation\n"
 "    │   ├── mir-lower/            # `dialect-mir` → LLVM dialect lowering\n"
 "    │   ├── dialect-mir/          # pliron dialect modelling Rust MIR\n"
-"    │   ├── llvm-export/          # shim re-exporting pliron-llvm + textual ."
-"ll export\n"
+"    │   ├── llvm-export/          # shim re-exporting pliron-llvm + "
+"textual .ll export\n"
 "    │   ├── dialect-nvvm/         # NVVM intrinsics dialect\n"
 "    │   ├── libnvvm-sys/          # dlopen bindings to libNVVM\n"
 "    │   ├── nvjitlink-sys/        # dlopen bindings to nvJitLink\n"

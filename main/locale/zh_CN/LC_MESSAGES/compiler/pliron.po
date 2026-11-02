@@ -345,8 +345,8 @@ msgstr ""
 
 #: ../../../compiler/pliron.md:126
 msgid ""
-"Every operation belongs to a dialect. The naming convention is `dialect_name."
-"op_name`:"
+"Every operation belongs to a dialect. The naming convention is "
+"`dialect_name.op_name`:"
 msgstr ""
 
 #: ../../../compiler/pliron.md:129
@@ -743,8 +743,9 @@ msgstr ""
 
 #: ../../../compiler/pliron.md:386
 msgid ""
-"**Arithmetic and casts**: all 19 LLVM binary ops (`llvm.add` through `llvm."
-"frem`), plus 13 cast ops (`llvm.sext`, `llvm.trunc`, `llvm.bitcast`, ...)."
+"**Arithmetic and casts**: all 19 LLVM binary ops (`llvm.add` through "
+"`llvm.frem`), plus 13 cast ops (`llvm.sext`, `llvm.trunc`, "
+"`llvm.bitcast`, ...)."
 msgstr ""
 
 #: ../../../compiler/pliron.md:388
@@ -772,9 +773,9 @@ msgstr ""
 
 #: ../../../compiler/pliron.md:398
 msgid ""
-"**Thread indexing**: `nvvm.read_ptx_sreg_tid_x`, `nvvm."
-"read_ptx_sreg_ctaid_x`, `nvvm.barrier0` -- the building blocks of `thread::"
-"index_1d()`."
+"**Thread indexing**: `nvvm.read_ptx_sreg_tid_x`, "
+"`nvvm.read_ptx_sreg_ctaid_x`, `nvvm.barrier0` -- the building blocks of "
+"`thread::index_1d()`."
 msgstr ""
 
 #: ../../../compiler/pliron.md:400

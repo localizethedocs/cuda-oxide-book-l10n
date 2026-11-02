@@ -597,9 +597,9 @@ msgid ""
 "What is missing is anything to gate *on*: the compiler supplies no target-"
 "derived `cfg`, so a kernel has no way to ask which architecture it is being "
 "compiled for. Arch requirements live in doc comments and are enforced by the "
-"caller, which is why an example that needs `redux.sync` checks `ctx."
-"compute_capability()` on the host and skips rather than specializing the "
-"kernel."
+"caller, which is why an example that needs `redux.sync` checks "
+"`ctx.compute_capability()` on the host and skips rather than specializing "
+"the kernel."
 msgstr ""
 
 #: ../../../gpu-programming/kernels-and-device-functions.md:243

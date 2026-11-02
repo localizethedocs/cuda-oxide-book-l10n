@@ -34,10 +34,10 @@ msgstr ""
 
 #: ../../../async-programming/the-device-operation-model.md:12
 msgid ""
-"[CUDA Programming Guide -- Asynchronous Concurrent Execution](https://docs."
-"nvidia.com/cuda/cuda-programming-guide/#asynchronous-concurrent-execution) "
-"for the underlying CUDA stream and event model that `DeviceOperation` builds "
-"on."
+"[CUDA Programming Guide -- Asynchronous Concurrent Execution](https://"
+"docs.nvidia.com/cuda/cuda-programming-guide/#asynchronous-concurrent-"
+"execution) for the underlying CUDA stream and event model that "
+"`DeviceOperation` builds on."
 msgstr ""
 
 #: ../../../async-programming/the-device-operation-model.md:16
@@ -334,10 +334,10 @@ msgstr ""
 
 #: ../../../async-programming/the-device-operation-model.md:179
 msgid ""
-"Inside an `execute` implementation, you access the stream with `ctx."
-"get_cuda_stream()` and the CUDA context with `ctx.get_cuda_context()`. For "
-"most operations this is all you need -- enqueue a kernel or a memory copy on "
-"the stream, and you are done."
+"Inside an `execute` implementation, you access the stream with "
+"`ctx.get_cuda_stream()` and the CUDA context with `ctx.get_cuda_context()`. "
+"For most operations this is all you need -- enqueue a kernel or a memory "
+"copy on the stream, and you are done."
 msgstr ""
 
 #: ../../../async-programming/the-device-operation-model.md:184
@@ -525,10 +525,10 @@ msgid ""
 "        let n = host_data.len();\n"
 "        let num_bytes = n * std::mem::size_of::<f32>();\n"
 "        unsafe {\n"
-"            let dptr = malloc_async(stream.cu_stream(), num_bytes)."
-"unwrap();\n"
-"            memcpy_htod_async(dptr, host_data.as_ptr(), num_bytes, stream."
-"cu_stream())\n"
+"            let dptr = malloc_async(stream.cu_stream(), "
+"num_bytes).unwrap();\n"
+"            memcpy_htod_async(dptr, host_data.as_ptr(), num_bytes, "
+"stream.cu_stream())\n"
 "                .unwrap();\n"
 "            value(DeviceBox::from_raw_parts(dptr, n, ctx.get_device_id()))\n"
 "        }\n"
@@ -622,8 +622,8 @@ msgstr ""
 
 #: ../../../async-programming/the-device-operation-model.md:369
 msgid ""
-"On the **second poll**, the future sees the flag and returns `Poll::"
-"Ready(Ok(result))`. The task resumes with the value."
+"On the **second poll**, the future sees the flag and returns "
+"`Poll::Ready(Ok(result))`. The task resumes with the value."
 msgstr ""
 
 #: ../../../async-programming/the-device-operation-model.md:372

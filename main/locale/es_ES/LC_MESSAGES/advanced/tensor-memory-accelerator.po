@@ -42,10 +42,10 @@ msgstr ""
 
 #: ../../../advanced/tensor-memory-accelerator.md:17
 msgid ""
-"[CUDA Programming Guide — Asynchronous Data Copies using TMA](https://docs."
-"nvidia.com/cuda/cuda-programming-guide/#tensor-memory-access) for a complete "
-"description of the hardware unit, swizzle modes, and supported tensor "
-"dimensions."
+"[CUDA Programming Guide — Asynchronous Data Copies using TMA](https://"
+"docs.nvidia.com/cuda/cuda-programming-guide/#tensor-memory-access) for a "
+"complete description of the hardware unit, swizzle modes, and supported "
+"tensor dimensions."
 msgstr ""
 
 #: ../../../advanced/tensor-memory-accelerator.md:24

@@ -381,8 +381,9 @@ msgstr ""
 
 #: ../../../gpu-programming/memory-and-data-movement.md:132
 msgid ""
-"**Dropping after synchronization** (e.g., after `to_host_vec` or `stream."
-"synchronize()`) has no additional cost because the device is already idle."
+"**Dropping after synchronization** (e.g., after `to_host_vec` or "
+"`stream.synchronize()`) has no additional cost because the device is already "
+"idle."
 msgstr ""
 
 #: ../../../gpu-programming/memory-and-data-movement.md:136
@@ -673,8 +674,8 @@ msgid ""
 "This works because CUDA's thread indices are **uniform values provided by "
 "the hardware**: every thread in a block receives a unique `threadIdx` from "
 "the GPU's warp scheduler. For 1D grid launches (where only the x dimension "
-"is used), the global index derived from `blockIdx.x * blockDim.x + threadIdx."
-"x` is unique across the entire grid."
+"is used), the global index derived from `blockIdx.x * blockDim.x + "
+"threadIdx.x` is unique across the entire grid."
 msgstr ""
 
 #: ../../../gpu-programming/memory-and-data-movement.md:270
@@ -948,10 +949,10 @@ msgid ""
 "`ConstantMemory<T>` accepts `T: ConstantMemoryValue`, an unsafe marker "
 "implemented for the primitive integers and floats, `*const T` / `*mut T`, "
 "tuples up to eight elements, and arrays of those. The requirement it encodes "
-"is that an all-zero bit pattern is a valid `T`, since `ConstantMemory::"
-"UNINIT` starts out zeroed -- which is why references and `NonZero*` types "
-"are excluded, and why a custom struct needs an explicit `#[repr(C)]` layout "
-"before opting in."
+"is that an all-zero bit pattern is a valid `T`, since "
+"`ConstantMemory::UNINIT` starts out zeroed -- which is why references and "
+"`NonZero*` types are excluded, and why a custom struct needs an explicit "
+"`#[repr(C)]` layout before opting in."
 msgstr ""
 
 #: ../../../gpu-programming/memory-and-data-movement.md:432

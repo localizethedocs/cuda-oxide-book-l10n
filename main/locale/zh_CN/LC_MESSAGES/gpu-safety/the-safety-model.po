@@ -414,11 +414,11 @@ msgstr ""
 msgid ""
 "An exact `block` is checked twice, in two places that fail independently. "
 "Preparation rejects a mismatched launch configuration on the host, before "
-"any driver call. The shape also reaches the device compiler, which emits `."
-"reqntid 64, 1, 1`, so the CUDA driver refuses any launch whose block differs "
-"on any axis. The second check covers the paths the first one cannot see: an "
-"`unsafe` raw launch, and a module whose loaded PTX is not the artifact the "
-"generated Rust markers describe."
+"any driver call. The shape also reaches the device compiler, which emits "
+"`.reqntid 64, 1, 1`, so the CUDA driver refuses any launch whose block "
+"differs on any axis. The second check covers the paths the first one cannot "
+"see: an `unsafe` raw launch, and a module whose loaded PTX is not the "
+"artifact the generated Rust markers describe."
 msgstr ""
 
 #: ../../../gpu-safety/the-safety-model.md:188
@@ -814,8 +814,8 @@ msgstr ""
 
 #: ../../../gpu-safety/the-safety-model.md:0
 msgid ""
-"Same rules, but size is set at launch time via `LaunchConfig::"
-"shared_mem_bytes`."
+"Same rules, but size is set at launch time via "
+"`LaunchConfig::shared_mem_bytes`."
 msgstr ""
 
 #: ../../../gpu-safety/the-safety-model.md:444
@@ -874,8 +874,8 @@ msgstr ""
 
 #: ../../../gpu-safety/the-safety-model.md:470
 msgid ""
-"The `ManagedBarrier` typestate API encodes the barrier lifecycle (`Uninit` -"
-"> `Ready` -> `Invalidated`) in the type system, so you cannot wait on a "
+"The `ManagedBarrier` typestate API encodes the barrier lifecycle (`Uninit` "
+"-> `Ready` -> `Invalidated`) in the type system, so you cannot wait on a "
 "barrier that was never initialized or use one that has been invalidated. The "
 "`init()` and `inval()` transitions still require `unsafe` because they "
 "interact with the hardware, but the type states prevent the most common "
@@ -1128,8 +1128,8 @@ msgstr ""
 
 #: ../../../gpu-safety/the-safety-model.md:569
 msgid ""
-"The first three are standard Rust. The fourth is GPU-specific: CUDA's `bar."
-"sync`, fence, and warp shuffle instructions must not be duplicated or "
+"The first three are standard Rust. The fourth is GPU-specific: CUDA's "
+"`bar.sync`, fence, and warp shuffle instructions must not be duplicated or "
 "reordered by the compiler. cuda-oxide marks them `convergent` in the IR so "
 "that LLVM's optimization passes leave them alone."
 msgstr ""

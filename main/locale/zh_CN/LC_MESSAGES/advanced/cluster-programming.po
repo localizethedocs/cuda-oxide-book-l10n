@@ -102,8 +102,8 @@ msgstr ""
 
 #: ../../../advanced/cluster-programming.md:62
 msgid ""
-"Injects a `__cluster_config<X, Y, Z>()` function that sets the PTX `."
-"reqnctapercluster` directive."
+"Injects a `__cluster_config<X, Y, Z>()` function that sets the PTX "
+"`.reqnctapercluster` directive."
 msgstr ""
 
 #: ../../../advanced/cluster-programming.md:64
@@ -203,10 +203,10 @@ msgstr ""
 #: ../../../advanced/cluster-programming.md:133
 msgid ""
 "That last line is an ordinary Rust read. The compiler keeps the mapped "
-"pointer in the cluster-shared address space, so the deref compiles to `ld."
-"shared::cluster`. Writes work the same way: map with `map_shared_rank_mut`, "
-"assign through the pointer, and the store compiles to `st.shared::cluster`. "
-"This works for any type and needs sm_90+."
+"pointer in the cluster-shared address space, so the deref compiles to "
+"`ld.shared::cluster`. Writes work the same way: map with "
+"`map_shared_rank_mut`, assign through the pointer, and the store compiles to "
+"`st.shared::cluster`. This works for any type and needs sm_90+."
 msgstr ""
 
 #: ../../../advanced/cluster-programming.md:139

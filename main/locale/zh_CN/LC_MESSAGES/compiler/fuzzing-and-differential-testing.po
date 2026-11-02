@@ -495,8 +495,8 @@ msgid ""
 "The widening plan is incremental, and two steps have already landed: the "
 "adapter now accepts every scalar the trace API can hash (f32 and f64 arrived "
 "last, in [#484](https://github.com/NVlabs/cuda-oxide/pull/484)), plus arrays "
-"and tuples built from them ([#792](https://github.com/NVlabs/cuda-oxide/"
-"pull/792)). What remains:"
+"and tuples built from them ([#792](https://github.com/NVlabs/cuda-oxide/pull/"
+"792)). What remains:"
 msgstr ""
 
 #: ../../../compiler/fuzzing-and-differential-testing.md:257

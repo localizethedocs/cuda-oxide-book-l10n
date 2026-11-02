@@ -82,9 +82,9 @@ msgstr ""
 
 #: ../../../gpu-programming/virtual-memory-and-peer-access.md:28
 msgid ""
-"The complete integration test is available in [`cuda-core/tests/simt_vmm_p2p."
-"rs`](https://github.com/NVIDIA/cuda-rust/blob/main/cuda-core/tests/"
-"simt_vmm_p2p.rs)."
+"The complete integration test is available in [`cuda-core/tests/"
+"simt_vmm_p2p.rs`](https://github.com/NVIDIA/cuda-rust/blob/main/cuda-core/"
+"tests/simt_vmm_p2p.rs)."
 msgstr ""
 
 #: ../../../gpu-programming/virtual-memory-and-peer-access.md:31

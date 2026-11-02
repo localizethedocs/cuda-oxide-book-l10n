@@ -121,8 +121,8 @@ msgstr ""
 
 #: ../../../getting-started/installation.md:33
 msgid ""
-"The repository includes a cuda-oxide devcontainer in `cuda-oxide/."
-"devcontainer/`. Using it is the quickest way to get a reproducible "
+"The repository includes a cuda-oxide devcontainer in `cuda-"
+"oxide/.devcontainer/`. Using it is the quickest way to get a reproducible "
 "development environment with CUDA Toolkit 13.0, LLVM 21, Clang 21, and the "
 "pinned Rust nightly already installed."
 msgstr ""
@@ -256,8 +256,9 @@ msgstr ""
 
 #: ../../../getting-started/installation.md:118
 msgid ""
-"Install the CUDA Toolkit from the [NVIDIA CUDA Downloads](https://developer."
-"nvidia.com/cuda-downloads) page, then make sure it is on your `PATH`:"
+"Install the CUDA Toolkit from the [NVIDIA CUDA Downloads](https://"
+"developer.nvidia.com/cuda-downloads) page, then make sure it is on your "
+"`PATH`:"
 msgstr ""
 
 #: ../../../getting-started/installation.md:120
@@ -551,8 +552,8 @@ msgstr ""
 
 #: ../../../getting-started/installation.md:287
 msgid ""
-"cargo +nightly-2026-10-11 install --git https://github.com/NVIDIA/cuda-rust."
-"git cargo-oxide\n"
+"cargo +nightly-2026-10-11 install --git https://github.com/NVIDIA/cuda-"
+"rust.git cargo-oxide\n"
 msgstr ""
 
 #: ../../../getting-started/installation.md:291

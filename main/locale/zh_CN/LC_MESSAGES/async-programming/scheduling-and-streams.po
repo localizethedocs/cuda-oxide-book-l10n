@@ -269,8 +269,8 @@ msgstr ""
 
 #: ../../../async-programming/scheduling-and-streams.md:153
 msgid ""
-"Call this once at the start of your program, before any `.sync()` or `."
-"await`. Calling it twice on the same thread returns an error."
+"Call this once at the start of your program, before any `.sync()` or "
+"`.await`. Calling it twice on the same thread returns an error."
 msgstr ""
 
 #: ../../../async-programming/scheduling-and-streams.md:156
@@ -328,8 +328,8 @@ msgid ""
 "The key insight is that between the first `poll()` and the callback, **no "
 "host thread is occupied**. The async runtime parks the task and runs other "
 "tasks. The GPU notifies the runtime when it is done, via the "
-"`cuLaunchHostFunc` callback. This is why `.await` scales better than `."
-"sync()` for concurrent workloads -- you can have dozens of in-flight "
+"`cuLaunchHostFunc` callback. This is why `.await` scales better than "
+"`.sync()` for concurrent workloads -- you can have dozens of in-flight "
 "operations without tying up a thread for each one."
 msgstr ""
 
