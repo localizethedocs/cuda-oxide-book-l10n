@@ -1,0 +1,956 @@
+
+<!DOCTYPE html>
+
+
+<html lang="es-ES" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Kernels and Device Functions &#8212; cuda-oxide</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/nvidia-sphinx-theme.css?v=5d97cc0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=196aea71" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/lightbox.css?v=31fdf494" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../_static/documentation_options.js?v=4730b09f"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'gpu-programming/kernels-and-device-functions';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../_static/js/lightbox.js?v=8cf6bc2b"></script>
+    <script src="../_static/js/spa-nav.js?v=9a4d0bbe"></script>
+    <link rel="canonical" href="https://projects.localizethedocs.org/cuda-oxide-book-l10n/gpu-programming/kernels-and-device-functions.html" />
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="next" title="Memory and Data Movement" href="memory-and-data-movement.html" />
+    <link rel="prev" title="The CUDA Execution Model" href="execution-model.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="es-ES"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+<script type="text/javascript" src="../ltd-provenance.js"></script>
+<script type="text/javascript" src="../ltd-current.js"></script>
+<script type="text/javascript" src="../../../ltd-config.js"></script>
+<script type="text/javascript" src="../../../ltd-flyout.js"></script>
+
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Saltar al contenido principal</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Volver arriba</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Advertencia de versión"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Navegación del sitio">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">cuda-oxide</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Búsqueda" aria-label="Búsqueda" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Tema">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Tema" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Claro"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Oscuro"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="Sistema"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>Sistema</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Claro</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Oscuro</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="En esta página">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Búsqueda" aria-label="Búsqueda" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Tema">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Tema" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Claro"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Oscuro"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="Sistema"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>Sistema</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Claro</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Oscuro</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><div class="sidebar-tree">
+    <p class="sidebar-tree-title">
+        Table of Contents
+    </p>
+    <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/hello-gpu.html">Writing Your First Kernel</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Writing GPU Programs</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="execution-model.html">The CUDA Execution Model</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Kernels and Device Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="memory-and-data-movement.html">Memory and Data Movement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="launching-kernels.html">Launching Kernels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="closures-and-generics.html">Closures and Generics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="error-handling-and-debugging.html">Error Handling and Debugging</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Safety on the GPU</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-safety/the-safety-model.html">The Safety Model</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Async GPU Programming</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/the-device-operation-model.html">The DeviceOperation Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/combinators-and-composition.html">Combinators and Composition</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/scheduling-and-streams.html">Scheduling and Streams</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/concurrent-execution.html">Concurrent Execution</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Building a Real Application</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../projects/async-mlp-pipeline.html">Project: Async MLP Pipeline</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Advanced GPU Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/shared-memory-and-synchronization.html">Shared Memory and Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/warp-level-programming.html">Warp-Level Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/tensor-memory-accelerator.html">Tensor Memory Accelerator (TMA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/matrix-multiply-accelerators.html">Matrix Multiply Accelerators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cluster-programming.html">Cluster Programming</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Inside the Compiler</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/architecture-overview.html">Architecture Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/pliron.html">Pliron – Pliron IR (MLIR-like)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/rustc-public.html">rustc_public – Stable MIR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/rustc-codegen-cuda.html">The Code Generator: rustc-codegen-cuda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/mir-importer.html">The MIR Importer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/compiler-optimizations.html">Compiler Optimizations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/mlir-dialects.html">Pliron Dialects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/lowering-pipeline.html">The Lowering Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/adding-new-intrinsics.html">Adding New Intrinsics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/fuzzing-and-differential-testing.html">Fuzzing and Differential Testing</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Appendix</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/building-from-source.html">Building from Source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/api-quick-reference.html">API Quick Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/supported-features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/cuda-cpp-comparison.html">cuda-oxide vs CUDA C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/ecosystem.html">The Rust + GPU Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/glossary.html">Glossary</a></li>
+</ul>
+
+</div></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Miga de pan" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Inicio">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Kernels and Device Functions</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="kernels-and-device-functions">
+<h1>Kernels and Device Functions<a class="headerlink" href="#kernels-and-device-functions" title="Link to this heading">#</a></h1>
+<p>A <strong>kernel</strong> is a function that runs on the GPU – the entry point that the host
+launches across thousands of threads. A <strong>device function</strong> is a helper that runs
+on the GPU but can only be called from another device function or kernel, never
+from the host. This chapter covers both, along with the Rust patterns that are
+(and aren’t) supported in device code.</p>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p><a class="reference external" href="https://docs.nvidia.com/cuda/cuda-programming-guide/#kernels">CUDA Programming Guide – Kernels</a>
+for the authoritative CUDA C++ reference on kernel and device functions.</p>
+</div>
+<section id="kernel-the-gpu-entry-point">
+<h2><code class="docutils literal notranslate"><span class="pre">#[kernel]</span></code> – the GPU entry point<a class="headerlink" href="#kernel-the-gpu-entry-point" title="Link to this heading">#</a></h2>
+<p>Annotating a function with <code class="docutils literal notranslate"><span class="pre">#[kernel]</span></code> tells cuda-oxide to compile it as a GPU
+entry point. The function must return <code class="docutils literal notranslate"><span class="pre">()</span></code> – kernels communicate results by
+writing to output buffers, not by returning values.</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::{</span><span class="n">kernel</span><span class="p">,</span><span class="w"> </span><span class="n">thread</span><span class="p">,</span><span class="w"> </span><span class="n">DisjointSlice</span><span class="p">};</span>
+
+<span class="cp">#[kernel]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">vecadd</span><span class="p">(</span><span class="n">a</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span><span class="w"> </span><span class="n">b</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">c</span><span class="p">:</span><span class="w"> </span><span class="nc">DisjointSlice</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">thread</span><span class="p">::</span><span class="n">index_1d</span><span class="p">();</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nb">Some</span><span class="p">(</span><span class="n">c_elem</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">get_mut</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="o">*</span><span class="n">c_elem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="p">[</span><span class="n">idx</span><span class="p">.</span><span class="n">get</span><span class="p">()]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="p">[</span><span class="n">idx</span><span class="p">.</span><span class="n">get</span><span class="p">()];</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Under the hood, <code class="docutils literal notranslate"><span class="pre">#[kernel]</span></code> does three things:</p>
+<ol class="arabic simple">
+<li><p><strong>Renames</strong> the function into the reserved <code class="docutils literal notranslate"><span class="pre">cuda_oxide_kernel_&lt;hash&gt;_&lt;name&gt;</span></code>
+namespace so the compiler’s collector can identify it as a device entry
+point. The exact prefix is owned by the workspace-internal
+<code class="docutils literal notranslate"><span class="pre">reserved-oxide-symbols</span></code> crate; the <code class="docutils literal notranslate"><span class="pre">&lt;hash&gt;</span></code> suffix makes the namespace
+unguessable for user code.</p></li>
+<li><p><strong>Adds <code class="docutils literal notranslate"><span class="pre">#[no_mangle]</span></code></strong> to preserve the symbol name in the generated PTX.</p></li>
+<li><p><strong>Generates host lookup metadata</strong> so typed launch code can find the correct
+PTX entry. Generic kernels also get a readable helper such as
+<code class="docutils literal notranslate"><span class="pre">scale_ptx_name::&lt;f32&gt;()</span></code>; generated marker types are internal plumbing.</p></li>
+</ol>
+<p>In the generated PTX, a kernel becomes a <code class="docutils literal notranslate"><span class="pre">.entry</span></code> directive – the GPU
+equivalent of <code class="docutils literal notranslate"><span class="pre">main</span></code>:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>.entry vecadd(.param .u64 a, .param .u64 a_len, ...) { ... }
+</pre></div>
+</div>
+<section id="parameter-constraints">
+<h3>Parameter constraints<a class="headerlink" href="#parameter-constraints" title="Link to this heading">#</a></h3>
+<p>Kernel parameters cross the host/device ABI boundary through
+<strong>argument scalarization</strong> (covered in the
+<a class="reference internal" href="memory-and-data-movement.html"><span class="std std-doc">Memory and Data Movement</span></a> chapter). The key
+rules:</p>
+<ul class="simple">
+<li><p><strong>Slices</strong> (<code class="docutils literal notranslate"><span class="pre">&amp;[T]</span></code>, <code class="docutils literal notranslate"><span class="pre">DisjointSlice&lt;T&gt;</span></code>) become a pointer + length pair.</p></li>
+<li><p><strong>Scalars</strong> (<code class="docutils literal notranslate"><span class="pre">u32</span></code>, <code class="docutils literal notranslate"><span class="pre">f32</span></code>, etc.) are passed directly.</p></li>
+<li><p><strong>Structs and closures by value</strong> travel as a single byval <code class="docutils literal notranslate"><span class="pre">.param</span></code>. The
+field-by-field flattening still applies to internal device-to-device
+calls, but the kernel boundary itself receives the whole aggregate as
+one value to match the single packet slot the host launcher pushes.</p></li>
+<li><p><strong>No heap-allocated types</strong> (<code class="docutils literal notranslate"><span class="pre">Vec</span></code>, <code class="docutils literal notranslate"><span class="pre">String</span></code>, <code class="docutils literal notranslate"><span class="pre">Box</span></code>) – the <code class="docutils literal notranslate"><span class="pre">alloc</span></code> crate is
+allowed through the compiler, but no device-side <code class="docutils literal notranslate"><span class="pre">#[global_allocator]</span></code> is
+configured today. Even with one, device <code class="docutils literal notranslate"><span class="pre">malloc</span></code> is extremely slow.</p></li>
+</ul>
+</section>
+</section>
+<section id="device-helper-functions">
+<h2>Device helper functions<a class="headerlink" href="#device-helper-functions" title="Link to this heading">#</a></h2>
+<p>Not all GPU code belongs in the kernel itself. You can factor logic into helper
+functions that the compiler will also compile for the GPU.</p>
+<section id="auto-discovered-helpers">
+<h3>Auto-discovered helpers<a class="headerlink" href="#auto-discovered-helpers" title="Link to this heading">#</a></h3>
+<p>The simplest approach: just write a normal Rust function and call it from your
+kernel. The compiler’s <strong>collector</strong> traverses the call graph from each
+<code class="docutils literal notranslate"><span class="pre">#[kernel]</span></code> entry point and automatically compiles every reachable function for
+the GPU – no annotation needed:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">fn</span><span class="w"> </span><span class="nf">clamp</span><span class="p">(</span><span class="n">x</span><span class="p">:</span><span class="w"> </span><span class="kt">f32</span><span class="p">,</span><span class="w"> </span><span class="n">lo</span><span class="p">:</span><span class="w"> </span><span class="kt">f32</span><span class="p">,</span><span class="w"> </span><span class="n">hi</span><span class="p">:</span><span class="w"> </span><span class="kt">f32</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="kt">f32</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">lo</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">lo</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">hi</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">hi</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="cp">#[kernel]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">apply_clamp</span><span class="p">(</span><span class="n">input</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">out</span><span class="p">:</span><span class="w"> </span><span class="nc">DisjointSlice</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">thread</span><span class="p">::</span><span class="n">index_1d</span><span class="p">();</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nb">Some</span><span class="p">(</span><span class="n">out_elem</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">out</span><span class="p">.</span><span class="n">get_mut</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="o">*</span><span class="n">out_elem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">clamp</span><span class="p">(</span><span class="n">input</span><span class="p">[</span><span class="n">idx</span><span class="p">.</span><span class="n">get</span><span class="p">()],</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">clamp</span></code> function is compiled to a PTX <code class="docutils literal notranslate"><span class="pre">.func</span></code> (device function) and
+typically inlined by the compiler, so there is no call overhead.</p>
+</section>
+<section id="when-device-is-needed">
+<h3>When <code class="docutils literal notranslate"><span class="pre">#[device]</span></code> is needed<a class="headerlink" href="#when-device-is-needed" title="Link to this heading">#</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">#[device]</span></code> attribute is required in three specific scenarios where
+auto-discovery is not sufficient:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Scenario</p></th>
+<th class="head text-left"><p>Why <code class="docutils literal notranslate"><span class="pre">#[device]</span></code> is needed</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><strong>Standalone device libraries</strong></p></td>
+<td class="text-left"><p>No <code class="docutils literal notranslate"><span class="pre">#[kernel]</span></code> in the crate, so the collector has no entry point to walk from</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><strong>Cross-crate device functions</strong></p></td>
+<td class="text-left"><p>The function is in a different crate from the kernel</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><strong>Device FFI</strong></p></td>
+<td class="text-left"><p>The function is exposed as <code class="docutils literal notranslate"><span class="pre">#[device]</span> <span class="pre">extern</span> <span class="pre">&quot;C&quot;</span></code> for linking with CUDA C++ via LTOIR</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::</span><span class="n">device</span><span class="p">;</span>
+
+<span class="cp">#[device]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">magnitude</span><span class="p">(</span><span class="n">x</span><span class="p">:</span><span class="w"> </span><span class="kt">f32</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">:</span><span class="w"> </span><span class="kt">f32</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="kt">f32</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">y</span><span class="p">).</span><span class="n">sqrt</span><span class="p">()</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="kernel-vs-device">
+<h3><code class="docutils literal notranslate"><span class="pre">#[kernel]</span></code> vs <code class="docutils literal notranslate"><span class="pre">#[device]</span></code><a class="headerlink" href="#kernel-vs-device" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Feature</p></th>
+<th class="head text-left"><p><code class="docutils literal notranslate"><span class="pre">#[kernel]</span></code></p></th>
+<th class="head text-left"><p><code class="docutils literal notranslate"><span class="pre">#[device]</span></code></p></th>
+<th class="head text-left"><p>Auto-discovered</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>PTX directive</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">.entry</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">.func</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">.func</span></code> (or inlined)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Launchable from host</p></td>
+<td class="text-left"><p>Yes, via typed module</p></td>
+<td class="text-left"><p>No</p></td>
+<td class="text-left"><p>No</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Can return a value</p></td>
+<td class="text-left"><p>No (must be <code class="docutils literal notranslate"><span class="pre">()</span></code>)</p></td>
+<td class="text-left"><p>Yes</p></td>
+<td class="text-left"><p>Yes</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Callable from device code</p></td>
+<td class="text-left"><p>Yes</p></td>
+<td class="text-left"><p>Yes</p></td>
+<td class="text-left"><p>Yes</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Annotation required</p></td>
+<td class="text-left"><p>Always</p></td>
+<td class="text-left"><p>Only for standalone/cross-crate/FFI</p></td>
+<td class="text-left"><p>Never</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<section id="what-rust-works-on-the-gpu">
+<h2>What Rust works on the GPU<a class="headerlink" href="#what-rust-works-on-the-gpu" title="Link to this heading">#</a></h2>
+<p>cuda-oxide compiles standard Rust through <code class="docutils literal notranslate"><span class="pre">rustc</span></code> – it is not a subset
+language. That said, GPU code runs in a <code class="docutils literal notranslate"><span class="pre">no_std</span></code> environment without a
+device-side heap allocator configured, so certain Rust features are
+unavailable today. Here is the current support matrix:</p>
+<section id="supported">
+<h3>Supported<a class="headerlink" href="#supported" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Feature</p></th>
+<th class="head text-left"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>Primitive types (<code class="docutils literal notranslate"><span class="pre">u8</span></code>..<code class="docutils literal notranslate"><span class="pre">u64</span></code>, <code class="docutils literal notranslate"><span class="pre">f32</span></code>, <code class="docutils literal notranslate"><span class="pre">f64</span></code>, <code class="docutils literal notranslate"><span class="pre">bool</span></code>)</p></td>
+<td class="text-left"><p>Full support</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Structs and tuples</p></td>
+<td class="text-left"><p>Decomposed at ABI boundary</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Enums (<code class="docutils literal notranslate"><span class="pre">Option&lt;T&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">Result&lt;T,E&gt;</span></code>, custom)</p></td>
+<td class="text-left"><p>Including <code class="docutils literal notranslate"><span class="pre">match</span></code></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">match</span></code> / <code class="docutils literal notranslate"><span class="pre">if</span></code> / <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">let</span></code></p></td>
+<td class="text-left"><p>Multi-way branching</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">for</span></code> loops and <code class="docutils literal notranslate"><span class="pre">while</span></code> loops</p></td>
+<td class="text-left"><p>Range-based and iterator-based</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Iterators (<code class="docutils literal notranslate"><span class="pre">.iter()</span></code>, <code class="docutils literal notranslate"><span class="pre">.enumerate()</span></code>)</p></td>
+<td class="text-left"><p>Desugared through MIR</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">break</span></code> and <code class="docutils literal notranslate"><span class="pre">continue</span></code></p></td>
+<td class="text-left"><p>Inside loops</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Arrays (<code class="docutils literal notranslate"><span class="pre">[T;</span> <span class="pre">N]</span></code>)</p></td>
+<td class="text-left"><p>Read, write, indexing</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Slices (<code class="docutils literal notranslate"><span class="pre">&amp;[T]</span></code>)</p></td>
+<td class="text-left"><p>Read-only; mutable writes via <code class="docutils literal notranslate"><span class="pre">DisjointSlice</span></code></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Closures (within device code)</p></td>
+<td class="text-left"><p>Normal Rust semantics</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Generic functions</p></td>
+<td class="text-left"><p>Monomorphized per call site</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">unsafe</span></code> blocks and raw pointers</p></td>
+<td class="text-left"><p>For advanced patterns</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="not-supported">
+<h3>Not supported<a class="headerlink" href="#not-supported" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Feature</p></th>
+<th class="head text-left"><p>Reason</p></th>
+<th class="head text-left"><p>Alternative</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">String</span></code>, <code class="docutils literal notranslate"><span class="pre">Vec</span></code>, <code class="docutils literal notranslate"><span class="pre">Box</span></code></p></td>
+<td class="text-left"><p>Require heap allocator (no device-side <code class="docutils literal notranslate"><span class="pre">#[global_allocator]</span></code> today)</p></td>
+<td class="text-left"><p>Use fixed-size arrays or slices</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">format!</span></code>, <code class="docutils literal notranslate"><span class="pre">println!</span></code></p></td>
+<td class="text-left"><p>Require formatting machinery + I/O</p></td>
+<td class="text-left"><p>Use <code class="docutils literal notranslate"><span class="pre">gpu_printf!</span></code></p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">std</span></code> I/O, networking, filesystem</p></td>
+<td class="text-left"><p>No OS on GPU</p></td>
+<td class="text-left"><p>Communicate via buffers</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Trait objects (<code class="docutils literal notranslate"><span class="pre">dyn</span> <span class="pre">Trait</span></code>)</p></td>
+<td class="text-left"><p>Require vtable dispatch</p></td>
+<td class="text-left"><p>Use generics (monomorphized)</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">panic!</span></code> with message</p></td>
+<td class="text-left"><p>Formatting + allocation</p></td>
+<td class="text-left"><p>Use <code class="docutils literal notranslate"><span class="pre">gpu_assert!</span></code> or <code class="docutils literal notranslate"><span class="pre">debug::trap()</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Truco</p>
+<p>If you accidentally use an unsupported feature, the compiler will produce a
+clear error: <code class="docutils literal notranslate"><span class="pre">&quot;CUDA-OXIDE:</span> <span class="pre">FORBIDDEN</span> <span class="pre">CRATE</span> <span class="pre">IN</span> <span class="pre">DEVICE</span> <span class="pre">CODE&quot;</span></code> with a list of
+allowed crates (<code class="docutils literal notranslate"><span class="pre">core</span></code>, <code class="docutils literal notranslate"><span class="pre">alloc</span></code>, <code class="docutils literal notranslate"><span class="pre">cuda_device</span></code>, and your local crate).</p>
+</div>
+</section>
+</section>
+<section id="loop-unrolling">
+<span id="id1"></span><h2>Loop unrolling<a class="headerlink" href="#loop-unrolling" title="Link to this heading">#</a></h2>
+<p>Inside a <code class="docutils literal notranslate"><span class="pre">#[kernel]</span></code> or <code class="docutils literal notranslate"><span class="pre">#[device]</span></code> function, put <code class="docutils literal notranslate"><span class="pre">#[unroll]</span></code> directly on a
+loop whose trip count is known at compile time. This requests that the compiler
+remove the loop and lay out copies of its body:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="cp">#[kernel]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">sum_four</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">out</span><span class="p">:</span><span class="w"> </span><span class="nc">DisjointSlice</span><span class="o">&lt;</span><span class="kt">u32</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">tid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">thread</span><span class="p">::</span><span class="n">index_1d</span><span class="p">();</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nb">Some</span><span class="p">(</span><span class="n">out_elem</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">out</span><span class="p">.</span><span class="n">get_mut</span><span class="p">(</span><span class="n">tid</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">        </span><span class="cp">#[unroll]</span>
+<span class="w">        </span><span class="k">while</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">4</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">sum</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">i</span><span class="p">;</span>
+<span class="w">            </span><span class="n">i</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="o">*</span><span class="n">out_elem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sum</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The pass currently recognizes explicit counted <code class="docutils literal notranslate"><span class="pre">while</span></code> loops. Range-based
+<code class="docutils literal notranslate"><span class="pre">for</span></code> loops are not yet recognized.</p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">#[unroll(N)]</span></code>, where <code class="docutils literal notranslate"><span class="pre">N</span> <span class="pre">&gt;=</span> <span class="pre">2</span></code>, when the trip count is only known at runtime.
+The loop then does <code class="docutils literal notranslate"><span class="pre">N</span></code> iterations” work per trip. A small remainder loop handles
+any leftover iterations, so <code class="docutils literal notranslate"><span class="pre">n</span></code> does not have to be divisible by <code class="docutils literal notranslate"><span class="pre">N</span></code>:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="cp">#[unroll(4)]</span>
+<span class="k">while</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">process</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>
+<span class="w">    </span><span class="n">i</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>An annotated loop may contain other loops. Only the loop carrying the
+annotation is unrolled; each inner loop is copied intact and remains a loop.
+Add a separate annotation to an inner loop if you want to unroll it too.</p>
+<p>Loops with several <code class="docutils literal notranslate"><span class="pre">continue</span></code> paths are supported. Full <code class="docutils literal notranslate"><span class="pre">#[unroll]</span></code> also
+preserves <code class="docutils literal notranslate"><span class="pre">break</span></code> paths and loops with more than one exit target.</p>
+<p>Partial <code class="docutils literal notranslate"><span class="pre">#[unroll(N)]</span></code> currently requires the loop condition to be the only
+exit. If the loop has a <code class="docutils literal notranslate"><span class="pre">break</span></code> or another exit, the compiler warns and does not
+unroll that loop.</p>
+<p>Partial unrolling also requires a counted-up loop: the counter must have a
+positive step, use <code class="docutils literal notranslate"><span class="pre">&lt;</span></code> or <code class="docutils literal notranslate"><span class="pre">&lt;=</span></code>, and compare against a limit that does not change
+inside the loop. The compiler warns and does not unroll unsupported requests.</p>
+<p>To keep generated code bounded, one annotation may create at most 1,024 body
+copies, 8,192 cloned basic blocks, and 65,536 cloned operations. A larger
+request warns and is not unrolled. Full variable-debug builds also skip
+unrolling because they keep loop variables in memory instead of SSA form.</p>
+<p>Unrolling trades larger generated code for fewer branches and more
+optimization opportunities. Use it for small or performance-critical loops,
+and measure the result.</p>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p>For how the compiler analyzes and rewrites annotated loops, including the
+stage-index peephole, see <a class="reference internal" href="../compiler/compiler-optimizations.html"><span class="std std-doc">Compiler Optimizations</span></a>.</p>
+</div>
+</section>
+<section id="launch-bounds-occupancy-hints">
+<h2><code class="docutils literal notranslate"><span class="pre">#[launch_bounds]</span></code> – occupancy hints<a class="headerlink" href="#launch-bounds-occupancy-hints" title="Link to this heading">#</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">#[launch_bounds]</span></code> attribute tells the compiler how many threads you intend
+to launch per block. This lets the PTX assembler make better register allocation
+decisions and can improve occupancy:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="cp">#[kernel]</span>
+<span class="cp">#[launch_bounds(256, 2)]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">optimized_kernel</span><span class="p">(</span><span class="k">mut</span><span class="w"> </span><span class="n">out</span><span class="p">:</span><span class="w"> </span><span class="nc">DisjointSlice</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// ...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Parameter</p></th>
+<th class="head text-left"><p>Required</p></th>
+<th class="head text-left"><p>PTX directive</p></th>
+<th class="head text-left"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">max_threads</span></code></p></td>
+<td class="text-left"><p>Yes</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">.maxntid</span></code></p></td>
+<td class="text-left"><p>Maximum threads per block</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">min_blocks</span></code></p></td>
+<td class="text-left"><p>No</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">.minnctapersm</span></code></p></td>
+<td class="text-left"><p>Minimum concurrent blocks per SM</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The generated PTX includes these directives:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>.entry optimized_kernel .maxntid 256, 1, 1 .minnctapersm 2 { ... }
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Truco</p>
+<p><code class="docutils literal notranslate"><span class="pre">#[launch_bounds]</span></code> must appear <strong>after</strong> <code class="docutils literal notranslate"><span class="pre">#[kernel]</span></code>:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="cp">#[kernel]</span>
+<span class="cp">#[launch_bounds(256, 2)]</span><span class="w">   </span><span class="c1">// correct</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">my_kernel</span><span class="p">(</span><span class="o">..</span><span class="p">.)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="the-collector-how-device-code-is-discovered">
+<h2>The collector – how device code is discovered<a class="headerlink" href="#the-collector-how-device-code-is-discovered" title="Link to this heading">#</a></h2>
+<p>When you build with <code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">oxide</span></code>, the <code class="docutils literal notranslate"><span class="pre">rustc-codegen-cuda</span></code> backend runs a
+<strong>collector</strong> pass that determines which functions to compile for the GPU:</p>
+<ol class="arabic simple">
+<li><p>Scan all compilation units for functions in the reserved
+<code class="docutils literal notranslate"><span class="pre">cuda_oxide_kernel_&lt;hash&gt;_</span></code> namespace (generated by <code class="docutils literal notranslate"><span class="pre">#[kernel]</span></code>).</p></li>
+<li><p>For each kernel, <strong>traverse the call graph</strong> and collect all transitively
+reachable functions.</p></li>
+<li><p><strong>Filter</strong> each callee against the allowed-crate list:</p></li>
+</ol>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Crate</p></th>
+<th class="head text-left"><p>Allowed</p></th>
+<th class="head text-left"><p>Why</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>Your local crate</p></td>
+<td class="text-left"><p>Yes</p></td>
+<td class="text-left"><p>Your kernel and helper code</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cuda_device</span></code></p></td>
+<td class="text-left"><p>Yes</p></td>
+<td class="text-left"><p>GPU intrinsics (threads, warps, shared memory)</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">core</span></code></p></td>
+<td class="text-left"><p>Yes</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">no_std</span></code> Rust core library</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">std</span></code></p></td>
+<td class="text-left"><p>No</p></td>
+<td class="text-left"><p>Requires OS facilities not available on GPU</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">alloc</span></code></p></td>
+<td class="text-left"><p>Allowed</p></td>
+<td class="text-left"><p>Passes the collector, but no device-side allocator is wired up yet. Link-time error today.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>If the collector encounters a call into a forbidden crate, it reports a
+compile-time error rather than generating broken PTX.</p>
+<figure class="align-center" id="id2">
+<a class="reference internal image-reference" href="../_images/collector-traversal.svg"><img alt="../_images/collector-traversal.svg" src="../_images/collector-traversal.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">The device code collector: starting from #[kernel] entry points, the compiler
+walks the call graph to discover all reachable device functions, then filters
+each callee against the allowed-crate list (local crate, cuda_device, core).
+The output is a PTX module with .entry and .func directives.</span><a class="headerlink" href="#id2" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="no-std-and-panic-behavior">
+<h2><code class="docutils literal notranslate"><span class="pre">no_std</span></code> and panic behavior<a class="headerlink" href="#no-std-and-panic-behavior" title="Link to this heading">#</a></h2>
+<p>Device code runs in an implicit <code class="docutils literal notranslate"><span class="pre">#![no_std]</span></code> environment. You do not need to add
+this attribute yourself – the compiler backend handles it.</p>
+<p><strong>Panic behavior:</strong> all unwind paths in MIR are treated as unreachable. If a
+panic actually triggers at runtime (e.g., an array bounds check fails), the GPU
+executes a <strong>trap instruction</strong>, which causes the host to receive
+<code class="docutils literal notranslate"><span class="pre">CUDA_ERROR_ILLEGAL_INSTRUCTION</span></code>. This is semantically equivalent to
+<code class="docutils literal notranslate"><span class="pre">panic=abort</span></code> but does not require any special compiler flags.</p>
+<p>In practice this means:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">unwrap()</span></code> and <code class="docutils literal notranslate"><span class="pre">expect()</span></code> work but will trap the GPU on <code class="docutils literal notranslate"><span class="pre">None</span></code>/<code class="docutils literal notranslate"><span class="pre">Err</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">assert!</span></code> and <code class="docutils literal notranslate"><span class="pre">debug_assert!</span></code> work but trap on failure.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">panic!(&quot;message&quot;)</span></code> is <strong>not</strong> supported (the formatting machinery is
+unavailable) – use <code class="docutils literal notranslate"><span class="pre">gpu_assert!</span></code> or <code class="docutils literal notranslate"><span class="pre">debug::trap()</span></code> instead.</p></li>
+</ul>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p>The <a class="reference internal" href="error-handling-and-debugging.html"><span class="std std-doc">Error Handling and Debugging</span></a> chapter
+covers <code class="docutils literal notranslate"><span class="pre">gpu_printf!</span></code>, <code class="docutils literal notranslate"><span class="pre">gpu_assert!</span></code>, and <code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">oxide</span> <span class="pre">debug</span></code> for diagnosing
+kernel failures.</p>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="execution-model.html"
+       title="página anterior">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">anterior</p>
+        <p class="prev-next-title">The CUDA Execution Model</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="memory-and-data-movement.html"
+       title="siguiente página">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">siguiente</p>
+        <p class="prev-next-title">Memory and Data Movement</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> En esta página
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#kernel-the-gpu-entry-point"><code class="docutils literal notranslate"><span class="pre">#[kernel]</span></code> – the GPU entry point</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#parameter-constraints">Parameter constraints</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#device-helper-functions">Device helper functions</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#auto-discovered-helpers">Auto-discovered helpers</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#when-device-is-needed">When <code class="docutils literal notranslate"><span class="pre">#[device]</span></code> is needed</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#kernel-vs-device"><code class="docutils literal notranslate"><span class="pre">#[kernel]</span></code> vs <code class="docutils literal notranslate"><span class="pre">#[device]</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-rust-works-on-the-gpu">What Rust works on the GPU</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#supported">Supported</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#not-supported">Not supported</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#loop-unrolling">Loop unrolling</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#launch-bounds-occupancy-hints"><code class="docutils literal notranslate"><span class="pre">#[launch_bounds]</span></code> – occupancy hints</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-collector-how-device-code-is-discovered">The collector – how device code is discovered</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#no-std-and-panic-behavior"><code class="docutils literal notranslate"><span class="pre">no_std</span></code> and panic behavior</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+    <div class="footer-items__center">
+      
+        <div class="footer-item"><footer class="bd-footer-content">
+  <div class="footer-container" style="padding: 1rem 0 2rem 0; border-top: 1px solid var(--pst-color-border); text-align: left;">
+    
+    <!-- NVIDIA Logo -->
+    <div style="margin-bottom: 1rem;">
+      <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem; filter: brightness(0);"
+           class="only-light">
+      <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem;"
+           class="only-dark pst-js-only">
+    </div>
+    
+    <!-- Footer Links - single line, left aligned -->
+    <div style="font-size: 0.8125rem; margin-bottom: 0.5rem; color: var(--pst-color-text-muted);">
+      <a href="https://www.nvidia.com/en-us/about-nvidia/privacy-policy/" target="_blank" style="color: inherit; text-decoration: none;">Privacy Policy</a> | 
+      <a href="https://www.nvidia.com/en-us/preferences/email-preferences/" target="_blank" style="color: inherit; text-decoration: none;">Your Privacy Choices</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/terms-of-service/" target="_blank" style="color: inherit; text-decoration: none;">Terms of Service</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/accessibility/" target="_blank" style="color: inherit; text-decoration: none;">Accessibility</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/company-policies/" target="_blank" style="color: inherit; text-decoration: none;">Corporate Policies</a> | 
+      <a href="https://www.nvidia.com/en-us/product-security/" target="_blank" style="color: inherit; text-decoration: none;">Product Security</a> | 
+      <a href="https://www.nvidia.com/en-us/contact/" target="_blank" style="color: inherit; text-decoration: none;">Contact</a>
+    </div>
+    
+    <!-- Copyright -->
+    <div style="font-size: 0.8125rem; color: var(--pst-color-text-muted);">
+      Copyright &copy; 2025-2026, NVIDIA.
+    </div>
+    
+  </div>
+</footer></div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>
