@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-19 15:08+0000\n"
+"POT-Creation-Date: 2026-11-02 17:35+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -140,8 +140,8 @@ msgstr ""
 
 #: ../../../appendix/supported-features.md:0
 msgid ""
-"`core::ptr::copy_nonoverlapping` lowers to a `mir.memcpy` op and then `llvm."
-"memcpy`, with the element count scaled to bytes for the pointee. The "
+"`core::ptr::copy_nonoverlapping` lowers to a `mir.memcpy` op and then "
+"`llvm.memcpy`, with the element count scaled to bytes for the pointee. The "
 "intrinsic overload suffix is derived from the operand address spaces and "
 "length width."
 msgstr ""
@@ -441,7 +441,8 @@ msgid ""
 "paths work; full unrolling preserves `break` paths and multiple exit "
 "targets, while partial unrolling requires a positive-step `<`/`<=` loop with "
 "an invariant limit and only the normal header exit. Requests are capped at "
-"1,024 copies, 8,192 cloned blocks, and 65,536 cloned operations."
+"1,024 copies, 8,192 cloned blocks, and 65,536 cloned operations. "
+"`#[nounroll]` keeps any loop rolled through LLVM, libNVVM, and ptxas."
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
@@ -533,16 +534,11 @@ msgstr ""
 
 #: ../../../appendix/supported-features.md:0
 msgid ""
-"Inter-kernel interop works today: a [cutile-rs Tile kernel](https://github."
-"com/NVIDIA/cuda-rust/tree/main/cutile-rs) and a cuda-oxide SIMT PTX kernel "
-"can run in one host process on the same CUDA stream over shared device "
-"tensors. Intra-kernel interop is built as a [tile library](../advanced/tile-"
-"libraries.md): `#[tile_export]` and `cargo oxide tilelib` produce the LTOIR "
-"and the Tile IR descriptions today (at the installed assembler's current "
-"bytecode version, 13.5 or newer), packaging them into a `.tilelib` needs the "
-"CUDA 13.5 or newer `tileiras`, and the caller is cuTile Python's "
-"`foreign_call`. Tracked in [#96](https://github.com/NVlabs/cuda-oxide/"
-"issues/96)."
+"Inter-kernel interop works today: a [cutile-rs Tile kernel](https://"
+"github.com/NVIDIA/cuda-rust/tree/main/cutile-rs) and a cuda-oxide SIMT PTX "
+"kernel can run in one host process on the same CUDA stream over shared "
+"device tensors. Intra-kernel interop is tracked in [#96](https://github.com/"
+"NVlabs/cuda-oxide/issues/96)."
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
@@ -691,9 +687,9 @@ msgstr ""
 #: ../../../appendix/supported-features.md:0
 msgid ""
 "`cargo oxide clean` removes project-local `target/` directories and "
-"generated device artifacts (`.ptx`, `.ll`, `.opt.ll`, `.ltoir`, `.cubin`, `."
-"target`, `.options`, `.cubin.target`), never the shared `~/.cargo/cuda-oxide/"
-"` cache."
+"generated device artifacts (`.ptx`, `.ll`, `.opt.ll`, `.ltoir`, `.cubin`, "
+"`.target`, `.options`, `.cubin.target`), never the shared `~/.cargo/cuda-"
+"oxide/` cache."
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
@@ -874,8 +870,8 @@ msgstr ""
 
 #: ../../../appendix/supported-features.md:0
 msgid ""
-"`DynamicSharedArray<T, ALIGN>` — runtime-sized, set via `LaunchConfig::"
-"shared_mem_bytes`."
+"`DynamicSharedArray<T, ALIGN>` — runtime-sized, set via "
+"`LaunchConfig::shared_mem_bytes`."
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
@@ -1021,8 +1017,9 @@ msgstr ""
 
 #: ../../../appendix/supported-features.md:0
 msgid ""
-"`ballot`, `all`, `any`, `shfl`, `shfl_xor`, `shfl_down`, `shfl_up` (`u32` "
-"and `f32`); `match_any` / `match_all` (`i32` and `i64`); `active_mask`."
+"`ballot`, `all`, `any`, `shfl`, `shfl_xor`, `shfl_down`, `shfl_up` (`u32`, "
+"`f32`, and `u64` as two 32-bit shuffles); `match_any` / `match_all` (`i32` "
+"and `i64`); `active_mask`."
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
@@ -1032,7 +1029,7 @@ msgstr ""
 #: ../../../appendix/supported-features.md:0
 msgid ""
 "`warp_reduce`, `warp_scan` (inclusive). `Sum`/`Min`/`Max` for `u32`/`i32`/"
-"`f32`; `BitAnd`/`BitOr`/`BitXor` for `u32`."
+"`f32`/`u64`/`i64`; `BitAnd`/`BitOr`/`BitXor` for `u32`/`u64`."
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0

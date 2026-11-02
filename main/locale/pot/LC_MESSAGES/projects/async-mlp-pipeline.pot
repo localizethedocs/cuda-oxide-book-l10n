@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-16 04:35+0000\n"
+"POT-Creation-Date: 2026-11-02 17:35+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -127,9 +127,9 @@ msgid ""
 "cuda-device   = { path = \"../../../cuda-device\" }       # #[kernel], "
 "DisjointSlice, thread::*\n"
 "cuda-core     = \"0.3.1\"                                 # shared with "
-"cutile-rs: CudaModule, simt::LaunchConfig\n"
+"cutile-rs: CudaModule, LaunchConfig\n"
 "cuda-async    = \"0.3.1\"                                 # shared with "
-"cutile-rs: simt::DeviceOperation, zip!, and_then\n"
+"cutile-rs: DeviceOp, zip!, and_then\n"
 "tokio       = { version = \"1\", features = [\"rt\", \"macros\"] }\n"
 msgstr ""
 
@@ -225,12 +225,13 @@ msgid ""
 "    mut vec_out: DisjointSlice<f32>,\n"
 ") {\n"
 "    let row = thread::index_1d();\n"
+"    let i = row.get();\n"
 "    if let Some(out_elem) = vec_out.get_mut(row) {\n"
 "        let n_sz = n as usize;\n"
 "        let mut sum = 0.0f32;\n"
 "        let mut j = 0usize;\n"
 "        while j < n_sz {\n"
-"            sum = sum + mat[row.get() * n_sz + j] * vec_in[j];\n"
+"            sum = sum + mat[i * n_sz + j] * vec_in[j];\n"
 "            j = j + 1;\n"
 "        }\n"
 "        *out_elem = sum;\n"
@@ -238,41 +239,42 @@ msgid ""
 "}\n"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:174
+#: ../../../projects/async-mlp-pipeline.md:175
 msgid ""
 "One thread per output element, one-dimensional indexing. The `_m` parameter "
 "is unused but keeps the calling convention consistent with BLAS-style "
 "interfaces."
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:178
+#: ../../../projects/async-mlp-pipeline.md:179
 msgid "relu — activation"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:180
+#: ../../../projects/async-mlp-pipeline.md:181
 msgid ""
 "#[kernel]\n"
 "pub fn relu(input: &[f32], mut output: DisjointSlice<f32>) {\n"
 "    let idx = thread::index_1d();\n"
+"    let i = idx.get();\n"
 "    if let Some(out_elem) = output.get_mut(idx) {\n"
-"        let val = input[idx.get()];\n"
+"        let val = input[i];\n"
 "        *out_elem = if val > 0.0f32 { val } else { 0.0f32 };\n"
 "    }\n"
 "}\n"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:191
+#: ../../../projects/async-mlp-pipeline.md:193
 msgid ""
 "Elementwise `max(0, x)`. In the pipeline, `input` and `output` point to the "
 "same buffer — a perfectly valid in-place pattern since each thread reads and "
 "writes the same index and the launch is 1D."
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:195
+#: ../../../projects/async-mlp-pipeline.md:197
 msgid "What to notice"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:197
+#: ../../../projects/async-mlp-pipeline.md:199
 msgid "A few patterns that recur across all three kernels:"
 msgstr ""
 
@@ -319,20 +321,17 @@ msgid ""
 "makes the loop bounds explicit"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:208
+#: ../../../projects/async-mlp-pipeline.md:210
 msgid "Bridging host and device"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:210
+#: ../../../projects/async-mlp-pipeline.md:212
 msgid ""
-"Three helper functions wrap raw CUDA driver calls into `DeviceOperation` "
-"values. They use `with_context` to receive the scheduler's stream at "
-"execution time — not at the call site. This is the key insight: you build "
-"the recipe now, the scheduler picks the stream later."
-msgstr ""
-
-#: ../../../projects/async-mlp-pipeline.md:215
-msgid "h2d — host to device"
+"The shared `DeviceBuffer` and `DeviceBox` wrappers transfer ownership "
+"without copying device memory. A host-to-device source must be retained "
+"independently of the operation's output; host combinators can discard "
+"outputs before GPU completion. An ordinary host `Vec` is returned only after "
+"its copy completes."
 msgstr ""
 
 #: ../../../projects/async-mlp-pipeline.md:217
@@ -340,112 +339,68 @@ msgid ""
 "fn h2d(host_data: Vec<f32>) -> impl DeviceOperation<Output = "
 "DeviceBox<[f32]>> {\n"
 "    device_operation::with_context(move |ctx| {\n"
-"        let stream = ctx.get_cuda_stream();\n"
-"        let n = host_data.len();\n"
-"        let num_bytes = n * mem::size_of::<f32>();\n"
-"        unsafe {\n"
-"            let dptr = malloc_async(stream.cu_stream(), num_bytes)."
-"unwrap();\n"
-"            memcpy_htod_async(dptr, host_data.as_ptr(), num_bytes, stream."
-"cu_stream())\n"
-"                .unwrap();\n"
-"            value(DeviceBox::from_raw_parts(dptr, n, ctx.get_device_id()))\n"
-"        }\n"
+"        let host_data = Arc::new(host_data);\n"
+"        // Retain before DMA: dropping or forgetting the operation must not\n"
+"        // release the source while the device still reads it.\n"
+"        ctx.retain(host_data.clone()).unwrap();\n"
+"        let buffer = unsafe {\n"
+"            DeviceBuffer::from_host_async_unchecked(ctx.get_cuda_stream(), "
+"&host_data)\n"
+"        }.unwrap();\n"
+"        value(DeviceBox::from_buffer(buffer))\n"
 "    })\n"
 "}\n"
-msgstr ""
-
-#: ../../../projects/async-mlp-pipeline.md:233
-msgid ""
-"The `host_data` vector is captured by `move`. The closure runs when the "
-"scheduler executes the operation — at that point it has a real CUDA stream. "
-"`malloc_async` and `memcpy_htod_async` are stream-ordered, so the allocation "
-"and copy are serialized on the scheduler's chosen stream."
-msgstr ""
-
-#: ../../../projects/async-mlp-pipeline.md:238
-msgid "zeros — zero-initialized device buffer"
-msgstr ""
-
-#: ../../../projects/async-mlp-pipeline.md:240
-msgid ""
+"\n"
+"/// Zero-initialization and later kernels share the same stream and "
+"storage.\n"
 "fn zeros(n: usize) -> impl DeviceOperation<Output = DeviceBox<[f32]>> {\n"
 "    device_operation::with_context(move |ctx| {\n"
-"        let stream = ctx.get_cuda_stream();\n"
-"        let num_bytes = n * mem::size_of::<f32>();\n"
-"        unsafe {\n"
-"            let dptr = malloc_async(stream.cu_stream(), num_bytes)."
-"unwrap();\n"
-"            memset_d8_async(dptr, 0, num_bytes, stream.cu_stream())."
-"unwrap();\n"
-"            value(DeviceBox::from_raw_parts(dptr, n, ctx.get_device_id()))\n"
-"        }\n"
+"        value(DeviceBox::from_buffer(DeviceBuffer::zeroed(ctx.get_cuda_stream(), "
+"n).unwrap()))\n"
 "    })\n"
 "}\n"
-msgstr ""
-
-#: ../../../projects/async-mlp-pipeline.md:254
-msgid ""
-"Same pattern as `h2d`, but `memset_d8_async` instead of `memcpy`. The GEMM "
-"kernel uses `beta = 0.0` so the initial contents do not matter, but zeroing "
-"is defensive."
-msgstr ""
-
-#: ../../../projects/async-mlp-pipeline.md:258
-msgid "d2h — device to host"
-msgstr ""
-
-#: ../../../projects/async-mlp-pipeline.md:260
-msgid ""
+"\n"
+"/// Exposing an ordinary Vec to host combinators requires completion before\n"
+"/// returning it. The shared transfer helper also handles partial-error "
+"cleanup.\n"
 "fn d2h(dev: DeviceBox<[f32]>) -> impl DeviceOperation<Output = Vec<f32>> {\n"
 "    device_operation::with_context(move |ctx| {\n"
-"        let stream = ctx.get_cuda_stream();\n"
-"        let n = dev.len();\n"
-"        let num_bytes = n * mem::size_of::<f32>();\n"
-"        let mut host = vec![0.0f32; n];\n"
-"        unsafe {\n"
-"            memcpy_dtoh_async(\n"
-"                host.as_mut_ptr(), dev.cu_deviceptr(),\n"
-"                num_bytes, stream.cu_stream(),\n"
-"            ).unwrap();\n"
-"        }\n"
-"        let _ = &dev;\n"
-"        value(host)\n"
+"        value(dev.into_buffer().to_host_vec(ctx.get_cuda_stream()).unwrap())\n"
 "    })\n"
 "}\n"
+"\n"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:279
+#: ../../../projects/async-mlp-pipeline.md:248
 msgid ""
-"The `let _ = &dev;` line looks like a no-op, but it keeps `dev` alive in the "
-"closure until the stream synchronizes. Without it, `dev` would be dropped "
-"after the `memcpy_dtoh_async` call but before the stream finishes the copy — "
-"a classic use-after-free on the device side."
+"These helpers use the execution context's stream, so their GPU work remains "
+"ordered with subsequent Tile or SIMT launches. The `DeviceBox` conversions "
+"preserve the allocation owner, CUDA context and access tracker."
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:286
+#: ../../../projects/async-mlp-pipeline.md:252
 msgid "Composing the pipeline"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:288
+#: ../../../projects/async-mlp-pipeline.md:254
 msgid ""
 "Each batch is a single `DeviceOperation` built from combinators. No GPU work "
 "happens when you assemble it — it is a lazy description of future work. Here "
 "is how the pieces fit together:"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:296
+#: ../../../projects/async-mlp-pipeline.md:262
 msgid ""
 "The combinator pipeline for a single batch. `zip!` allocates three buffers "
 "in parallel. The `and_then` chain sequences GEMM → MatVec → ReLU → D2H, "
 "threading device handles through each stage via `value()`."
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:301
+#: ../../../projects/async-mlp-pipeline.md:267
 msgid "Step 1: Initialize the runtime"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:303
+#: ../../../projects/async-mlp-pipeline.md:269
 msgid ""
 "const DIM: usize = 64;\n"
 "const BLOCK: u32 = 16;\n"
@@ -456,7 +411,7 @@ msgid ""
 "    let module = kernels::load_async(0)?;\n"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:313
+#: ../../../projects/async-mlp-pipeline.md:279
 msgid ""
 "`init_device_contexts(0, 1)` sets device 0 as the default and initializes "
 "the device context map (capacity 1). The round-robin stream pool is created "
@@ -464,11 +419,11 @@ msgid ""
 "functions is loaded once and shared by the typed module handle."
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:318
+#: ../../../projects/async-mlp-pipeline.md:284
 msgid "Step 2: Upload shared weights"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:320
+#: ../../../projects/async-mlp-pipeline.md:286
 msgid ""
 "    let w0_host: Vec<f32> = (0..DIM * DIM)\n"
 "        .map(|i| ((i % 7) as f32 - 3.0) * 0.01)\n"
@@ -481,34 +436,34 @@ msgid ""
 "        zip!(h2d(w0_host).arc(), h2d(w1_host).arc()).await?;\n"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:332
+#: ../../../projects/async-mlp-pipeline.md:298
 msgid ""
-"Two independent uploads, bundled with `zip!` so they can share a stream. `."
-"arc()` wraps each result in `Arc` — a reference-counted pointer that costs "
+"Two independent uploads, bundled with `zip!` so they can share a stream. "
+"`.arc()` wraps each result in `Arc` — a reference-counted pointer that costs "
 "roughly one nanosecond to clone. Four batches, four clones, zero device "
 "copies."
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:337
+#: ../../../projects/async-mlp-pipeline.md:303
 msgid "Step 3: Build the per-batch pipeline"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:339
+#: ../../../projects/async-mlp-pipeline.md:305
 msgid ""
 "This is where the magic lives. For each batch, we build a four-stage chain:"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:341
+#: ../../../projects/async-mlp-pipeline.md:307
 msgid ""
-"    use cuda_async::simt::launch::{AsyncKernelLaunchBuilder, "
+"    use cuda_async::launch::{AsyncKernelLaunchBuilder, "
 "OwnedAsyncKernelLaunch};\n"
 "\n"
 "    let pipeline = zip!(h2d(batch_data), zeros(DIM * DIM), zeros(DIM))\n"
 "        .and_then(move |(input, hidden, output)| {\n"
 "            // Stage 1: GEMM — hidden = input @ W0\n"
 "            let func = module.load_function(\"sgemm_naive\").unwrap();\n"
-"            let mut builder = AsyncKernelLaunchBuilder::new(Arc::"
-"new(func));\n"
+"            let mut builder = "
+"AsyncKernelLaunchBuilder::new(Arc::new(func));\n"
 "            builder.push_args((\n"
 "                DIM as u32, DIM as u32, DIM as u32,\n"
 "                1.0f32,\n"
@@ -533,8 +488,8 @@ msgid ""
 "        .and_then(move |(hidden, output, w1, module)| {\n"
 "            // Stage 2: MatVec — output = hidden @ W1\n"
 "            let func = module.load_function(\"matvec_naive\").unwrap();\n"
-"            let mut builder = AsyncKernelLaunchBuilder::new(Arc::"
-"new(func));\n"
+"            let mut builder = "
+"AsyncKernelLaunchBuilder::new(Arc::new(func));\n"
 "            builder.push_args((\n"
 "                DIM as u32, DIM as u32,\n"
 "                hidden.cu_deviceptr(), hidden.len() as u64,\n"
@@ -555,8 +510,8 @@ msgid ""
 "            // Stage 3: ReLU — result = max(0, output)\n"
 "            let func = module.load_function(\"relu\").unwrap();\n"
 "            let relu_out: DeviceBox<[f32]> = output;\n"
-"            let mut builder = AsyncKernelLaunchBuilder::new(Arc::"
-"new(func));\n"
+"            let mut builder = "
+"AsyncKernelLaunchBuilder::new(Arc::new(func));\n"
 "            builder.push_args((\n"
 "                relu_out.cu_deviceptr(), relu_out.len() as u64,\n"
 "                relu_out.cu_deviceptr(), relu_out.len() as u64,\n"
@@ -570,11 +525,11 @@ msgid ""
 "        .and_then(d2h);\n"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:401
+#: ../../../projects/async-mlp-pipeline.md:367
 msgid "A few things are worth slowing down for:"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:403
+#: ../../../projects/async-mlp-pipeline.md:369
 msgid ""
 "**The `value()` baton.** Each `and_then` closure consumes the previous "
 "stage's output and returns a `DeviceOperation`. Kernel launches return `()`, "
@@ -582,14 +537,14 @@ msgid ""
 "needs. Think of it as a relay baton — the kernel runs, the baton passes."
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:408
+#: ../../../projects/async-mlp-pipeline.md:374
 msgid ""
 "**Type annotations.** The deeply nested generics from `zip!` + `and_then` "
 "chains exceed Rust's type inference. You will need explicit annotations on "
 "closure parameters:"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:412
+#: ../../../projects/async-mlp-pipeline.md:378
 msgid ""
 ".and_then(move |(hidden, output, w1, module): (\n"
 "    DeviceBox<[f32]>,\n"
@@ -599,20 +554,20 @@ msgid ""
 ")| { ... })\n"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:421
+#: ../../../projects/async-mlp-pipeline.md:387
 msgid ""
 "This is the one ergonomic rough edge. The `Zippable` trait import is also "
 "required for `zip!` to work."
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:424
+#: ../../../projects/async-mlp-pipeline.md:390
 msgid ""
 "**In-place ReLU.** Stage 3 passes `relu_out` as both `input` and `output` to "
 "the kernel. Since each thread reads `input[idx]` and writes `output[idx]` at "
 "the same index, this is safe — no thread reads another's write."
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:428
+#: ../../../projects/async-mlp-pipeline.md:394
 msgid ""
 "**Raw launch boundary.** The builder is inert. `finalize_unchecked` is where "
 "the raw packet and geometry become runnable, so each call has a local safety "
@@ -623,15 +578,15 @@ msgid ""
 "packet word for you."
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:436
+#: ../../../projects/async-mlp-pipeline.md:402
 msgid "Step 4: Spawn and collect"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:438
+#: ../../../projects/async-mlp-pipeline.md:404
 msgid "    handles.push(tokio::spawn(pipeline.into_future()));\n"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:442
+#: ../../../projects/async-mlp-pipeline.md:408
 msgid ""
 "`.into_future()` converts the lazy `DeviceOperation` into a `DeviceFuture`. "
 "At this point the scheduling policy picks a stream (batch 0 → stream 0, "
@@ -639,7 +594,7 @@ msgid ""
 "Tokio runtime."
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:447
+#: ../../../projects/async-mlp-pipeline.md:413
 msgid ""
 "On the first poll, the pipeline's `execute()` submits all GPU work to the "
 "assigned stream and registers a `cuLaunchHostFunc` callback. The future "
@@ -647,7 +602,7 @@ msgid ""
 "No host thread spins."
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:452
+#: ../../../projects/async-mlp-pipeline.md:418
 msgid ""
 "    for (i, handle) in handles.into_iter().enumerate() {\n"
 "        let result: Vec<f32> = handle.await.expect(\"Tokio task "
@@ -655,32 +610,32 @@ msgid ""
 "        let all_non_negative = result.iter().all(|&v| v >= 0.0);\n"
 "        println!(\"Batch {}: {} elements, first 8 = {:?}{}\",\n"
 "            i, result.len(), &result[..8.min(result.len())],\n"
-"            if all_non_negative { \" [ReLU OK]\" } else { \" [ReLU "
-"FAILED]\" }\n"
+"            if all_non_negative { \" [ReLU OK]\" } else { \" [ReLU FAILED]"
+"\" }\n"
 "        );\n"
 "    }\n"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:463
+#: ../../../projects/async-mlp-pipeline.md:429
 msgid ""
 "The ReLU sanity check is not deep learning validation — it just confirms "
 "that the activation function ran. Every output should be non-negative. If "
 "you see `[ReLU FAILED]`, something upstream is very wrong."
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:469
+#: ../../../projects/async-mlp-pipeline.md:435
 msgid "Build, run, verify"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:471
+#: ../../../projects/async-mlp-pipeline.md:437
 msgid "cargo oxide run async_mlp\n"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:475
+#: ../../../projects/async-mlp-pipeline.md:441
 msgid "Expected output:"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:477
+#: ../../../projects/async-mlp-pipeline.md:443
 msgid ""
 "=== Async MLP Pipeline ===\n"
 "\n"
@@ -698,7 +653,7 @@ msgid ""
 "SUCCESS: All batches completed.\n"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:494
+#: ../../../projects/async-mlp-pipeline.md:460
 msgid ""
 "The Arc refcounts start at 1 (one reference each for `w0` and `w1`). During "
 "batch processing they temporarily rise to 5 (original + four clones) and "
@@ -706,21 +661,21 @@ msgid ""
 "accordingly — no copies, no reallocation."
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:499
+#: ../../../projects/async-mlp-pipeline.md:465
 msgid "Profiling with Nsight Systems"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:501
+#: ../../../projects/async-mlp-pipeline.md:467
 msgid "To see the stream overlap in action:"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:503
+#: ../../../projects/async-mlp-pipeline.md:469
 msgid ""
 "nsys profile --trace=cuda cargo oxide run async_mlp\n"
 "nsys-ui report.nsys-rep\n"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:508
+#: ../../../projects/async-mlp-pipeline.md:474
 msgid ""
 "In the timeline view, look for four parallel rows of kernel blocks — one per "
 "stream. If kernels are serialized on one stream, the round-robin scheduler "
@@ -728,65 +683,65 @@ msgid ""
 "stream was configured)."
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:515
+#: ../../../projects/async-mlp-pipeline.md:481
 msgid "What makes this \"real\""
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:517
+#: ../../../projects/async-mlp-pipeline.md:483
 msgid ""
 "This is still a toy — 64×64 matrices, fake weights, three kernels. But the "
 "*structure* is the same as production GPU pipelines:"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:292
+#: ../../../projects/async-mlp-pipeline.md:258
 msgid "Production pattern"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:292
+#: ../../../projects/async-mlp-pipeline.md:258
 msgid "async_mlp equivalent"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:292
+#: ../../../projects/async-mlp-pipeline.md:258
 msgid "Model weights loaded once, shared across requests"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:292
+#: ../../../projects/async-mlp-pipeline.md:258
 msgid "`zip!(h2d(w0).arc(), h2d(w1).arc())`"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:292
+#: ../../../projects/async-mlp-pipeline.md:258
 msgid "Per-request inference pipeline"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:292
+#: ../../../projects/async-mlp-pipeline.md:258
 msgid "`and_then` chain: GEMM → MatVec → ReLU → D2H"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:292
+#: ../../../projects/async-mlp-pipeline.md:258
 msgid "Concurrent request processing"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:292
+#: ../../../projects/async-mlp-pipeline.md:258
 msgid "`tokio::spawn(pipeline.into_future())` per batch"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:292
+#: ../../../projects/async-mlp-pipeline.md:258
 msgid "Stream-based GPU scheduling"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:292
+#: ../../../projects/async-mlp-pipeline.md:258
 msgid "Round-robin `init_device_contexts(0, 1)`"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:292
+#: ../../../projects/async-mlp-pipeline.md:258
 msgid "Non-blocking host"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:292
+#: ../../../projects/async-mlp-pipeline.md:258
 msgid "`.await` on join handles, not `.sync()`"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:528
+#: ../../../projects/async-mlp-pipeline.md:494
 msgid ""
 "Scale the matrices from 64 to 4096, replace the naive kernels with tiled "
 "shared-memory versions (see [Shared Memory](../advanced/shared-memory-and-"
@@ -794,29 +749,29 @@ msgid ""
 "inference server."
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:534
+#: ../../../projects/async-mlp-pipeline.md:500
 msgid "Extending the example"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:536
+#: ../../../projects/async-mlp-pipeline.md:502
 msgid "A few ideas for taking this further:"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:538
+#: ../../../projects/async-mlp-pipeline.md:504
 msgid ""
 "**Add a softmax layer.** Write a `#[kernel]` that computes the [numerically "
 "stable softmax](https://en.wikipedia.org/wiki/Softmax_function) across the "
 "64-element output vector. Chain it with another `.and_then` after ReLU."
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:543
+#: ../../../projects/async-mlp-pipeline.md:509
 msgid ""
 "**Profile at larger dimensions.** Change `DIM` to 512 or 1024. Watch the "
 "GEMM dominate the timeline. Then replace `sgemm_naive` with a tiled version "
 "using `SharedArray` and observe the speedup."
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:547
+#: ../../../projects/async-mlp-pipeline.md:513
 msgid ""
 "**Add error recovery.** Replace `.unwrap()` in the kernel launch closures "
 "with proper `Result` propagation. Use the three-arm `match` pattern from the "
@@ -824,32 +779,32 @@ msgid ""
 "GPU errors and task panics independently."
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:552
+#: ../../../projects/async-mlp-pipeline.md:518
 msgid ""
 "**Multi-device.** Pass `init_device_contexts(0, 2)` to manage two GPUs. "
 "Build a batch splitter that routes even batches to GPU 0 and odd batches to "
 "GPU 1."
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:557
+#: ../../../projects/async-mlp-pipeline.md:523
 msgid ""
-"[The DeviceOperation Model](../async-programming/the-device-operation-model."
-"md) — how lazy GPU graphs work"
+"[The DeviceOperation Model](../async-programming/the-device-operation-"
+"model.md) — how lazy GPU graphs work"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:558
+#: ../../../projects/async-mlp-pipeline.md:524
 msgid ""
 "[Combinators and Composition](../async-programming/combinators-and-"
 "composition.md) — `and_then`, `zip!`, `value()`, `.arc()` in detail"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:559
+#: ../../../projects/async-mlp-pipeline.md:525
 msgid ""
 "[Scheduling and Streams](../async-programming/scheduling-and-streams.md) — "
 "round-robin, stream pools, scheduling policies"
 msgstr ""
 
-#: ../../../projects/async-mlp-pipeline.md:560
+#: ../../../projects/async-mlp-pipeline.md:526
 msgid ""
 "[Concurrent Execution](../async-programming/concurrent-execution.md) — the "
 "theory behind everything in this chapter"
