@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-19 15:08+0000\n"
+"POT-Creation-Date: 2026-11-09 17:58+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -155,8 +155,8 @@ msgstr ""
 #: ../../../advanced/shared-memory-and-synchronization.md:117
 msgid ""
 "`SharedArray` must be declared as `static mut` inside the kernel function "
-"body. This tells the compiler to allocate it in PTX shared address space (`."
-"shared`). The `UNINIT` constant skips initialization — the contents are "
+"body. This tells the compiler to allocate it in PTX shared address space "
+"(`.shared`). The `UNINIT` constant skips initialization — the contents are "
 "undefined until threads write to them."
 msgstr ""
 
@@ -260,9 +260,10 @@ msgstr ""
 
 #: ../../../advanced/shared-memory-and-synchronization.md:178
 msgid ""
-"Indexing is bounds-checked in debug builds. In release (and on the GPU), the "
-"bounds check is elided. If you index out of bounds, you get undefined "
-"behavior — the same rules as any `static mut` access in Rust."
+"Indexing is bounds-checked like a Rust array: `TILE[i]` traps on the GPU if "
+"`i >= N`. `#[kernel(unchecked_indexing)]` (or "
+"`CUDA_OXIDE_UNCHECKED_INDEXING=1`) removes the check, and an out-of-bounds "
+"index then becomes undefined behavior."
 msgstr ""
 
 #: ../../../advanced/shared-memory-and-synchronization.md:184
@@ -846,9 +847,9 @@ msgstr ""
 
 #: ../../../advanced/shared-memory-and-synchronization.md:450
 msgid ""
-"[CUDA Programming Guide — Shared Memory Bank Conflicts](https://docs.nvidia."
-"com/cuda/cuda-programming-guide/#shared-memory-5-x) for a detailed treatment "
-"of bank conflict rules and padding strategies."
+"[CUDA Programming Guide — Shared Memory Bank Conflicts](https://"
+"docs.nvidia.com/cuda/cuda-programming-guide/#shared-memory-5-x) for a "
+"detailed treatment of bank conflict rules and padding strategies."
 msgstr ""
 
 #: ../../../advanced/shared-memory-and-synchronization.md:456

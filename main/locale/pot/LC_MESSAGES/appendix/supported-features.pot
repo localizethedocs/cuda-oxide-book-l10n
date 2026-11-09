@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-19 15:08+0000\n"
+"POT-Creation-Date: 2026-11-09 17:58+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -140,8 +140,8 @@ msgstr ""
 
 #: ../../../appendix/supported-features.md:0
 msgid ""
-"`core::ptr::copy_nonoverlapping` lowers to a `mir.memcpy` op and then `llvm."
-"memcpy`, with the element count scaled to bytes for the pointee. The "
+"`core::ptr::copy_nonoverlapping` lowers to a `mir.memcpy` op and then "
+"`llvm.memcpy`, with the element count scaled to bytes for the pointee. The "
 "intrinsic overload suffix is derived from the operand address spaces and "
 "length width."
 msgstr ""
@@ -232,12 +232,12 @@ msgid ""
 "enum, tuple, and zero-sized fields. Tuple element strides and field offsets "
 "come from rustc layout, including internal and trailing padding; direct "
 "tuple value constants use the same layout-aware decoder. Struct constants "
-"(direct and promoted-by-reference) also read every field at its rustc layout "
-"offset, so padded, reordered, `#[repr(C)]`, and nested shapes decode "
-"correctly, and a struct's stored size is its padded size, which fixes the "
-"element stride for arrays of padded structs inside constants. Pointer-free "
-"initialized union constants are materialized from rustc's evaluated storage "
-"image without guessing an active field: initialized bytes are preserved, "
+"(direct and by reference) also read every field at its rustc layout offset, "
+"so padded, reordered, `#[repr(C)]`, and nested shapes decode correctly, and "
+"a struct's stored size is its padded size, which fixes the element stride "
+"for arrays of padded structs inside constants. Pointer-free initialized "
+"union constants are materialized from rustc's evaluated storage image "
+"without guessing an active field: initialized bytes are preserved, "
 "uninitialized inactive bytes remain `undef`, and the byte image is "
 "transmuted into the layout-exact union type. This includes direct unions, "
 "unions nested in tuple or struct constants, runtime-indexed `[U; N]`, and "
@@ -332,10 +332,54 @@ msgid ""
 "tagged enum layouts, both for direct thin-reference payloads and for "
 "pointers nested inside tuple, struct, or array payload fields. Relocation-"
 "carrying enum constants can also be nested inside tuple, struct, and array "
-"constants. Anonymous promoted allocations remain unsupported."
+"constants."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:127
+#: ../../../appendix/supported-features.md:126
+msgid ""
+"Reference constants and rustc-promoted borrows (`const C: &T = &...`, `&(3, "
+"4)`, `&42`) point at anonymous constant memory. Each such allocation becomes "
+"one module-level read-only device global holding rustc's evaluated byte "
+"image, so a `&'static` reference stays valid after the function that named "
+"it returns, including across an `#[inline(never)]` call. References into the "
+"same allocation share its global: `&PAIR.1` addresses 4 bytes into `PAIR`'s "
+"global. These globals are keyed by their contents (bytes, alignment, and "
+"what their pointers target), so adding unrelated constants or kernels never "
+"renames an existing one, and two read-only allocations with the same "
+"contents share one global, which Rust permits because it does not promise "
+"constants distinct addresses. A reference to a whole array (`&[T; N]`) keeps "
+"the promoted-table path above, whose globals are keyed by content, so it can "
+"get a separate copy of the bytes from a `&T` into the same allocation; Rust "
+"does not promise one address across uses of a constant. Pointers stored "
+"inside the allocation (`&&7`, `&&TABLE[2]`) are relocations to the inner "
+"allocation's own global or to the device static. `*mut T` constants formed "
+"with `as` casts from references (`&42 as *const u32 as *mut u32`) use the "
+"same read-only globals; the storage stays read-only. The same per-allocation "
+"globals back thin pointer fields of tuple, struct, array, and enum constants "
+"that point at anonymous memory, and the thin-pointer and slice data words of "
+"device-static initializers (`static S: &[u32] = &[1, 2]`). When the importer "
+"cannot prove the pointee's device layout byte-identical to rustc's (for "
+"example `&Option<u32>`), a reference to the whole allocation declares the "
+"same global typed as the pointee, and lowering validates that layout against "
+"the shared bytes, so `&Option<u32>` and `&u32` into its payload still "
+"compare equal. An interior pointer is rejected at compile time when the "
+"importer cannot prove the layout of the pointee it views. A pointer into "
+"shared memory cannot be stored inside a constant or a static: a constant or "
+"static initializer whose type holds a `*const`/`&` to a `SharedArray` or "
+"`Barrier` is rejected at compile time (see `error_shared_pointer_constant`), "
+"and so is a stored pointer that reaches a `SharedArray` or `Barrier` static "
+"through a type-erasing cast (see `error_shared_static_relocation`). Those "
+"statics live in per-block shared memory and have no initialized global to "
+"point at, and every stored pointer targets an initialized global. The type "
+"check is conservative: a constant whose type holds such a pointer is refused "
+"whenever it stores any relocated pointer, even when the shared-memory "
+"pointer itself is null. Slice references in `const` items and slice fat-"
+"pointer fields of aggregate constants whose data word points at anonymous "
+"memory remain unsupported and fail at compile time. See "
+"`promoted_ref_return`."
+msgstr ""
+
+#: ../../../appendix/supported-features.md:167
 msgid "Compiler: Closures"
 msgstr ""
 
@@ -377,10 +421,12 @@ msgstr ""
 #: ../../../appendix/supported-features.md:0
 msgid ""
 "Closures created and used entirely on device, including closures passed to "
-"device functions."
+"device functions. A non-`move` closure can capture a shared-memory pointer "
+"by reference: the captured local holds the generic form of the pointer, and "
+"optimized builds recover `st.shared` / `cp.async...shared` after inlining."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:136
+#: ../../../appendix/supported-features.md:176
 msgid "Compiler: Control Flow"
 msgstr ""
 
@@ -439,9 +485,11 @@ msgid ""
 "integer counter, including `isize`. Other iterator loops, such as `a..=b` or "
 "`.step_by(k)`, are not yet recognized. Nested loops and multiple `continue` "
 "paths work; full unrolling preserves `break` paths and multiple exit "
-"targets, while partial unrolling requires a positive-step `<`/`<=` loop with "
-"an invariant limit and only the normal header exit. Requests are capped at "
-"1,024 copies, 8,192 cloned blocks, and 65,536 cloned operations."
+"targets, while partial unrolling requires a `<`/`<=` loop with an invariant "
+"limit, a positive constant or loop-invariant runtime step (block-stride "
+"loops included), and only the normal header exit. Requests are capped at "
+"1,024 copies, 8,192 cloned blocks, and 65,536 cloned operations. "
+"`#[nounroll]` keeps any loop rolled through LLVM, libNVVM, and ptxas."
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
@@ -459,7 +507,7 @@ msgid ""
 "general constant-propagation pass."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:148
+#: ../../../appendix/supported-features.md:188
 msgid "Compiler: Arithmetic and Casting"
 msgstr ""
 
@@ -493,7 +541,7 @@ msgid ""
 "per `u32`. sm_80+."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:156
+#: ../../../appendix/supported-features.md:196
 msgid "Compiler: Interop"
 msgstr ""
 
@@ -533,16 +581,11 @@ msgstr ""
 
 #: ../../../appendix/supported-features.md:0
 msgid ""
-"Inter-kernel interop works today: a [cutile-rs Tile kernel](https://github."
-"com/NVIDIA/cuda-rust/tree/main/cutile-rs) and a cuda-oxide SIMT PTX kernel "
-"can run in one host process on the same CUDA stream over shared device "
-"tensors. Intra-kernel interop is built as a [tile library](../advanced/tile-"
-"libraries.md): `#[tile_export]` and `cargo oxide tilelib` produce the LTOIR "
-"and the Tile IR descriptions today (at the installed assembler's current "
-"bytecode version, 13.5 or newer), packaging them into a `.tilelib` needs the "
-"CUDA 13.5 or newer `tileiras`, and the caller is cuTile Python's "
-"`foreign_call`. Tracked in [#96](https://github.com/NVlabs/cuda-oxide/"
-"issues/96)."
+"Inter-kernel interop works today: a [cutile-rs Tile kernel](https://"
+"github.com/NVIDIA/cuda-rust/tree/main/cutile-rs) and a cuda-oxide SIMT PTX "
+"kernel can run in one host process on the same CUDA stream over shared "
+"device tensors. Intra-kernel interop is tracked in [#96](https://github.com/"
+"NVlabs/cuda-oxide/issues/96)."
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
@@ -555,7 +598,7 @@ msgid ""
 "at the binary crate use site."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:166
+#: ../../../appendix/supported-features.md:206
 msgid "Compiler: Functions"
 msgstr ""
 
@@ -607,7 +650,7 @@ msgid ""
 "PTX module."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:175
+#: ../../../appendix/supported-features.md:215
 msgid "Compiler: Compilation Pipeline"
 msgstr ""
 
@@ -691,9 +734,9 @@ msgstr ""
 #: ../../../appendix/supported-features.md:0
 msgid ""
 "`cargo oxide clean` removes project-local `target/` directories and "
-"generated device artifacts (`.ptx`, `.ll`, `.opt.ll`, `.ltoir`, `.cubin`, `."
-"target`, `.options`, `.cubin.target`), never the shared `~/.cargo/cuda-oxide/"
-"` cache."
+"generated device artifacts (`.ptx`, `.ll`, `.opt.ll`, `.ltoir`, `.cubin`, "
+"`.target`, `.options`, `.cubin.target`), never the shared `~/.cargo/cuda-"
+"oxide/` cache."
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
@@ -731,7 +774,7 @@ msgid ""
 "gpu-programming/error-handling-and-debugging.md) for current limits."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:191
+#: ../../../appendix/supported-features.md:231
 msgid "Compiler: Inline PTX"
 msgstr ""
 
@@ -757,7 +800,7 @@ msgid ""
 "ordering-around-the-barrier>`."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:199
+#: ../../../appendix/supported-features.md:239
 msgid "Runtime Library: Safety"
 msgstr ""
 
@@ -814,7 +857,7 @@ msgid ""
 "transitions are compile errors."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:209
+#: ../../../appendix/supported-features.md:249
 msgid "Runtime Library: Atomics"
 msgstr ""
 
@@ -854,7 +897,7 @@ msgstr ""
 msgid "Standard library atomic types lowered to PTX `atom.sys` instructions."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:218
+#: ../../../appendix/supported-features.md:258
 msgid "Runtime Library: Shared Memory"
 msgstr ""
 
@@ -874,8 +917,8 @@ msgstr ""
 
 #: ../../../appendix/supported-features.md:0
 msgid ""
-"`DynamicSharedArray<T, ALIGN>` — runtime-sized, set via `LaunchConfig::"
-"shared_mem_bytes`."
+"`DynamicSharedArray<T, ALIGN>` — runtime-sized, set via "
+"`LaunchConfig::shared_mem_bytes`."
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
@@ -888,7 +931,7 @@ msgid ""
 "`map_shared_rank()` for address mapping. sm_90+."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:226
+#: ../../../appendix/supported-features.md:266
 msgid "Runtime Library: Thread and Synchronization"
 msgstr ""
 
@@ -938,7 +981,7 @@ msgstr ""
 msgid "`fence_proxy_async_shared_cta()` for TMA visibility, `nanosleep(ns)`."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:236
+#: ../../../appendix/supported-features.md:276
 msgid "Runtime Library: Warp"
 msgstr ""
 
@@ -982,7 +1025,7 @@ msgid ""
 "No `f64` form."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:245
+#: ../../../appendix/supported-features.md:285
 msgid "Runtime Library: Cooperative Groups"
 msgstr ""
 
@@ -1021,8 +1064,9 @@ msgstr ""
 
 #: ../../../appendix/supported-features.md:0
 msgid ""
-"`ballot`, `all`, `any`, `shfl`, `shfl_xor`, `shfl_down`, `shfl_up` (`u32` "
-"and `f32`); `match_any` / `match_all` (`i32` and `i64`); `active_mask`."
+"`ballot`, `all`, `any`, `shfl`, `shfl_xor`, `shfl_down`, `shfl_up` (`u32`, "
+"`f32`, and `u64` as two 32-bit shuffles); `match_any` / `match_all` (`i32` "
+"and `i64`); `active_mask`."
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
@@ -1032,7 +1076,7 @@ msgstr ""
 #: ../../../appendix/supported-features.md:0
 msgid ""
 "`warp_reduce`, `warp_scan` (inclusive). `Sum`/`Min`/`Max` for `u32`/`i32`/"
-"`f32`; `BitAnd`/`BitOr`/`BitXor` for `u32`."
+"`f32`/`u64`/`i64`; `BitAnd`/`BitOr`/`BitXor` for `u32`/`u64`."
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
@@ -1057,7 +1101,7 @@ msgid ""
 "grid-wide barriers."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:257
+#: ../../../appendix/supported-features.md:297
 msgid "Runtime Library: Debug"
 msgstr ""
 
@@ -1090,7 +1134,7 @@ msgid ""
 "`clock()`, `clock64()`, `trap()`, `breakpoint()`, `prof_trigger::<N>()`."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:265
+#: ../../../appendix/supported-features.md:305
 msgid "Runtime Library: Kernel Launch"
 msgstr ""
 
@@ -1147,7 +1191,7 @@ msgstr ""
 msgid "Compile-time cluster dimensions. Emits `.reqnctapercluster` in PTX."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:276
+#: ../../../appendix/supported-features.md:316
 msgid "Runtime Library: TMA"
 msgstr ""
 
@@ -1178,7 +1222,7 @@ msgid ""
 "completion tracking."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:286
+#: ../../../appendix/supported-features.md:326
 msgid "Runtime Library: Matrix and Tensor Cores"
 msgstr ""
 
@@ -1208,12 +1252,14 @@ msgstr ""
 
 #: ../../../appendix/supported-features.md:0
 msgid ""
-"Hopper `sm_90a`: fence/commit/wait pipeline, shared-memory descriptors, and "
-"`m64n64k16` MMA with `bf16`/`f16` inputs and `f32` accumulate. Gap: the "
-"lowering covers specific proven loop patterns (`bf16` works in straight-line "
-"code, counted K-loops, and partial-wait pipelines; `f16` in straight-line "
-"code only), and `tf32` calls are rejected pending [#1076](https://github.com/"
-"NVlabs/cuda-oxide/issues/1076)."
+"Hopper `sm_90a`: fence/commit/wait pipeline, shared-memory descriptors, "
+"`m64n64k16` MMA with `bf16`/`f16` inputs and `f32` accumulate, and "
+"`m64n128k16` MMA with `bf16`/`f16` inputs and `f32` accumulate for canonical "
+"linear full-drain regions. Gap: the lowering covers specific proven loop "
+"patterns (`bf16` m64n64 works in straight-line code, counted K-loops, and "
+"partial-wait pipelines; `f16` m64n64 in straight-line code and counted K-"
+"loops; m64n128 is linear full-drain only), and `tf32` calls are rejected "
+"pending [#1076](https://github.com/NVlabs/cuda-oxide/issues/1076)."
 msgstr ""
 
 #: ../../../appendix/supported-features.md:0
@@ -1249,7 +1295,7 @@ msgid ""
 "carried as packed bit patterns and converted before use."
 msgstr ""
 
-#: ../../../appendix/supported-features.md:299
+#: ../../../appendix/supported-features.md:339
 msgid "Not Yet Implemented"
 msgstr ""
 
