@@ -1,0 +1,1116 @@
+
+<!DOCTYPE html>
+
+
+<html lang="es-ES" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Error Handling and Debugging &#8212; cuda-oxide</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/nvidia-sphinx-theme.css?v=5d97cc0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=196aea71" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/lightbox.css?v=31fdf494" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../_static/documentation_options.js?v=4730b09f"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'gpu-programming/error-handling-and-debugging';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../_static/js/lightbox.js?v=8cf6bc2b"></script>
+    <script src="../_static/js/spa-nav.js?v=9a4d0bbe"></script>
+    <link rel="canonical" href="https://projects.localizethedocs.org/cuda-oxide-book-l10n/gpu-programming/error-handling-and-debugging.html" />
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="next" title="The Safety Model" href="../gpu-safety/the-safety-model.html" />
+    <link rel="prev" title="Closures and Generics" href="closures-and-generics.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="es-ES"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+<script type="text/javascript" src="../ltd-provenance.js"></script>
+<script type="text/javascript" src="../ltd-current.js"></script>
+<script type="text/javascript" src="../../../ltd-config.js"></script>
+<script type="text/javascript" src="../../../ltd-flyout.js"></script>
+
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Saltar al contenido principal</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Volver arriba</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Advertencia de versión"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Navegación del sitio">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">cuda-oxide</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Búsqueda" aria-label="Búsqueda" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Tema">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Tema" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Claro"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Oscuro"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="Sistema"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>Sistema</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Claro</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Oscuro</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="En esta página">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Búsqueda" aria-label="Búsqueda" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Tema">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Tema" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Claro"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Oscuro"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="Sistema"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>Sistema</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Claro</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Oscuro</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><div class="sidebar-tree">
+    <p class="sidebar-tree-title">
+        Table of Contents
+    </p>
+    <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/hello-gpu.html">Writing Your First Kernel</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Writing GPU Programs</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="execution-model.html">The CUDA Execution Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kernels-and-device-functions.html">Kernels and Device Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="memory-and-data-movement.html">Memory and Data Movement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="launching-kernels.html">Launching Kernels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="closures-and-generics.html">Closures and Generics</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Error Handling and Debugging</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Safety on the GPU</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-safety/the-safety-model.html">The Safety Model</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Async GPU Programming</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/the-device-operation-model.html">The DeviceOperation Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/combinators-and-composition.html">Combinators and Composition</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/scheduling-and-streams.html">Scheduling and Streams</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/concurrent-execution.html">Concurrent Execution</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Building a Real Application</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../projects/async-mlp-pipeline.html">Project: Async MLP Pipeline</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Advanced GPU Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/shared-memory-and-synchronization.html">Shared Memory and Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/warp-level-programming.html">Warp-Level Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/tensor-memory-accelerator.html">Tensor Memory Accelerator (TMA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/matrix-multiply-accelerators.html">Matrix Multiply Accelerators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cluster-programming.html">Cluster Programming</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Inside the Compiler</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/architecture-overview.html">Architecture Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/pliron.html">Pliron – Pliron IR (MLIR-like)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/rustc-public.html">rustc_public – Stable MIR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/rustc-codegen-cuda.html">The Code Generator: rustc-codegen-cuda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/mir-importer.html">The MIR Importer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/compiler-optimizations.html">Compiler Optimizations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/mlir-dialects.html">Pliron Dialects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/lowering-pipeline.html">The Lowering Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/adding-new-intrinsics.html">Adding New Intrinsics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/fuzzing-and-differential-testing.html">Fuzzing and Differential Testing</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Appendix</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/building-from-source.html">Building from Source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/api-quick-reference.html">API Quick Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/supported-features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/cuda-cpp-comparison.html">cuda-oxide vs CUDA C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/ecosystem.html">The Rust + GPU Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/glossary.html">Glossary</a></li>
+</ul>
+
+</div></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Miga de pan" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Inicio">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Error Handling and Debugging</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="error-handling-and-debugging">
+<h1>Error Handling and Debugging<a class="headerlink" href="#error-handling-and-debugging" title="Link to this heading">#</a></h1>
+<p>GPU kernels fail differently from CPU code. The CUDA toolchain does not
+support exceptions or stack unwinding today, there are no stack traces in
+kernel output, and no <code class="docutils literal notranslate"><span class="pre">println!</span></code>. When something goes wrong, the result is
+either silent data corruption, a hardware trap, or a cryptic driver error on the
+host. This chapter covers cuda-oxide’s tools for diagnosing and fixing kernel
+problems.</p>
+<section id="what-happens-when-a-kernel-goes-wrong">
+<h2>What happens when a kernel goes wrong<a class="headerlink" href="#what-happens-when-a-kernel-goes-wrong" title="Link to this heading">#</a></h2>
+<p>GPU errors fall into three categories:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Failure mode</p></th>
+<th class="head text-left"><p>What you see</p></th>
+<th class="head text-left"><p>Example</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><strong>Silent corruption</strong></p></td>
+<td class="text-left"><p>Wrong results, no error</p></td>
+<td class="text-left"><p>Race condition, off-by-one index</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><strong>Hardware trap</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">CUDA_ERROR_ILLEGAL_INSTRUCTION</span></code> on host</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">gpu_assert!</span></code> failure, panic, OOB access</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><strong>Launch failure</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">DriverError</span></code> returned immediately</p></td>
+<td class="text-left"><p>Wrong grid dims, missing module, out of resources</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The CUDA toolchain does not expose an exception mechanism today (the hardware
+could support it, but nvcc/ptxas do not wire it up). A trap instruction kills
+the kernel and poisons the CUDA context – subsequent operations on the same
+context will fail until you handle or recreate it.</p>
+</section>
+<section id="gpu-printf-printing-from-the-gpu">
+<h2><code class="docutils literal notranslate"><span class="pre">gpu_printf!</span></code> – printing from the GPU<a class="headerlink" href="#gpu-printf-printing-from-the-gpu" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">gpu_printf!</span></code> lets you print values from device code for quick debugging. It
+uses CUDA’s built-in <code class="docutils literal notranslate"><span class="pre">vprintf</span></code> mechanism:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::{</span><span class="n">kernel</span><span class="p">,</span><span class="w"> </span><span class="n">thread</span><span class="p">,</span><span class="w"> </span><span class="n">gpu_printf</span><span class="p">,</span><span class="w"> </span><span class="n">DisjointSlice</span><span class="p">};</span>
+
+<span class="cp">#[kernel]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">debug_kernel</span><span class="p">(</span><span class="n">data</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">out</span><span class="p">:</span><span class="w"> </span><span class="nc">DisjointSlice</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">thread</span><span class="p">::</span><span class="n">index_1d</span><span class="p">();</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">idx</span><span class="p">.</span><span class="n">get</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">4</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">gpu_printf</span><span class="o">!</span><span class="p">(</span><span class="s">&quot;Thread {} sees value {}</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">idx</span><span class="p">.</span><span class="n">get</span><span class="p">(),</span><span class="w"> </span><span class="n">data</span><span class="p">[</span><span class="n">idx</span><span class="p">.</span><span class="n">get</span><span class="p">()]);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nb">Some</span><span class="p">(</span><span class="n">out_elem</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">out</span><span class="p">.</span><span class="n">get_mut</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="o">*</span><span class="n">out_elem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">data</span><span class="p">[</span><span class="n">idx</span><span class="p">.</span><span class="n">get</span><span class="p">()]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">2.0</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<section id="important-details">
+<h3>Important details<a class="headerlink" href="#important-details" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>Flush requires sync.</strong> Output is buffered on the GPU and only appears on
+the host after a stream or device synchronization (e.g., <code class="docutils literal notranslate"><span class="pre">to_host_vec</span></code> or
+<code class="docutils literal notranslate"><span class="pre">ctx.synchronize()</span></code>).</p></li>
+<li><p><strong>Buffer size.</strong> The default printf buffer is 1 MiB. If many threads print,
+output may be truncated. Enlarge with
+<code class="docutils literal notranslate"><span class="pre">cudaDeviceSetLimit(cudaLimitPrintfFifoSize,</span> <span class="pre">size)</span></code>.</p></li>
+<li><p><strong>Thread ordering.</strong> Output from different threads appears in arbitrary order.</p></li>
+<li><p><strong>Performance.</strong> Printf serializes across threads – avoid it in hot paths.
+Use it for debugging, not logging.</p></li>
+<li><p><strong>Format conversion.</strong> The macro converts Rust <code class="docutils literal notranslate"><span class="pre">{}</span></code> format specifiers to C
+printf equivalents (<code class="docutils literal notranslate"><span class="pre">%d</span></code>, <code class="docutils literal notranslate"><span class="pre">%f</span></code>, etc.) at compile time.</p></li>
+</ul>
+</section>
+<section id="why-not-println-or-debug">
+<h3>Why not <code class="docutils literal notranslate"><span class="pre">println!</span></code> or <code class="docutils literal notranslate"><span class="pre">Debug</span></code>?<a class="headerlink" href="#why-not-println-or-debug" title="Link to this heading">#</a></h3>
+<p>Standard Rust formatting (<code class="docutils literal notranslate"><span class="pre">fmt::Display</span></code>, <code class="docutils literal notranslate"><span class="pre">fmt::Debug</span></code>, <code class="docutils literal notranslate"><span class="pre">format!</span></code>, <code class="docutils literal notranslate"><span class="pre">println!</span></code>)
+requires dynamic dispatch, string allocation, and I/O – none of which exist on
+the GPU. <code class="docutils literal notranslate"><span class="pre">gpu_printf!</span></code> bypasses all of this by lowering directly to a CUDA
+<code class="docutils literal notranslate"><span class="pre">vprintf</span></code> call.</p>
+</section>
+</section>
+<section id="gpu-assert-and-trap">
+<h2><code class="docutils literal notranslate"><span class="pre">gpu_assert!</span></code> and <code class="docutils literal notranslate"><span class="pre">trap()</span></code><a class="headerlink" href="#gpu-assert-and-trap" title="Link to this heading">#</a></h2>
+<p>For fatal error checking on the device, use <code class="docutils literal notranslate"><span class="pre">gpu_assert!</span></code> or <code class="docutils literal notranslate"><span class="pre">debug::trap()</span></code>:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::{</span><span class="n">kernel</span><span class="p">,</span><span class="w"> </span><span class="n">thread</span><span class="p">,</span><span class="w"> </span><span class="n">debug</span><span class="p">,</span><span class="w"> </span><span class="n">gpu_assert</span><span class="p">,</span><span class="w"> </span><span class="n">DisjointSlice</span><span class="p">};</span>
+
+<span class="cp">#[kernel]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">checked_kernel</span><span class="p">(</span><span class="n">data</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span><span class="w"> </span><span class="n">len</span><span class="p">:</span><span class="w"> </span><span class="kt">u32</span><span class="p">,</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">out</span><span class="p">:</span><span class="w"> </span><span class="nc">DisjointSlice</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">thread</span><span class="p">::</span><span class="n">index_1d</span><span class="p">();</span>
+<span class="w">    </span><span class="n">gpu_assert</span><span class="o">!</span><span class="p">(</span><span class="n">idx</span><span class="p">.</span><span class="n">get</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">len</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">usize</span><span class="p">);</span><span class="w">   </span><span class="c1">// traps if false</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nb">Some</span><span class="p">(</span><span class="n">out_elem</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">out</span><span class="p">.</span><span class="n">get_mut</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="o">*</span><span class="n">out_elem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">data</span><span class="p">[</span><span class="n">idx</span><span class="p">.</span><span class="n">get</span><span class="p">()];</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Intrinsic</p></th>
+<th class="head text-left"><p>What it does</p></th>
+<th class="head text-left"><p>Host effect</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">gpu_assert!(condition)</span></code></p></td>
+<td class="text-left"><p>Traps if condition is false</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">CUDA_ERROR_ILLEGAL_INSTRUCTION</span></code></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">debug::trap()</span></code></p></td>
+<td class="text-left"><p>Unconditional trap</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">CUDA_ERROR_ILLEGAL_INSTRUCTION</span></code></p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">debug::breakpoint()</span></code></p></td>
+<td class="text-left"><p>Emit <code class="docutils literal notranslate"><span class="pre">brkpt</span></code> instruction</p></td>
+<td class="text-left"><p>Pauses in cuda-gdb; crashes without debugger</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<section id="the-trap-and-check-pattern">
+<h3>The trap-and-check pattern<a class="headerlink" href="#the-trap-and-check-pattern" title="Link to this heading">#</a></h3>
+<p>A common workflow for catching device-side errors:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="c1">// Launch kernel</span>
+<span class="c1">// SAFETY: config matches vecadd&#39;s 1D indexing and all buffer bounds.</span>
+<span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">module</span><span class="p">.</span><span class="n">vecadd</span><span class="p">(</span><span class="o">&amp;</span><span class="n">stream</span><span class="p">,</span><span class="w"> </span><span class="n">config</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="p">.</span><span class="n">expect</span><span class="p">(</span><span class="s">&quot;Launch failed&quot;</span><span class="p">);</span>
+
+<span class="c1">// Synchronize and check for traps</span>
+<span class="n">stream</span><span class="p">.</span><span class="n">synchronize</span><span class="p">().</span><span class="n">expect</span><span class="p">(</span><span class="s">&quot;Kernel trapped -- check gpu_assert! conditions&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>If a <code class="docutils literal notranslate"><span class="pre">gpu_assert!</span></code> fires, synchronization returns an error. The error message
+doesn’t tell you <em>which</em> assertion failed, so use <code class="docutils literal notranslate"><span class="pre">gpu_printf!</span></code> alongside
+assertions to narrow down the problem.</p>
+</section>
+</section>
+<section id="host-side-error-handling">
+<h2>Host-side error handling<a class="headerlink" href="#host-side-error-handling" title="Link to this heading">#</a></h2>
+<section id="drivererror">
+<h3><code class="docutils literal notranslate"><span class="pre">DriverError</span></code><a class="headerlink" href="#drivererror" title="Link to this heading">#</a></h3>
+<p>The synchronous launch path returns
+<code class="docutils literal notranslate"><span class="pre">Result&lt;(),</span> <span class="pre">DriverError&gt;</span></code>. The <code class="docutils literal notranslate"><span class="pre">DriverError</span></code> wraps a CUDA driver result code:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="c1">// SAFETY: config matches vecadd&#39;s 1D indexing and all buffer bounds.</span>
+<span class="k">match</span><span class="w"> </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">module</span><span class="p">.</span><span class="n">vecadd</span><span class="p">(</span><span class="o">&amp;</span><span class="n">stream</span><span class="p">,</span><span class="w"> </span><span class="n">config</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nb">Ok</span><span class="p">(())</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="cm">/* launched successfully */</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="nb">Err</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="fm">eprintln!</span><span class="p">(</span><span class="s">&quot;Launch failed: {e}&quot;</span><span class="p">),</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="deviceerror">
+<h3><code class="docutils literal notranslate"><span class="pre">DeviceError</span></code><a class="headerlink" href="#deviceerror" title="Link to this heading">#</a></h3>
+<p>The async path (<code class="docutils literal notranslate"><span class="pre">{kernel}_async</span></code> / <code class="docutils literal notranslate"><span class="pre">DeviceOperation</span></code>) uses <code class="docutils literal notranslate"><span class="pre">DeviceError</span></code>,
+which wraps driver errors alongside context and scheduling failures:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_async</span><span class="p">::</span><span class="n">error</span><span class="p">::</span><span class="n">DeviceError</span><span class="p">;</span>
+
+<span class="kd">let</span><span class="w"> </span><span class="n">result</span><span class="p">:</span><span class="w"> </span><span class="nb">Result</span><span class="o">&lt;</span><span class="nb">Vec</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">,</span><span class="w"> </span><span class="n">DeviceError</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">operation</span><span class="p">.</span><span class="n">sync</span><span class="p">();</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">DeviceError</span></code> variants include <code class="docutils literal notranslate"><span class="pre">Driver</span></code>, <code class="docutils literal notranslate"><span class="pre">Context</span></code>, <code class="docutils literal notranslate"><span class="pre">KernelCache</span></code>, <code class="docutils literal notranslate"><span class="pre">Scheduling</span></code>,
+<code class="docutils literal notranslate"><span class="pre">Launch</span></code>, and <code class="docutils literal notranslate"><span class="pre">Internal</span></code>.</p>
+</section>
+<section id="cudacontext-check-err">
+<h3><code class="docutils literal notranslate"><span class="pre">CudaContext::check_err</span></code><a class="headerlink" href="#cudacontext-check-err" title="Link to this heading">#</a></h3>
+<p>After a series of operations, call <code class="docutils literal notranslate"><span class="pre">check_err()</span></code> on the context to surface any
+asynchronous errors that may have been recorded:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="n">ctx</span><span class="p">.</span><span class="n">check_err</span><span class="p">().</span><span class="n">expect</span><span class="p">(</span><span class="s">&quot;Asynchronous GPU error detected&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="cargo-oxide-debug-cuda-gdb-integration">
+<h2><code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">oxide</span> <span class="pre">debug</span></code> – cuda-gdb integration<a class="headerlink" href="#cargo-oxide-debug-cuda-gdb-integration" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">oxide</span> <span class="pre">debug</span></code> builds your kernel with debug info and launches cuda-gdb:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cargo<span class="w"> </span>oxide<span class="w"> </span>debug<span class="w"> </span>vecadd<span class="w">          </span><span class="c1"># Standard GDB</span>
+cargo<span class="w"> </span>oxide<span class="w"> </span>debug<span class="w"> </span>vecadd<span class="w"> </span>--tui<span class="w">    </span><span class="c1"># GDB with TUI</span>
+cargo<span class="w"> </span>oxide<span class="w"> </span>debug<span class="w"> </span>vecadd<span class="w"> </span>--cgdb<span class="w">   </span><span class="c1"># cgdb front-end</span>
+</pre></div>
+</div>
+<p>By default this gives you <strong>source-level debugging</strong>: cuda-gdb can stop in
+Rust source files and show a useful backtrace. Local-variable inspection is a
+separate, heavier mode that you opt into when you need it.</p>
+<section id="debug-info-modes">
+<h3>Debug info modes<a class="headerlink" href="#debug-info-modes" title="Link to this heading">#</a></h3>
+<p>cuda-oxide has three device debug modes:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Mode</p></th>
+<th class="head text-left"><p>How to enable it</p></th>
+<th class="head text-left"><p>What you get</p></th>
+<th class="head text-left"><p>Cost</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>Off</p></td>
+<td class="text-left"><p>default for normal <code class="docutils literal notranslate"><span class="pre">build</span></code> / <code class="docutils literal notranslate"><span class="pre">run</span></code></p></td>
+<td class="text-left"><p>Fastest generated PTX, no source mapping</p></td>
+<td class="text-left"><p>none</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Line tables</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">oxide</span> <span class="pre">debug</span></code>, or <code class="docutils literal notranslate"><span class="pre">CUDA_OXIDE_DEBUG=line-tables</span></code></p></td>
+<td class="text-left"><p>Source breakpoints, stepping, backtraces</p></td>
+<td class="text-left"><p>low</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Full</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">CUDA_OXIDE_DEBUG=full</span> <span class="pre">cargo</span> <span class="pre">oxide</span> <span class="pre">debug</span> <span class="pre">&lt;example&gt;</span></code></p></td>
+<td class="text-left"><p>Line tables plus basic argument/local inspection</p></td>
+<td class="text-left"><p>higher</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Think of line tables as a map from machine instructions back to source lines:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>PTX instruction  ──debug line table──&gt;  src/main.rs:39
+</pre></div>
+</div>
+<p>Full debug adds variable records:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>source local `tid`
+      |
+      v
+LLVM/DWARF says: &quot;tid lives in this stack slot&quot;
+      |
+      v
+cuda-gdb can try: print tid
+</pre></div>
+</div>
+<p>For local variables, the debugger also needs the current instruction to be
+inside the same lexical scope as the variable:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>function
+  └─ if-let block
+      └─ loop block
+          └─ current instruction
+</pre></div>
+</div>
+<p>If you stop too early, such as at kernel launch or at the first helper call,
+the variable may honestly print as <code class="docutils literal notranslate"><span class="pre">&lt;optimized</span> <span class="pre">out&gt;</span></code> because it has not been
+loaded into a register yet. For variable checks, prefer a source line after the
+value is used:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>break src/main.rs:412
+run
+info args
+info locals
+</pre></div>
+</div>
+<p>Seeing one variable as <code class="docutils literal notranslate"><span class="pre">&lt;optimized</span> <span class="pre">out&gt;</span></code> is not automatically a compiler bug;
+it can mean «this value has no live machine location at this exact PC.» Debug
+info is a map, not a time machine.</p>
+<p>For inlined helper calls, cuda-oxide also keeps the original owner of each
+argument. That matters because two different functions can both have an
+argument numbered <code class="docutils literal notranslate"><span class="pre">1</span></code>:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>kernel(data) calls helper(self)
+
+data -&gt; arg #1 in kernel&#39;s debug scope
+self -&gt; arg #1 in helper&#39;s debug scope, with &quot;inlined at&quot; the kernel callsite
+</pre></div>
+</div>
+<p>Without that scope split, LLVM treats the metadata as contradictory and drops
+it. Debug info is fussy like that; it wants the family tree, not just the
+surname.</p>
+<p>Use line tables first. They are enough for most «where did execution go?»
+questions, and they avoid the slower CUDA debug target mode. Use full debug
+when you specifically want <code class="docutils literal notranslate"><span class="pre">print</span> <span class="pre">idx</span></code>, <code class="docutils literal notranslate"><span class="pre">print</span> <span class="pre">ptr</span></code>, or similar local-variable
+inspection. Debuggers are allowed to be nosy; they are not always allowed to be
+fast.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">CUDA_OXIDE_DEBUG</span></code> override works with <code class="docutils literal notranslate"><span class="pre">build</span></code>, <code class="docutils literal notranslate"><span class="pre">run</span></code>, <code class="docutils literal notranslate"><span class="pre">pipeline</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">debug</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">CUDA_OXIDE_DEBUG</span><span class="o">=</span>line-tables<span class="w"> </span>cargo<span class="w"> </span>oxide<span class="w"> </span>pipeline<span class="w"> </span>vecadd
+<span class="nv">CUDA_OXIDE_DEBUG</span><span class="o">=</span>full<span class="w"> </span>cargo<span class="w"> </span>oxide<span class="w"> </span>debug<span class="w"> </span>vecadd
+</pre></div>
+</div>
+<p>Useful aliases:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Value</p></th>
+<th class="head text-left"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">off</span></code>, <code class="docutils literal notranslate"><span class="pre">none</span></code>, <code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>
+<td class="text-left"><p>no device debug metadata</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">line-tables</span></code>, <code class="docutils literal notranslate"><span class="pre">line</span></code>, <code class="docutils literal notranslate"><span class="pre">lines</span></code>, <code class="docutils literal notranslate"><span class="pre">1</span></code></p></td>
+<td class="text-left"><p>source line tables only</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">full</span></code>, <code class="docutils literal notranslate"><span class="pre">2</span></code></p></td>
+<td class="text-left"><p>line tables plus basic variable metadata</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="why-full-debug-turns-optimization-off">
+<h3>Why full debug turns optimization off<a class="headerlink" href="#why-full-debug-turns-optimization-off" title="Link to this heading">#</a></h3>
+<p>Reliable local inspection and aggressive optimization pull in opposite
+directions. An optimized value usually lives in a register only across the
+short window where it is used; outside that window the debugger honestly has
+nowhere to read it from, so <code class="docutils literal notranslate"><span class="pre">info</span> <span class="pre">locals</span></code> shows <code class="docutils literal notranslate"><span class="pre">&lt;optimized</span> <span class="pre">out&gt;</span></code>. The only way
+to make a variable inspectable for its whole scope is to keep it in <strong>memory</strong>
+and describe it with <code class="docutils literal notranslate"><span class="pre">llvm.dbg.declare</span></code>, the way every debug build does
+(<code class="docutils literal notranslate"><span class="pre">gcc</span> <span class="pre">-O0</span></code>, <code class="docutils literal notranslate"><span class="pre">rustc</span></code> debug, and nvcc <code class="docutils literal notranslate"><span class="pre">-G</span></code>).</p>
+<p>So <code class="docutils literal notranslate"><span class="pre">CUDA_OXIDE_DEBUG=full</span></code> is a <code class="docutils literal notranslate"><span class="pre">-G</span></code>-style build. It automatically:</p>
+<ul class="simple">
+<li><p>keeps every source local in its stack slot (skips Pliron <code class="docutils literal notranslate"><span class="pre">mem2reg</span></code>),</p></li>
+<li><p>skips annotated loop unrolling, which requires <code class="docutils literal notranslate"><span class="pre">mem2reg</span></code>’s SSA form,</p></li>
+<li><p>skips LLVM <code class="docutils literal notranslate"><span class="pre">opt</span> <span class="pre">-O2</span></code>, and</p></li>
+<li><p>runs <code class="docutils literal notranslate"><span class="pre">llc</span></code> at <code class="docutils literal notranslate"><span class="pre">-O0</span></code>,</p></li>
+</ul>
+<p>so the locals you see in cuda-gdb are real and stable. You do not need to set
+<code class="docutils literal notranslate"><span class="pre">CUDA_OXIDE_NO_OPT=1</span></code> yourself; full mode implies it.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Setting</p></th>
+<th class="head text-left"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">CUDA_OXIDE_DEBUG=off</span></code></p></td>
+<td class="text-left"><p>no device debug metadata; fully optimized PTX</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">CUDA_OXIDE_DEBUG=line-tables</span></code></p></td>
+<td class="text-left"><p>source lines only; still optimized</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">CUDA_OXIDE_DEBUG=full</span></code></p></td>
+<td class="text-left"><p>source lines plus locals/args; optimization off (<code class="docutils literal notranslate"><span class="pre">-G</span></code>)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Line tables stay on the optimized pipeline because a line map survives
+optimization well; locals do not, which is why full mode steps off it.</p>
+<blockquote>
+<div><p>The promotion-aware <code class="docutils literal notranslate"><span class="pre">mir.dbg_value</span></code> salvage that Pliron <code class="docutils literal notranslate"><span class="pre">mem2reg</span></code> performs is
+the building block for a future <em>optimized</em> debug tier (locals through
+<code class="docutils literal notranslate"><span class="pre">opt</span> <span class="pre">-O2</span></code>, best-effort). It is not what <code class="docutils literal notranslate"><span class="pre">full</span></code> uses today.</p>
+</div></blockquote>
+</section>
+<section id="what-works-today">
+<h3>What works today<a class="headerlink" href="#what-works-today" title="Link to this heading">#</a></h3>
+<p>Line-table mode supports:</p>
+<ul class="simple">
+<li><p>breakpoints by kernel name, e.g. <code class="docutils literal notranslate"><span class="pre">break</span> <span class="pre">vecadd</span></code></p></li>
+<li><p>source stepping and backtraces</p></li>
+<li><p>helper/inlined source locations from other files, such as stepping from your
+kernel into <code class="docutils literal notranslate"><span class="pre">cuda-device/src/thread.rs</span></code></p></li>
+</ul>
+<p>Full mode (<code class="docutils literal notranslate"><span class="pre">-G</span></code>) supports inspecting:</p>
+<ul class="simple">
+<li><p>local variables and arguments rustc exposes through <code class="docutils literal notranslate"><span class="pre">var_debug_info</span></code></p></li>
+<li><p>scalar types (<code class="docutils literal notranslate"><span class="pre">bool</span></code>, integers, floats), raw pointers, and references</p></li>
+<li><p>structs, tuples, and fixed-size arrays, with their fields shown at the
+correct (real-layout) offsets, e.g.
+<code class="docutils literal notranslate"><span class="pre">out</span> <span class="pre">=</span> <span class="pre">DisjointSlice</span> <span class="pre">{ptr:</span> <span class="pre">0x...,</span> <span class="pre">len:</span> <span class="pre">1}</span></code> and <code class="docutils literal notranslate"><span class="pre">idx</span> <span class="pre">=</span> <span class="pre">ThreadIndex</span> <span class="pre">{raw:</span> <span class="pre">0}</span></code></p></li>
+</ul>
+<p>End-to-end behavior (breakpoint binds, backtrace, <code class="docutils literal notranslate"><span class="pre">info</span> <span class="pre">args</span></code>/<code class="docutils literal notranslate"><span class="pre">info</span> <span class="pre">locals</span></code>) is
+checked on real hardware by <code class="docutils literal notranslate"><span class="pre">scripts/debug-smoketest.sh</span></code>.</p>
+<p>Full mode does <strong>not</strong> yet describe: enums (<code class="docutils literal notranslate"><span class="pre">Option</span></code>, <code class="docutils literal notranslate"><span class="pre">Result</span></code>, and other
+multi-variant types), bare slice arguments split into a <code class="docutils literal notranslate"><span class="pre">(ptr,</span> <span class="pre">len)</span></code> pair at
+the ABI boundary, closures, projections like <code class="docutils literal notranslate"><span class="pre">x.0</span></code>, or destructured variables.
+Locals of an inlined helper frame may also show fewer entries than the kernel
+frame; select the kernel frame (<code class="docutils literal notranslate"><span class="pre">frame</span> <span class="pre">1</span></code>) to inspect kernel locals.</p>
+</section>
+<section id="breakpoint-workflow">
+<h3>Breakpoint workflow<a class="headerlink" href="#breakpoint-workflow" title="Link to this heading">#</a></h3>
+<ol class="arabic simple">
+<li><p>Build with debug: <code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">oxide</span> <span class="pre">debug</span> <span class="pre">&lt;example&gt;</span></code></p></li>
+<li><p>Set a breakpoint on your kernel: <code class="docutils literal notranslate"><span class="pre">break</span> <span class="pre">vecadd</span></code></p></li>
+<li><p>Run: <code class="docutils literal notranslate"><span class="pre">run</span></code></p></li>
+<li><p>Inspect threads: <code class="docutils literal notranslate"><span class="pre">cuda</span> <span class="pre">thread</span></code>, <code class="docutils literal notranslate"><span class="pre">cuda</span> <span class="pre">block</span></code>, <code class="docutils literal notranslate"><span class="pre">cuda</span> <span class="pre">warp</span></code></p></li>
+<li><p>Print variables: <code class="docutils literal notranslate"><span class="pre">print</span> <span class="pre">idx</span></code>, <code class="docutils literal notranslate"><span class="pre">print</span> <span class="pre">*c_elem</span></code></p></li>
+</ol>
+<p><code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">oxide</span> <span class="pre">debug</span></code> selects the executable from Cargo’s build artifact
+metadata instead of assuming <code class="docutils literal notranslate"><span class="pre">target/release/&lt;example&gt;</span></code>. That keeps debugging
+working with custom binary names, <code class="docutils literal notranslate"><span class="pre">package.default-run</span></code>, configured target
+directories, host target triples, and virtual workspaces. Use <code class="docutils literal notranslate"><span class="pre">--bin</span> <span class="pre">&lt;name&gt;</span></code>
+when a package has multiple binaries and no unambiguous default.</p>
+<p>For programmatic breakpoints, use <code class="docutils literal notranslate"><span class="pre">debug::breakpoint()</span></code> in your kernel code.
+When cuda-gdb hits the <code class="docutils literal notranslate"><span class="pre">brkpt</span></code> instruction, it pauses execution and lets you
+inspect the GPU state.</p>
+<div class="admonition tip">
+<p class="admonition-title">Truco</p>
+<p><code class="docutils literal notranslate"><span class="pre">debug::breakpoint()</span></code> will <strong>crash</strong> the kernel if no debugger is attached.
+Guard it with a compile-time flag or only use it during debugging sessions.</p>
+</div>
+</section>
+</section>
+<section id="cargo-oxide-sanitize-compute-sanitizer">
+<h2><code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">oxide</span> <span class="pre">sanitize</span></code> – Compute Sanitizer<a class="headerlink" href="#cargo-oxide-sanitize-compute-sanitizer" title="Link to this heading">#</a></h2>
+<p>For memory and synchronization correctness checks, run the same build path under
+NVIDIA Compute Sanitizer:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cargo<span class="w"> </span>oxide<span class="w"> </span>sanitize<span class="w"> </span>vecadd
+cargo<span class="w"> </span>oxide<span class="w"> </span>sanitize<span class="w"> </span>sharedmem<span class="w"> </span>--tool<span class="w"> </span>racecheck
+cargo<span class="w"> </span>oxide<span class="w"> </span>sanitize<span class="w"> </span>debug<span class="w"> </span>--tool<span class="w"> </span>synccheck<span class="w"> </span>--<span class="w"> </span>--kernel-name<span class="w"> </span><span class="nv">kns</span><span class="o">=</span>clock
+cargo<span class="w"> </span>oxide<span class="w"> </span>sanitize<span class="w"> </span>my_app<span class="w"> </span>--<span class="w"> </span>--leak-check<span class="w"> </span>full<span class="w"> </span>--<span class="w"> </span>--app-flag<span class="w"> </span>value
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">memcheck</span></code> is the default tool. Use <code class="docutils literal notranslate"><span class="pre">racecheck</span></code> for shared-memory hazards,
+<code class="docutils literal notranslate"><span class="pre">initcheck</span></code> for uninitialized global-memory reads, and <code class="docutils literal notranslate"><span class="pre">synccheck</span></code> for invalid
+synchronization usage. Extra arguments after <code class="docutils literal notranslate"><span class="pre">--</span></code> are passed directly to
+<code class="docutils literal notranslate"><span class="pre">compute-sanitizer</span></code> before the executable; use a second <code class="docutils literal notranslate"><span class="pre">--</span></code> to pass arguments
+to the target program after the executable.</p>
+<p>The command enables optimized device line tables by default so findings can
+name Rust source files and lines. An explicit <code class="docutils literal notranslate"><span class="pre">CUDA_OXIDE_DEBUG</span></code> process or
+project setting still wins.</p>
+<p>Compute Sanitizer normally exits with status zero even when it reports a tool
+finding. <code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">oxide</span> <span class="pre">sanitize</span></code> therefore supplies <code class="docutils literal notranslate"><span class="pre">--error-exitcode</span> <span class="pre">86</span></code> by
+default, making findings fail scripts and CI. An explicit sanitizer argument
+overrides that default:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Intentionally keep a zero exit status and inspect the printed report.</span>
+cargo<span class="w"> </span>oxide<span class="w"> </span>sanitize<span class="w"> </span>vecadd<span class="w"> </span>--<span class="w"> </span>--error-exitcode<span class="w"> </span><span class="m">0</span>
+</pre></div>
+</div>
+<p>Options such as <code class="docutils literal notranslate"><span class="pre">--check-exit-code</span> <span class="pre">no</span></code> and <code class="docutils literal notranslate"><span class="pre">--require-cuda-init</span> <span class="pre">no</span></code> weaken what
+a zero status proves. The wrapper therefore never declares the report clean
+from process status alone; it reports completion and leaves the sanitizer
+output visible for inspection.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">--no-fmad</span></code> CLI flag is forwarded through both ordinary and interop builds.
+It keeps ordinary multiply and add/subtract operations separate, with one
+rounding per operation. Explicit fused operations such as <code class="docutils literal notranslate"><span class="pre">f32::mul_add</span></code>
+remain fused.</p>
+<p>NVVM IR and LTOIR builds also produce <code class="docutils literal notranslate"><span class="pre">.options</span></code> and versioned <code class="docutils literal notranslate"><span class="pre">.target</span></code>
+sidecars. Keep both files with the artifact so later libNVVM and nvJitLink
+steps preserve the same FMA policy.</p>
+<p>Run <code class="docutils literal notranslate"><span class="pre">memcheck</span></code> first when investigating memory safety. The other tools are
+complementary and do not perform full memory-access checking.</p>
+</section>
+<section id="cargo-oxide-doctor-environment-validation">
+<h2><code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">oxide</span> <span class="pre">doctor</span></code> – environment validation<a class="headerlink" href="#cargo-oxide-doctor-environment-validation" title="Link to this heading">#</a></h2>
+<p>Before debugging kernel failures, verify your environment is correctly set up:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cargo<span class="w"> </span>oxide<span class="w"> </span>doctor
+</pre></div>
+</div>
+<p>Doctor checks:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Check</p></th>
+<th class="head text-left"><p>What it verifies</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>Rust toolchain</p></td>
+<td class="text-left"><p>Nightly compiler with required components</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Codegen backend</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">librustc_codegen_cuda.so</span></code> built</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>CUDA headers</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cuda.h</span></code> present under the toolkit root</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>CUDA toolkit</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">nvcc</span></code> found and version compatible</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>libNVVM</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">libnvvm.so</span></code> loadable (libdevice math kernels)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>nvJitLink</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">libnvJitLink.so</span></code> loadable (same)</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>libdevice</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">libdevice.10.bc</span></code> discoverable (same)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>LLVM</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">llc</span></code> (21+) available for PTX generation</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Driver / GPU</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">nvidia-smi</span></code> reports a GPU and its compute cap</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The libNVVM / nvJitLink / libdevice checks fire only when a kernel calls
+CUDA libdevice math (<code class="docutils literal notranslate"><span class="pre">sin</span></code>, <code class="docutils literal notranslate"><span class="pre">cos</span></code>, <code class="docutils literal notranslate"><span class="pre">exp</span></code>, <code class="docutils literal notranslate"><span class="pre">pow</span></code>, <code class="docutils literal notranslate"><span class="pre">sqrt</span></code>, …). If your
+kernel is pure arithmetic, those three failing is harmless. They all ship
+with the CUDA Toolkit – no separate download. If any check fails, doctor
+prints the standard install location for that component.</p>
+<p>Doctor itself needs neither the CUDA toolkit nor a driver, and it never
+builds anything first, so it works on a machine where nothing is installed
+yet. Two checks are informational rather than fatal: the codegen backend (a
+missing <code class="docutils literal notranslate"><span class="pre">.so</span></code> just means «run <code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">oxide</span> <span class="pre">setup</span></code>»; <code class="docutils literal notranslate"><span class="pre">run</span></code>/<code class="docutils literal notranslate"><span class="pre">build</span></code> build it
+on demand anyway) and the driver / GPU check (only <code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">oxide</span> <span class="pre">run</span></code> needs
+a GPU; <code class="docutils literal notranslate"><span class="pre">build</span></code> and <code class="docutils literal notranslate"><span class="pre">pipeline</span></code> work without one).</p>
+</section>
+<section id="cargo-oxide-pipeline-inspecting-the-compilation">
+<h2><code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">oxide</span> <span class="pre">pipeline</span></code> – inspecting the compilation<a class="headerlink" href="#cargo-oxide-pipeline-inspecting-the-compilation" title="Link to this heading">#</a></h2>
+<p>When a kernel produces wrong results but no errors, inspect the compilation
+pipeline to see exactly what code was generated:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cargo<span class="w"> </span>oxide<span class="w"> </span>pipeline<span class="w"> </span>vecadd
+</pre></div>
+</div>
+<p>This prints the full pipeline output:</p>
+<ol class="arabic simple">
+<li><p><strong>MIR collection</strong> – which functions the collector found</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">dialect-mir</span></code></strong> – pliron IR modelling Rust MIR (before and after <code class="docutils literal notranslate"><span class="pre">mem2reg</span></code>)</p></li>
+<li><p><strong>LLVM dialect</strong> – pliron IR modelling LLVM IR, provided by <code class="docutils literal notranslate"><span class="pre">pliron-llvm</span></code> (after <code class="docutils literal notranslate"><span class="pre">mir-lower</span></code>)</p></li>
+<li><p><strong>Textual LLVM IR</strong> – serialized <code class="docutils literal notranslate"><span class="pre">.ll</span></code> file</p></li>
+<li><p><strong>Final PTX</strong> – the generated assembly</p></li>
+</ol>
+<section id="environment-variables">
+<h3>Environment variables<a class="headerlink" href="#environment-variables" title="Link to this heading">#</a></h3>
+<p>For more targeted inspection:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Variable</p></th>
+<th class="head text-left"><p>Effect</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">CUDA_OXIDE_VERBOSE=1</span></code></p></td>
+<td class="text-left"><p>Verbose compiler output</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">CUDA_OXIDE_SHOW_RUSTC_MIR=1</span></code></p></td>
+<td class="text-left"><p>Dump the rustc MIR before import</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">CUDA_OXIDE_DEBUG=line-tables</span></code></p></td>
+<td class="text-left"><p>Emit source line-table metadata</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">CUDA_OXIDE_DEBUG=full</span></code></p></td>
+<td class="text-left"><p>Emit full metadata for basic locals and args</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<section id="profiling-with-nsight-compute">
+<h2>Profiling with Nsight Compute<a class="headerlink" href="#profiling-with-nsight-compute" title="Link to this heading">#</a></h2>
+<p>For performance debugging, NVIDIA’s <strong>Nsight Compute</strong> (<code class="docutils literal notranslate"><span class="pre">ncu</span></code>) provides
+roofline analysis, memory throughput, and occupancy metrics:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ncu<span class="w"> </span>--set<span class="w"> </span>full<span class="w"> </span>./target/release/my_example
+</pre></div>
+</div>
+<p>cuda-oxide kernels can emit profiler triggers using
+<code class="docutils literal notranslate"><span class="pre">debug::prof_trigger::&lt;N&gt;()</span></code>, which generates a <code class="docutils literal notranslate"><span class="pre">pmevent</span></code> instruction that
+Nsight Compute and Nsight Systems can capture for timeline annotation.</p>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p><a class="reference external" href="https://docs.nvidia.com/nsight-compute/">Nsight Compute Documentation</a>
+for the full profiling toolkit.</p>
+</div>
+</section>
+<section id="common-pitfalls">
+<h2>Common pitfalls<a class="headerlink" href="#common-pitfalls" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Pitfall</p></th>
+<th class="head text-left"><p>Symptom</p></th>
+<th class="head text-left"><p>Fix</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>Race condition on output buffer</p></td>
+<td class="text-left"><p>Wrong results, non-deterministic</p></td>
+<td class="text-left"><p>Use <code class="docutils literal notranslate"><span class="pre">DisjointSlice</span></code> plus matching prepared launch geometry</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Missing <code class="docutils literal notranslate"><span class="pre">sync_threads()</span></code></p></td>
+<td class="text-left"><p>Stale shared memory reads</p></td>
+<td class="text-left"><p>Add barrier between writes and reads</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Wrong <code class="docutils literal notranslate"><span class="pre">shared_mem_bytes</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">LAUNCH_OUT_OF_RESOURCES</span></code> or garbage data</p></td>
+<td class="text-left"><p>Match <code class="docutils literal notranslate"><span class="pre">LaunchConfig</span></code> to actual <code class="docutils literal notranslate"><span class="pre">DynamicSharedArray</span></code> usage</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Out-of-bounds with raw pointers</p></td>
+<td class="text-left"><p>Trap or silent corruption</p></td>
+<td class="text-left"><p>Use <code class="docutils literal notranslate"><span class="pre">DisjointSlice::get_mut</span></code> for bounds checking</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">panic!(&quot;message&quot;)</span></code> in kernel</p></td>
+<td class="text-left"><p>Compile error (fmt unavailable)</p></td>
+<td class="text-left"><p>Use <code class="docutils literal notranslate"><span class="pre">gpu_assert!</span></code> or <code class="docutils literal notranslate"><span class="pre">debug::trap()</span></code></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Forgetting to sync after launch</p></td>
+<td class="text-left"><p>Host reads stale data</p></td>
+<td class="text-left"><p>Call <code class="docutils literal notranslate"><span class="pre">to_host_vec</span></code>, <code class="docutils literal notranslate"><span class="pre">stream.synchronize()</span></code>, or <code class="docutils literal notranslate"><span class="pre">.sync()</span></code></p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>PTX built for wrong arch</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">NO_BINARY_FOR_GPU</span></code></p></td>
+<td class="text-left"><p>Rebuild with <code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">oxide</span> <span class="pre">build</span> <span class="pre">--arch</span> <span class="pre">sm_XX</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<figure class="align-center" id="id1">
+<a class="reference internal image-reference" href="../_images/debug-workflow.svg"><img alt="../_images/debug-workflow.svg" src="../_images/debug-workflow.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">Debugging decision tree: kernel problems fall into three categories (compile
+error, runtime trap, silent corruption), each with different diagnostic tools.
+Common fixes are shown at the bottom.</span><a class="headerlink" href="#id1" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="closures-and-generics.html"
+       title="página anterior">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">anterior</p>
+        <p class="prev-next-title">Closures and Generics</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../gpu-safety/the-safety-model.html"
+       title="siguiente página">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">siguiente</p>
+        <p class="prev-next-title">The Safety Model</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> En esta página
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-happens-when-a-kernel-goes-wrong">What happens when a kernel goes wrong</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gpu-printf-printing-from-the-gpu"><code class="docutils literal notranslate"><span class="pre">gpu_printf!</span></code> – printing from the GPU</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#important-details">Important details</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-not-println-or-debug">Why not <code class="docutils literal notranslate"><span class="pre">println!</span></code> or <code class="docutils literal notranslate"><span class="pre">Debug</span></code>?</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gpu-assert-and-trap"><code class="docutils literal notranslate"><span class="pre">gpu_assert!</span></code> and <code class="docutils literal notranslate"><span class="pre">trap()</span></code></a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-trap-and-check-pattern">The trap-and-check pattern</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#host-side-error-handling">Host-side error handling</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#drivererror"><code class="docutils literal notranslate"><span class="pre">DriverError</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#deviceerror"><code class="docutils literal notranslate"><span class="pre">DeviceError</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#cudacontext-check-err"><code class="docutils literal notranslate"><span class="pre">CudaContext::check_err</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cargo-oxide-debug-cuda-gdb-integration"><code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">oxide</span> <span class="pre">debug</span></code> – cuda-gdb integration</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#debug-info-modes">Debug info modes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-full-debug-turns-optimization-off">Why full debug turns optimization off</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-works-today">What works today</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#breakpoint-workflow">Breakpoint workflow</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cargo-oxide-sanitize-compute-sanitizer"><code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">oxide</span> <span class="pre">sanitize</span></code> – Compute Sanitizer</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cargo-oxide-doctor-environment-validation"><code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">oxide</span> <span class="pre">doctor</span></code> – environment validation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cargo-oxide-pipeline-inspecting-the-compilation"><code class="docutils literal notranslate"><span class="pre">cargo</span> <span class="pre">oxide</span> <span class="pre">pipeline</span></code> – inspecting the compilation</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#environment-variables">Environment variables</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#profiling-with-nsight-compute">Profiling with Nsight Compute</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#common-pitfalls">Common pitfalls</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+    <div class="footer-items__center">
+      
+        <div class="footer-item"><footer class="bd-footer-content">
+  <div class="footer-container" style="padding: 1rem 0 2rem 0; border-top: 1px solid var(--pst-color-border); text-align: left;">
+    
+    <!-- NVIDIA Logo -->
+    <div style="margin-bottom: 1rem;">
+      <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem; filter: brightness(0);"
+           class="only-light">
+      <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem;"
+           class="only-dark pst-js-only">
+    </div>
+    
+    <!-- Footer Links - single line, left aligned -->
+    <div style="font-size: 0.8125rem; margin-bottom: 0.5rem; color: var(--pst-color-text-muted);">
+      <a href="https://www.nvidia.com/en-us/about-nvidia/privacy-policy/" target="_blank" style="color: inherit; text-decoration: none;">Privacy Policy</a> | 
+      <a href="https://www.nvidia.com/en-us/preferences/email-preferences/" target="_blank" style="color: inherit; text-decoration: none;">Your Privacy Choices</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/terms-of-service/" target="_blank" style="color: inherit; text-decoration: none;">Terms of Service</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/accessibility/" target="_blank" style="color: inherit; text-decoration: none;">Accessibility</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/company-policies/" target="_blank" style="color: inherit; text-decoration: none;">Corporate Policies</a> | 
+      <a href="https://www.nvidia.com/en-us/product-security/" target="_blank" style="color: inherit; text-decoration: none;">Product Security</a> | 
+      <a href="https://www.nvidia.com/en-us/contact/" target="_blank" style="color: inherit; text-decoration: none;">Contact</a>
+    </div>
+    
+    <!-- Copyright -->
+    <div style="font-size: 0.8125rem; color: var(--pst-color-text-muted);">
+      Copyright &copy; 2025-2026, NVIDIA.
+    </div>
+    
+  </div>
+</footer></div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>
