@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-16 04:35+0000\n"
+"POT-Creation-Date: 2026-11-09 17:58+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -449,19 +449,19 @@ msgstr ""
 
 #: ../../../gpu-safety/bounds-checks.md:257
 msgid ""
-"Only indexing checks (`a[i]`) are removed. Arithmetic overflow, division by "
-"zero, and every other safety check still traps. Range indexing (`&a[i..j]`) "
-"also still traps."
+"Only indexing checks (`a[i]` on slices, arrays, and `SharedArray`) are "
+"removed. Arithmetic overflow, division by zero, and every other safety check "
+"still traps. Range indexing (`&a[i..j]`) also still traps."
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:260
+#: ../../../gpu-safety/bounds-checks.md:261
 msgid ""
 "The per-kernel flag covers that kernel's body, including functions inlined "
 "into it. It never leaks: a kernel that calls a flagged kernel's helper "
 "function keeps its own checks."
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:263
+#: ../../../gpu-safety/bounds-checks.md:264
 msgid ""
 "Turn it on only after the checked build passes, ideally under `compute-"
 "sanitizer`. The [`unchecked_indexing`](https://github.com/NVIDIA/cuda-rust/"
@@ -469,11 +469,11 @@ msgid ""
 "example shows the PTX with and without the flag."
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:270
+#: ../../../gpu-safety/bounds-checks.md:271
 msgid "Choosing between them"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:272
+#: ../../../gpu-safety/bounds-checks.md:273
 msgid ""
 "Can a view express the access pattern (rows, columns, tiles, dot products)?\n"
 "├── yes -> use views + a `requires` contract.  Safe, and measurably as\n"
@@ -484,30 +484,30 @@ msgid ""
 "               garbage at 7,000.\n"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:282
+#: ../../../gpu-safety/bounds-checks.md:283
 msgid "Summary"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:284
+#: ../../../gpu-safety/bounds-checks.md:285
 msgid ""
 "`a[i]` costs a compare and a branch per access, and in hot loops that is the "
 "dominant cost -- 2.4x on naive GEMM."
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:286
+#: ../../../gpu-safety/bounds-checks.md:287
 msgid ""
 "Read views (`MatrixView32::row` / `col`, `zip_exact`) check a whole strip "
 "once and make every read inside it check-free. Fully safe, and the PTX "
 "matches hand-written unsafe code."
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:289
+#: ../../../gpu-safety/bounds-checks.md:290
 msgid ""
 "`requires = (...)` moves buffer-size checks to the host: one typed error per "
 "launch instead of a mid-kernel trap."
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:291
+#: ../../../gpu-safety/bounds-checks.md:292
 msgid ""
 "`#[kernel(unchecked_indexing)]` deletes indexing checks outright. Same "
 "contract as `get_unchecked`; out of bounds is undefined behavior."

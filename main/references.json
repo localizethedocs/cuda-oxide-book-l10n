@@ -47,9 +47,9 @@
     "branch" : "main",
     "commit" : 
     {
-      "date" : "2026-10-19 20:16:03 +0530",
-      "hash" : "717432490ccf85f0a9166401be6de362d6c622b2",
-      "title" : "feat(cuda-oxide): carry inline intent through the device pipeline (#1511)"
+      "date" : "2026-11-09 22:15:39 +0530",
+      "hash" : "a0a4dc78a20e06ec90827f597e950bdc49f723e2",
+      "title" : "fix(tilelib_relu): pass generated call_<decl> kernel names to link_ltoir (#1766)"
     }
   },
   "type" : "branch",
