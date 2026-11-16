@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-16 04:35+0000\n"
+"POT-Creation-Date: 2026-11-16 17:40+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -113,7 +113,7 @@ msgstr ""
 
 #: ../../../gpu-programming/launching-kernels.md:55
 msgid ""
-"use cuda_core::simt::LaunchConfig;\n"
+"use cuda_core::LaunchConfig;\n"
 "use cuda_core::{CudaContext, DeviceBuffer};\n"
 "use cuda_device::{DisjointSlice, cuda_module, kernel, thread};\n"
 "\n"
@@ -157,44 +157,45 @@ msgstr ""
 msgid "Field-by-field breakdown"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:96
 msgid "Piece"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:96
+#: ../../../gpu-programming/launching-kernels.md:544
 msgid "Description"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:96
 msgid "`#[cuda_module]`"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:98
 msgid "Generates loader and launch methods"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:98
 msgid "`kernels::load(&ctx)`"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:99
 msgid "Loads the embedded artifact bundle"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:99
 msgid "`module.vecadd(...)`"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:100
 msgid "Type-checks arguments; raw config requires `unsafe`"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:100
 #: ../../../gpu-programming/launching-kernels.md:530
 msgid "`LaunchConfig`"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:101
 msgid "Grid/block dimensions and smem"
 msgstr ""
 
@@ -206,51 +207,54 @@ msgstr ""
 msgid "The generated method maps kernel parameters to host values:"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:107
 msgid "Kernel parameter"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:107
 msgid "Host argument"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:107
 msgid "GPU ABI"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:107
 msgid "`&[T]`"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:109
 msgid "`&DeviceBuffer<T>`"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:109
+#: ../../../gpu-programming/launching-kernels.md:110
+#: ../../../gpu-programming/launching-kernels.md:111
 msgid "Pointer + length"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:109
 msgid "`&mut [T]`"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:110
+#: ../../../gpu-programming/launching-kernels.md:111
 msgid "`&mut DeviceBuffer<T>`"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:110
 msgid "`DisjointSlice<T>`"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:111
 msgid "scalar/raw pointer"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:111
 msgid "Same value"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:111
 msgid "Value directly"
 msgstr ""
 
@@ -328,8 +332,8 @@ msgid ""
 "Cluster and cooperative attributes may be declared together "
 "(`#[cluster_launch(...)]` + `#[cooperative_launch]`). Preparation proves the "
 "cluster shape with `cuOccupancyMaxActiveClusters`, then requires the whole "
-"grid to fit in that concurrent cluster capacity so a cooperative `grid::"
-"sync()` cannot hang on non-resident blocks. An oversized grid fails "
+"grid to fit in that concurrent cluster capacity so a cooperative "
+"`grid::sync()` cannot hang on non-resident blocks. An oversized grid fails "
 "preparation with `LaunchContractError::CooperativeGridTooLarge` (or a "
 "related cluster residency error) instead of submitting an unsound launch."
 msgstr ""
@@ -576,8 +580,8 @@ msgstr ""
 
 #: ../../../gpu-programming/launching-kernels.md:355
 msgid ""
-"`MIN_BLOCKS` is a compiler occupancy hint represented by PTX `."
-"minnctapersm`. It is not a grid or block dimension and is not enforced as "
+"`MIN_BLOCKS` is a compiler occupancy hint represented by PTX "
+"`.minnctapersm`. It is not a grid or block dimension and is not enforced as "
 "launch geometry."
 msgstr ""
 
@@ -862,7 +866,7 @@ msgstr ""
 
 #: ../../../gpu-programming/launching-kernels.md:534
 msgid ""
-"use cuda_core::simt::LaunchConfig;\n"
+"use cuda_core::LaunchConfig;\n"
 "\n"
 "let config = LaunchConfig {\n"
 "    grid_dim: (num_blocks, 1, 1),\n"
@@ -871,43 +875,44 @@ msgid ""
 "};\n"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:544
 msgid "Field"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:544
 msgid "Type"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:544
 msgid "`grid_dim`"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:546
+#: ../../../gpu-programming/launching-kernels.md:547
 msgid "`(u32, u32, u32)`"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:546
 msgid "Number of blocks in x, y, z"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:546
 msgid "`block_dim`"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:547
 msgid "Threads per block in x, y, z"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:547
 msgid "`shared_mem_bytes`"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:548
 msgid "`u32`"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:548
 msgid "Dynamic shared memory per block"
 msgstr ""
 
@@ -992,8 +997,8 @@ msgstr ""
 
 #: ../../../gpu-programming/launching-kernels.md:594
 msgid ""
-"use cuda_async::simt::device_context::init_device_contexts;\n"
-"use cuda_async::simt::device_operation::DeviceOperation;\n"
+"use cuda_async::device_context::init_device_contexts;\n"
+"use cuda_async::device_operation::DeviceOperation;\n"
 "\n"
 "init_device_contexts(0, 1)?;\n"
 "let module = kernels::load_async(0)?;\n"
@@ -1074,29 +1079,29 @@ msgstr ""
 msgid "`.sync()` vs `.await`"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:661
 msgid "Method"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:661
 msgid "What it does"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:661
 msgid "`.sync()`"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:663
 msgid ""
 "Execute on the default scheduling policy, block the current thread until "
 "complete"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:663
 msgid "`.await`"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:27
+#: ../../../gpu-programming/launching-kernels.md:664
 msgid "Execute and yield the current async task (requires a Tokio runtime)"
 msgstr ""
 
@@ -1132,8 +1137,8 @@ msgstr ""
 
 #: ../../../gpu-programming/launching-kernels.md:688
 msgid ""
-"The [Async GPU Programming](../async-programming/the-device-operation-model."
-"md) section covers `DeviceOperation`, scheduling policies, and stream "
+"The [Async GPU Programming](../async-programming/the-device-operation-"
+"model.md) section covers `DeviceOperation`, scheduling policies, and stream "
 "management in depth."
 msgstr ""
 
@@ -1262,113 +1267,113 @@ msgstr ""
 msgid "Common launch errors"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:776
+#: ../../../gpu-programming/launching-kernels.md:785
 msgid "Error"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:776
+#: ../../../gpu-programming/launching-kernels.md:785
 msgid "Likely cause"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:776
+#: ../../../gpu-programming/launching-kernels.md:785
 msgid "Fix"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:776
+#: ../../../gpu-programming/launching-kernels.md:785
 msgid "`CUDA_ERROR_INVALID_VALUE`"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:776
+#: ../../../gpu-programming/launching-kernels.md:787
 msgid "Grid or block dimensions are zero or exceed limits"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:776
+#: ../../../gpu-programming/launching-kernels.md:787
 msgid "Check `LaunchConfig` values; max block is 1024 threads"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:776
+#: ../../../gpu-programming/launching-kernels.md:787
 msgid "`CUDA_ERROR_NOT_FOUND`"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:776
+#: ../../../gpu-programming/launching-kernels.md:788
 msgid "PTX entry point name doesn't match"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:776
+#: ../../../gpu-programming/launching-kernels.md:788
 msgid "Verify `#[kernel]` name matches the loaded module"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:776
+#: ../../../gpu-programming/launching-kernels.md:788
 msgid "`CUDA_ERROR_LAUNCH_OUT_OF_RESOURCES`"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:776
+#: ../../../gpu-programming/launching-kernels.md:789
 msgid "Too much shared memory or too many registers per block"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:776
+#: ../../../gpu-programming/launching-kernels.md:789
 msgid "Reduce `shared_mem_bytes` or block size; use `#[launch_bounds]`"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:776
+#: ../../../gpu-programming/launching-kernels.md:789
 msgid "`CUDA_ERROR_ILLEGAL_INSTRUCTION`"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:776
+#: ../../../gpu-programming/launching-kernels.md:790
 msgid "Kernel hit a trap (panic, assert failure, OOB)"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:776
+#: ../../../gpu-programming/launching-kernels.md:790
 msgid "Debug with `cargo oxide debug` or `gpu_printf!`"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:776
+#: ../../../gpu-programming/launching-kernels.md:790
 msgid "`CUDA_ERROR_NO_BINARY_FOR_GPU`"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:776
+#: ../../../gpu-programming/launching-kernels.md:791
 msgid "PTX compiled for wrong architecture"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:776
+#: ../../../gpu-programming/launching-kernels.md:791
 msgid "Rebuild with `--arch` matching your GPU"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:776
+#: ../../../gpu-programming/launching-kernels.md:791
 msgid "`CUDA_ERROR_UNSUPPORTED_PTX_VERSION` (222)"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:776
+#: ../../../gpu-programming/launching-kernels.md:792
 msgid "Driver cannot compile the PTX version in the module"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:776
+#: ../../../gpu-programming/launching-kernels.md:792
 msgid "Select a compatible `CUDA_TOOLKIT_PATH` or upgrade the driver"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:776
+#: ../../../gpu-programming/launching-kernels.md:792
 msgid "`CUDA_ERROR_NOT_INITIALIZED`"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:776
+#: ../../../gpu-programming/launching-kernels.md:793
 msgid ""
 "`libcuda` missing, or the driver's CUDA major is older than the toolkit's"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:776
+#: ../../../gpu-programming/launching-kernels.md:793
 msgid ""
 "Install an R580+ driver; the error text names the files the loader tried"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:776
+#: ../../../gpu-programming/launching-kernels.md:793
 msgid "`CUDA_ERROR_NOT_FOUND` (from a non-launch call)"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:776
+#: ../../../gpu-programming/launching-kernels.md:794
 msgid "Driver symbol missing from the loaded `libcuda`"
 msgstr ""
 
-#: ../../../gpu-programming/launching-kernels.md:776
+#: ../../../gpu-programming/launching-kernels.md:794
 msgid "Upgrade the driver to the toolkit's CUDA version"
 msgstr ""
 

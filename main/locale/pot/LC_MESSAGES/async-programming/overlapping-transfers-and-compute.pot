@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-16 04:35+0000\n"
+"POT-Creation-Date: 2026-11-16 17:40+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -134,8 +134,8 @@ msgstr ""
 msgid ""
 "The complete setup, slot-reuse wait, and final drain are in the "
 "[`run_overlapped` implementation](https://github.com/NVIDIA/cuda-rust/blob/"
-"main/cuda-oxide/crates/rustc-codegen-cuda/examples/pinned_overlap/src/main."
-"rs)."
+"main/cuda-oxide/crates/rustc-codegen-cuda/examples/pinned_overlap/src/"
+"main.rs)."
 msgstr ""
 
 #: ../../../async-programming/overlapping-transfers-and-compute.md:77
@@ -157,35 +157,35 @@ msgstr ""
 msgid "On the reference RTX 4090 (`sm_89`) run:"
 msgstr ""
 
-#: ../../../async-programming/overlapping-transfers-and-compute.md:0
+#: ../../../async-programming/overlapping-transfers-and-compute.md:89
 msgid "Pipeline"
 msgstr ""
 
-#: ../../../async-programming/overlapping-transfers-and-compute.md:0
+#: ../../../async-programming/overlapping-transfers-and-compute.md:89
 msgid "Time"
 msgstr ""
 
-#: ../../../async-programming/overlapping-transfers-and-compute.md:0
+#: ../../../async-programming/overlapping-transfers-and-compute.md:89
 msgid "Serialized pageable"
 msgstr ""
 
-#: ../../../async-programming/overlapping-transfers-and-compute.md:0
+#: ../../../async-programming/overlapping-transfers-and-compute.md:89
 msgid "174.996 ms"
 msgstr ""
 
-#: ../../../async-programming/overlapping-transfers-and-compute.md:0
+#: ../../../async-programming/overlapping-transfers-and-compute.md:89
 msgid "Overlapped pinned"
 msgstr ""
 
-#: ../../../async-programming/overlapping-transfers-and-compute.md:0
+#: ../../../async-programming/overlapping-transfers-and-compute.md:89
 msgid "99.332 ms"
 msgstr ""
 
-#: ../../../async-programming/overlapping-transfers-and-compute.md:0
+#: ../../../async-programming/overlapping-transfers-and-compute.md:89
 msgid "Speedup"
 msgstr ""
 
-#: ../../../async-programming/overlapping-transfers-and-compute.md:0
+#: ../../../async-programming/overlapping-transfers-and-compute.md:89
 msgid "1.76x"
 msgstr ""
 

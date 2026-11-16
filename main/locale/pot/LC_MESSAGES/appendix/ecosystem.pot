@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-16 04:35+0000\n"
+"POT-Creation-Date: 2026-11-16 17:40+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -35,131 +35,131 @@ msgstr ""
 msgid "Where cuda-oxide fits"
 msgstr ""
 
-#: ../../../appendix/ecosystem.md:0
+#: ../../../appendix/ecosystem.md:12
 msgid "Project"
 msgstr ""
 
-#: ../../../appendix/ecosystem.md:0
+#: ../../../appendix/ecosystem.md:12
 msgid "Approach"
 msgstr ""
 
-#: ../../../appendix/ecosystem.md:0
+#: ../../../appendix/ecosystem.md:12
 msgid "Target"
 msgstr ""
 
-#: ../../../appendix/ecosystem.md:0
+#: ../../../appendix/ecosystem.md:12
 msgid "Scope"
 msgstr ""
 
-#: ../../../appendix/ecosystem.md:0
+#: ../../../appendix/ecosystem.md:12
 msgid "**cuda-oxide**"
 msgstr ""
 
-#: ../../../appendix/ecosystem.md:0
+#: ../../../appendix/ecosystem.md:14
 msgid "`rustc` codegen backend"
 msgstr ""
 
-#: ../../../appendix/ecosystem.md:0
+#: ../../../appendix/ecosystem.md:14
 msgid "NVIDIA PTX/SASS"
 msgstr ""
 
-#: ../../../appendix/ecosystem.md:0
+#: ../../../appendix/ecosystem.md:14
 msgid "CUDA programming model in safe Rust"
 msgstr ""
 
-#: ../../../appendix/ecosystem.md:0
+#: ../../../appendix/ecosystem.md:14
 msgid "**Rust-GPU**"
 msgstr ""
 
-#: ../../../appendix/ecosystem.md:0
+#: ../../../appendix/ecosystem.md:15
 msgid "`rustc` → SPIR-V"
 msgstr ""
 
-#: ../../../appendix/ecosystem.md:0
+#: ../../../appendix/ecosystem.md:15
 msgid "Vulkan/Metal/DX"
 msgstr ""
 
-#: ../../../appendix/ecosystem.md:0
+#: ../../../appendix/ecosystem.md:15
 msgid "Graphics shaders and compute via SPIR-V"
 msgstr ""
 
-#: ../../../appendix/ecosystem.md:0
+#: ../../../appendix/ecosystem.md:15
 msgid "**rust-cuda**"
 msgstr ""
 
-#: ../../../appendix/ecosystem.md:0
+#: ../../../appendix/ecosystem.md:16
 msgid "`rustc` → NVVM IR"
 msgstr ""
 
-#: ../../../appendix/ecosystem.md:0
+#: ../../../appendix/ecosystem.md:16
 msgid "NVIDIA PTX"
 msgstr ""
 
-#: ../../../appendix/ecosystem.md:0
+#: ../../../appendix/ecosystem.md:16
 msgid "Rust language model on NVIDIA GPUs"
 msgstr ""
 
-#: ../../../appendix/ecosystem.md:0
+#: ../../../appendix/ecosystem.md:16
 msgid "**CubeCL**"
 msgstr ""
 
-#: ../../../appendix/ecosystem.md:0
+#: ../../../appendix/ecosystem.md:17
 msgid "Embedded DSL + JIT runtime"
 msgstr ""
 
-#: ../../../appendix/ecosystem.md:0
+#: ../../../appendix/ecosystem.md:17
 msgid "CUDA/ROCm/WGPU"
 msgstr ""
 
-#: ../../../appendix/ecosystem.md:0
+#: ../../../appendix/ecosystem.md:17
 msgid "Cross-vendor compute kernels from a Rust DSL"
 msgstr ""
 
-#: ../../../appendix/ecosystem.md:0
+#: ../../../appendix/ecosystem.md:17
 msgid "**std::offload**"
 msgstr ""
 
-#: ../../../appendix/ecosystem.md:0
+#: ../../../appendix/ecosystem.md:18
 msgid "`rustc` + LLVM offload"
 msgstr ""
 
-#: ../../../appendix/ecosystem.md:0
+#: ../../../appendix/ecosystem.md:18
 msgid "NVIDIA/AMD/Intel"
 msgstr ""
 
-#: ../../../appendix/ecosystem.md:0
+#: ../../../appendix/ecosystem.md:18
 msgid "Implicit offload of CPU code"
 msgstr ""
 
-#: ../../../appendix/ecosystem.md:0
+#: ../../../appendix/ecosystem.md:18
 msgid "**cudarc**"
 msgstr ""
 
-#: ../../../appendix/ecosystem.md:0
+#: ../../../appendix/ecosystem.md:19
 msgid "Safe CUDA driver bindings"
 msgstr ""
 
-#: ../../../appendix/ecosystem.md:0
+#: ../../../appendix/ecosystem.md:19
 msgid "NVIDIA"
 msgstr ""
 
-#: ../../../appendix/ecosystem.md:0
+#: ../../../appendix/ecosystem.md:19
 msgid "Host-side bindings to the CUDA driver"
 msgstr ""
 
-#: ../../../appendix/ecosystem.md:0
+#: ../../../appendix/ecosystem.md:19
 msgid "**wgpu**"
 msgstr ""
 
-#: ../../../appendix/ecosystem.md:0
+#: ../../../appendix/ecosystem.md:20
 msgid "WebGPU API + WGSL/Naga"
 msgstr ""
 
-#: ../../../appendix/ecosystem.md:0
+#: ../../../appendix/ecosystem.md:20
 msgid "Cross-platform"
 msgstr ""
 
-#: ../../../appendix/ecosystem.md:0
+#: ../../../appendix/ecosystem.md:20
 msgid "Portable compute via shader languages"
 msgstr ""
 
@@ -272,6 +272,7 @@ msgid ""
 "If you're building a Rust + GPU project — or evaluating which of the above "
 "fits your needs — we're happy to compare notes. Join the community on "
 "[Discord](https://discord.gg/ZUEr4AhH5C) for questions, design discussions, "
-"and announcements, or reach the team via [GitHub Discussions](https://github."
-"com/NVIDIA/cuda-rust/discussions) or by opening an issue on the repository."
+"and announcements, or reach the team via [GitHub Discussions](https://"
+"github.com/NVIDIA/cuda-rust/discussions) or by opening an issue on the "
+"repository."
 msgstr ""
