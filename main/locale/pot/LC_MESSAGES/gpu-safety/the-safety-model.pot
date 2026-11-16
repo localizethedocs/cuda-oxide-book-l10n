@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-16 04:35+0000\n"
+"POT-Creation-Date: 2026-11-16 17:40+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -57,51 +57,51 @@ msgid ""
 "compiler can verify:"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:27
 msgid "Tier"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:27
 msgid "Description"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:27
 msgid "`unsafe` Required?"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:27
 msgid "**Tier 1**"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:29
 msgid "Safe kernel body plus a checked `PreparedLaunch`"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:29
 msgid "No"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:29
 msgid "**Tier 2**"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:30
 msgid "Explicit `unsafe` with clear safety contracts"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:30
 msgid "Yes, scoped"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:30
 msgid "**Tier 3**"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:31
 msgid "Raw hardware intrinsics -- full user responsibility"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:31
 msgid "Yes, pervasive"
 msgstr ""
 
@@ -176,8 +176,8 @@ msgid ""
 "#[kernel]\n"
 "pub fn vecadd(a: &[f32], b: &[f32], mut c: DisjointSlice<f32>) {\n"
 "    let idx = thread::index_1d();\n"
+"    let i = idx.get();\n"
 "    if let Some(c_elem) = c.get_mut(idx) {\n"
-"        let i = idx.get();\n"
 "        *c_elem = a[i] + b[i];\n"
 "    }\n"
 "}\n"
@@ -247,87 +247,90 @@ msgid ""
 "are the constructors cuda-oxide provides:"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:122
 msgid "Function"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:122
 msgid "Formula"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:122
 msgid "Return Type"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:122
 msgid "Notes"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:122
 msgid "`index_1d()`"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:124
+#: ../../../gpu-safety/the-safety-model.md:128
 msgid "`blockIdx.x * blockDim.x + threadIdx.x`"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:124
 msgid "`ThreadIndex<'kernel, Index1D>`"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:124
 msgid "Invalid when an untyped launch has active Y/Z"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:124
 msgid "`index_2d::<S>()`"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:125
 msgid "`row * S + col`"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:125
 msgid "`Option<ThreadIndex<'kernel, Index2D<S>>>`"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:125
 msgid "Const stride; mixing strides is a compile error"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:125
 msgid "`index_2d_runtime(&slice)`"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:126
 msgid "`row * width + col`"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:126
 msgid "`Option<ThreadIndex<'kernel, Runtime2DIndex>>`"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:126
 msgid "Row width read from the slice, bound by the host"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:126
 msgid "`index_2d_row()`"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:127
 msgid "`blockIdx.y * blockDim.y + threadIdx.y`"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:127
+#: ../../../gpu-safety/the-safety-model.md:128
 msgid "`usize`"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:127
+#: ../../../gpu-safety/the-safety-model.md:128
 msgid "Component accessor, not a witness constructor"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:127
 msgid "`index_2d_col()`"
 msgstr ""
 
@@ -414,11 +417,11 @@ msgstr ""
 msgid ""
 "An exact `block` is checked twice, in two places that fail independently. "
 "Preparation rejects a mismatched launch configuration on the host, before "
-"any driver call. The shape also reaches the device compiler, which emits `."
-"reqntid 64, 1, 1`, so the CUDA driver refuses any launch whose block differs "
-"on any axis. The second check covers the paths the first one cannot see: an "
-"`unsafe` raw launch, and a module whose loaded PTX is not the artifact the "
-"generated Rust markers describe."
+"any driver call. The shape also reaches the device compiler, which emits "
+"`.reqntid 64, 1, 1`, so the CUDA driver refuses any launch whose block "
+"differs on any axis. The second check covers the paths the first one cannot "
+"see: an `unsafe` raw launch, and a module whose loaded PTX is not the "
+"artifact the generated Rust markers describe."
 msgstr ""
 
 #: ../../../gpu-safety/the-safety-model.md:188
@@ -757,7 +760,7 @@ msgid ""
 msgstr ""
 
 #: ../../../gpu-safety/the-safety-model.md:417
-#: ../../../gpu-safety/the-safety-model.md:547
+#: ../../../gpu-safety/the-safety-model.md:697
 msgid "Shared memory"
 msgstr ""
 
@@ -787,35 +790,35 @@ msgid ""
 "reads."
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
-#: ../../../gpu-safety/the-safety-model.md:443
-#: ../../../gpu-safety/the-safety-model.md:463
+#: ../../../gpu-safety/the-safety-model.md:438
+#: ../../../gpu-safety/the-safety-model.md:457
+#: ../../../gpu-safety/the-safety-model.md:477
 msgid "API"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
-#: ../../../gpu-safety/the-safety-model.md:443
-#: ../../../gpu-safety/the-safety-model.md:463
+#: ../../../gpu-safety/the-safety-model.md:438
+#: ../../../gpu-safety/the-safety-model.md:457
+#: ../../../gpu-safety/the-safety-model.md:477
 msgid "Safety Obligation"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:438
 msgid "`SharedArray<T, N>`"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:440
 msgid ""
 "Accessed via `static mut`. No conflicting writes without synchronization."
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:440
 msgid "`DynamicSharedArray<T>`"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:0
+#: ../../../gpu-safety/the-safety-model.md:441
 msgid ""
-"Same rules, but size is set at launch time via `LaunchConfig::"
-"shared_mem_bytes`."
+"Same rules, but size is set at launch time via "
+"`LaunchConfig::shared_mem_bytes`."
 msgstr ""
 
 #: ../../../gpu-safety/the-safety-model.md:444
@@ -838,27 +841,27 @@ msgid ""
 "undefined behavior (typically a silent hang, which is worse than a crash)."
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:443
+#: ../../../gpu-safety/the-safety-model.md:457
 msgid "`shfl_sync`, `shfl_up_sync`, `shfl_down_sync`, `shfl_xor_sync`"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:443
+#: ../../../gpu-safety/the-safety-model.md:459
 msgid "Source lane must be active; mask must include calling thread"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:443
+#: ../../../gpu-safety/the-safety-model.md:459
 msgid "`ballot_sync`, `any_sync`, `all_sync`"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:443
+#: ../../../gpu-safety/the-safety-model.md:460
 msgid "All threads in mask must be converged"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:443
+#: ../../../gpu-safety/the-safety-model.md:460
 msgid "`activemask`"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:443
+#: ../../../gpu-safety/the-safety-model.md:461
 msgid "Result is only meaningful at the point of call"
 msgstr ""
 
@@ -874,42 +877,42 @@ msgstr ""
 
 #: ../../../gpu-safety/the-safety-model.md:470
 msgid ""
-"The `ManagedBarrier` typestate API encodes the barrier lifecycle (`Uninit` -"
-"> `Ready` -> `Invalidated`) in the type system, so you cannot wait on a "
+"The `ManagedBarrier` typestate API encodes the barrier lifecycle (`Uninit` "
+"-> `Ready` -> `Invalidated`) in the type system, so you cannot wait on a "
 "barrier that was never initialized or use one that has been invalidated. The "
 "`init()` and `inval()` transitions still require `unsafe` because they "
 "interact with the hardware, but the type states prevent the most common "
 "mistakes at compile time."
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:463
+#: ../../../gpu-safety/the-safety-model.md:477
 msgid "`mbarrier_init`"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:463
+#: ../../../gpu-safety/the-safety-model.md:479
 msgid "Must be called by exactly one thread; barrier must be in shared memory"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:463
+#: ../../../gpu-safety/the-safety-model.md:479
 msgid "`mbarrier_arrive` / `mbarrier_wait`"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:463
+#: ../../../gpu-safety/the-safety-model.md:480
 msgid "Barrier must be initialized; token must match"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:463
+#: ../../../gpu-safety/the-safety-model.md:480
 msgid "`ManagedBarrier` (typestate)"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:463
+#: ../../../gpu-safety/the-safety-model.md:481
 msgid ""
 "`init()` and `inval()` require `unsafe`; state machine enforced at compile "
 "time"
 msgstr ""
 
 #: ../../../gpu-safety/the-safety-model.md:483
-#: ../../../gpu-safety/the-safety-model.md:547
+#: ../../../gpu-safety/the-safety-model.md:700
 msgid "Atomics"
 msgstr ""
 
@@ -979,75 +982,78 @@ msgid ""
 "Rust doc comments."
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:463
+#: ../../../gpu-safety/the-safety-model.md:532
 msgid "Feature"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:463
+#: ../../../gpu-safety/the-safety-model.md:532
 msgid "Key APIs"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:463
+#: ../../../gpu-safety/the-safety-model.md:532
 msgid "Architectures"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:463
+#: ../../../gpu-safety/the-safety-model.md:532
 msgid "**TMA** (Tensor Memory Accelerator)"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:463
+#: ../../../gpu-safety/the-safety-model.md:534
 msgid "`tma_load_2d`, `tma_store_2d`, `TmaDescriptor`"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:463
+#: ../../../gpu-safety/the-safety-model.md:534
+#: ../../../gpu-safety/the-safety-model.md:536
+#: ../../../gpu-safety/the-safety-model.md:537
 msgid "sm_90+ (Hopper)"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:463
+#: ../../../gpu-safety/the-safety-model.md:534
 msgid "**tcgen05** (Tensor Core Gen 5)"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:463
+#: ../../../gpu-safety/the-safety-model.md:535
 msgid "`tcgen05_mma`, `tcgen05_commit`, `TensorMemoryHandle`"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:463
+#: ../../../gpu-safety/the-safety-model.md:535
+#: ../../../gpu-safety/the-safety-model.md:539
 msgid "sm_100a (Blackwell DC)"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:463
+#: ../../../gpu-safety/the-safety-model.md:535
 msgid "**WGMMA** (Warpgroup MMA)"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:463
+#: ../../../gpu-safety/the-safety-model.md:536
 msgid "`wgmma_mma_async`, `wgmma_commit_group`, `wgmma_wait_group`"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:463
+#: ../../../gpu-safety/the-safety-model.md:536
 msgid "**Cluster**"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:463
+#: ../../../gpu-safety/the-safety-model.md:537
 msgid "`cluster_rank`, `map_shared_rank`, `cluster_barrier_arrive`"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:463
+#: ../../../gpu-safety/the-safety-model.md:537
 msgid "**CLC** (Cluster Launch Control)"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:463
+#: ../../../gpu-safety/the-safety-model.md:538
 msgid "`clc_prefetch`, `clc_query_channel`"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:463
+#: ../../../gpu-safety/the-safety-model.md:538
 msgid "sm_100+ (Blackwell)"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:463
+#: ../../../gpu-safety/the-safety-model.md:538
 msgid "**TMEM** (Tensor Memory)"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:463
+#: ../../../gpu-safety/the-safety-model.md:539
 msgid "`TmemGuard` (typestate), `tmem_alloc`, `tmem_dealloc`"
 msgstr ""
 
@@ -1078,49 +1084,49 @@ msgid ""
 "provides on the CPU is also enforced on the GPU:"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:547
+#: ../../../gpu-safety/the-safety-model.md:562
 msgid "Guarantee"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:547
+#: ../../../gpu-safety/the-safety-model.md:562
 msgid "How It Works"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:547
+#: ../../../gpu-safety/the-safety-model.md:562
 msgid "**Ownership and borrowing**"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:547
+#: ../../../gpu-safety/the-safety-model.md:564
 msgid ""
 "Lifetime errors, use-after-free, and aliasing violations caught at compile "
 "time"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:547
+#: ../../../gpu-safety/the-safety-model.md:564
 msgid "**Safe parallel writes**"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:547
+#: ../../../gpu-safety/the-safety-model.md:565
 msgid ""
 "`DisjointSlice<T>` + `ThreadIndex` + matching prepared geometry prove that "
 "writes do not race"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:547
+#: ../../../gpu-safety/the-safety-model.md:565
 msgid "**Explicit `unsafe` scoping**"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:547
+#: ../../../gpu-safety/the-safety-model.md:566
 msgid ""
 "Raw pointer access requires `unsafe`, making obligations visible and "
 "auditable"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:547
+#: ../../../gpu-safety/the-safety-model.md:566
 msgid "**Convergent attribute enforcement**"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:547
+#: ../../../gpu-safety/the-safety-model.md:567
 msgid ""
 "Sync primitives (barriers, fences, shuffles) marked `convergent` in the IR, "
 "preventing the optimizer from moving or duplicating them across control flow"
@@ -1128,8 +1134,8 @@ msgstr ""
 
 #: ../../../gpu-safety/the-safety-model.md:569
 msgid ""
-"The first three are standard Rust. The fourth is GPU-specific: CUDA's `bar."
-"sync`, fence, and warp shuffle instructions must not be duplicated or "
+"The first three are standard Rust. The fourth is GPU-specific: CUDA's "
+"`bar.sync`, fence, and warp shuffle instructions must not be duplicated or "
 "reordered by the compiler. cuda-oxide marks them `convergent` in the IR so "
 "that LLVM's optimization passes leave them alone."
 msgstr ""
@@ -1213,41 +1219,41 @@ msgid ""
 "extended, not reinvented:"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:547
+#: ../../../gpu-safety/the-safety-model.md:625
 msgid "Idea"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:547
+#: ../../../gpu-safety/the-safety-model.md:625
 msgid "What It Solves"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:547
+#: ../../../gpu-safety/the-safety-model.md:625
 msgid "**Execution-resource-aware types**"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:547
+#: ../../../gpu-safety/the-safety-model.md:627
 msgid ""
 "Functions annotated with their execution level (grid / block / warp / "
 "thread). A barrier call inside a divergent branch becomes a compile-time "
 "error."
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:547
+#: ../../../gpu-safety/the-safety-model.md:627
 msgid "**Memory views**"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:547
+#: ../../../gpu-safety/the-safety-model.md:628
 msgid ""
 "Generalized parallel access patterns -- like `DisjointSlice` but covering "
 "blocked, striped, transposed, and composed layouts. Type-checked race-"
 "freedom at scale."
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:547
+#: ../../../gpu-safety/the-safety-model.md:628
 msgid "**Extended borrow checking for sync**"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:547
+#: ../../../gpu-safety/the-safety-model.md:629
 msgid ""
 "Statically enforce that barriers cannot be forgotten, placed at divergent "
 "control flow, or duplicated by the optimizer. Convergence in the type system."
@@ -1365,67 +1371,67 @@ msgstr ""
 msgid "When you need `unsafe`"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:547
+#: ../../../gpu-safety/the-safety-model.md:697
 msgid "Pattern"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:547
+#: ../../../gpu-safety/the-safety-model.md:697
 msgid "Why"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:547
+#: ../../../gpu-safety/the-safety-model.md:697
 msgid "Mitigation"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:547
+#: ../../../gpu-safety/the-safety-model.md:697
 msgid "Multiple threads access the same `static mut`"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:547
+#: ../../../gpu-safety/the-safety-model.md:699
 msgid "Synchronize with `sync_threads()` before cross-thread reads"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:547
+#: ../../../gpu-safety/the-safety-model.md:699
 msgid "Warp shuffles"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:547
+#: ../../../gpu-safety/the-safety-model.md:699
 msgid "Thread convergence is not compiler-checked"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:547
+#: ../../../gpu-safety/the-safety-model.md:699
 msgid "Use `FULL_MASK` for full-warp operations; document partial masks"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:547
+#: ../../../gpu-safety/the-safety-model.md:700
 msgid "Construction from a raw pointer"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:547
+#: ../../../gpu-safety/the-safety-model.md:700
 msgid "Wrap in a helper; the atomic operations themselves are safe"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:547
+#: ../../../gpu-safety/the-safety-model.md:700
 msgid "Non-uniform writes"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:547
+#: ../../../gpu-safety/the-safety-model.md:700
 msgid "Not every thread writes to its own index"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:547
+#: ../../../gpu-safety/the-safety-model.md:700
 msgid "Use `get_unchecked_mut` with a documented uniqueness argument"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:547
+#: ../../../gpu-safety/the-safety-model.md:702
 msgid "Hardware intrinsics"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:547
+#: ../../../gpu-safety/the-safety-model.md:702
 msgid "Complex, architecture-specific contracts"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:547
+#: ../../../gpu-safety/the-safety-model.md:702
 msgid "Follow the PTX ISA documentation; test on target hardware"
 msgstr ""
 
@@ -1469,91 +1475,91 @@ msgstr ""
 msgid "Summary"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:725
+#: ../../../gpu-safety/the-safety-model.md:735
 msgid "Property"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:725
+#: ../../../gpu-safety/the-safety-model.md:735
 msgid "Status"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:725
+#: ../../../gpu-safety/the-safety-model.md:735
 msgid "Borrow checker on device code"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:725
+#: ../../../gpu-safety/the-safety-model.md:735
 msgid "Enforced (real `rustc` frontend)"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:725
+#: ../../../gpu-safety/the-safety-model.md:737
 msgid "Safe 1D parallel writes (`DisjointSlice + index_1d`)"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:725
+#: ../../../gpu-safety/the-safety-model.md:738
 msgid "Enforced with a `domain = 1` prepared launch"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:725
+#: ../../../gpu-safety/the-safety-model.md:738
 msgid "Safe 2D parallel writes -- const stride"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:725
+#: ../../../gpu-safety/the-safety-model.md:738
 msgid "Enforced (`Index2D<S>` mismatch is a compile error)"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:725
+#: ../../../gpu-safety/the-safety-model.md:739
 msgid "Safe 2D parallel writes -- runtime stride"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:725
+#: ../../../gpu-safety/the-safety-model.md:739
 msgid "Enforced (host-bound row width, per-slice resolution)"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:725
+#: ../../../gpu-safety/the-safety-model.md:739
 msgid "`ThreadIndex` non-transferable across threads (smem laundering)"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:725
+#: ../../../gpu-safety/the-safety-model.md:741
 msgid "Enforced (`!Send + !Sync + !Copy + !Clone + 'kernel`)"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:725
+#: ../../../gpu-safety/the-safety-model.md:741
 msgid "`&mut [T]` kernel parameter"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:725
+#: ../../../gpu-safety/the-safety-model.md:742
 msgid "NOT enforced -- treat any `&mut` arg as `unsafe`"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:725
+#: ../../../gpu-safety/the-safety-model.md:742
 msgid "Explicit `unsafe` for shared memory, intrinsics"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:725
+#: ../../../gpu-safety/the-safety-model.md:743
 msgid "Enforced (Rust language rules)"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:725
+#: ../../../gpu-safety/the-safety-model.md:743
 msgid "Convergent attribute on sync primitives"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:725
+#: ../../../gpu-safety/the-safety-model.md:743
 msgid "Enforced (IR-level `convergent` marking)"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:725
+#: ../../../gpu-safety/the-safety-model.md:744
 msgid "Thread convergence for warp ops"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:725
+#: ../../../gpu-safety/the-safety-model.md:744
 msgid "NOT enforced (runtime obligation)"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:725
+#: ../../../gpu-safety/the-safety-model.md:744
 msgid "Memory space awareness (shared vs global)"
 msgstr ""
 
-#: ../../../gpu-safety/the-safety-model.md:725
+#: ../../../gpu-safety/the-safety-model.md:744
 msgid "NOT enforced (future work)"
 msgstr ""
 

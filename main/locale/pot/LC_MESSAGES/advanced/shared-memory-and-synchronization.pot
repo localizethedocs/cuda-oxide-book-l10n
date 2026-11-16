@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-19 15:08+0000\n"
+"POT-Creation-Date: 2026-11-16 17:40+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -155,40 +155,40 @@ msgstr ""
 #: ../../../advanced/shared-memory-and-synchronization.md:117
 msgid ""
 "`SharedArray` must be declared as `static mut` inside the kernel function "
-"body. This tells the compiler to allocate it in PTX shared address space (`."
-"shared`). The `UNINIT` constant skips initialization — the contents are "
+"body. This tells the compiler to allocate it in PTX shared address space "
+"(`.shared`). The `UNINIT` constant skips initialization — the contents are "
 "undefined until threads write to them."
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:38
+#: ../../../advanced/shared-memory-and-synchronization.md:122
 msgid "Parameter"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:38
+#: ../../../advanced/shared-memory-and-synchronization.md:122
 msgid "Meaning"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:38
+#: ../../../advanced/shared-memory-and-synchronization.md:122
 msgid "`T`"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:38
+#: ../../../advanced/shared-memory-and-synchronization.md:124
 msgid "Element type (`f32`, `u32`, etc.)"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:38
+#: ../../../advanced/shared-memory-and-synchronization.md:124
 msgid "`N`"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:38
+#: ../../../advanced/shared-memory-and-synchronization.md:125
 msgid "Number of elements (fixed at compile time)"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:38
+#: ../../../advanced/shared-memory-and-synchronization.md:125
 msgid "`ALIGN`"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:38
+#: ../../../advanced/shared-memory-and-synchronization.md:126
 msgid ""
 "Byte alignment: 0 (natural) or a power of two; use 128 for TMA destinations"
 msgstr ""
@@ -260,9 +260,10 @@ msgstr ""
 
 #: ../../../advanced/shared-memory-and-synchronization.md:178
 msgid ""
-"Indexing is bounds-checked in debug builds. In release (and on the GPU), the "
-"bounds check is elided. If you index out of bounds, you get undefined "
-"behavior — the same rules as any `static mut` access in Rust."
+"Indexing is bounds-checked like a Rust array: `TILE[i]` traps on the GPU if "
+"`i >= N`. `#[kernel(unchecked_indexing)]` (or "
+"`CUDA_OXIDE_UNCHECKED_INDEXING=1`) removes the check, and an out-of-bounds "
+"index then becomes undefined behavior."
 msgstr ""
 
 #: ../../../advanced/shared-memory-and-synchronization.md:184
@@ -418,46 +419,53 @@ msgstr ""
 msgid "The rule is simple: **sync before reading what another thread wrote**."
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:151
+#: ../../../advanced/shared-memory-and-synchronization.md:294
 msgid "Situation"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:151
+#: ../../../advanced/shared-memory-and-synchronization.md:294
 msgid "Need sync?"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:151
+#: ../../../advanced/shared-memory-and-synchronization.md:294
 msgid "Thread A writes `TILE[i]`, Thread B reads `TILE[i]`"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:151
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:296
+#: ../../../advanced/shared-memory-and-synchronization.md:328
+#: ../../../advanced/shared-memory-and-synchronization.md:329
+#: ../../../advanced/shared-memory-and-synchronization.md:330
+#: ../../../advanced/shared-memory-and-synchronization.md:331
+#: ../../../advanced/shared-memory-and-synchronization.md:332
+#: ../../../advanced/shared-memory-and-synchronization.md:336
+#: ../../../advanced/shared-memory-and-synchronization.md:337
 msgid "Yes"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:151
+#: ../../../advanced/shared-memory-and-synchronization.md:296
 msgid "Thread A writes `TILE[i]`, Thread A reads `TILE[i]`"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:151
+#: ../../../advanced/shared-memory-and-synchronization.md:297
 msgid "No (same thread)"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:151
+#: ../../../advanced/shared-memory-and-synchronization.md:297
 msgid "Overwriting a tile for the next loop iteration"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:151
+#: ../../../advanced/shared-memory-and-synchronization.md:297
 msgid ""
 "Yes (before the new load overwrites data threads might still be reading)"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:151
+#: ../../../advanced/shared-memory-and-synchronization.md:297
 msgid "Reading from `DisjointSlice` (each thread reads its own index)"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:151
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:299
+#: ../../../advanced/shared-memory-and-synchronization.md:333
+#: ../../../advanced/shared-memory-and-synchronization.md:335
 msgid "No"
 msgstr ""
 
@@ -500,61 +508,61 @@ msgid ""
 "clobber."
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:326
 msgid "Access form"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:326
 msgid "Kept on its side of `sync_threads()`"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:326
 msgid "Notes"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:326
 msgid "`SharedArray` indexing, `S[i]`"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:328
 msgid "A plain load or store in address space 3."
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:328
 msgid "`SharedArray::as_raw_mut_ptr(&raw mut S)`"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:329
 msgid ""
 "The same instructions as indexing. Prefer it to `as_mut_ptr()` and "
 "`as_ptr()`. Those methods borrow `S`, and the `static_mut_refs` lint rejects "
 "a borrow of a `static mut` under edition 2024."
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:329
 msgid "`DynamicSharedArray::<T>::get()` and `offset()`"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:330
 msgid "A plain load or store through the returned pointer."
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:330
 msgid "`ptx_asm!` with no options"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:331
 msgid ""
 "The call is `asm sideeffect` with no memory attribute. The PTX keeps it in "
 "order against the barrier, plain loads and stores, and other side-effecting "
 "asm. ptxas may drop a snippet with an unused result from the SASS."
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:331
 msgid "`ptx_asm!` with `clobber(\"memory\")`"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:332
 msgid ""
 "Adds `~{memory}` to the constraint string. The order matches the row above "
 "in the current lowering. Without the clobber that order comes from the "
@@ -563,56 +571,56 @@ msgid ""
 "an address."
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:332
 msgid "`ptx_asm!` with `options(register_only)`"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:333
 msgid ""
 "The call has no `sideeffect` flag. The compiler may move it across memory "
 "operations and the barrier, and deletes it when its result is unused. Use it "
 "for snippets that touch registers only."
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:333
 msgid ""
 "`cp_async_*` copies, `cp_async_commit_group()`, `cp_async_wait_group(n)`"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:334
 msgid "Yes, but see below"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:334
 msgid ""
 "Issue, commit and wait stay in order. The barrier does not wait for the copy "
 "to land."
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:334
 msgid ""
 "A `&T` or `&[T]` to slots another thread writes, live across the barrier"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:335
 msgid "rustc merges reads through it before either backend runs. See below."
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:335
 msgid "A `&UnsafeCell<T>` to such a slot"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:336
 msgid ""
 "A plain load that is re-read after each barrier. Two adjacent reads with "
 "nothing between them may still become one load."
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:336
 msgid "A reference to a `BlockAtomic*` type"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:337
 msgid ""
 "Each `load()` is side-effecting asm with a memory clobber. The compiler "
 "keeps every one."
@@ -727,79 +735,79 @@ msgstr ""
 msgid "Shared memory vs. other approaches"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:415
 msgid "Approach"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:415
 msgid "Latency"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:415
 msgid "Capacity"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:415
 msgid "Programmer effort"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:415
 msgid "Global memory (naive)"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:415
 msgid "~500 cycles"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:415
 msgid "GBs"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:415
 msgid "None"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:415
 msgid "L1/L2 cache (implicit)"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:415
 msgid "~30–100 cycles"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:415
 msgid "128 KB–40 MB"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:415
 msgid "**Shared memory (explicit)**"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:419
 msgid "**~5 cycles**"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:419
 msgid "**48–228 KB per SM**"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:419
 msgid "**Tiling, sync, bank awareness**"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:419
 msgid "Registers"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:419
 msgid "~1 cycle"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:419
 msgid "64K × 32-bit per SM"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:305
+#: ../../../advanced/shared-memory-and-synchronization.md:419
 msgid "Compiler-managed"
 msgstr ""
 
@@ -846,9 +854,9 @@ msgstr ""
 
 #: ../../../advanced/shared-memory-and-synchronization.md:450
 msgid ""
-"[CUDA Programming Guide — Shared Memory Bank Conflicts](https://docs.nvidia."
-"com/cuda/cuda-programming-guide/#shared-memory-5-x) for a detailed treatment "
-"of bank conflict rules and padding strategies."
+"[CUDA Programming Guide — Shared Memory Bank Conflicts](https://"
+"docs.nvidia.com/cuda/cuda-programming-guide/#shared-memory-5-x) for a "
+"detailed treatment of bank conflict rules and padding strategies."
 msgstr ""
 
 #: ../../../advanced/shared-memory-and-synchronization.md:456
@@ -861,63 +869,63 @@ msgid ""
 "MLP pipeline:"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:449
+#: ../../../advanced/shared-memory-and-synchronization.md:461
 msgid "Version"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:449
+#: ../../../advanced/shared-memory-and-synchronization.md:461
 msgid "Global loads per thread (64×64)"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:449
+#: ../../../advanced/shared-memory-and-synchronization.md:461
 msgid "Shared loads per thread"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:449
+#: ../../../advanced/shared-memory-and-synchronization.md:461
 msgid "Speedup"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:449
+#: ../../../advanced/shared-memory-and-synchronization.md:461
 msgid "Naive (`sgemm_naive`)"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:449
+#: ../../../advanced/shared-memory-and-synchronization.md:463
 msgid "128"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:449
+#: ../../../advanced/shared-memory-and-synchronization.md:463
 msgid "0"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:449
+#: ../../../advanced/shared-memory-and-synchronization.md:463
 msgid "1×"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:449
+#: ../../../advanced/shared-memory-and-synchronization.md:463
 msgid "Tiled (16×16 tiles)"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:449
+#: ../../../advanced/shared-memory-and-synchronization.md:463
 msgid "8 (4 iterations × 2 tiles)"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:449
+#: ../../../advanced/shared-memory-and-synchronization.md:463
 msgid "~4–10×"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:449
+#: ../../../advanced/shared-memory-and-synchronization.md:463
 msgid "Tiled + double buffering"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:449
+#: ../../../advanced/shared-memory-and-synchronization.md:463
 msgid "8"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:449
+#: ../../../advanced/shared-memory-and-synchronization.md:463
 msgid "128 (overlapped)"
 msgstr ""
 
-#: ../../../advanced/shared-memory-and-synchronization.md:449
+#: ../../../advanced/shared-memory-and-synchronization.md:463
 msgid "~6–15×"
 msgstr ""
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-16 04:35+0000\n"
+"POT-Creation-Date: 2026-11-16 17:40+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -194,43 +194,43 @@ msgid ""
 "}\n"
 msgstr ""
 
-#: ../../../gpu-programming/kernel-families.md:0
+#: ../../../gpu-programming/kernel-families.md:101
 msgid "Component"
 msgstr ""
 
-#: ../../../gpu-programming/kernel-families.md:0
+#: ../../../gpu-programming/kernel-families.md:101
 msgid "Purpose"
 msgstr ""
 
-#: ../../../gpu-programming/kernel-families.md:0
+#: ../../../gpu-programming/kernel-families.md:101
 msgid "`Id`"
 msgstr ""
 
-#: ../../../gpu-programming/kernel-families.md:0
+#: ../../../gpu-programming/kernel-families.md:103
 msgid "Stable semantic identity for the variant"
 msgstr ""
 
-#: ../../../gpu-programming/kernel-families.md:0
+#: ../../../gpu-programming/kernel-families.md:103
 msgid "`Entry`"
 msgstr ""
 
-#: ../../../gpu-programming/kernel-families.md:0
+#: ../../../gpu-programming/kernel-families.md:104
 msgid "Callable entry or launcher associated with the variant"
 msgstr ""
 
-#: ../../../gpu-programming/kernel-families.md:0
+#: ../../../gpu-programming/kernel-families.md:104
 msgid "`Meta`"
 msgstr ""
 
-#: ../../../gpu-programming/kernel-families.md:0
+#: ../../../gpu-programming/kernel-families.md:105
 msgid "Eligibility and preference metadata"
 msgstr ""
 
-#: ../../../gpu-programming/kernel-families.md:0
+#: ../../../gpu-programming/kernel-families.md:105
 msgid "`N`"
 msgstr ""
 
-#: ../../../gpu-programming/kernel-families.md:0
+#: ../../../gpu-programming/kernel-families.md:106
 msgid "Compile-time number of variants"
 msgstr ""
 
@@ -1111,8 +1111,8 @@ msgid ""
 "    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {\n"
 "        write!(\n"
 "            formatter,\n"
-"            \"{:?} requires len >= {} and len divisible by {}, but len is "
-"{}\",\n"
+"            \"{:?} requires len >= {} and len divisible by {}, but len is {}"
+"\",\n"
 "            self.variant,\n"
 "            self.required_min_len,\n"
 "            self.required_multiple,\n"
@@ -1399,75 +1399,75 @@ msgstr ""
 msgid "The principal variants are:"
 msgstr ""
 
-#: ../../../gpu-programming/kernel-families.md:0
+#: ../../../gpu-programming/kernel-families.md:810
 msgid "Error"
 msgstr ""
 
-#: ../../../gpu-programming/kernel-families.md:0
+#: ../../../gpu-programming/kernel-families.md:810
 msgid "Meaning"
 msgstr ""
 
-#: ../../../gpu-programming/kernel-families.md:0
+#: ../../../gpu-programming/kernel-families.md:810
 msgid "`UnknownForcedVariant`"
 msgstr ""
 
-#: ../../../gpu-programming/kernel-families.md:0
+#: ../../../gpu-programming/kernel-families.md:812
 msgid "A forced ID is not a family member"
 msgstr ""
 
-#: ../../../gpu-programming/kernel-families.md:0
+#: ../../../gpu-programming/kernel-families.md:812
 msgid "`IneligibleForcedVariant`"
 msgstr ""
 
-#: ../../../gpu-programming/kernel-families.md:0
+#: ../../../gpu-programming/kernel-families.md:813
 msgid "A forced family member cannot handle the problem"
 msgstr ""
 
-#: ../../../gpu-programming/kernel-families.md:0
+#: ../../../gpu-programming/kernel-families.md:813
 msgid "`NoEligibleVariants`"
 msgstr ""
 
-#: ../../../gpu-programming/kernel-families.md:0
+#: ../../../gpu-programming/kernel-families.md:814
 msgid "Every family member failed validation"
 msgstr ""
 
-#: ../../../gpu-programming/kernel-families.md:0
+#: ../../../gpu-programming/kernel-families.md:814
 msgid "`SelectorFailed`"
 msgstr ""
 
-#: ../../../gpu-programming/kernel-families.md:0
+#: ../../../gpu-programming/kernel-families.md:815
 msgid "The selector returned its own policy error"
 msgstr ""
 
-#: ../../../gpu-programming/kernel-families.md:0
+#: ../../../gpu-programming/kernel-families.md:815
 msgid "`SelectorReturnedUnknownVariant`"
 msgstr ""
 
-#: ../../../gpu-programming/kernel-families.md:0
+#: ../../../gpu-programming/kernel-families.md:816
 msgid "The selector returned an ID outside the family"
 msgstr ""
 
-#: ../../../gpu-programming/kernel-families.md:0
+#: ../../../gpu-programming/kernel-families.md:816
 msgid "`SelectorReturnedIneligibleVariant`"
 msgstr ""
 
-#: ../../../gpu-programming/kernel-families.md:0
+#: ../../../gpu-programming/kernel-families.md:817
 msgid "The selector returned a family member that was not eligible"
 msgstr ""
 
-#: ../../../gpu-programming/kernel-families.md:0
+#: ../../../gpu-programming/kernel-families.md:817
 msgid "`CacheLookupFailed`"
 msgstr ""
 
-#: ../../../gpu-programming/kernel-families.md:0
+#: ../../../gpu-programming/kernel-families.md:818
 msgid "Cache lookup returned an error"
 msgstr ""
 
-#: ../../../gpu-programming/kernel-families.md:0
+#: ../../../gpu-programming/kernel-families.md:818
 msgid "`CacheStoreFailed`"
 msgstr ""
 
-#: ../../../gpu-programming/kernel-families.md:0
+#: ../../../gpu-programming/kernel-families.md:819
 msgid "Cache storage returned an error"
 msgstr ""
 
@@ -1788,7 +1788,7 @@ msgstr ""
 #: ../../../gpu-programming/kernel-families.md:995
 msgid ""
 "[`gemm_sol_final`](https://github.com/NVIDIA/cuda-rust/tree/main/cuda-oxide/"
-"crates/rustc-codegen-cuda/examples/gemm_sol_final)"
+"examples/gemm_sol_final)"
 msgstr ""
 
 #: ../../../gpu-programming/kernel-families.md:996

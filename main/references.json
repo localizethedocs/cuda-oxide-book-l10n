@@ -47,9 +47,9 @@
     "branch" : "main",
     "commit" : 
     {
-      "date" : "2026-10-19 20:16:03 +0530",
-      "hash" : "717432490ccf85f0a9166401be6de362d6c622b2",
-      "title" : "feat(cuda-oxide): carry inline intent through the device pipeline (#1511)"
+      "date" : "2026-11-13 17:04:39 -0800",
+      "hash" : "348895e421a92d13a2c3a843ccb20ed1fb8b7f8b",
+      "title" : "fix(cuda-async): preserve device state on duplicate registration (#1754)"
     }
   },
   "type" : "branch",

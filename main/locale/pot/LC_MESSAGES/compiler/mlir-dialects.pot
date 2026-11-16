@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-19 15:08+0000\n"
+"POT-Creation-Date: 2026-11-16 17:40+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -52,51 +52,51 @@ msgstr ""
 msgid "The Three Dialects at a Glance"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:23
 msgid "Dialect"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:23
 msgid "Purpose"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:23
 msgid "Level"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:23
 msgid "**dialect-mir**"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:25
 msgid "Models Rust MIR semantics"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:25
 msgid "Highest -- Rust types, tuples, enums, slices, checked arithmetic"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:25
 msgid "**LLVM dialect**"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:26
 msgid "Models LLVM IR"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:26
 msgid "Middle -- flat types, GEP, PHI-ready control flow"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:26
 msgid "**dialect-nvvm**"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:27
 msgid "Models NVIDIA GPU intrinsics"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:27
 msgid "Orthogonal -- thread indexing, warps, TMA, WGMMA, tcgen05"
 msgstr ""
 
@@ -152,119 +152,120 @@ msgstr ""
 msgid "The dialect defines nine custom types that mirror Rust's own:"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:60 ../../../compiler/mlir-dialects.md:179
 msgid "Type"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:60 ../../../compiler/mlir-dialects.md:179
 msgid "Example"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:60 ../../../compiler/mlir-dialects.md:179
+#: ../../../compiler/mlir-dialects.md:317
 msgid "Description"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:60
 msgid "`mir.tuple`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:62
 msgid "`mir.tuple<i32, f32, i64>`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:62
 msgid "Heterogeneous tuples"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:62
 msgid "`mir.ptr`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:63
 msgid "`mir.ptr<f32, mutable, addrspace: 1>`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:63
 msgid "Pointers with GPU address space"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:63
 msgid "`mir.array`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:64
 msgid "`mir.array<f32, 256>`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:64 ../../../compiler/mlir-dialects.md:185
 msgid "Fixed-size arrays"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:64
 msgid "`mir.struct`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:65
 msgid "`mir.struct<\"Point\", [f32, f32]>`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:65
 msgid "Named structs with layout info"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:65
 msgid "`mir.union`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:66
 msgid "`mir.union<\"Repr\", [a, b], [i32, f32], 4, 4>`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:66
 msgid "Rust unions -- every field is a view of the same bytes"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:66
 msgid "`mir.slice`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:67
 msgid "`mir.slice<f32, addrspace: 1>`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:67
 msgid "Fat pointers (ptr + length)"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:67
 msgid "`mir.disjoint_slice`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:68
 msgid "`mir.disjoint_slice<f32>`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:68
 msgid "Bounds-checked slice carrying a typed index space"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:68
 msgid "`mir.enum`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:69
 msgid "`mir.enum<\"Option_i32\", [(\"None\", []), (\"Some\", [i32])]>`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:69
 msgid "Rust enums with discriminant and variant payloads"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:69 ../../../compiler/mlir-dialects.md:70
 msgid "`mir.fp16`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:70
 msgid "IEEE 754 binary16, Rust's `f16`"
 msgstr ""
 
@@ -274,59 +275,71 @@ msgid ""
 "the GPU memory hierarchy:"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:75
 msgid "Address Space"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:75
 msgid "Meaning"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:75
 msgid "0"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:75
 msgid "Generic (resolved at runtime)"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:75 ../../../compiler/mlir-dialects.md:91
+#: ../../../compiler/mlir-dialects.md:99 ../../../compiler/mlir-dialects.md:101
+#: ../../../compiler/mlir-dialects.md:102
+#: ../../../compiler/mlir-dialects.md:210
+#: ../../../compiler/mlir-dialects.md:213
+#: ../../../compiler/mlir-dialects.md:319
+#: ../../../compiler/mlir-dialects.md:323
 msgid "1"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:75
 msgid "Global (device DRAM)"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:75 ../../../compiler/mlir-dialects.md:93
+#: ../../../compiler/mlir-dialects.md:212
 msgid "3"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:75
 msgid "Shared (per-block SRAM)"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:75 ../../../compiler/mlir-dialects.md:98
+#: ../../../compiler/mlir-dialects.md:205
+#: ../../../compiler/mlir-dialects.md:211
+#: ../../../compiler/mlir-dialects.md:214
 msgid "4"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:75
 msgid "Constant (read-only cache)"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:75 ../../../compiler/mlir-dialects.md:206
+#: ../../../compiler/mlir-dialects.md:208
+#: ../../../compiler/mlir-dialects.md:320
 msgid "5"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:75
 msgid "Local (per-thread stack, spills to DRAM)"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:75 ../../../compiler/mlir-dialects.md:204
 msgid "6"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:75
 msgid "Tensor memory (Blackwell TMEM)"
 msgstr ""
 
@@ -336,149 +349,155 @@ msgstr ""
 
 #: ../../../compiler/mlir-dialects.md:86
 msgid ""
-"`dialect-mir` defines 62 operations across 12 categories, one per module "
+"`dialect-mir` defines 63 operations across 12 categories, one per module "
 "under `cuda-oxide/crates/dialect-mir/src/ops/`:"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:89 ../../../compiler/mlir-dialects.md:200
 msgid "Category"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:89 ../../../compiler/mlir-dialects.md:200
 msgid "Examples"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:89 ../../../compiler/mlir-dialects.md:200
 msgid "Count"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:89
 msgid "Function"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:89
 msgid "`mir.func`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:91 ../../../compiler/mlir-dialects.md:203
 msgid "Control flow"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:91
 msgid ""
 "`mir.goto`, `mir.cond_br`, `mir.return`, `mir.assert`, `mir.unreachable`, "
-"`mir.unroll_hint`"
+"`mir.unroll_hint`, `mir.nounroll_hint`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
-msgid "Constants"
-msgstr ""
-
-#: ../../../compiler/mlir-dialects.md:0
-msgid "`mir.constant`, `mir.float_constant`, `mir.undef`"
-msgstr ""
-
-#: ../../../compiler/mlir-dialects.md:0
-msgid "Memory"
-msgstr ""
-
-#: ../../../compiler/mlir-dialects.md:0
-msgid ""
-"`mir.alloca`, `mir.load`, `mir.store`, `mir.assign`, `mir.ref`, `mir."
-"ptr_offset`, `mir.memcpy`, `mir.memmove`, `mir.shared_alloc`, `mir."
-"global_alloc`, `mir.extern_shared`"
-msgstr ""
-
-#: ../../../compiler/mlir-dialects.md:0
-msgid "11"
-msgstr ""
-
-#: ../../../compiler/mlir-dialects.md:0
-msgid "Arithmetic"
-msgstr ""
-
-#: ../../../compiler/mlir-dialects.md:0
-msgid ""
-"`mir.add`, `mir.sub`, `mir.mul`, `mir.div`, `mir.rem`, `mir.checked_add`, "
-"`mir.checked_sub`, `mir.checked_mul`, `mir.neg`, `mir.not`, `mir.shr`, `mir."
-"shl`, `mir.bitand`, `mir.bitor`, `mir.bitxor`"
-msgstr ""
-
-#: ../../../compiler/mlir-dialects.md:0
-msgid "15"
-msgstr ""
-
-#: ../../../compiler/mlir-dialects.md:0
-msgid "Comparison"
-msgstr ""
-
-#: ../../../compiler/mlir-dialects.md:0
-msgid "`mir.eq`, `mir.ne`, `mir.lt`, `mir.le`, `mir.gt`, `mir.ge`, `mir.cmp`"
-msgstr ""
-
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:92 ../../../compiler/mlir-dialects.md:96
 msgid "7"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:92 ../../../compiler/mlir-dialects.md:210
+msgid "Constants"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:92
+msgid "`mir.constant`, `mir.float_constant`, `mir.undef`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:93 ../../../compiler/mlir-dialects.md:204
+msgid "Memory"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:93
+msgid ""
+"`mir.alloca`, `mir.load`, `mir.store`, `mir.assign`, `mir.ref`, "
+"`mir.ptr_offset`, `mir.memcpy`, `mir.memmove`, `mir.shared_alloc`, "
+"`mir.global_alloc`, `mir.extern_shared`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:94 ../../../compiler/mlir-dialects.md:342
+msgid "11"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:94 ../../../compiler/mlir-dialects.md:200
+msgid "Arithmetic"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:94
+msgid ""
+"`mir.add`, `mir.sub`, `mir.mul`, `mir.div`, `mir.rem`, `mir.checked_add`, "
+"`mir.checked_sub`, `mir.checked_mul`, `mir.neg`, `mir.not`, `mir.shr`, "
+"`mir.shl`, `mir.bitand`, `mir.bitor`, `mir.bitxor`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:95
+msgid "15"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:95 ../../../compiler/mlir-dialects.md:206
+msgid "Comparison"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:95
+msgid "`mir.eq`, `mir.ne`, `mir.lt`, `mir.le`, `mir.gt`, `mir.ge`, `mir.cmp`"
+msgstr ""
+
+#: ../../../compiler/mlir-dialects.md:96 ../../../compiler/mlir-dialects.md:207
 msgid "Aggregate"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:96
 msgid ""
-"`mir.extract_field`, `mir.insert_field`, `mir.construct_struct`, `mir."
-"construct_tuple`, `mir.construct_array`, `mir.construct_slice`, `mir."
-"construct_disjoint_slice`, `mir.extract_array_element`, `mir.field_addr`, "
-"`mir.array_element_addr`"
+"`mir.extract_field`, `mir.insert_field`, `mir.construct_struct`, "
+"`mir.construct_tuple`, `mir.construct_array`, `mir.construct_slice`, "
+"`mir.construct_disjoint_slice`, `mir.extract_array_element`, "
+"`mir.field_addr`, `mir.array_element_addr`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:97 ../../../compiler/mlir-dialects.md:343
 msgid "10"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:97
 msgid "Enum"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:97
 msgid ""
-"`mir.get_discriminant`, `mir.set_discriminant`, `mir.construct_enum`, `mir."
-"enum_payload`"
+"`mir.get_discriminant`, `mir.set_discriminant`, `mir.construct_enum`, "
+"`mir.enum_payload`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:98 ../../../compiler/mlir-dialects.md:202
 msgid "Cast"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:98
 msgid "`mir.cast`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:99
 msgid "Storage"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:99
 msgid "`mir.storage_live`, `mir.storage_dead`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:100
+#: ../../../compiler/mlir-dialects.md:207
+#: ../../../compiler/mlir-dialects.md:209
+#: ../../../compiler/mlir-dialects.md:321
+#: ../../../compiler/mlir-dialects.md:322
+#: ../../../compiler/mlir-dialects.md:324
 msgid "2"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:100
+#: ../../../compiler/mlir-dialects.md:208
 msgid "Call"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:100
 msgid "`mir.call`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:101
 msgid "Debug"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:101
 msgid "`mir.dbg_value`"
 msgstr ""
 
@@ -602,95 +621,95 @@ msgid ""
 "that pliron-llvm does not ship."
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:179
 msgid "Integers"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:179
 msgid "`i1`, `i8`, `i16`, `i32`, `i64`, `i128`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:181
 msgid "Pliron built-in, used directly"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:181
 msgid "Floats"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:181
 msgid "`half`, `float`, `double`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:182
 msgid "Pliron built-in (`FP16Type`, `FP32Type`, `FP64Type`)"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:182
 msgid "`llvm.ptr`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:183
 msgid "`ptr addrspace(1)`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:183
 msgid "Opaque pointers with optional address space"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:183
 msgid "`llvm.struct`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:184
 msgid "`{ i32, float }` or `%MyStruct`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:184
 msgid "Named or anonymous, may be opaque"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:184
 msgid "`llvm.array`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:185
 msgid "`[256 x float]`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:185
 msgid "`llvm.vector`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:186
 msgid "`<4 x float>`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:186
 msgid "SIMD vectors"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:186
 msgid "`llvm.func`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:187
 msgid "`(i32, ptr) -> void`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:187
 msgid "Function signatures"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:187
 msgid "`llvm.void`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:188
 msgid "`void`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:188
 msgid "The unit type"
 msgstr ""
 
@@ -707,95 +726,96 @@ msgstr ""
 msgid "The pinned `pliron-llvm` 0.20.0 release defines 69 operations:"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:200
 msgid ""
 "`add`, `sub`, `mul`, `fadd`, `fsub`, `fmul`, `fdiv`, `frem`, `fneg`, ..."
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:202
 msgid "19"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:202
 msgid ""
 "`zext`, `sext`, `trunc`, `fpext`, `fptrunc`, `sitofp`, `uitofp`, `fptosi`, "
 "`fptoui`, `ptrtoint`, `inttoptr`, `addrspacecast`, `bitcast`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:203
 msgid "13"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:203
 msgid "`br`, `cond_br`, `switch`, `return`, `unreachable`, `indirectbr`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:204
 msgid "`load`, `store`, `alloca`, `gep`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:205
 msgid "Atomic"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:205
 msgid "`atomic_load`, `atomic_store`, `atomicrmw`, `cmpxchg`, `fence`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:206
 msgid "`icmp`, `fcmp`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:207
 msgid ""
 "`extract_value`, `insert_value`, `extract_element`, `insert_element`, "
 "`shuffle_vector`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:208
 msgid "`call`, `call_intrinsic`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:209
 msgid "Inline asm"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:209
 msgid "`inline_asm`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:210
 msgid "`constant`, `zero`, `undef`, `poison`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:211
 msgid "Symbol"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:211
 msgid "`func`, `global`, `addressof`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:212
 msgid "Select"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:212
 msgid "`select`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:213
 msgid "Other"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:213
 msgid "`freeze`, `va_arg`, `blockaddress`, `blocktag`"
 msgstr ""
 
 #: ../../../compiler/mlir-dialects.md:216
 msgid ""
-"`llvm-export` adds one operation of its own on top of those, `llvm."
-"dbg_value`, alongside the address-space and fp16 helpers mentioned above."
+"`llvm-export` adds one operation of its own on top of those, "
+"`llvm.dbg_value`, alongside the address-space and fp16 helpers mentioned "
+"above."
 msgstr ""
 
 #: ../../../compiler/mlir-dialects.md:219
@@ -926,11 +946,11 @@ msgstr ""
 
 #: ../../../compiler/mlir-dialects.md:306
 msgid ""
-"At catalog SHA-256 `31b52388` (the stamp in every `ops/generated/` file "
-"header), the dialect holds 580 operations across 42 modules, and they come "
+"At catalog SHA-256 `5e7752e6` (the stamp in every `ops/generated/` file "
+"header), the dialect holds 589 operations across 42 modules, and they come "
 "from two different places. The split is the first thing to know about it, "
 "because it decides where -- and whether -- you would add one. If the header "
-"stamp no longer starts with `31b52388`, the counts on this page predate the "
+"stamp no longer starts with `5e7752e6`, the counts on this page predate the "
 "catalog you are reading."
 msgstr ""
 
@@ -938,77 +958,78 @@ msgstr ""
 msgid ""
 "**Hand-written**, directly under `cuda-oxide/crates/dialect-nvvm/src/ops/`. "
 "These are the ops with bespoke verification or lowering that the intrinsic "
-"catalog does not describe. There are seven modules and 26 operations:"
+"catalog does not describe. There are seven modules and 29 operations:"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:317
 msgid "Module"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:317
+#: ../../../compiler/mlir-dialects.md:333
 msgid "Ops"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:317
 msgid "`asm`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:319
 msgid "`inline_ptx`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:319
 msgid "`atomic`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:320
 msgid "Atomic load/store/RMW/cmpxchg/fence"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:320
 msgid "`cluster`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:321
 msgid "Cluster index and cluster-count registers"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:321
 msgid "`debug`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:322
 msgid "`assertfail`, `vprintf`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:322
 msgid "`grid`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:323
 msgid "Cooperative `grid_sync`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:323
 msgid "`memory`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
-msgid "Generic-to-shared address conversion with a byte offset"
+#: ../../../compiler/mlir-dialects.md:324
+msgid "Generic-to-shared address conversion and global stores"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:324
 msgid "`wgmma`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:325
 msgid ""
-"Warpgroup MMA descriptors; bf16/f16 at m64n64k16, bf16 at m64n128k16, tf32 "
-"at m64n64k8"
+"Warpgroup MMA descriptors; bf16/f16 at m64n64k16, bf16/f16 at m64n128k16, "
+"tf32 at m64n64k8"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
-msgid "14"
+#: ../../../compiler/mlir-dialects.md:325
+msgid "16"
 msgstr ""
 
 #: ../../../compiler/mlir-dialects.md:327
@@ -1016,145 +1037,145 @@ msgid ""
 "**Generated**, under `ops/generated/`, from `intrinsics/catalog.json` by "
 "`cuda-intrinsics-gen`. Every file there opens with `// @generated ... DO NOT "
 "EDIT.`, and editing one by hand is undone by the next generator run. This is "
-"the large majority -- 35 modules and 554 operations, resolved from 1033 "
+"the large majority -- 35 modules and 562 operations, resolved from 1058 "
 "catalog entries, since several intrinsics can share one structural op:"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:333
 msgid "Area"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:333
 msgid "Modules"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:333
 msgid "Tensor Core Gen 5 + TMEM"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:333
 msgid "`tcgen05`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:335
 msgid "210"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:335
 msgid "Tensor Memory Accelerator"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:335
 msgid "`tma`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
-msgid "111"
+#: ../../../compiler/mlir-dialects.md:336
+msgid "116"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:336
 msgid "Special registers"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:336
 msgid "`sreg`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:337
 msgid "44"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:337
 msgid "Packed (SIMD-in-register)"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:337
 msgid "`packed_alu`, `packed_conversion`, `packed_atomic`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:338
 msgid "55"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:338
 msgid "Async copy and barriers"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:338
 msgid "`cp_async`, `mbarrier_extended`, `mbarrier_basic`, `sync`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
-msgid "35"
+#: ../../../compiler/mlir-dialects.md:339
+msgid "38"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:339
 msgid "Warp-level"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:339
 msgid ""
 "`warp_shuffle`, `redux`, `vote`, `warp_match`, `warp_barrier`, "
 "`active_mask`, `elect`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:340
 msgid "39"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:340
 msgid "Matrix fragment movement"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:340
 msgid ""
 "`ldmatrix`, `register_mma`, `stmatrix`, `wgmma_control`, `movmatrix`, "
 "`sparse_mma`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:341
 msgid "22"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:341
 msgid "Execution and debug control"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:341
 msgid "`execution_control`, `debug_control`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:342
 msgid "Cluster"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:342
 msgid "`clc`, `cluster_barrier`, `cluster_memory`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:343
 msgid "Scalar math"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:343
 msgid ""
 "`dotprod`, `scalar_arithmetic`, `scalar_conversion`, `scalar_math`, "
 "`extended_minmax`, `prmt`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:344
 msgid "9"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:344
 msgid "Integer min/max (DPX)"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:344
 msgid "`integer_minmax`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:345
 msgid "8"
 msgstr ""
 
@@ -1185,63 +1206,63 @@ msgstr ""
 msgid "Each NVVM operation maps through three levels of naming:"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:365
 msgid "Pliron operation"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:365
 msgid "LLVM intrinsic"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:365
 msgid "PTX instruction"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:365
 msgid "`ReadPtxSregTidXOp`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:367
 msgid "`llvm.nvvm.read.ptx.sreg.tid.x`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:367
 msgid "`mov.u32 %r1, %tid.x`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:367
 msgid "`Barrier0Op`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:368
 msgid "`llvm.nvvm.barrier0`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:368
 msgid "`bar.sync 0`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:368
 msgid "`ShflSyncBflyI32Op`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:369
 msgid "`llvm.nvvm.shfl.sync.bfly.i32`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:369
 msgid "`shfl.sync.bfly.b32`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:369
 msgid "`CpAsyncBulkTensorG2sTile2dOp`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:370
 msgid "`llvm.nvvm.cp.async.bulk.tensor.2d.tile.g2s.im2col.*`"
 msgstr ""
 
-#: ../../../compiler/mlir-dialects.md:0
+#: ../../../compiler/mlir-dialects.md:370
 msgid "`cp.async.bulk.tensor.2d.tile.g2s ...`"
 msgstr ""
 
@@ -1251,8 +1272,9 @@ msgid ""
 "what `llvm-export` emits (after the underscore-to-dot transformation). The "
 "third is what `llc` produces. You never have to write any of these by hand: "
 "`mir-importer` emits the operation when it translates a call to a `cuda-"
-"device` intrinsic such as `thread::threadIdx_x()` or `warp::"
-"shuffle_xor_sync()`, and the later stages derive the other two forms from it."
+"device` intrinsic such as `thread::threadIdx_x()` or "
+"`warp::shuffle_xor_sync()`, and the later stages derive the other two forms "
+"from it."
 msgstr ""
 
 #: ../../../compiler/mlir-dialects.md:380
@@ -1325,8 +1347,8 @@ msgstr ""
 #: ../../../compiler/mlir-dialects.md:428
 msgid ""
 "Rust source:   let tid = thread::threadIdx_x();\n"
-"                ↓  (mir-importer matches \"cuda_device::thread::"
-"threadIdx_x\")\n"
+"                ↓  (mir-importer matches "
+"\"cuda_device::thread::threadIdx_x\")\n"
 "dialect-nvvm:  %v2 = nvvm.read_ptx_sreg_tid_x : i32\n"
 "                ↓  (mir-lower, then llvm-export)\n"
 "LLVM IR:       %v2 = call i32 @llvm.nvvm.read.ptx.sreg.tid.x() #0\n"
