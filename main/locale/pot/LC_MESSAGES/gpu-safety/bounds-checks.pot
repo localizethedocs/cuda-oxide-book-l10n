@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-16 04:35+0000\n"
+"POT-Creation-Date: 2026-11-23 19:38+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -23,82 +23,87 @@ msgstr ""
 
 #: ../../../gpu-safety/bounds-checks.md:3
 msgid ""
-"Every `a[i]` in a kernel hides a safety check. The compiler turns it into "
-"\"is `i` inside the slice? If not, stop the kernel\" -- a compare and a "
-"branch, on every access, in every thread. On a CPU you rarely notice. In a "
-"GPU hot loop you do: the naive GEMM in the `gemm` example spends most of its "
-"inner loop on two such checks per multiply-add and reaches about 2,940 "
-"GFLOPS on an RTX 5090. The same kernel with the checks removed runs at 7,160 "
-"GFLOPS."
+"Every `a[i]` in Rust compiles to a bounds comparison and a conditional trap "
+"branch. On a CPU branch predictor you rarely notice; inside a GPU inner "
+"loop, two extra checks per multiply-add cut naive `1024^3` SGEMM on RTX 5090 "
+"from **7,160 GFLOPS** down to **2,940 GFLOPS**."
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:11
+#: ../../../gpu-safety/bounds-checks.md:5
 msgid ""
-"This chapter is about closing that gap without giving up safety. It builds "
-"on [the safety model](the-safety-model.md): you already know that "
-"`DisjointSlice` makes parallel writes race-free and that a checked "
-"`PreparedLaunch` proves launch geometry on the host. The same idea -- check "
-"a fact once, in the right place, and carry the proof in a type -- extends to "
-"reads and to buffer sizes."
+"`cuda-oxide` gives you **four ways** to remove per-element bounds checks, "
+"ordered from simplest safe APIs to the unverified escape hatch:"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:18
-msgid "Three tools, from safest to bluntest:"
-msgstr ""
-
-#: ../../../gpu-safety/bounds-checks.md:0
+#: ../../../gpu-safety/bounds-checks.md:7
 msgid "Tool"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:0
-msgid "What it does"
+#: ../../../gpu-safety/bounds-checks.md:7
+msgid "How It Removes Hot-Loop Checks"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:0
+#: ../../../gpu-safety/bounds-checks.md:7
 msgid "Safety"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:0
-msgid "Read views"
+#: ../../../gpu-safety/bounds-checks.md:7
+msgid "**Read views (`MatrixView32`)**"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:0
-msgid "Check a whole row or column once, then read check-free"
+#: ../../../gpu-safety/bounds-checks.md:9
+msgid "Checks a whole row or column once before the loop"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:0
-msgid "Fully safe"
+#: ../../../gpu-safety/bounds-checks.md:9
+msgid "Safe (pure Rust types)"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:0
-msgid "`requires` on the launch contract"
+#: ../../../gpu-safety/bounds-checks.md:9
+msgid "**`requires = (...)`**"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:0
-msgid "Check buffer sizes once per launch, on the CPU"
+#: ../../../gpu-safety/bounds-checks.md:10
+msgid "Checks buffer sizes once on the CPU before launch"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:0
-msgid "`#[kernel(unchecked_indexing)]`"
+#: ../../../gpu-safety/bounds-checks.md:10
+msgid "Safe (host launch check)"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:0
-msgid "Delete the indexing checks and trust you"
+#: ../../../gpu-safety/bounds-checks.md:10
+msgid "**`#[verify(no_oob_idx(...))]`**"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:0
-msgid "UB if you're wrong"
+#: ../../../gpu-safety/bounds-checks.md:11
+msgid "Proves general global/shared indices in Lean 4"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:28
-msgid "What a bounds check costs"
+#: ../../../gpu-safety/bounds-checks.md:11
+msgid "Safe, preview (check erased)"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:30
-msgid "A dot product between a row of A and a column of B looks harmless:"
+#: ../../../gpu-safety/bounds-checks.md:11
+msgid "**`#[kernel(unchecked_indexing)]`**"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:32
+#: ../../../gpu-safety/bounds-checks.md:12
+msgid "Deletes slice/shared bounds checks without proof"
+msgstr ""
+
+#: ../../../gpu-safety/bounds-checks.md:12
+msgid "Unsafe contract (UB if OOB)"
+msgstr ""
+
+#: ../../../gpu-safety/bounds-checks.md:16
+msgid "1. Why Per-Access Bounds Checks Hurt GPU Loops"
+msgstr ""
+
+#: ../../../gpu-safety/bounds-checks.md:18
+msgid "Consider a naive matrix-multiply inner loop:"
+msgstr ""
+
+#: ../../../gpu-safety/bounds-checks.md:20
 msgid ""
 "let mut sum = 0.0f32;\n"
 "let mut i = 0;\n"
@@ -108,95 +113,59 @@ msgid ""
 "}\n"
 msgstr ""
 
+#: ../../../gpu-safety/bounds-checks.md:29
+msgid "Each iteration executes three comparisons instead of one:"
+msgstr ""
+
+#: ../../../gpu-safety/bounds-checks.md:31
+msgid ""
+"i < k               loop exit condition             (needed)\n"
+"row * k + i < a.len bounds check + branch to trap   (overhead)\n"
+"i * n + col < b.len bounds check + branch to trap   (overhead)\n"
+msgstr ""
+
+#: ../../../gpu-safety/bounds-checks.md:37
+msgid ""
+"Those extra trap branches also split the loop body across basic blocks and "
+"block loop unrolling. Because `a.len()` is an opaque runtime parameter to "
+"`rustc`, the compiler cannot erase those checks unless you give it a strip "
+"view, a launch precondition, or a `#[verify]` proof."
+msgstr ""
+
 #: ../../../gpu-safety/bounds-checks.md:41
-msgid "Count what each iteration actually executes:"
+msgid "2. Read Views: Check a Whole Row or Column Once"
 msgstr ""
 
 #: ../../../gpu-safety/bounds-checks.md:43
 msgid ""
-"i < k              the loop's own exit test        (necessary)\n"
-"row*k + i < a.len  bounds check, branch to trap    (overhead)\n"
-"load a\n"
-"i*n + col < b.len  bounds check, branch to trap    (overhead)\n"
-"load b\n"
-"fma\n"
+"A row-major matrix of width `stride` stores `(row, col)` at flat index `row "
+"* stride + col`:"
+msgstr ""
+
+#: ../../../gpu-safety/bounds-checks.md:45
+msgid ""
+"3 x 4 matrix (stride = 4):\n"
+"  row 0: [ 0   1   2   3 ]     row(1, 4) covers [4, 5, 6, 7]\n"
+"  row 1: [ 4   5   6   7 ]     col(2, 3) covers [2, 6, 10] (step = 4)\n"
+"  row 2: [ 8   9  10  11 ]\n"
 msgstr ""
 
 #: ../../../gpu-safety/bounds-checks.md:52
 msgid ""
-"Two of the three compares are overhead, and they also split the loop body "
-"into multiple basic blocks, which blocks unrolling. The compiler cannot "
-"remove them on its own: it sees `a.len()` as an opaque number and has no way "
-"to know that `row * k + i` stays below it. *You* know it -- because you "
-"sized the buffers on the host -- but that fact lives in a different program. "
-"The rest of this chapter is about handing that fact to the compiler."
+"`MatrixView32` wraps `&[f32]` with its row stride. Requesting `row(...)` or "
+"`col(...)` performs **one** bounds check for the entire strip, and "
+"`zip_exact` drives both strips with a single loop counter:"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:61
-msgid "Read views: check a whole strip once"
-msgstr ""
-
-#: ../../../gpu-safety/bounds-checks.md:63
+#: ../../../gpu-safety/bounds-checks.md:54
 msgid ""
-"A matrix lives in GPU memory as one long array, row after row. The **row "
-"width** (called `stride` in the API) is how many elements one row occupies. "
-"Element `(row, col)` lives at flat index `row * stride + col`:"
-msgstr ""
-
-#: ../../../gpu-safety/bounds-checks.md:67
-msgid ""
-" 3 x 4 matrix, stride = 4:\n"
+"let a_mat = MatrixView32::new(a, k);\n"
+"let b_mat = MatrixView32::new(b, n);\n"
 "\n"
-"  col:      0   1   2   3\n"
-"  row 0:  [ 0   1   2   3 ]     row(1) covers flat 4, 5, 6, 7\n"
-"  row 1:  [ 4   5   6   7 ]     col(2) covers flat 2, 6, 10\n"
-"  row 2:  [ 8   9  10  11 ]              (a jump of 4 per step)\n"
-msgstr ""
-
-#: ../../../gpu-safety/bounds-checks.md:76
-msgid ""
-"`MatrixView32` wraps a plain `&[f32]` parameter together with its row width. "
-"Asking it for a row or a column performs **one** check -- \"does the whole "
-"strip fit inside the slice?\" -- and returns a view whose reads need no "
-"further checks:"
-msgstr ""
-
-#: ../../../gpu-safety/bounds-checks.md:81
-msgid ""
-"let a_mat = MatrixView32::new(a, k);   // A is m rows, each k wide\n"
-"let b_mat = MatrixView32::new(b, n);   // B is k rows, each n wide\n"
-"\n"
-"if let Some(a_row) = a_mat.row(row, k)      // one check: A's whole row\n"
-"    && let Some(b_col) = b_mat.col(col, k)  // one check: B's whole column\n"
+"if let Some(a_row) = a_mat.row(row, k)\n"
+"    && let Some(b_col) = b_mat.col(col, k)\n"
+"    && let Some(pair) = a_row.zip_exact(b_col)\n"
 "{\n"
-"    // every read through a_row / b_col is now check-free\n"
-"}\n"
-msgstr ""
-
-#: ../../../gpu-safety/bounds-checks.md:92
-msgid ""
-"If a check fails you get `None` and no pointer is ever created. There is no "
-"`unsafe` anywhere: reading cannot race, so any number of threads may hold "
-"overlapping read views."
-msgstr ""
-
-#: ../../../gpu-safety/bounds-checks.md:96
-msgid "Fusing the dot product: `zip_exact`"
-msgstr ""
-
-#: ../../../gpu-safety/bounds-checks.md:98
-msgid ""
-"Iterating one view is already check-free: an iterator's \"is there a next "
-"element?\" test *is* the loop's exit condition, which even a raw pointer "
-"loop needs. But a dot product iterates two views, and zipping two iterators "
-"normally checks both sides every step. `zip_exact` checks **once** that the "
-"row and the column have the same length, then drives both with a single "
-"counter:"
-msgstr ""
-
-#: ../../../gpu-safety/bounds-checks.md:105
-msgid ""
-"if let Some(pair) = a_row.zip_exact(b_col) {\n"
 "    let mut sum = 0.0f32;\n"
 "    for (x, y) in pair {\n"
 "        sum += x * y;\n"
@@ -204,311 +173,207 @@ msgid ""
 "}\n"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:114
-msgid "The loop that comes out the other end is:"
-msgstr ""
-
-#: ../../../gpu-safety/bounds-checks.md:116
-msgid "load a, load b, fma, advance, compare, branch\n"
-msgstr ""
-
-#: ../../../gpu-safety/bounds-checks.md:120
+#: ../../../gpu-safety/bounds-checks.md:69
 msgid ""
-"-- exactly the shape of a hand-written raw-pointer loop. The [`gemm_views`]"
-"(https://github.com/NVIDIA/cuda-rust/tree/main/cuda-oxide/crates/rustc-"
-"codegen-cuda/examples/gemm_views) example proves this literally: it compiles "
-"each safe kernel next to an `unsafe` raw-pointer twin and verifies that the "
-"PTX has the same branch counts, the same memory instructions, no traps in "
-"the loop, and bit-identical results on the GPU. Measured at 1024x1024x1024:"
+"The emitted inner loop (`load a, load b, fma, advance, branch`) has zero "
+"trap branches and matches hand-written `unsafe` pointer code on `1024^3` "
+"SGEMM (`examples/gemm_views`):"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:0
-msgid "Kernel"
+#: ../../../gpu-safety/bounds-checks.md:71
+msgid "Kernel Variant"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:0
-msgid "GFLOPS"
+#: ../../../gpu-safety/bounds-checks.md:71
+msgid "RTX 5090 GFLOPS"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:0
-msgid "Notes"
+#: ../../../gpu-safety/bounds-checks.md:71
+msgid "Bounds Checks in Inner Loop"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:0
-msgid "`gemm` (plain `a[i]`)"
+#: ../../../gpu-safety/bounds-checks.md:71
+msgid "Plain `a[...]` indexing"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:0
+#: ../../../gpu-safety/bounds-checks.md:73
 msgid "2,942"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:0
-msgid "two checks per multiply-add"
+#: ../../../gpu-safety/bounds-checks.md:73
+msgid "2 per FMA"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:0
-msgid "naive views (safe)"
+#: ../../../gpu-safety/bounds-checks.md:73
+msgid "`MatrixView32` (safe)"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:0
+#: ../../../gpu-safety/bounds-checks.md:74
 msgid "7,159"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:0
-msgid "2.4x -- checks paid once"
+#: ../../../gpu-safety/bounds-checks.md:74
+msgid "0 (checked once per thread)"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:0
-msgid "naive raw (`unsafe`)"
+#: ../../../gpu-safety/bounds-checks.md:74
+msgid "Raw pointers (`unsafe`)"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:0
+#: ../../../gpu-safety/bounds-checks.md:75
 msgid "7,161"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:0
-msgid "safety cost: about 0.1%"
+#: ../../../gpu-safety/bounds-checks.md:75
+msgid "0"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:133
-msgid "Views and barriers"
-msgstr ""
-
-#: ../../../gpu-safety/bounds-checks.md:135
+#: ../../../gpu-safety/bounds-checks.md:77
 msgid ""
-"One rule when a kernel uses `sync_threads()`: every thread must reach the "
-"barrier, so a thread whose view check failed must not return early. Fall "
-"back to an empty view instead, and let reads degrade to a fill value:"
+"**Rule with `sync_threads()`**: Never return early before a block barrier if "
+"a strip check fails. Use `.unwrap_or(RowView32::empty())` and "
+"`.get(i).unwrap_or(0.0)` so out-of-range edge threads zero-fill and still "
+"reach `thread::sync_threads()`."
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:139
+#: ../../../gpu-safety/bounds-checks.md:81
+msgid "3. `requires`: Check Buffer Sizes Once on the Host"
+msgstr ""
+
+#: ../../../gpu-safety/bounds-checks.md:83
 msgid ""
-"let a_row = a_mat.row(row, k).unwrap_or(RowView32::empty());\n"
-"// ... later, in the staging loop:\n"
-"tile[idx] = a_row.get(i).unwrap_or(0.0);   // one compare, zero-fill at "
-"edges\n"
+"`#[launch_contract(..., requires = (...))]` states buffer-length relations "
+"right on the kernel:"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:145
-msgid ""
-"`get` costs a single compare -- this is the accessor for edges, not for hot "
-"loops. The tiled kernel in `gemm_views` uses exactly this pattern."
-msgstr ""
-
-#: ../../../gpu-safety/bounds-checks.md:150
-msgid "Writing the result: a tile with a runtime row width"
-msgstr ""
-
-#: ../../../gpu-safety/bounds-checks.md:152
-msgid ""
-"The safe way to *write* is still `DisjointSlice`, as described in [the "
-"safety model](the-safety-model.md). What's new is `tile_2d32_rt`: the 2D "
-"tile whose row width is a runtime value like `n`, for output matrices whose "
-"size isn't known at compile time:"
-msgstr ""
-
-#: ../../../gpu-safety/bounds-checks.md:157
-msgid ""
-"// `c` carries its own row width, bound on the host to this same `n`,\n"
-"// so the call is safe: no per-thread width crosses the call.\n"
-"if let Some(mut cell) = c.tile_2d32_rt(coord) {\n"
-"    let previous = cell.at_const::<0, 0>().read();\n"
-"    cell.at_const::<0, 0>().write(alpha * sum + beta * previous);\n"
-"}\n"
-msgstr ""
-
-#: ../../../gpu-safety/bounds-checks.md:166
-msgid ""
-"Why does the width come from the slice and not from an argument? The tile-"
-"disjointness argument -- \"distinct thread coordinates own non-overlapping "
-"rectangles\" -- silently assumes all threads agree on the row width. Two "
-"threads that disagree describe two different grids over the same memory: "
-"with 1x1 tiles, thread `(1, 0)` with width 5 resolves flat index `1*5 + 0 = "
-"5`, and thread `(0, 5)` with width 100 resolves `0*100 + 5 = 5`. Same "
-"element, two `&mut`, a data race."
-msgstr ""
-
-#: ../../../gpu-safety/bounds-checks.md:174
-msgid ""
-"An earlier design took the width as an `unsafe` per-call argument, but no "
-"call-site obligation can close that hole: safe code can select between two "
-"\"uniform\" widths under a thread-varying condition. So the row width lives "
-"in the slice instead. The host binds it once for the launch through "
-"`cuda_host::RowWidth`, device code cannot choose it, and every thread that "
-"addresses `c` reads the same width by construction. When the width *is* "
-"known at compile time, use `tile_2d32` instead and a mismatch becomes a type "
-"error."
-msgstr ""
-
-#: ../../../gpu-safety/bounds-checks.md:185
-msgid "`requires`: promise the sizes at launch"
-msgstr ""
-
-#: ../../../gpu-safety/bounds-checks.md:187
-msgid ""
-"The views check strips against `a.len()` at runtime because nothing else "
-"guarantees the buffers are big enough. But the host *knows* the sizes -- it "
-"allocated the buffers. The `requires` key on a launch contract writes that "
-"knowledge down, next to the kernel:"
-msgstr ""
-
-#: ../../../gpu-safety/bounds-checks.md:192
+#: ../../../gpu-safety/bounds-checks.md:85
 msgid ""
 "#[kernel(launch_context = lc)]\n"
 "#[launch_bounds(256)]\n"
-"#[launch_contract(domain = 2, coordinates = u32, block = (16, 16, 1),\n"
+"#[launch_contract(\n"
+"    domain = 2,\n"
+"    coordinates = u32,\n"
+"    block = (16, 16, 1),\n"
 "    requires = (k >= 1, a.len() >= m * k, b.len() >= k * n, c.len() >= m * "
-"n))]\n"
-"pub fn sgemm_naive_views(m: u32, n: u32, k: u32, alpha: f32,\n"
+"n),\n"
+")]\n"
+"pub fn sgemm_naive_views(\n"
+"    m: u32, n: u32, k: u32, alpha: f32,\n"
 "    a: &[f32], b: &[f32], beta: f32,\n"
-"    mut c: DisjointSlice<f32, RuntimeRowMajorTiles<1, 1>>) {\n"
+"    mut c: DisjointSlice<f32, RuntimeRowMajorTiles<1, 1>>,\n"
+") { ... }\n"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:202
+#: ../../../gpu-safety/bounds-checks.md:101
 msgid ""
-"The generated launcher evaluates every relation once per launch, on the CPU, "
-"before anything touches the GPU. A launch that breaks a relation doesn't "
-"fault mid-kernel -- it returns an error that names the promise:"
+"**Evaluated once on the CPU** inside `prepare_*` / typed launch using "
+"checked `u64` arithmetic (so `m * k` cannot overflow and falsely pass)."
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:206
+#: ../../../gpu-safety/bounds-checks.md:102
+msgid ""
+"**Clear host error** instead of a mid-kernel GPU trap when a buffer is "
+"undersized:"
+msgstr ""
+
+#: ../../../gpu-safety/bounds-checks.md:103
 msgid ""
 "sgemm_naive_views: size requirement `a.len() >= m * k` violated:\n"
 "left-hand side is 8192, right-hand side is 16384\n"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:211
+#: ../../../gpu-safety/bounds-checks.md:107
 msgid ""
-"Relations are deliberately *not* arbitrary Rust. Each one is a single "
-"comparison built from slice parameters as `name.len()`, unsigned integer "
-"scalar parameters, integer literals, parentheses, and `+ - *`. Two reasons:"
+"**Feeds directly into `#[verify]`**: When paired with "
+"`#[verify(no_oob_idx(...))]`, Lean 4 uses `requires` preconditions to prove "
+"in-kernel indexing safe and erase `mir.assert` checks automatically."
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:215
+#: ../../../gpu-safety/bounds-checks.md:111
 msgid ""
-"Every identifier is validated against the kernel's actual parameter list, so "
-"a typo is a compile error, not a check against the wrong value."
+"4. `#[verify(no_oob_idx(...))]` (preview): Erase General & Shared-Memory "
+"Checks Safely"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:218
+#: ../../../gpu-safety/bounds-checks.md:113
 msgid ""
-"Every `+`, `-`, `*` compiles to checked `u64` arithmetic, so a huge `m * k` "
-"cannot wrap around to a small number and falsely pass."
+"Read views cover contiguous rows, columns, and fixed 2D tiles, while GPU "
+"kernels also index `SharedArray` tiles (`TILE[ty * 16 + i]`), sub-warp bit-"
+"splits (`S_X[tid * 4 + w]`), and multi-stage rings."
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:221
+#: ../../../gpu-safety/bounds-checks.md:115
 msgid ""
-"The `_unchecked` launcher variants skip these checks, exactly as they skip "
-"the geometry checks; upholding the relations becomes part of their `SAFETY` "
-"contract."
+"Adding `#[verify(no_oob_idx(...))]` (preview) proves those index expressions "
+"in Lean 4 at compile time and **deletes every proven `mir.assert` check "
+"before PTX lowering** with zero `unsafe`:"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:227
-msgid "The escape hatch: `unchecked_indexing`"
-msgstr ""
-
-#: ../../../gpu-safety/bounds-checks.md:229
+#: ../../../gpu-safety/bounds-checks.md:117
 msgid ""
-"Sometimes no view fits the access pattern, and you've verified the kernel is "
-"correct. For that case there is a blunt instrument:"
+"On 2D tiled SGEMM (`safe_gemm_views`), Lean 4 erases all 6 global and shared-"
+"memory bounds checks (`~9,390 GFLOPS` on RTX 5090)."
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:232
+#: ../../../gpu-safety/bounds-checks.md:118
+msgid ""
+"On 2-CTA Blackwell GEMM (`safe_gemm_sol_final`), Lean 4 erases all 27 shared-"
+"memory and barrier-array checks (`2,118 TFLOPS` on B200, `100%+` of `--"
+"unchecked-indexing`)."
+msgstr ""
+
+#: ../../../gpu-safety/bounds-checks.md:120
+msgid ""
+"See [Provably Safe Kernels (preview)](verified-kernels.md) for walkthroughs."
+msgstr ""
+
+#: ../../../gpu-safety/bounds-checks.md:124
+msgid "5. The Unverified Escape Hatch: `unchecked_indexing`"
+msgstr ""
+
+#: ../../../gpu-safety/bounds-checks.md:126
+msgid ""
+"When you are prototyping an unverified kernel and accept full "
+"`get_unchecked` responsibility, `#[kernel(unchecked_indexing)]` (or `--"
+"unchecked-indexing` / `CUDA_OXIDE_UNCHECKED_INDEXING=1`) strips slice, "
+"array, and `SharedArray` bounds checks without a proof:"
+msgstr ""
+
+#: ../../../gpu-safety/bounds-checks.md:128
 msgid ""
 "#[kernel(unchecked_indexing)]\n"
 "pub fn hot_loop(a: &[f32], b: &[f32], mut c: DisjointSlice<f32>) {\n"
-"    let idx = thread::index_1d().get();\n"
-"    if let Some(out) = c.get_mut(thread::index_1d()) {\n"
-"        *out = a[idx] + b[idx];   // no check, no trap\n"
+"    let idx = thread::index_1d();\n"
+"    let i = idx.get();\n"
+"    if let Some(out) = c.get_mut(idx) {\n"
+"        *out = a[i] + b[i]; // no check: OOB is undefined behavior\n"
 "    }\n"
 "}\n"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:242
+#: ../../../gpu-safety/bounds-checks.md:139
 msgid ""
-"The flag deletes the check behind every `a[i]` in the kernel. The contract "
-"is `get_unchecked`'s: you promise every index is in bounds, and if you're "
-"wrong the result is undefined behavior -- no trap, possibly silent "
-"corruption of unrelated memory. It doesn't require the `unsafe` keyword, but "
-"treat it as if it did."
+"**Narrow scope**: Removes only `x[i]` bounds checks inside that kernel; "
+"division-by-zero, overflow, and range slicing (`&a[i..j]`) still trap."
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:248
-msgid "There is also a whole-build switch for experiments:"
-msgstr ""
-
-#: ../../../gpu-safety/bounds-checks.md:250
+#: ../../../gpu-safety/bounds-checks.md:140
 msgid ""
-"$ CUDA_OXIDE_UNCHECKED_INDEXING=1 cargo oxide build my_example\n"
-"$ cargo oxide build my_example --unchecked-indexing   # same thing\n"
+"**Treat like `unsafe`**: Validate with `cargo oxide sanitize <target>` "
+"(`compute-sanitizer --tool memcheck`) before enabling it."
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:255
-msgid "Scope, precisely:"
+#: ../../../gpu-safety/bounds-checks.md:144
+msgid "Which Tool Should I Pick?"
 msgstr ""
 
-#: ../../../gpu-safety/bounds-checks.md:257
+#: ../../../gpu-safety/bounds-checks.md:146
 msgid ""
-"Only indexing checks (`a[i]`) are removed. Arithmetic overflow, division by "
-"zero, and every other safety check still traps. Range indexing (`&a[i..j]`) "
-"also still traps."
-msgstr ""
-
-#: ../../../gpu-safety/bounds-checks.md:260
-msgid ""
-"The per-kernel flag covers that kernel's body, including functions inlined "
-"into it. It never leaks: a kernel that calls a flagged kernel's helper "
-"function keeps its own checks."
-msgstr ""
-
-#: ../../../gpu-safety/bounds-checks.md:263
-msgid ""
-"Turn it on only after the checked build passes, ideally under `compute-"
-"sanitizer`. The [`unchecked_indexing`](https://github.com/NVIDIA/cuda-rust/"
-"tree/main/cuda-oxide/crates/rustc-codegen-cuda/examples/unchecked_indexing) "
-"example shows the PTX with and without the flag."
-msgstr ""
-
-#: ../../../gpu-safety/bounds-checks.md:270
-msgid "Choosing between them"
-msgstr ""
-
-#: ../../../gpu-safety/bounds-checks.md:272
-msgid ""
-"Can a view express the access pattern (rows, columns, tiles, dot products)?\n"
-"├── yes -> use views + a `requires` contract.  Safe, and measurably as\n"
-"│          fast as raw pointers.\n"
-"└── no  -> is the kernel verified correct (sanitizer, tests)?\n"
-"    ├── yes -> #[kernel(unchecked_indexing)], documented like unsafe code.\n"
-"    └── no  -> keep the checks. 2,900 GFLOPS with traps beats\n"
-"               garbage at 7,000.\n"
-msgstr ""
-
-#: ../../../gpu-safety/bounds-checks.md:282
-msgid "Summary"
-msgstr ""
-
-#: ../../../gpu-safety/bounds-checks.md:284
-msgid ""
-"`a[i]` costs a compare and a branch per access, and in hot loops that is the "
-"dominant cost -- 2.4x on naive GEMM."
-msgstr ""
-
-#: ../../../gpu-safety/bounds-checks.md:286
-msgid ""
-"Read views (`MatrixView32::row` / `col`, `zip_exact`) check a whole strip "
-"once and make every read inside it check-free. Fully safe, and the PTX "
-"matches hand-written unsafe code."
-msgstr ""
-
-#: ../../../gpu-safety/bounds-checks.md:289
-msgid ""
-"`requires = (...)` moves buffer-size checks to the host: one typed error per "
-"launch instead of a mid-kernel trap."
-msgstr ""
-
-#: ../../../gpu-safety/bounds-checks.md:291
-msgid ""
-"`#[kernel(unchecked_indexing)]` deletes indexing checks outright. Same "
-"contract as `get_unchecked`; out of bounds is undefined behavior."
+"Need zero bounds-check overhead in a hot loop?\n"
+"├── Row, column, or fixed 1D/2D tile?     -> MatrixView32 / LinearTiles + "
+"`requires` (Safe, pure Rust)\n"
+"├── SharedArray, bit-splits, or custom i? -> "
+"`#[verify(no_oob_idx(...))]`            (Safe, proved in Lean 4)\n"
+"└── Unverified prototype escape hatch?    -> "
+"`#[kernel(unchecked_indexing)]`         (UB if out of bounds)\n"
 msgstr ""

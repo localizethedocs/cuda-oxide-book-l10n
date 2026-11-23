@@ -1,0 +1,135 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025-2026, NVIDIA Corporation
+# This file is distributed under the same license as the cuda-oxide package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: cuda-oxide \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-23 19:38+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../../getting-started/windows.md:1
+msgid "Windows Setup"
+msgstr ""
+
+#: ../../../getting-started/windows.md:3
+msgid ""
+"`cuda-oxide` supports `x86_64-pc-windows-msvc` on Windows 10 22H2 and "
+"Windows 11. For Linux, see [Installation](installation.md)."
+msgstr ""
+
+#: ../../../getting-started/windows.md:6
+msgid "Requirements"
+msgstr ""
+
+#: ../../../getting-started/windows.md:8
+msgid "NVIDIA GPU and a driver compatible with the installed CUDA Toolkit."
+msgstr ""
+
+#: ../../../getting-started/windows.md:9
+msgid ""
+"[CUDA Toolkit 13.0+](https://docs.nvidia.com/cuda/cuda-installation-guide-"
+"microsoft-windows/) (including `nvcc`, `libNVVM`, `nvJitLink`, and `cuRAND` "
+"headers)."
+msgstr ""
+
+#: ../../../getting-started/windows.md:10
+msgid ""
+"Visual Studio 2022 or newer with MSVC x64 Build Tools, Windows SDK, and C++ "
+"Clang tools (`libclang.dll` and `lld-link.exe`)."
+msgstr ""
+
+#: ../../../getting-started/windows.md:11
+msgid ""
+"Rust 1.99.1 (`x86_64-pc-windows-msvc`) with `rust-src`, `rustc-dev`, `rust-"
+"analyzer`, `rustfmt`, `clippy`, and `llvm-tools`."
+msgstr ""
+
+#: ../../../getting-started/windows.md:12
+msgid "`libffi:x64-windows` installed via `vcpkg`."
+msgstr ""
+
+#: ../../../getting-started/windows.md:14
+msgid "Install the pinned Rust toolchain and components:"
+msgstr ""
+
+#: ../../../getting-started/windows.md:16
+msgid ""
+"rustup toolchain install 1.99.1\n"
+"rustup component add rust-src rustc-dev rust-analyzer rustfmt clippy llvm-"
+"tools --toolchain 1.99.1\n"
+msgstr ""
+
+#: ../../../getting-started/windows.md:21
+msgid "CUDA and LLVM Environment"
+msgstr ""
+
+#: ../../../getting-started/windows.md:23
+msgid ""
+"Point `CUDA_PATH` / `CUDA_TOOLKIT_PATH` at your installed CUDA Toolkit and "
+"`LIBCLANG_PATH` at your LLVM/Clang `bin` directory:"
+msgstr ""
+
+#: ../../../getting-started/windows.md:25
+msgid ""
+"$env:CUDA_PATH = \"C:\\Program Files\\NVIDIA GPU Computing "
+"Toolkit\\CUDA\\v13.2\"\n"
+"$env:CUDA_TOOLKIT_PATH = $env:CUDA_PATH\n"
+"$env:LIBCLANG_PATH = \"C:\\Program Files\\LLVM\\bin\"\n"
+"$env:PATH = \"$env:CUDA_PATH\\bin\\x64;$env:CUDA_PATH\\bin;"
+"$env:LIBCLANG_PATH;$env:PATH\"\n"
+msgstr ""
+
+#: ../../../getting-started/windows.md:32
+msgid "Build from Source"
+msgstr ""
+
+#: ../../../getting-started/windows.md:34
+msgid ""
+"Open a Developer PowerShell for VS 2022 (x64) and install `libffi:x64-"
+"windows` with `vcpkg`:"
+msgstr ""
+
+#: ../../../getting-started/windows.md:36
+msgid ""
+"$env:VCPKG_ROOT = \"C:\\vcpkg\"\n"
+"& \"$env:VCPKG_ROOT\\vcpkg.exe\" install libffi:x64-windows\n"
+"cd cuda-oxide\n"
+"cargo install --locked --path crates/cargo-oxide\n"
+"cargo oxide setup\n"
+"cargo oxide doctor\n"
+"cargo oxide run vecadd\n"
+msgstr ""
+
+#: ../../../getting-started/windows.md:46
+msgid ""
+"For a build-only check without a GPU, run `scripts/smoketest.ps1 -BuildOnly` "
+"from `cuda-oxide/`:"
+msgstr ""
+
+#: ../../../getting-started/windows.md:48
+msgid ".\\scripts\\smoketest.ps1 -BuildOnly\n"
+msgstr ""
+
+#: ../../../getting-started/windows.md:52
+msgid "Compute Sanitizer on Windows (WDDM)"
+msgstr ""
+
+#: ../../../getting-started/windows.md:54
+msgid ""
+"When running `cargo oxide sanitize` on a Windows GPU using the WDDM driver "
+"model, enable the WDDM debugger interface once from an elevated "
+"Administrator prompt:"
+msgstr ""
+
+#: ../../../getting-started/windows.md:56
+msgid "& \"$env:CUDA_PATH\\compute-sanitizer\\EnableDebuggerInterface.bat\"\n"
+msgstr ""

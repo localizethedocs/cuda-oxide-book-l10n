@@ -1,0 +1,194 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025-2026, NVIDIA Corporation
+# This file is distributed under the same license as the cuda-oxide package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: cuda-oxide \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-23 19:38+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../../cute/contracts.md:1
+msgid "Checks and Obligations"
+msgstr ""
+
+#: ../../../cute/contracts.md:3
+msgid ""
+"The compiler verifies the whole module before any MLIR is built. Types carry "
+"the static facts, the verifier checks how operations connect, and everything "
+"dynamic stays with the author at `unsafe` boundaries."
+msgstr ""
+
+#: ../../../cute/contracts.md:11
+msgid ""
+"Where cutlass-primitives sits: typed carriers select instruction families, "
+"one of two compiler profiles consumes them, and the author keeps the "
+"schedule."
+msgstr ""
+
+#: ../../../cute/contracts.md:14
+msgid "What is checked"
+msgstr ""
+
+#: ../../../cute/contracts.md:16
+msgid "Layer"
+msgstr ""
+
+#: ../../../cute/contracts.md:16
+msgid "Checks"
+msgstr ""
+
+#: ../../../cute/contracts.md:16
+msgid "Rust types"
+msgstr ""
+
+#: ../../../cute/contracts.md:16
+msgid ""
+"layout, swizzle, operand role, element format, MMA shape, pipeline stage "
+"count, barrier ids; `TensorMut` over `DisjointSlice`; `TmemGuard` typestate; "
+"sealed traits"
+msgstr ""
+
+#: ../../../cute/contracts.md:18
+msgid "cute-layout proofs"
+msgstr ""
+
+#: ../../../cute/contracts.md:18
+msgid ""
+"cooperative copy coverage and per-thread contiguity, `ldmatrix` source "
+"validity, TMA encodability and swizzle phase alignment"
+msgstr ""
+
+#: ../../../cute/contracts.md:19
+msgid "dialect-cute verifier"
+msgstr ""
+
+#: ../../../cute/contracts.md:19
+msgid ""
+"tensor provenance, one pipeline init with complete producer and consumer "
+"state, cursor provenance, scheduler grids, MMA placement, epilogue phases, "
+"no compiler-only type reaches runtime storage"
+msgstr ""
+
+#: ../../../cute/contracts.md:19
+msgid "Target gate"
+msgstr ""
+
+#: ../../../cute/contracts.md:19
+msgid ""
+"`sm_100a`, `sm_103a`, `sm_107a`, or `sm_120a`; `tcgen05` on `sm_100a`/`103a`/"
+"`107a`; SM107 `MXF8F6F4` on `sm_107a`; MXF4 `mma.sync` on `sm_120a`"
+msgstr ""
+
+#: ../../../cute/contracts.md:21
+msgid "Launch ABI"
+msgstr ""
+
+#: ../../../cute/contracts.md:21
+msgid ""
+"cubin argument sizes and offsets match the exported MLIR; `#[grid_constant] "
+"&TensorMap` is a 128-byte by-value argument aligned to 64"
+msgstr ""
+
+#: ../../../cute/contracts.md:24
+msgid ""
+"Any failure stops the build. The importer is closed-world: a `cute_rs::` "
+"call it does not recognise is an error, not a fallback."
+msgstr ""
+
+#: ../../../cute/contracts.md:27
+msgid "What you own"
+msgstr ""
+
+#: ../../../cute/contracts.md:29
+msgid "Thread convergence and which lanes take part in each collective."
+msgstr ""
+
+#: ../../../cute/contracts.md:30
+msgid "Barrier phases, arrival counts and transaction bytes at run time."
+msgstr ""
+
+#: ../../../cute/contracts.md:31
+msgid "Asynchronous completion before a buffer or TMEM column is reused."
+msgstr ""
+
+#: ../../../cute/contracts.md:32
+msgid ""
+"Pointer lifetimes behind raw views and descriptors; the tensors a descriptor "
+"points to must stay alive until the GPU is done with them."
+msgstr ""
+
+#: ../../../cute/contracts.md:34
+msgid "Disjoint writes across threads."
+msgstr ""
+
+#: ../../../cute/contracts.md:36
+msgid "Two rules worth remembering"
+msgstr ""
+
+#: ../../../cute/contracts.md:38
+msgid ""
+"**SM100 collective TMA loads.** `Sm100ClusterTmaCopy::copy` needs all 32 "
+"lanes of the producer warp with identical arguments; the operation elects a "
+"lane internally. An outer elected-lane branch deadlocks once a stage is "
+"reused. TMA stores have one issuing thread, so this rule does not apply to "
+"them."
+msgstr ""
+
+#: ../../../cute/contracts.md:43
+msgid ""
+"**Collector buffers on SM100 and SM107.** Tensor Cores have a small internal "
+"scratchpad called a **collector** that can stash an input operand so the "
+"next MMA reuses it without reading shared memory again:"
+msgstr ""
+
+#: ../../../cute/contracts.md:47
+msgid ""
+"SM100 paired FP16 (`Sm100TiledMma`, automatic per K16 step):\n"
+"  first N partition   ──►  fill the A collector\n"
+"  second N partition  ──►  last use of the A collector\n"
+"\n"
+"SM107 MXFP8 (`SM107BlockScaledMmaMXF8F6F4Op`, explicit `BCollector` type "
+"marker):\n"
+"  top M half    (`CollectorFill`)    ──►  reads B from SMEM and stashes B in "
+"the collector\n"
+"  bottom M half (`CollectorLastUse`) ──►  reuses B from the collector and "
+"frees the slot\n"
+msgstr ""
+
+#: ../../../cute/contracts.md:57
+msgid ""
+"In `Sm100TiledMma`, the paired operation owns both halves so you cannot "
+"leave the A collector dangling. In `SM107BlockScaledMmaMXF8F6F4Op`, you "
+"choose `CollectorDiscard`, `CollectorFill`, or `CollectorLastUse` in the "
+"type parameters, and you own pairing each `CollectorFill` with a matching "
+"`CollectorLastUse` on the same `K = 64` sub-step."
+msgstr ""
+
+#: ../../../cute/contracts.md:62
+msgid "Grid-constant launch arguments"
+msgstr ""
+
+#: ../../../cute/contracts.md:64
+msgid ""
+"#[grid_constant] desc: &TensorMap<...>\n"
+"\n"
+"host descriptor  ──►  128-byte launch argument  ──►  device &TensorMap<...>\n"
+"                      aligned to 64 bytes            same address for every "
+"thread\n"
+msgstr ""
+
+#: ../../../cute/contracts.md:71
+msgid ""
+"The descriptor needs no device allocation. The full launch contract is under "
+"[Kernels and Device Functions](../gpu-programming/kernels-and-device-"
+"functions.md)."
+msgstr ""

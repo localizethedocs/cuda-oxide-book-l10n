@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-21 14:41+0000\n"
+"POT-Creation-Date: 2026-11-23 19:38+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -398,8 +398,7 @@ msgstr ""
 
 #: ../../../async-programming/combinators-and-composition.md:256
 msgid ""
-"use cuda_async::simt::launch::{AsyncKernelLaunchBuilder, "
-"OwnedAsyncKernelLaunch};\n"
+"use cuda_async::launch::{AsyncKernelLaunchBuilder, OwnedAsyncKernelLaunch};\n"
 "\n"
 "fn forward_pass(\n"
 "    batch: Vec<f32>,\n"
@@ -412,8 +411,8 @@ msgid ""
 "        // Stage 1: GEMM — hidden = input × W0\n"
 "        .and_then(move |(input, hidden, output)| {\n"
 "            let func = module.load_function(\"sgemm_naive\").unwrap();\n"
-"            let mut builder = AsyncKernelLaunchBuilder::new(Arc::"
-"new(func));\n"
+"            let mut builder = "
+"AsyncKernelLaunchBuilder::new(Arc::new(func));\n"
 "            builder.push_args((DIM as u32, DIM as u32, DIM as u32,\n"
 "                               1.0f32,\n"
 "                               input.cu_deviceptr(), input.len() as u64,\n"
@@ -436,8 +435,8 @@ msgid ""
 "        // Stage 2: MatVec — output = hidden × W1\n"
 "        .and_then(move |(hidden, output, w1, module)| {\n"
 "            let func = module.load_function(\"matvec_naive\").unwrap();\n"
-"            let mut builder = AsyncKernelLaunchBuilder::new(Arc::"
-"new(func));\n"
+"            let mut builder = "
+"AsyncKernelLaunchBuilder::new(Arc::new(func));\n"
 "            builder.push_args((DIM as u32, DIM as u32,\n"
 "                               hidden.cu_deviceptr(), hidden.len() as u64,\n"
 "                               w1.cu_deviceptr(), w1.len() as u64,\n"
@@ -457,8 +456,8 @@ msgid ""
 "        // Stage 3: ReLU — result = max(0, output)\n"
 "        .and_then(move |(output, module)| {\n"
 "            let func = module.load_function(\"relu\").unwrap();\n"
-"            let mut builder = AsyncKernelLaunchBuilder::new(Arc::"
-"new(func));\n"
+"            let mut builder = "
+"AsyncKernelLaunchBuilder::new(Arc::new(func));\n"
 "            builder.push_args((output.cu_deviceptr(), output.len() as u64,\n"
 "                               output.cu_deviceptr(), output.len() as "
 "u64));\n"
@@ -523,123 +522,123 @@ msgstr ""
 msgid "Quick reference"
 msgstr ""
 
-#: ../../../async-programming/combinators-and-composition.md:241
+#: ../../../async-programming/combinators-and-composition.md:341
 msgid "Combinator"
 msgstr ""
 
-#: ../../../async-programming/combinators-and-composition.md:241
+#: ../../../async-programming/combinators-and-composition.md:341
 msgid "What it does"
 msgstr ""
 
-#: ../../../async-programming/combinators-and-composition.md:241
+#: ../../../async-programming/combinators-and-composition.md:341
 msgid "When to use it"
 msgstr ""
 
-#: ../../../async-programming/combinators-and-composition.md:241
+#: ../../../async-programming/combinators-and-composition.md:341
 msgid "`.and_then(f)`"
 msgstr ""
 
-#: ../../../async-programming/combinators-and-composition.md:241
+#: ../../../async-programming/combinators-and-composition.md:343
 msgid "Run self, then `f(result)` on the same stream"
 msgstr ""
 
-#: ../../../async-programming/combinators-and-composition.md:241
+#: ../../../async-programming/combinators-and-composition.md:343
 msgid "Sequential dependent stages"
 msgstr ""
 
-#: ../../../async-programming/combinators-and-composition.md:241
+#: ../../../async-programming/combinators-and-composition.md:343
 msgid "`.and_then_with_context(f)`"
 msgstr ""
 
-#: ../../../async-programming/combinators-and-composition.md:241
+#: ../../../async-programming/combinators-and-composition.md:344
 msgid "Like `and_then` but `f` also gets the `ExecutionContext`"
 msgstr ""
 
-#: ../../../async-programming/combinators-and-composition.md:241
+#: ../../../async-programming/combinators-and-composition.md:344
 msgid "When the closure needs the raw stream"
 msgstr ""
 
-#: ../../../async-programming/combinators-and-composition.md:241
+#: ../../../async-programming/combinators-and-composition.md:344
 msgid "`.apply(f)`"
 msgstr ""
 
-#: ../../../async-programming/combinators-and-composition.md:241
+#: ../../../async-programming/combinators-and-composition.md:345
 msgid "Alias for `and_then`"
 msgstr ""
 
-#: ../../../async-programming/combinators-and-composition.md:241
+#: ../../../async-programming/combinators-and-composition.md:345
 msgid "Whichever reads better in context"
 msgstr ""
 
-#: ../../../async-programming/combinators-and-composition.md:241
+#: ../../../async-programming/combinators-and-composition.md:345
 msgid "`zip!(a, b)`"
 msgstr ""
 
-#: ../../../async-programming/combinators-and-composition.md:241
+#: ../../../async-programming/combinators-and-composition.md:346
 msgid "Run both, return `(A, B)`"
 msgstr ""
 
-#: ../../../async-programming/combinators-and-composition.md:241
+#: ../../../async-programming/combinators-and-composition.md:346
 msgid "Independent setup steps"
 msgstr ""
 
-#: ../../../async-programming/combinators-and-composition.md:241
+#: ../../../async-programming/combinators-and-composition.md:346
 msgid "`zip!(a, b, c)`"
 msgstr ""
 
-#: ../../../async-programming/combinators-and-composition.md:241
+#: ../../../async-programming/combinators-and-composition.md:347
 msgid "Run all three, return `(A, B, C)`"
 msgstr ""
 
-#: ../../../async-programming/combinators-and-composition.md:241
+#: ../../../async-programming/combinators-and-composition.md:347
 msgid "Same, for three operands"
 msgstr ""
 
-#: ../../../async-programming/combinators-and-composition.md:241
+#: ../../../async-programming/combinators-and-composition.md:347
 msgid "`.arc()`"
 msgstr ""
 
-#: ../../../async-programming/combinators-and-composition.md:241
+#: ../../../async-programming/combinators-and-composition.md:348
 msgid "Wrap output in `Arc<T>`"
 msgstr ""
 
-#: ../../../async-programming/combinators-and-composition.md:241
+#: ../../../async-programming/combinators-and-composition.md:348
 msgid "Sharing results across pipelines"
 msgstr ""
 
-#: ../../../async-programming/combinators-and-composition.md:241
+#: ../../../async-programming/combinators-and-composition.md:348
 msgid "`unzip!(op)`"
 msgstr ""
 
-#: ../../../async-programming/combinators-and-composition.md:241
+#: ../../../async-programming/combinators-and-composition.md:349
 msgid "Split a tuple-producing op into two"
 msgstr ""
 
-#: ../../../async-programming/combinators-and-composition.md:241
+#: ../../../async-programming/combinators-and-composition.md:349
 msgid "Diverging downstream chains"
 msgstr ""
 
-#: ../../../async-programming/combinators-and-composition.md:241
+#: ../../../async-programming/combinators-and-composition.md:349
 msgid "`value(x)`"
 msgstr ""
 
-#: ../../../async-programming/combinators-and-composition.md:241
+#: ../../../async-programming/combinators-and-composition.md:350
 msgid "Wrap `x` as a no-op operation"
 msgstr ""
 
-#: ../../../async-programming/combinators-and-composition.md:241
+#: ../../../async-programming/combinators-and-composition.md:350
 msgid "Feeding host data into pipelines"
 msgstr ""
 
-#: ../../../async-programming/combinators-and-composition.md:241
+#: ../../../async-programming/combinators-and-composition.md:350
 msgid "`with_context(f)`"
 msgstr ""
 
-#: ../../../async-programming/combinators-and-composition.md:241
+#: ../../../async-programming/combinators-and-composition.md:351
 msgid "Defer construction until the stream is known"
 msgstr ""
 
-#: ../../../async-programming/combinators-and-composition.md:241
+#: ../../../async-programming/combinators-and-composition.md:351
 msgid "Wrapping raw CUDA driver calls"
 msgstr ""
 

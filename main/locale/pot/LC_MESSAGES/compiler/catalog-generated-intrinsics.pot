@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-16 04:35+0000\n"
+"POT-Creation-Date: 2026-11-23 19:38+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -89,8 +89,8 @@ msgid ""
 "intrinsics/abi-v1.toml -----------------------------------+--> resolve\n"
 "intrinsics/evidence/*.json -------------------------------/       |\n"
 "                                                                  v\n"
-"                                                     intrinsics/catalog."
-"json\n"
+"                                                     intrinsics/"
+"catalog.json\n"
 "                                                            GENERATED\n"
 "                                                                  |\n"
 "                                                                  v\n"
@@ -101,71 +101,71 @@ msgstr ""
 msgid "Their roles are different:"
 msgstr ""
 
-#: ../../../compiler/catalog-generated-intrinsics.md:0
+#: ../../../compiler/catalog-generated-intrinsics.md:57
 msgid "File / artifact"
 msgstr ""
 
-#: ../../../compiler/catalog-generated-intrinsics.md:0
+#: ../../../compiler/catalog-generated-intrinsics.md:57
 msgid "Role"
 msgstr ""
 
-#: ../../../compiler/catalog-generated-intrinsics.md:0
+#: ../../../compiler/catalog-generated-intrinsics.md:57
 msgid "`intrinsics/upstream.lock`"
 msgstr ""
 
-#: ../../../compiler/catalog-generated-intrinsics.md:0
+#: ../../../compiler/catalog-generated-intrinsics.md:59
 msgid ""
 "Pins the LLVM source/extraction identity used by the imported facts, and the "
 "rustc commit whose `llc` the evidence probe must run under."
 msgstr ""
 
-#: ../../../compiler/catalog-generated-intrinsics.md:0
+#: ../../../compiler/catalog-generated-intrinsics.md:59
 msgid "`intrinsics/imported.json`"
 msgstr ""
 
-#: ../../../compiler/catalog-generated-intrinsics.md:0
+#: ../../../compiler/catalog-generated-intrinsics.md:60
 msgid ""
 "Records what the pinned LLVM/NVPTX source declares. Normal intrinsic "
 "additions consume this committed file; they do not rerun extraction."
 msgstr ""
 
-#: ../../../compiler/catalog-generated-intrinsics.md:0
+#: ../../../compiler/catalog-generated-intrinsics.md:60
 msgid "`intrinsics/overlay.toml`"
 msgstr ""
 
-#: ../../../compiler/catalog-generated-intrinsics.md:0
+#: ../../../compiler/catalog-generated-intrinsics.md:61
 msgid "Explicitly indexes the admitted overlay shards."
 msgstr ""
 
-#: ../../../compiler/catalog-generated-intrinsics.md:0
+#: ../../../compiler/catalog-generated-intrinsics.md:61
 msgid "`intrinsics/overlay/*.toml`"
 msgstr ""
 
-#: ../../../compiler/catalog-generated-intrinsics.md:0
+#: ../../../compiler/catalog-generated-intrinsics.md:62
 msgid "Records cuda-oxide policy for reviewed intrinsic families."
 msgstr ""
 
-#: ../../../compiler/catalog-generated-intrinsics.md:0
+#: ../../../compiler/catalog-generated-intrinsics.md:62
 msgid "`intrinsics/abi-v1.toml`"
 msgstr ""
 
-#: ../../../compiler/catalog-generated-intrinsics.md:0
+#: ../../../compiler/catalog-generated-intrinsics.md:63
 msgid "Append-only stable intrinsic ABI ledger."
 msgstr ""
 
-#: ../../../compiler/catalog-generated-intrinsics.md:0
+#: ../../../compiler/catalog-generated-intrinsics.md:63
 msgid "`intrinsics/evidence/*.json`"
 msgstr ""
 
-#: ../../../compiler/catalog-generated-intrinsics.md:0
+#: ../../../compiler/catalog-generated-intrinsics.md:64
 msgid "Records reviewed lowering evidence when the route requires it."
 msgstr ""
 
-#: ../../../compiler/catalog-generated-intrinsics.md:0
+#: ../../../compiler/catalog-generated-intrinsics.md:64
 msgid "`intrinsics/catalog.json`"
 msgstr ""
 
-#: ../../../compiler/catalog-generated-intrinsics.md:0
+#: ../../../compiler/catalog-generated-intrinsics.md:65
 msgid "Resolved generated plan. Do not edit it by hand."
 msgstr ""
 
