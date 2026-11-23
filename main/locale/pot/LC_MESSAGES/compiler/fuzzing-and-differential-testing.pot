@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-16 04:35+0000\n"
+"POT-Creation-Date: 2026-11-23 19:38+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -112,43 +112,43 @@ msgstr ""
 msgid "The fuzzing setup is split into four parts:"
 msgstr ""
 
-#: ../../../compiler/fuzzing-and-differential-testing.md:53
+#: ../../../compiler/fuzzing-and-differential-testing.md:65
 msgid "Piece"
 msgstr ""
 
-#: ../../../compiler/fuzzing-and-differential-testing.md:53
+#: ../../../compiler/fuzzing-and-differential-testing.md:65
 msgid "Role"
 msgstr ""
 
-#: ../../../compiler/fuzzing-and-differential-testing.md:53
+#: ../../../compiler/fuzzing-and-differential-testing.md:65
 msgid "`cuda-oxide/crates/fuzzer`"
 msgstr ""
 
-#: ../../../compiler/fuzzing-and-differential-testing.md:53
+#: ../../../compiler/fuzzing-and-differential-testing.md:67
 msgid "Shared trace API and vendored rustlantis"
 msgstr ""
 
-#: ../../../compiler/fuzzing-and-differential-testing.md:53
+#: ../../../compiler/fuzzing-and-differential-testing.md:67
 msgid "`cuda-oxide/crates/fuzzer/tools/mir_generator.py`"
 msgstr ""
 
-#: ../../../compiler/fuzzing-and-differential-testing.md:53
+#: ../../../compiler/fuzzing-and-differential-testing.md:68
 msgid "Seed-to-`generated_case.rs` adapter"
 msgstr ""
 
-#: ../../../compiler/fuzzing-and-differential-testing.md:53
+#: ../../../compiler/fuzzing-and-differential-testing.md:68
 msgid "`cuda-oxide/crates/fuzzer/tools/run_seed.py`"
 msgstr ""
 
-#: ../../../compiler/fuzzing-and-differential-testing.md:53
+#: ../../../compiler/fuzzing-and-differential-testing.md:69
 msgid "Batch runner and artifact recorder"
 msgstr ""
 
-#: ../../../compiler/fuzzing-and-differential-testing.md:53
+#: ../../../compiler/fuzzing-and-differential-testing.md:69
 msgid "`rustlantis-smoke`"
 msgstr ""
 
-#: ../../../compiler/fuzzing-and-differential-testing.md:53
+#: ../../../compiler/fuzzing-and-differential-testing.md:70
 msgid "Stable CPU/GPU execution harness"
 msgstr ""
 
@@ -321,43 +321,43 @@ msgstr ""
 msgid "The statuses mean:"
 msgstr ""
 
-#: ../../../compiler/fuzzing-and-differential-testing.md:53
+#: ../../../compiler/fuzzing-and-differential-testing.md:168
 msgid "Status"
 msgstr ""
 
-#: ../../../compiler/fuzzing-and-differential-testing.md:53
+#: ../../../compiler/fuzzing-and-differential-testing.md:168
 msgid "Meaning"
 msgstr ""
 
-#: ../../../compiler/fuzzing-and-differential-testing.md:53
+#: ../../../compiler/fuzzing-and-differential-testing.md:168
 msgid "`PASS`"
 msgstr ""
 
-#: ../../../compiler/fuzzing-and-differential-testing.md:53
+#: ../../../compiler/fuzzing-and-differential-testing.md:170
 msgid "CPU and GPU traces matched"
 msgstr ""
 
-#: ../../../compiler/fuzzing-and-differential-testing.md:53
+#: ../../../compiler/fuzzing-and-differential-testing.md:170
 msgid "`MISMATCH`"
 msgstr ""
 
-#: ../../../compiler/fuzzing-and-differential-testing.md:53
+#: ../../../compiler/fuzzing-and-differential-testing.md:171
 msgid "CPU and GPU traces differed"
 msgstr ""
 
-#: ../../../compiler/fuzzing-and-differential-testing.md:53
+#: ../../../compiler/fuzzing-and-differential-testing.md:171
 msgid "`COMPILE_FAIL [backend]`"
 msgstr ""
 
-#: ../../../compiler/fuzzing-and-differential-testing.md:53
+#: ../../../compiler/fuzzing-and-differential-testing.md:172
 msgid "The adapter produced a case, but cuda-oxide failed it"
 msgstr ""
 
-#: ../../../compiler/fuzzing-and-differential-testing.md:53
+#: ../../../compiler/fuzzing-and-differential-testing.md:172
 msgid "`UNSUPPORTED [adapter]`"
 msgstr ""
 
-#: ../../../compiler/fuzzing-and-differential-testing.md:53
+#: ../../../compiler/fuzzing-and-differential-testing.md:173
 msgid "rustlantis generated MIR, but the adapter declined it"
 msgstr ""
 
@@ -495,8 +495,8 @@ msgid ""
 "The widening plan is incremental, and two steps have already landed: the "
 "adapter now accepts every scalar the trace API can hash (f32 and f64 arrived "
 "last, in [#484](https://github.com/NVlabs/cuda-oxide/pull/484)), plus arrays "
-"and tuples built from them ([#792](https://github.com/NVlabs/cuda-oxide/"
-"pull/792)). What remains:"
+"and tuples built from them ([#792](https://github.com/NVlabs/cuda-oxide/pull/"
+"792)). What remains:"
 msgstr ""
 
 #: ../../../compiler/fuzzing-and-differential-testing.md:257

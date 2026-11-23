@@ -1,0 +1,1741 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025-2026, NVIDIA Corporation
+# This file is distributed under the same license as the cuda-oxide package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: cuda-oxide \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-23 19:38+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../../gpu-safety/verified-kernels.md:1
+msgid "Provably Safe Kernels (preview)"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:3
+msgid "Preview"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:5
+msgid ""
+"Compile-time Lean 4 verification (`#[verify(...)]` and `cuda-oxide/oxide-"
+"proofs-preview/`) is in preview. It covers a validated subset of "
+"`PostMem2Reg` integer, shared-memory, barrier, 2-CTA cluster, and Blackwell "
+"`tcgen05` / `TMEM` MIR through the pinned Lean `v4.33.1` toolchain. Kernels "
+"outside that subset fail closed at compile time, and attribute syntax and "
+"supported operations may change between releases."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:8
+msgid "On a CPU, **Safe Rust** means your program has zero undefined behavior:"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:9
+msgid "No out-of-bounds memory accesses"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:10
+msgid "No data races between threads"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:11
+msgid "No dangling pointers"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:13
+msgid ""
+"Notice what Safe Rust does *not* mean: it does not prove **functional "
+"correctness** (that your math formula is right). Writing `a[i] - b[i]` when "
+"you meant `a[i] + b[i]` is a logic bug, but it is still 100% memory-safe "
+"Rust."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:15
+msgid ""
+"On a GPU, thousands of threads run the same kernel function at once, and the "
+"Rust borrow checker cannot reason about thread coordinates or barriers:"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:16
+msgid ""
+"**What Rust types already cover**: [Safe Kernels Using Rust's Type System]"
+"(the-safety-model.md) proves one-thread-per-element writes with disjoint "
+"slices, and [Bounds Checks](bounds-checks.md) hoists row and column checks "
+"with matrix views."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:17
+msgid ""
+"**Where Rust types stop**: When 256 threads share an on-chip tile across "
+"barriers, the borrow checker cannot tell if two threads collide or if a "
+"barrier sits inside an `if` branch. Without compile-time verification, those "
+"kernels require `unsafe` blocks or unchecked indexing flags."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:18
+msgid ""
+"**How we make them provably safe**: The `#[verify(...)]` attribute pairs "
+"Rust's type system with compile-time **Lean 4** safety proofs, giving you "
+"**Provably Safe SIMT** across shared memory, barriers, and async hardware."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:20
+msgid "Three GPU safety hazards proved at compile time by the verify attribute"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:25
+msgid ""
+"The three GPU safety bugs caught at compile time: out-of-bounds indexing, "
+"same-phase shared-memory data races, and divergent barriers."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:30
+msgid "1. The Core Idea: Specify and Verify"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:32
+msgid ""
+"You declare the safety properties you want on the kernel, and the compiler "
+"proves them before generating PTX."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:34
+msgid ""
+"We do not prove functional correctness or floating-point math formulas. "
+"Instead, we prove the exact memory and concurrency rules needed to make the "
+"kernel safe and strip out redundant bounds checks:"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:36
+msgid "Property You Write"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:36
+msgid "What Lean 4 Proves at Compile Time"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:36
+msgid "What Is Not Claimed"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:36
+msgid "`no_oob_idx`"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:38
+msgid "Every buffer read and write index stays below its length"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:38
+msgid "Values stored at those indices (`NaN`)"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:38
+msgid "`no_data_race`"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:39
+msgid "No two threads conflict on shared memory in the same step"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:39
+msgid "Shared-memory bank conflicts (speed only)"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:39
+msgid "`disjoint_writes`"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:40
+msgid "Two different threads never write to the same output slot"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:40
+msgid "Which formula is written (`a - b` vs `+`)"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:40
+msgid "`writes_all_elems`"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:41
+msgid "Every output slot is written by a launched thread"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:41
+msgid "Whether the written value is right"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:41
+msgid "`uniform_barriers`"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:42
+msgid "Every thread in the block reaches every barrier"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:42
+msgid "Waiting across different thread blocks"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:42
+msgid "`tmem_lifecycle`"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:43
+msgid "Valid `TMEM` bounds, warpgroup slices, and async order"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:43
+msgid "Floating-point Tensor Core rounding"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:47
+msgid "2. How It Works"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:49
+msgid ""
+"Verification splits the work between compile time and launch time so GPU "
+"threads pay zero runtime cost:"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:50
+msgid ""
+"**Before launch on the CPU**: The host checks buffer sizes and launch "
+"dimensions once per kernel call."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:51
+msgid ""
+"**At compile time in Lean 4**: Right after variables are promoted to SSA "
+"registers (and before loops are unrolled), the compiler translates the "
+"kernel line by line into Lean 4, proves every safety rule, and deletes the "
+"proven bounds checks before generating PTX."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:53
+msgid "Specify and Verify pipeline"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:58
+msgid ""
+"The compiler pauses in memory before loop unrolling, proves the kernel safe "
+"in Lean 4, erases the proven bounds checks, and resumes lowering to PTX."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:61
+msgid "Compile Time vs. Runtime"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:63
+msgid ""
+"Almost all of the safety checking happens once when you build the kernel. "
+"Only the few numbers that do not exist until runtime (like dynamic slice "
+"lengths) are checked on the CPU right before launch, leaving the GPU threads "
+"completely free of extra checks:"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:65
+msgid "**Proved once at compile time (Lean 4)**:"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:66
+msgid ""
+"Every global slice, shared-memory array, barrier array, and Tensor Memory "
+"index stays in bounds."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:67
+msgid ""
+"Shared-memory and mutable-slice writes never collide across threads in the "
+"same phase."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:68
+msgid ""
+"Block and cluster barriers are reached uniformly by all participating "
+"threads."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:69
+msgid ""
+"Async DMA copies, producer-consumer ring buffers, 2-CTA cluster ranks, and "
+"Tensor Memory lifecycles happen in the right order."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:70
+msgid "**Checked once per launch (Host CPU)**:"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:71
+msgid "Block and cluster dimensions match what the kernel declared."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:72
+msgid ""
+"Runtime buffer sizes satisfy the contract's length rules (for example, "
+"inputs are at least as long as the output)."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:73
+msgid ""
+"The launch grid is large enough when the kernel promises to write every "
+"output element."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:74
+msgid "**Paid per element on the GPU**:"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:75
+msgid ""
+"**Nothing.** Proven bounds checks are stripped out before PTX codegen, so "
+"inner loops compile down to the exact same machine instructions as hand-"
+"written unchecked code."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:77
+msgid "What Needs Checking"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:77
+msgid "Compile Time (Lean 4)"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:77
+msgid "Launch Time (Host CPU)"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:77
+msgid "GPU Threads at Runtime"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:77
+msgid "Slice & shared bounds"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:77
+msgid "Proved from guards, loops, and block shape"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:77
+msgid "Checks slice length rules once"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:77
+msgid "Bounds checks removed"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:77
+msgid "Race freedom & phases"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:77
+msgid "Proved across thread pairs and barriers"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:77
+msgid "Nothing"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:77
+msgid "Zero extra sync cost"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:77
+msgid "Async rings & clusters"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:77
+msgid "Proved by the control-flow state machine"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:77
+msgid "Checks block & cluster sizes once"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:77
+msgid "Native hardware ops"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:77
+msgid "Tensor Memory lifecycle"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:77
+msgid "Proves warp slices, order, and column caps"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:77
+msgid "Native Tensor Core ops"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:77
+msgid "Full output coverage"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:77
+msgid "Proves active threads write their slot"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:77
+msgid "Checks grid covers output length"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:85
+msgid "What Rust Proves vs. What Lean 4 Proves"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:87
+msgid ""
+"Unlike a C or CUDA C++ verifier, Lean 4 does not need to prove pointer "
+"validity, alignment, or buffer non-aliasing from scratch. However, the Rust "
+"compiler type-checks a kernel function as if a **single thread** called it, "
+"so we split the safety proof across the host boundary and the GPU launch:"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:89
+msgid "**What transfers directly from Rust (Host to GPU)**:"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:90
+msgid ""
+"**Valid, aligned, live buffers**: Device buffers on the host are guaranteed "
+"non-null, aligned, and live for the launch."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:91
+msgid ""
+"**Separate parameters never alias**: At the launch call site, Rust's borrow "
+"checker proves that a mutable output buffer does not overlap the read-only "
+"input buffers."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:92
+msgid ""
+"**Shared read-only slices**: Copying `&[f32]` to thousands of GPU threads is "
+"sound because no thread mutates the input slices."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:93
+msgid "**What does *not* transfer from Rust alone**:"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:94
+msgid ""
+"Giving thousands of GPU threads a raw `&mut [f32]` (or shared-memory array) "
+"would let two threads mutate the same element at the same time."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:95
+msgid ""
+"Per-element exclusivity across GPU threads is proved by `DisjointSlice` (for "
+"unverified kernels) or by Lean 4 (`#[verify(no_oob_idx(c), "
+"disjoint_writes(c))]`, which unlocks plain `c: &mut [f32]` with zero "
+"`DisjointSlice` or `ThreadIndex` wrapper types)."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:97
+msgid "Property"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:97
+msgid "Who Proves It"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:97
+msgid "Why It Holds on the GPU"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:97
+msgid "**Buffers are non-null, aligned, live**"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:99
+msgid "Rust compiler at host launch"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:99
+msgid "Host passes typed device buffer references"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:99
+msgid "**Output does not alias inputs**"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:100
+msgid "Rust borrow checker at host launch"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:100
+msgid "Host cannot pass the same buffer as both shared and mutable"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:100
+msgid "**Multiple readers on read-only slices**"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:101
+msgid "Rust type system (`Sync`)"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:101
+msgid "Immutable slices never race across GPU threads"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:101
+msgid "**Disjoint per-thread output writes**"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:102
+msgid "`DisjointSlice` or Lean 4"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:102
+msgid "Each thread only writes to its own unique output slot"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:102
+msgid "**Shared-memory exclusivity**"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:103
+msgid "Lean 4 (`no_data_race` + barriers)"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:103
+msgid "Phase 0 writes one slot per thread or leader; Phase 1 reads"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:103
+msgid "**In-bounds indexing**"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:104
+msgid "Lean 4 (`no_oob_idx` + host check)"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:104
+msgid "Proved across all active threads before erasing bounds checks"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:106
+msgid "How the Compiler Translates Your Kernel"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:108
+msgid ""
+"cuda-oxide translates the kernel instruction by instruction before loop "
+"unrolling (while loops are still small and compact):"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:109
+msgid ""
+"**Index math and branches** (adds, shifts, masks, loop counters, and `if` "
+"checks) are copied one-for-one into Lean 4."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:110
+msgid ""
+"**Floating-point math is ignored**, because float values cannot change which "
+"memory slot a thread touches."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:111
+msgid ""
+"**Barriers and async hardware ops** (block syncs, cluster syncs, hardware "
+"barriers, DMA copies, work-stealing, and Tensor Memory) are tracked in a "
+"small control-flow state machine."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:112
+msgid ""
+"**Lean 4 does all the proving**: it turns every memory access and thread "
+"pair into plain integer math, checks the hardware ordering rules, and only "
+"lets the compiler delete a bounds check once the proof succeeds."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:114
+msgid "Trusted Computing Base"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:116
+msgid ""
+"Lean 4 checks every proof from scratch and rejects anything that leaves a "
+"gap or adds custom assumptions. Everything outside that proof check is part "
+"of the **Trusted Computing Base (TCB)**:"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:117
+msgid ""
+"**MIR import and SSA promotion**: Lowering Rust into compiler IR and turning "
+"stack variables into SSA registers (`--device-debug` skips SSA promotion and "
+"is rejected on `#[verify]` modules; pass `--lineinfo` for source-line info "
+"instead)."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:118
+msgid ""
+"**The Lean transcriber**: Copying basic blocks and control-flow ops into "
+"Lean 4, and stopping immediately if it sees an unsupported instruction or "
+"attribute."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:119
+msgid ""
+"**Downstream lowering**: Deleting proven bounds checks, unrolling loops, and "
+"generating LLVM IR and PTX after verification passes."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:120
+msgid ""
+"**Host launch checks and CUDA runtime**: Checking block sizes and buffer "
+"lengths on the CPU before launching the kernel."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:124
+msgid "3. Reading Verification Errors"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:126
+msgid ""
+"When a kernel has a safety bug, compilation stops before PTX is generated. "
+"You will see one of two kinds of Lean 4 errors depending on what went wrong:"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:128
+msgid "Bounds and Data-Race Bugs (Arithmetic Counterexample)"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:130
+msgid ""
+"If an index can walk out of bounds or two threads can collide on the same "
+"shared-memory slot (for example, writing `a[idx + 1]` under `if idx < "
+"c.len()`, forgetting `if lane == 0`, or dropping a barrier between a write "
+"and a read), Lean's integer solver prints a counterexample:"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:132
+msgid ""
+"error: omega could not prove the goal:\n"
+"a possible counterexample may satisfy the constraints\n"
+"  0 ≤ c ≤ 255\n"
+"  a - 256*b - c ≥ 1\n"
+"  256*b + c - e ≥ -1\n"
+"  a - e ≤ 0\n"
+"  ...\n"
+"where\n"
+"  a := ↑(hvc_512.sliceLen 2)   -- length of parameter 2 (output c)\n"
+"  b := ↑hvc_511.bx             -- blockIdx.x\n"
+"  c := ↑hvc_511.tx             -- threadIdx.x (0..255)\n"
+"  e := ↑(hvc_512.sliceLen 0)   -- length of parameter 0 (input a)\n"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:147
+msgid "How to read that output in three quick steps:"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:148
+msgid "**Start with the `where` legend at the bottom**:"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:149
+msgid ""
+"`sliceLen 0`, `sliceLen 1`, `sliceLen 2` are your slice parameters in "
+"function order (`a`, `b`, `c`)."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:150
+msgid ""
+"`bx` and `tx` are the block and thread coordinates (`256 * b + c` is the "
+"global thread index `idx`)."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:151
+msgid ""
+"Any `/ 18446744073709551616` terms are `2^64` from 64-bit `usize` wraparound "
+"checks; you can ignore them unless your index math itself overflows 64 bits."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:152
+msgid "**Read the constraints with those names**:"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:153
+msgid "`a - (256*b + c) >= 1` means the thread passed `idx < c.len()`."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:154
+msgid "`a - e <= 0` means the host launch check `a.len() >= c.len()` holds."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:155
+msgid ""
+"`(256*b + c) - e >= -1` means `idx + 1 >= a.len()`, so `a[idx + 1]` walks "
+"off the end of `a`!"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:156
+msgid ""
+"**Plug in a tiny test case**: If both `a` and `c` have length 10, thread 9 "
+"passes `9 < 10` and reads `a[9 + 1] = a[10]`, which is out of bounds."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:158
+msgid "Barrier, Ring, and Tensor Memory Bugs (State-Machine Failure)"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:160
+msgid ""
+"If a barrier sits inside a divergent `if`, a ring producer forgets to wait "
+"on its empty barrier, or a Tensor Memory op runs out of order, Lean's "
+"control-flow state machine returns `false` instead of `true` and names the "
+"check that failed:"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:162
+msgid ""
+"error: Application type mismatch: The argument\n"
+"  rfl\n"
+"... is expected to have type\n"
+"  checkTmemLifecycleWith controlFlowCfg cfgStateMap = true\n"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:169
+msgid ""
+"`checkUniformBarriersWith ... = true` failing means a block sync, cluster "
+"sync, or cyclic ring barrier is not reached cleanly on all active paths."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:170
+msgid ""
+"`checkTmemLifecycleWith ... = true` failing means an async proxy fence, "
+"barrier wait, full-warp allocation/free, or Tensor Memory column bound was "
+"violated."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:171
+msgid ""
+"Run `cargo oxide lean-export <target>` at any time to inspect the generated "
+"Lean file alongside your MIR blocks."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:175
+msgid "4. Walkthroughs"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:177
+msgid "Example 1: 1D Vector Addition"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:179
+msgid ""
+"In `safe_vecadd`, each thread checks `c.get_mut(idx)` (`idx < c.len()`) and "
+"then reads `a[idx_raw]` and `b[idx_raw]`:"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:181
+msgid ""
+"#[launch_contract(\n"
+"    domain = 1,\n"
+"    block = (256, 1, 1),\n"
+"    requires = (a.len() >= c.len(), b.len() >= c.len()),\n"
+")]\n"
+"#[verify(\n"
+"    no_oob_idx(a, b, c),\n"
+"    disjoint_writes(c),\n"
+"    writes_all_elems(c),\n"
+")]\n"
+"#[kernel]\n"
+"pub fn vecadd(a: &[f32], b: &[f32], mut c: DisjointSlice<f32>) {\n"
+"    let idx = thread::index_1d();\n"
+"    let idx_raw = idx.get();\n"
+"    if let Some(c_elem) = c.get_mut(idx) {\n"
+"        *c_elem = a[idx_raw] + b[idx_raw];\n"
+"    }\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:202
+msgid "What happens when you build:"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:203
+msgid "The host contract guarantees `a` and `b` are at least as long as `c`."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:204
+msgid ""
+"Lean 4 proves that any thread inside `if let Some(c_elem)` is also in bounds "
+"for `a` and `b`, and deletes those bounds checks before PTX lowering."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:205
+msgid ""
+"Because `#[verify]` proves `no_oob_idx(c)` and `disjoint_writes(c)` across "
+"all GPU threads, you can also write the exact same kernel using plain `c: "
+"&mut [f32]` and ordinary slice indexing (with all three bounds checks "
+"`a[idx]`, `b[idx]`, and `c[idx]` elided):"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:207
+msgid ""
+"#[launch_contract(\n"
+"    domain = 1,\n"
+"    block = (256, 1, 1),\n"
+"    requires = (a.len() >= c.len(), b.len() >= c.len()),\n"
+")]\n"
+"#[verify(no_oob_idx(a, b, c), disjoint_writes(c), writes_all_elems(c))]\n"
+"#[kernel]\n"
+"pub fn vecadd_mut_slice(a: &[f32], b: &[f32], c: &mut [f32]) {\n"
+"    let idx = (thread::blockIdx_x() as usize) * (thread::blockDim_x() as "
+"usize)\n"
+"        + (thread::threadIdx_x() as usize);\n"
+"    if idx < c.len() {\n"
+"        c[idx] = a[idx] + b[idx];\n"
+"    }\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:224
+msgid "You can inspect the MIR input and generated Lean theorems at any time:"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:226
+msgid "$ cargo oxide lean-export safe_vecadd\n"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:232
+msgid "Example 2: 2D Tiled Matrix Multiply (Shared Memory + Barriers)"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:234
+msgid ""
+"In a 2D tiled matrix multiply (`safe_gemm_views`), a 16x16 block of 256 "
+"threads cooperates in two phases separated by a barrier:"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:235
+msgid ""
+"**Phase 0 (Stage)**: Each thread `(tx, ty)` writes one float into shared "
+"memory at its own slot (`ty * 16 + tx`)."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:236
+msgid ""
+"**Barrier**: All 256 threads wait at `sync_threads()` until both shared "
+"tiles are full."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:237
+msgid ""
+"**Phase 1 (Scan)**: Each thread loops 16 times (`i = 0..16`), reading across "
+"row `ty` of tile A and down column `tx` of tile B."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:239
+msgid "Phased shared memory verification across sync_threads"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:244
+msgid ""
+"Phase 0 writes one unique slot per thread. After the barrier wall, Phase 1 "
+"only reads. Keeping writes and cross-thread reads in separate phases "
+"prevents data races."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:247
+msgid ""
+"Because Lean 4 proves bounds, race freedom, and uniform barriers at compile "
+"time:"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:248
+msgid ""
+"**Zero `unsafe` blocks with matrix views**: Adding "
+"`#[verify(no_oob_idx(TILE_A, TILE_B), no_data_race(TILE_A, TILE_B), "
+"uniform_barriers)]` proves both phases of shared-memory access and removes "
+"all 4 shared-memory bounds checks."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:249
+msgid ""
+"**Plain slice indexing without wrapper views**: Even without matrix view "
+"types, `sgemm_tiled_raw` is 100% safe Rust and removes all 6 bounds checks "
+"(2 on global slices `a` and `b`, plus 4 on shared tiles `TILE_A` and "
+"`TILE_B`)."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:251
+msgid ""
+"#[kernel(launch_context = lc)]\n"
+"#[launch_bounds(256)]\n"
+"#[launch_contract(domain = 2, coordinates = u32, block = (16, 16, 1),\n"
+"    requires = (k >= 1, a.len() >= m * k, b.len() >= k * n, c.len() >= m * "
+"n))]\n"
+"#[verify(\n"
+"    no_oob_idx(a, b, TILE_A, TILE_B),\n"
+"    no_data_race(TILE_A, TILE_B),\n"
+"    uniform_barriers,\n"
+")]\n"
+"pub fn sgemm_tiled_raw(\n"
+"    m: u32,\n"
+"    n: Uniform<u32>,\n"
+"    k: u32,\n"
+"    alpha: f32,\n"
+"    a: &[f32],\n"
+"    b: &[f32],\n"
+"    beta: f32,\n"
+"    mut c: DisjointSlice<f32, RuntimeRowMajorTiles<1, 1>>,\n"
+") {\n"
+"    static mut TILE_A: SharedArray<f32, 256> = SharedArray::UNINIT;\n"
+"    static mut TILE_B: SharedArray<f32, 256> = SharedArray::UNINIT;\n"
+"    // ...\n"
+"    while tile < num_tiles {\n"
+"        // ...\n"
+"        // Phase 0 (Lean-verified bounds and disjoint per-thread slot):\n"
+"        {\n"
+"            TILE_A[smem_idx] = a_value;\n"
+"            TILE_B[smem_idx] = b_value;\n"
+"        }\n"
+"\n"
+"        thread::sync_threads();\n"
+"\n"
+"        // Phase 1 (Lean-verified bounds and barrier separation):\n"
+"        {\n"
+"            let mut i = 0usize;\n"
+"            while i < TILE as usize {\n"
+"                sum += TILE_A[ty as usize * 16 + i] * TILE_B[i * 16 + tx as "
+"usize];\n"
+"                i += 1;\n"
+"            }\n"
+"        }\n"
+"\n"
+"        thread::sync_threads();\n"
+"        tile = tile.wrapping_add(1);\n"
+"    }\n"
+"    // ...\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:300
+msgid "Inspect both verified kernels or run the benchmark with:"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:302
+msgid ""
+"$ cargo oxide lean-export safe_gemm_views\n"
+"$ cargo oxide run safe_gemm_views\n"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:307
+msgid "Kernel Variant"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:307
+msgid "Safety Status"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:307
+msgid "Bounds Checks Removed by Lean 4"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:307
+msgid "Throughput (1024³)"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:307
+msgid "Naive with views"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:307
+#: ../../../gpu-safety/verified-kernels.md:311
+msgid "Safe"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:307
+msgid "None (uses matrix views)"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:307
+msgid "~7,225 GFLOPS"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:307
+msgid "Tiled with views"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:307
+msgid "4 shared-memory checks"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:307
+msgid "~9,405 GFLOPS"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:307
+msgid "Tiled without views (`tiled_raw`)"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:311
+msgid "2 global + 4 shared-memory checks"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:311
+msgid "~9,390 GFLOPS"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:315
+msgid "Example 3: Warp & 2-Phase Block Reduction"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:317
+msgid ""
+"In a 256-thread block reduction, 8 warps of 32 threads sum 256 elements in "
+"two phases using an 8-element shared array (`WARP_SUMS`):"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:318
+msgid ""
+"**Phase 0 (Warp Leader Stage)**: Every thread reduces across its 32-lane "
+"warp. Guarded by `if lane == 0`, only lane 0 of each warp writes its warp "
+"sum to `WARP_SUMS[tid / 32]`."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:319
+msgid "**Barrier**: All 256 threads wait at `sync_threads()`."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:320
+msgid ""
+"**Phase 1 (Block Scan)**: Each thread scans `w = 0..8` across `WARP_SUMS[w]` "
+"to accumulate the 256-thread block sum."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:322
+msgid "Leader-guarded warp and block reduction in shared memory"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:327
+msgid ""
+"In Phase 0, only lane 0 of each warp writes `WARP_SUMS[tid / 32]`, so each "
+"warp slot has a single writer. After the barrier, Phase 1 only reads."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:330
+msgid ""
+"Notice that the kernel uses the **exact same three verification clauses** as "
+"2D tiled GEMM (`no_oob_idx`, `no_data_race`, `uniform_barriers`):"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:332
+msgid ""
+"#[kernel(launch_context = lc)]\n"
+"#[launch_bounds(256)]\n"
+"#[launch_contract(\n"
+"    domain = 1,\n"
+"    coordinates = u32,\n"
+"    block = (256, 1, 1),\n"
+"    requires = (data.len() >= out.len()),\n"
+")]\n"
+"#[verify(\n"
+"    no_oob_idx(WARP_SUMS),\n"
+"    no_data_race(WARP_SUMS),\n"
+"    uniform_barriers,\n"
+")]\n"
+"pub fn block_reduce_sum(data: &[f32], mut out: DisjointSlice<f32>) {\n"
+"    static mut WARP_SUMS: SharedArray<f32, 8> = SharedArray::UNINIT;\n"
+"\n"
+"    let idx = thread::index_1d();\n"
+"    let gid = idx.get();\n"
+"    let tid = thread::threadIdx_x() as usize;\n"
+"    let lane = warp::lane_id();\n"
+"\n"
+"    let val = if gid < data.len() { data[gid] } else { 0.0 };\n"
+"    let warp_sum = warp::reduce_sum_f32(val);\n"
+"\n"
+"    // Phase 0 (Lean-verified bounds and single leader writer per warp):\n"
+"    if lane == 0 {\n"
+"        WARP_SUMS[tid / 32] = warp_sum;\n"
+"    }\n"
+"\n"
+"    thread::sync_threads();\n"
+"\n"
+"    // Phase 1 (Lean-verified bounds and barrier separation):\n"
+"    let mut block_sum = 0.0f32;\n"
+"    let mut w = 0usize;\n"
+"    while w < 8 {\n"
+"        block_sum += WARP_SUMS[w];\n"
+"        w += 1;\n"
+"    }\n"
+"\n"
+"    if let Some(out_elem) = out.get_mut(idx) {\n"
+"        *out_elem = block_sum;\n"
+"    }\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:378
+msgid "How Lean 4 proves this kernel (and what happens if you make a mistake):"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:379
+msgid ""
+"**Phase 0 bounds**: Because `tid < 256`, `tid / 32` is at most 7, which is "
+"strictly below 8."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:380
+msgid ""
+"**Phase 0 race freedom**: The exporter sees that the write happens inside "
+"`if lane == 0`. Lean 4 proves that two threads with `lane == 0` and the same "
+"warp index `tid / 32` must be the exact same thread. If you forget `if lane "
+"== 0`, Lean 4 rejects the build with a counterexample (threads 0 and 1 both "
+"write slot 0)."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:381
+msgid ""
+"**Phase 1 bounds and barrier separation**: The loop bound `w < 8` stays "
+"inside the 8-element array, and `sync_threads()` separates Phase 0 writes "
+"from Phase 1 reads, erasing both shared-memory bounds checks before PTX "
+"lowering."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:383
+msgid "Inspect both exported reduction kernels or run them on the GPU with:"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:385
+msgid ""
+"$ cargo oxide lean-export safe_warp_reduce\n"
+"$ cargo oxide run safe_warp_reduce\n"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:392
+msgid "Example 4: Sub-Warp Bitwise Splits & Multi-Buffer Staging"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:394
+msgid ""
+"High-throughput kernels often split a 256-thread block into **16 sub-warps "
+"of 16 lanes** using bit shifts and masks (`tid >> 4` and `tid & 15`) and "
+"stage data across **three shared-memory buffers** of different sizes over "
+"three barrier phases:"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:395
+msgid ""
+"**Phase 0 (Guarded & packed stage)**: The first 64 threads each write one "
+"scale into the 64-float buffer and four packed activations into the 256-"
+"float buffer."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:396
+msgid ""
+"**Phase 1 (Sub-warp scan & leader write)**: Every thread scans across its "
+"sub-warp's slice, reduces across 16 lanes with warp shuffles, and lets lane "
+"0 of each sub-warp write one output into the 16-float buffer."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:397
+msgid ""
+"**Phase 2 (Epilogue read)**: After a second barrier, the first 16 threads "
+"read the 16 sub-warp results."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:399
+msgid ""
+"Three-phase sub-warp bit-split and multi-buffer staging in shared memory"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:404
+msgid ""
+"Two barriers separate guarded packing in Phase 0, sub-warp scanning and "
+"leader writes in Phase 1, and the final epilogue read in Phase 2."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:407
+msgid ""
+"#[kernel(launch_context = lc)]\n"
+"#[launch_bounds(256)]\n"
+"#[launch_contract(\n"
+"    domain = 1,\n"
+"    coordinates = u32,\n"
+"    block = (256, 1, 1),\n"
+"    requires = (data.len() >= out.len()),\n"
+")]\n"
+"#[verify(\n"
+"    no_oob_idx(S_X_DIRECT, S_XS_DIRECT, S_ACT_DIRECT),\n"
+"    no_data_race(S_X_DIRECT, S_XS_DIRECT, S_ACT_DIRECT),\n"
+"    uniform_barriers,\n"
+")]\n"
+"pub fn multibuf_subwarp_stage(data: &[f32], mut out: DisjointSlice<f32>) {\n"
+"    static mut S_X_DIRECT: SharedArray<f32, 256> = SharedArray::UNINIT;\n"
+"    static mut S_XS_DIRECT: SharedArray<f32, 64> = SharedArray::UNINIT;\n"
+"    static mut S_ACT_DIRECT: SharedArray<f32, 16> = SharedArray::UNINIT;\n"
+"\n"
+"    let idx = thread::index_1d();\n"
+"    let gid = idx.get();\n"
+"    let tid = thread::threadIdx_x() as usize;\n"
+"    let m_local = tid >> 4;\n"
+"    let k_lane = tid & 15;\n"
+"    let base_val = if gid < data.len() { data[gid] } else { 0.0 };\n"
+"\n"
+"    // Phase 0 (Lean-verified under `if tid < 64`):\n"
+"    if tid < 64 {\n"
+"        S_XS_DIRECT[tid] = 0.5f32;\n"
+"        let mut w = 0usize;\n"
+"        while w < 4 {\n"
+"            S_X_DIRECT[tid * 4 + w] = base_val;\n"
+"            w += 1;\n"
+"        }\n"
+"    }\n"
+"\n"
+"    thread::sync_threads();\n"
+"\n"
+"    // Phase 1 (Lean-verified sub-warp lane scan + `if k_lane == 0` leader "
+"write):\n"
+"    let mut sum = 0.0f32;\n"
+"    let mut g = 0usize;\n"
+"    while g < 4 {\n"
+"        sum += S_X_DIRECT[k_lane * 16 + g] * S_XS_DIRECT[k_lane * 4 + g];\n"
+"        g += 1;\n"
+"    }\n"
+"    sum += warp::shuffle_xor_f32(sum, 8);\n"
+"    sum += warp::shuffle_xor_f32(sum, 4);\n"
+"    sum += warp::shuffle_xor_f32(sum, 2);\n"
+"    sum += warp::shuffle_xor_f32(sum, 1);\n"
+"\n"
+"    if k_lane == 0 {\n"
+"        S_ACT_DIRECT[m_local] = sum;\n"
+"    }\n"
+"\n"
+"    thread::sync_threads();\n"
+"\n"
+"    // Phase 2 (Lean-verified under `if tid < 16` after second barrier):\n"
+"    let mut final_val = sum;\n"
+"    if tid < 16 {\n"
+"        final_val = S_ACT_DIRECT[tid];\n"
+"    }\n"
+"\n"
+"    if let Some(out_elem) = out.get_mut(idx) {\n"
+"        *out_elem = final_val;\n"
+"    }\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:475
+msgid ""
+"How Lean 4 proves all three buffers and removes all 6 shared-memory bounds "
+"checks:"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:476
+msgid ""
+"**Phase 0 bounds and disjoint chunks**: Inside `if tid < 64`, each active "
+"thread stays below 64 on the scale buffer and owns its own 4-float chunk "
+"(`tid * 4 + w < 256`) on the activation buffer."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:477
+msgid ""
+"**Phase 1 sub-warp bounds and single writer**: Masking with `tid & 15` keeps "
+"every lane index below 16 across all 256 threads, while `if k_lane == 0` "
+"ensures only one leader thread writes each sub-warp slot (`tid >> 4 < 16`)."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:478
+msgid ""
+"**Phase 2 barrier separation**: Two block-wide barriers separate Phase 0 "
+"writes, Phase 1 reads/writes, and Phase 2 reads. Widening the guard from 64 "
+"to 128 or dropping the second barrier is rejected at compile time."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:480
+msgid "Inspect both sub-warp kernels or run them on the GPU with:"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:482
+msgid ""
+"$ cargo oxide lean-export safe_subwarp_stage\n"
+"$ cargo oxide run safe_subwarp_stage\n"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:489
+msgid "Example 5: Asynchronous TMA Bulk Copy & Barrier Ordering"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:491
+msgid ""
+"On Hopper and Blackwell GPUs, global-to-shared copies run asynchronously on "
+"the **Tensor Memory Accelerator (TMA)** engine while threads coordinate "
+"through a shared-memory hardware barrier instead of a full block sync:"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:492
+msgid ""
+"**Producer (thread 0)**: Sets the expected byte count on the barrier and "
+"kicks off the 2D TMA copy into shared memory."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:493
+msgid ""
+"**Consumer wait (all 256 threads)**: Spins on the barrier until both the "
+"thread arrival and the byte transfer finish."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:494
+msgid ""
+"**Consumer read (all 256 threads)**: Reads from the shared tile with zero "
+"`unsafe` blocks in the kernel body."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:496
+msgid "Asynchronous 2D TMA bulk copy and hardware barrier handoff"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:501
+msgid ""
+"Thread 0 arms the byte count and launches the 2D TMA transfer; all 256 "
+"threads wait on the barrier before reading the staged tile."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:504
+msgid ""
+"#[kernel(launch_context = lc)]\n"
+"#[launch_bounds(256)]\n"
+"#[launch_contract(\n"
+"    domain = 1,\n"
+"    coordinates = u32,\n"
+"    block = (256, 1, 1),\n"
+")]\n"
+"#[verify(\n"
+"    no_oob_idx(TILE),\n"
+"    no_data_race(TILE),\n"
+"    uniform_barriers,\n"
+")]\n"
+"pub fn async_copy_stage(\n"
+"    #[grid_constant] tensor_map: &TmaDescriptor,\n"
+"    mut out: DisjointSlice<f32>,\n"
+"    tile_x: i32,\n"
+"    tile_y: i32,\n"
+") {\n"
+"    static mut TILE: SharedArray<f32, 4096, 128> = SharedArray::UNINIT;\n"
+"    static mut BAR: Barrier = Barrier::UNINIT;\n"
+"\n"
+"    let idx = thread::index_1d();\n"
+"    let tid = thread::threadIdx_x() as usize;\n"
+"\n"
+"    if tid == 0 {\n"
+"        mbarrier_init(&raw mut BAR, 1);\n"
+"        fence_proxy_async_shared_cta();\n"
+"    }\n"
+"    thread::sync_threads();\n"
+"\n"
+"    // Producer (thread 0 kicks off the 16 KiB TMA copy):\n"
+"    if tid == 0 {\n"
+"        let _ = mbarrier_arrive_expect_tx(&raw const BAR, 1, 16384);\n"
+"        cp_async_bulk_tensor_2d_g2s_cta(\n"
+"            &raw mut TILE as *mut u8,\n"
+"            tensor_map,\n"
+"            tile_x,\n"
+"            tile_y,\n"
+"            &raw mut BAR,\n"
+"        );\n"
+"    }\n"
+"\n"
+"    // All 256 threads wait until the TMA transfer completes:\n"
+"    while !mbarrier_try_wait_parity(&raw const BAR, 0) {}\n"
+"\n"
+"    // Safe read with bounds check removed:\n"
+"    let val = TILE[tid];\n"
+"    if let Some(out_elem) = out.get_mut(idx) {\n"
+"        *out_elem = val;\n"
+"    }\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:558
+msgid "How Lean 4 checks this handoff:"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:559
+msgid ""
+"**Single producer**: Because the TMA launch sits inside `if tid == 0`, only "
+"thread 0 starts the shared-memory write."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:560
+msgid ""
+"**Transfer size fits**: Lean 4 checks that the 16,384-byte transfer (4,096 "
+"floats) fits inside the shared array."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:561
+msgid ""
+"**Wait before read**: Lean 4 checks that the barrier is initialized, fenced, "
+"armed with the expected byte count, and awaited on every path before any "
+"thread reads the tile. Skipping the wait or forgetting to arm the byte count "
+"stops compilation."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:563
+msgid "Inspect the exported Lean proof or run the TMA copy on the GPU with:"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:565
+msgid ""
+"$ cargo oxide lean-export safe_async_copy\n"
+"$ cargo oxide run safe_async_copy\n"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:572
+msgid "Example 6: Blackwell Tensor Cores & Tensor Memory"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:574
+msgid ""
+"On datacenter Blackwell GPUs (such as NVIDIA B200), 5th-generation Tensor "
+"Cores accumulate into dynamically allocated **Tensor Memory (TMEM)** instead "
+"of regular registers:"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:575
+msgid ""
+"**Allocation (warp 0)**: Warp 0 allocates 128 columns of Tensor Memory and "
+"stores the base address in shared memory."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:576
+msgid ""
+"**TMA + Tensor Core issue (thread 0)**: Thread 0 loads the input tiles via "
+"TMA, issues the matrix multiply into Tensor Memory, and commits completion "
+"to a barrier."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:577
+msgid ""
+"**Epilogue & free (all 4 warps)**: After waiting on the barrier, each warp "
+"reads its own 32-lane slice out of Tensor Memory, syncs across the block, "
+"and lets warp 0 free the 128 columns, all with zero `unsafe` blocks in the "
+"kernel."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:579
+msgid "Blackwell Tensor Core and Tensor Memory lifecycle verification"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:584
+msgid ""
+"Warp 0 allocates 128 Tensor Memory columns, thread 0 issues and commits the "
+"Tensor Core multiply, each warp reads its own 32-lane slice, and warp 0 "
+"frees the columns after a block sync."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:587
+msgid ""
+"#[kernel(launch_context = lc)]\n"
+"#[launch_bounds(128)]\n"
+"#[launch_contract(\n"
+"    domain = 1,\n"
+"    coordinates = u32,\n"
+"    block = (128, 1, 1),\n"
+")]\n"
+"#[verify(\n"
+"    no_oob_idx(SMEM_A, SMEM_B, TMEM_ADDR),\n"
+"    no_data_race(SMEM_A, SMEM_B, TMEM_ADDR),\n"
+"    uniform_barriers,\n"
+"    tmem_lifecycle\n"
+")]\n"
+"pub fn tcgen05_matmul_verified(\n"
+"    #[grid_constant] a_tmap: &TmaDescriptor,\n"
+"    #[grid_constant] b_tmap: &TmaDescriptor,\n"
+"    mut out: DisjointSlice<f32, LinearTiles<128>>,\n"
+"    tile_x: i32,\n"
+"    tile_y: i32,\n"
+") {\n"
+"    static mut SMEM_A: SharedArray<u8, 4096, 128> = SharedArray::UNINIT;\n"
+"    static mut SMEM_B: SharedArray<u8, 4096, 128> = SharedArray::UNINIT;\n"
+"    static mut TMEM_ADDR: SharedArray<u32, 1, 4> = SharedArray::UNINIT;\n"
+"    static mut TMA_A_BAR: Barrier = Barrier::UNINIT;\n"
+"    static mut TMA_B_BAR: Barrier = Barrier::UNINIT;\n"
+"    static mut MMA_BAR: Barrier = Barrier::UNINIT;\n"
+"\n"
+"    let idx32 = thread::index_1d_u32(lc);\n"
+"    let tid = thread::threadIdx_x() as usize;\n"
+"    let warp_id = warp::warp_id();\n"
+"\n"
+"    if tid == 0 {\n"
+"        mbarrier_init(&raw mut TMA_A_BAR, 1);\n"
+"        mbarrier_init(&raw mut TMA_B_BAR, 1);\n"
+"        mbarrier_init(&raw mut MMA_BAR, 1);\n"
+"        fence_proxy_async_shared_cta();\n"
+"    }\n"
+"    thread::sync_threads();\n"
+"\n"
+"    if warp_id == 0 {\n"
+"        tcgen05_alloc(&raw mut TMEM_ADDR[0], 128);\n"
+"    }\n"
+"    thread::sync_threads();\n"
+"    let tmem_addr = TMEM_ADDR[0];\n"
+"    // ... TMA loads, Tensor Core MMA + commit, barrier wait, and TMEM "
+"load ...\n"
+"    thread::sync_threads();\n"
+"    if warp_id == 0 {\n"
+"        tcgen05_dealloc(tmem_addr, 128);\n"
+"    }\n"
+"}\n"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:640
+msgid "Inspect the generated Lean proof or build and run on Blackwell:"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:642
+msgid ""
+"$ cargo oxide lean-export safe_tcgen05_matmul\n"
+"$ cargo oxide run safe_tcgen05_matmul --arch sm_100a\n"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:649
+msgid "Example 7: Warp-Specialized Ring Buffers"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:651
+msgid ""
+"Fast persistent kernels rarely stop the whole block at a single barrier. "
+"Instead, they split warps by role: one **producer warp** streams tiles into "
+"a multi-stage ring buffer, while **consumer warps** compute on earlier "
+"stages at the same time, coordinating through arrays of barriers:"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:653
+msgid "Warp-specialized 4-stage producer and consumer ring buffer"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:658
+msgid ""
+"Warp 4 fills ring slots ahead of Warps 0..3; full-barrier and empty-barrier "
+"arrays keep each slot's writes and reads ordered across laps."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:661
+msgid ""
+"What Lean 4 checks in the warp-ring example (erasing all 9 bounds checks "
+"with zero `unsafe` blocks):"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:662
+msgid ""
+"**Ring wrap stays in bounds**: Whether you advance the stage counter with an "
+"`if` wraparound, `% 4`, or `& 3`, Lean 4 proves the stage index stays below "
+"4 on every lap. An off-by-one wrap like `== 5` is caught at compile time."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:663
+msgid ""
+"**Matching barrier and data slots**: Waiting on slot `s` of the full-barrier "
+"array only unlocks slot `s` of the ring buffer. Waiting on slot `s` and "
+"accidentally reading `(s + 1) & 3` is rejected as a data race."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:664
+msgid ""
+"**No overwriting live data**: If the producer loop forgets to wait on the "
+"empty barrier before refilling a slot on the next lap, Lean 4 rejects the "
+"loop."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:666
+msgid "$ cargo oxide run safe_warp_ring\n"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:672
+msgid "Example 8: 2-CTA Clusters & Hardware Work-Stealing"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:674
+msgid ""
+"On Blackwell, two neighboring thread blocks can team up as a **2-CTA "
+"cluster** to share tiles across Distributed Shared Memory (DSMEM) and pull "
+"work dynamically from hardware **Cluster Launch Control (CLC)**:"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:676
+msgid "Two-CTA cluster DSMEM exchange and hardware work-stealing"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:681
+msgid ""
+"Two partner blocks synchronize across the cluster before reading each "
+"other's shared memory, while hardware work-stealing delivers the next tile "
+"into a verified 16-byte buffer."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:684
+msgid ""
+"**Safe peer rank**: In a 2-block cluster, your block rank is 0 or 1, so "
+"flipping the low bit (`my_rank ^ 1`) always points to your valid partner "
+"block. Lean 4 proves that peer rank is in bounds, and rejects bugs like "
+"`my_rank + 1` (which walks out of bounds on block 1)."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:685
+msgid ""
+"**Cluster-wide syncs**: A local block sync only waits for your own block. "
+"Lean 4 checks that you run a full cluster sync before reading your partner "
+"block's shared memory or freeing shared 2-CTA Tensor Memory."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:686
+msgid ""
+"**Work-stealing mailbox**: Hardware work-stealing writes a 16-byte response "
+"asynchronously. Lean 4 checks that the response buffer is at least 16 bytes "
+"wide and that threads wait on its completion barrier before reading the "
+"stolen tile ID."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:688
+msgid "$ cargo oxide run safe_cluster_clc\n"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:694
+msgid "Example 9: Speed-of-Light Blackwell GEMM"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:696
+msgid ""
+"The final example puts every piece together in a full production FP16/BF16 "
+"matrix multiply for NVIDIA B200 (6 warps per block across a 2-block cluster):"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:697
+msgid ""
+"**Warp 4 (Producer + Work-Stealing)**: Streams A and B tiles into a 7-stage, "
+"224 KiB shared-memory ring using 2-CTA multicast TMA, overlaps hardware work-"
+"stealing for the next tile, and posts tile coordinates to a 4-slot mailbox."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:698
+msgid ""
+"**Warp 5 (2-CTA Tensor Cores)**: Issues cooperative 2-CTA Tensor Core "
+"instructions into two alternating 256-column halves of a 512-column Tensor "
+"Memory buffer."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:699
+msgid ""
+"**Warps 0..3 (Epilogue)**: Unload Tensor Memory into registers, release the "
+"Tensor Memory stage early so the next tile can start, shuffle BF16 pairs "
+"across lanes, and write 128-bit stores to global memory."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:701
+msgid "Verified 2-CTA Blackwell GEMM pipeline in safe_gemm_sol_final"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:706
+msgid ""
+"Lean 4 verifies all seven shared-memory and barrier arrays, partner CTA "
+"ranks, work-stealing responses, and 512-column Tensor Memory stages at "
+"compile time, erasing all 27 bounds checks with zero register spills."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:709
+msgid ""
+"All 224 KiB of shared memory, all 11 hardware barriers, cross-block DSMEM "
+"signaling, hardware work-stealing, and all 512 columns of Tensor Memory run "
+"without `unsafe` (leaving only one 4-line `unsafe` block at the very end for "
+"the 128-bit vectorized global output store on dynamically stolen tile "
+"coordinates)."
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:711
+msgid ""
+"Measured back-to-back on an NVIDIA B200 GPU, the Lean-verified kernel runs "
+"just as fast as the hand-tuned unsafe baseline:"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:713
+msgid "Problem Size"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:713
+msgid "Unsafe Baseline"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:713
+msgid "Lean-Verified Safe"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:713
+msgid "Safe vs. Unsafe"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:713
+msgid "4096^3"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:713
+msgid "1,855.5 TFLOPS (74.1 us)"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:713
+msgid "1,858.4 TFLOPS (74.0 us)"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:713
+msgid "100.15%"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:713
+msgid "8192^3"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:713
+msgid "2,081.4 TFLOPS (528.3 us)"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:713
+msgid "2,082.3 TFLOPS (528.0 us)"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:713
+msgid "100.04%"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:713
+msgid "16384^3"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:713
+msgid "2,118.1 TFLOPS (4.15 ms)"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:713
+msgid "2,118.4 TFLOPS (4.15 ms)"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:713
+msgid "100.01%"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:719
+msgid "Build and benchmark on B200 with:"
+msgstr ""
+
+#: ../../../gpu-safety/verified-kernels.md:721
+msgid ""
+"$ cargo oxide build safe_gemm_sol_final --arch sm_100a\n"
+"$ cargo oxide run safe_gemm_sol_final --arch sm_100a\n"
+msgstr ""

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-16 04:35+0000\n"
+"POT-Creation-Date: 2026-11-23 19:38+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -82,9 +82,8 @@ msgstr ""
 
 #: ../../../gpu-programming/virtual-memory-and-peer-access.md:28
 msgid ""
-"The complete integration test is available in [`cuda-core/tests/simt_vmm_p2p."
-"rs`](https://github.com/NVIDIA/cuda-rust/blob/main/cuda-core/tests/"
-"simt_vmm_p2p.rs)."
+"The complete integration test is available in [`cuda-core/tests/vmm_p2p.rs`]"
+"(https://github.com/NVIDIA/cuda-rust/blob/main/cuda-core/tests/vmm_p2p.rs)."
 msgstr ""
 
 #: ../../../gpu-programming/virtual-memory-and-peer-access.md:31
@@ -93,14 +92,14 @@ msgstr ""
 
 #: ../../../gpu-programming/virtual-memory-and-peer-access.md:33
 msgid ""
-"[`cuda-core/src/simt/vmm.rs`](https://github.com/NVIDIA/cuda-rust/blob/main/"
-"cuda-core/src/simt/vmm.rs)"
+"[`cuda-core/src/vmm.rs`](https://github.com/NVIDIA/cuda-rust/blob/main/cuda-"
+"core/src/vmm.rs)"
 msgstr ""
 
 #: ../../../gpu-programming/virtual-memory-and-peer-access.md:34
 msgid ""
-"[`cuda-core/src/simt/peer.rs`](https://github.com/NVIDIA/cuda-rust/blob/main/"
-"cuda-core/src/simt/peer.rs)"
+"[`cuda-core/src/peer.rs`](https://github.com/NVIDIA/cuda-rust/blob/main/cuda-"
+"core/src/peer.rs)"
 msgstr ""
 
 #: ../../../gpu-programming/virtual-memory-and-peer-access.md:37
@@ -189,7 +188,7 @@ msgstr ""
 
 #: ../../../gpu-programming/virtual-memory-and-peer-access.md:85
 msgid ""
-"use cuda_core::simt::peer;\n"
+"use cuda_core::peer;\n"
 "use cuda_core::{CudaContext, DriverError};\n"
 "\n"
 "fn check_peer_access() -> Result<(), DriverError> {\n"
@@ -230,7 +229,7 @@ msgstr ""
 
 #: ../../../gpu-programming/virtual-memory-and-peer-access.md:116
 msgid ""
-"use cuda_core::simt::peer;\n"
+"use cuda_core::peer;\n"
 "use cuda_core::{CudaContext, DriverError};\n"
 "\n"
 "fn enable_bidirectional_peer_access() -> Result<(), DriverError> {\n"
@@ -257,35 +256,35 @@ msgstr ""
 msgid "The direction is determined by the argument order:"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:106
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:142
 msgid "Call"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:106
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:142
 msgid "Effect"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:106
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:142
 msgid "`enable_peer_access(&ctx0, &ctx1)`"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:106
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:144
 msgid "GPU 0's context may access GPU 1 memory"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:106
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:144
 msgid "`enable_peer_access(&ctx1, &ctx0)`"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:106
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:145
 msgid "GPU 1's context may access GPU 0 memory"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:106
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:145
 msgid "Both calls"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:106
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:145
 msgid "Bidirectional peer access"
 msgstr ""
 
@@ -331,66 +330,67 @@ msgstr ""
 msgid "The main APIs are:"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:152
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:169
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:539
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:556
 msgid "API"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:152
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:169
 msgid "Purpose"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:152
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:169
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:539
 msgid "`vmm::allocation_granularity(device)`"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:152
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:171
 msgid "Query the required allocation granularity"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:152
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:171
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:541
 msgid "`vmm::align_size(size, granularity)`"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:152
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:172
 msgid "Round a size to that granularity"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:152
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:172
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:542
 msgid "`PhysicalAllocation::new(device, size)`"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:152
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:173
 msgid "Allocate physical memory"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:152
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:173
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:545
 msgid "`VirtualReservation::new(size, alignment)`"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:152
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:174
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:546
 msgid "Reserve a virtual address range"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:152
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:174
 msgid "`Mapping::new(va, size, &physical, offset)`"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:152
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:175
 msgid "Map physical memory into a VA range"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:152
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:175
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:551
 msgid "`vmm::set_access(va, size, devices)`"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:152
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:176
 msgid "Grant devices access to the mapped range"
 msgstr ""
 
@@ -410,7 +410,7 @@ msgstr ""
 
 #: ../../../gpu-programming/virtual-memory-and-peer-access.md:185
 msgid ""
-"use cuda_core::simt::vmm;\n"
+"use cuda_core::vmm;\n"
 "use cuda_core::{CudaContext, DriverError};\n"
 "\n"
 "fn aligned_allocation_size(requested: usize) -> Result<usize, DriverError> "
@@ -440,7 +440,7 @@ msgstr ""
 
 #: ../../../gpu-programming/virtual-memory-and-peer-access.md:205
 msgid ""
-"use cuda_core::simt::vmm;\n"
+"use cuda_core::vmm;\n"
 "use cuda_core::{CudaContext, DriverError};\n"
 "\n"
 "fn single_gpu_vmm_roundtrip() -> Result<(), DriverError> {\n"
@@ -476,7 +476,7 @@ msgid ""
 "    let input: Vec<u8> = (0..64).map(|i| (i * 3 + 7) as u8).collect();\n"
 "\n"
 "    unsafe {\n"
-"        cuda_core::simt::memory::memcpy_htod_async(\n"
+"        cuda_core::memory::memcpy_htod_async(\n"
 "            reservation.base(),\n"
 "            input.as_ptr(),\n"
 "            input.len(),\n"
@@ -489,7 +489,7 @@ msgid ""
 "    let mut output = vec![0u8; input.len()];\n"
 "\n"
 "    unsafe {\n"
-"        cuda_core::simt::memory::memcpy_dtoh_async(\n"
+"        cuda_core::memory::memcpy_dtoh_async(\n"
 "            output.as_mut_ptr(),\n"
 "            reservation.base(),\n"
 "            output.len(),\n"
@@ -557,8 +557,8 @@ msgstr ""
 
 #: ../../../gpu-programming/virtual-memory-and-peer-access.md:294
 msgid ""
-"use cuda_core::simt::{peer, vmm};\n"
 "use cuda_core::{CudaContext, DriverError, IntoResult};\n"
+"use cuda_core::{peer, vmm};\n"
 "use std::mem::MaybeUninit;\n"
 "\n"
 "fn gpu_count() -> Result<usize, DriverError> {\n"
@@ -645,7 +645,7 @@ msgid ""
 "    ctx0.bind_to_thread()?;\n"
 "\n"
 "    unsafe {\n"
-"        cuda_core::simt::memory::memcpy_htod_async(\n"
+"        cuda_core::memory::memcpy_htod_async(\n"
 "            reservation0.base(),\n"
 "            input.as_ptr(),\n"
 "            byte_length,\n"
@@ -660,7 +660,7 @@ msgid ""
 "    ctx1.bind_to_thread()?;\n"
 "\n"
 "    unsafe {\n"
-"        cuda_core::simt::memory::memcpy_dtoh_async(\n"
+"        cuda_core::memory::memcpy_dtoh_async(\n"
 "            output.as_mut_ptr(),\n"
 "            reservation1.base(),\n"
 "            byte_length,\n"
@@ -733,51 +733,51 @@ msgstr ""
 msgid "The VMM wrapper types own CUDA resources through RAII:"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:444
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:454
 msgid "Type"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:444
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:454
 msgid "CUDA resource"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:444
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:454
 msgid "Drop operation"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:444
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:454
 msgid "`PhysicalAllocation`"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:444
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:456
 msgid "Generic physical allocation handle"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:444
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:456
 msgid "`cuMemRelease`"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:444
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:456
 msgid "`VirtualReservation`"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:444
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:457
 msgid "Reserved virtual address range"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:444
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:457
 msgid "`cuMemAddressFree`"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:444
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:457
 msgid "`Mapping`"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:444
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:458
 msgid "Physical-to-virtual mapping"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:444
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:458
 msgid "`cuMemUnmap`"
 msgstr ""
 
@@ -887,55 +887,55 @@ msgid ""
 "A portable multi-GPU application should treat these conditions separately:"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:521
 msgid "Condition"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:521
 msgid "Recommended behavior"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:521
 msgid "Fewer than two devices"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:521
 msgid "Skip the P2P path"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:521
 msgid "`can_access_peer` returns `false`"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:524
 msgid "Use host-staged transfers or another path"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:524
 msgid "VMM allocation fails"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:524
 msgid "Report the CUDA driver error"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:524
 msgid "Access permission setup fails"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:524
 msgid "Destroy mappings and fall back"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:524
 msgid "Peer access is already enabled"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:524
 msgid "Continue"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:524
 msgid "Peer access is already disabled"
 msgstr ""
 
@@ -955,79 +955,80 @@ msgstr ""
 msgid "VMM"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:539
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:556
 msgid "Description"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:541
 msgid "Required size granularity for VMM operations"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:542
 msgid "Round a requested size upward"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:543
 msgid "Allocate physical memory on a device"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:543
 msgid "`PhysicalAllocation::handle()`"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:544
 msgid "Return the raw allocation handle"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:544
 msgid "`PhysicalAllocation::size()`"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:545
 msgid "Return the physical allocation size"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:546
 msgid "`VirtualReservation::base()`"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:547
 msgid "Return the reserved base address"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:547
 msgid "`VirtualReservation::size()`"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:548
 msgid "Return the reserved range size"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:548
 msgid "`Mapping::new(va, size, physical, offset)`"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:549
 msgid "Map physical memory into a virtual range"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:549
 msgid "`Mapping::va()`"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:550
 msgid "Return the mapped virtual address"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:550
 msgid "`Mapping::size()`"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:551
 msgid "Return the mapped size"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:552
 msgid "Grant read/write access to selected devices"
 msgstr ""
 
@@ -1035,27 +1036,27 @@ msgstr ""
 msgid "P2P"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:556
 msgid "`peer::can_access_peer(from, to)`"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:558
 msgid "Query topology support"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:558
 msgid "`peer::enable_peer_access(from, to)`"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:559
 msgid "Enable directional peer access"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:559
 msgid "`peer::disable_peer_access(from, to)`"
 msgstr ""
 
-#: ../../../gpu-programming/virtual-memory-and-peer-access.md:497
+#: ../../../gpu-programming/virtual-memory-and-peer-access.md:560
 msgid "Disable directional peer access"
 msgstr ""
 

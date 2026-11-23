@@ -47,9 +47,9 @@
     "branch" : "main",
     "commit" : 
     {
-      "date" : "2026-10-19 20:16:03 +0530",
-      "hash" : "717432490ccf85f0a9166401be6de362d6c622b2",
-      "title" : "feat(cuda-oxide): carry inline intent through the device pipeline (#1511)"
+      "date" : "2026-11-23 21:13:36 +0530",
+      "hash" : "5e5c77b19a4b3204d6542bab2f0fde2a4eed824b",
+      "title" : "fix(cuda-oxide): harden #[verify] contracts, MIR translation, and macro hygiene (#1857)"
     }
   },
   "type" : "branch",

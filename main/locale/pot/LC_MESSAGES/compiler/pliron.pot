@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-19 15:08+0000\n"
+"POT-Creation-Date: 2026-11-23 19:38+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -94,51 +94,51 @@ msgid ""
 "different levels of abstraction:"
 msgstr ""
 
-#: ../../../compiler/pliron.md:0
+#: ../../../compiler/pliron.md:45
 msgid "Level"
 msgstr ""
 
-#: ../../../compiler/pliron.md:0
+#: ../../../compiler/pliron.md:45
 msgid "What it models"
 msgstr ""
 
-#: ../../../compiler/pliron.md:0
+#: ../../../compiler/pliron.md:45
 msgid "Example operations"
 msgstr ""
 
-#: ../../../compiler/pliron.md:0
+#: ../../../compiler/pliron.md:45
 msgid "**`dialect-mir`**"
 msgstr ""
 
-#: ../../../compiler/pliron.md:0
+#: ../../../compiler/pliron.md:47
 msgid "Rust semantics -- tuples, enums, slices, checked arithmetic"
 msgstr ""
 
-#: ../../../compiler/pliron.md:0
+#: ../../../compiler/pliron.md:47
 msgid "`mir.extract_field`, `mir.get_discriminant`"
 msgstr ""
 
-#: ../../../compiler/pliron.md:0
+#: ../../../compiler/pliron.md:47
 msgid "**LLVM dialect**"
 msgstr ""
 
-#: ../../../compiler/pliron.md:0
+#: ../../../compiler/pliron.md:48
 msgid "Machine-near operations -- integer math, memory, control flow"
 msgstr ""
 
-#: ../../../compiler/pliron.md:0
+#: ../../../compiler/pliron.md:48
 msgid "`llvm.add`, `llvm.load`, `llvm.br`"
 msgstr ""
 
-#: ../../../compiler/pliron.md:0
+#: ../../../compiler/pliron.md:48
 msgid "**`dialect-nvvm`**"
 msgstr ""
 
-#: ../../../compiler/pliron.md:0
+#: ../../../compiler/pliron.md:49
 msgid "GPU intrinsics -- thread indexing, warp shuffles, TMA, WGMMA"
 msgstr ""
 
-#: ../../../compiler/pliron.md:0
+#: ../../../compiler/pliron.md:49
 msgid "`nvvm.read_ptx_sreg_tid_x`, `nvvm.shfl_sync`"
 msgstr ""
 
@@ -172,87 +172,87 @@ msgid ""
 "compiler stack."
 msgstr ""
 
-#: ../../../compiler/pliron.md:0
+#: ../../../compiler/pliron.md:69
 msgid "Aspect"
 msgstr ""
 
-#: ../../../compiler/pliron.md:0
+#: ../../../compiler/pliron.md:69
 msgid "pliron"
 msgstr ""
 
-#: ../../../compiler/pliron.md:0
+#: ../../../compiler/pliron.md:69
 msgid "Upstream MLIR"
 msgstr ""
 
-#: ../../../compiler/pliron.md:0
+#: ../../../compiler/pliron.md:69
 msgid "Language"
 msgstr ""
 
-#: ../../../compiler/pliron.md:0
+#: ../../../compiler/pliron.md:69
 msgid "Pure Rust"
 msgstr ""
 
-#: ../../../compiler/pliron.md:0
+#: ../../../compiler/pliron.md:69
 msgid "C++ with Python bindings"
 msgstr ""
 
-#: ../../../compiler/pliron.md:0
+#: ../../../compiler/pliron.md:69
 msgid "Build system"
 msgstr ""
 
-#: ../../../compiler/pliron.md:0
+#: ../../../compiler/pliron.md:69
 msgid "`cargo build`"
 msgstr ""
 
-#: ../../../compiler/pliron.md:0
+#: ../../../compiler/pliron.md:72
 msgid "CMake + full LLVM build"
 msgstr ""
 
-#: ../../../compiler/pliron.md:0
+#: ../../../compiler/pliron.md:72
 msgid "DSLs required"
 msgstr ""
 
-#: ../../../compiler/pliron.md:0
+#: ../../../compiler/pliron.md:72
 msgid "None -- just Rust macros"
 msgstr ""
 
-#: ../../../compiler/pliron.md:0
+#: ../../../compiler/pliron.md:72
 msgid "TableGen, ODS"
 msgstr ""
 
-#: ../../../compiler/pliron.md:0
+#: ../../../compiler/pliron.md:72
 msgid "Debugging"
 msgstr ""
 
-#: ../../../compiler/pliron.md:0
+#: ../../../compiler/pliron.md:72
 msgid "Standard Rust tooling (`dbg!`, rust-gdb)"
 msgstr ""
 
-#: ../../../compiler/pliron.md:0
+#: ../../../compiler/pliron.md:74
 msgid "gdb on C++ templates"
 msgstr ""
 
-#: ../../../compiler/pliron.md:0
+#: ../../../compiler/pliron.md:74
 msgid "Extensibility"
 msgstr ""
 
-#: ../../../compiler/pliron.md:0
+#: ../../../compiler/pliron.md:74
 msgid "Add a dialect as a Rust crate"
 msgstr ""
 
-#: ../../../compiler/pliron.md:0
+#: ../../../compiler/pliron.md:74
 msgid "C++ extension against LLVM headers"
 msgstr ""
 
-#: ../../../compiler/pliron.md:0
+#: ../../../compiler/pliron.md:74
 msgid "Dependency weight"
 msgstr ""
 
-#: ../../../compiler/pliron.md:0
+#: ../../../compiler/pliron.md:74
 msgid "One published crate"
 msgstr ""
 
-#: ../../../compiler/pliron.md:0
+#: ../../../compiler/pliron.md:74
 msgid "Gigabytes of LLVM build artifacts"
 msgstr ""
 
@@ -345,8 +345,8 @@ msgstr ""
 
 #: ../../../compiler/pliron.md:126
 msgid ""
-"Every operation belongs to a dialect. The naming convention is `dialect_name."
-"op_name`:"
+"Every operation belongs to a dialect. The naming convention is "
+"`dialect_name.op_name`:"
 msgstr ""
 
 #: ../../../compiler/pliron.md:129
@@ -743,8 +743,9 @@ msgstr ""
 
 #: ../../../compiler/pliron.md:386
 msgid ""
-"**Arithmetic and casts**: all 19 LLVM binary ops (`llvm.add` through `llvm."
-"frem`), plus 13 cast ops (`llvm.sext`, `llvm.trunc`, `llvm.bitcast`, ...)."
+"**Arithmetic and casts**: all 19 LLVM binary ops (`llvm.add` through "
+"`llvm.frem`), plus 13 cast ops (`llvm.sext`, `llvm.trunc`, "
+"`llvm.bitcast`, ...)."
 msgstr ""
 
 #: ../../../compiler/pliron.md:388
@@ -772,9 +773,9 @@ msgstr ""
 
 #: ../../../compiler/pliron.md:398
 msgid ""
-"**Thread indexing**: `nvvm.read_ptx_sreg_tid_x`, `nvvm."
-"read_ptx_sreg_ctaid_x`, `nvvm.barrier0` -- the building blocks of `thread::"
-"index_1d()`."
+"**Thread indexing**: `nvvm.read_ptx_sreg_tid_x`, "
+"`nvvm.read_ptx_sreg_ctaid_x`, `nvvm.barrier0` -- the building blocks of "
+"`thread::index_1d()`."
 msgstr ""
 
 #: ../../../compiler/pliron.md:400

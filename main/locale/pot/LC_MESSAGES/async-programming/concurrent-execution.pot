@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cuda-oxide \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-21 14:41+0000\n"
+"POT-Creation-Date: 2026-11-23 19:38+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -100,13 +100,13 @@ msgstr ""
 msgid ""
 "Everything starts with `init_device_contexts`. This creates the CUDA "
 "context, sets up the scheduling policy (round-robin with four streams by "
-"default), and makes the thread-local state available for `.sync()` and `."
-"await`:"
+"default), and makes the thread-local state available for `.sync()` and "
+"`.await`:"
 msgstr ""
 
 #: ../../../async-programming/concurrent-execution.md:61
 msgid ""
-"use cuda_async::simt::device_context::init_device_contexts;\n"
+"use cuda_async::device_context::init_device_contexts;\n"
 "\n"
 "#[tokio::main]\n"
 "async fn main() -> Result<(), Box<dyn std::error::Error>> {\n"
@@ -286,8 +286,8 @@ msgstr ""
 msgid ""
 "**`.await`** yields the current async task while the GPU works. Other tasks "
 "on the same Tokio thread can make progress. This is better than `.sync()` "
-"for throughput but still sequential within the task -- the code after `."
-"await` does not run until the operation completes:"
+"for throughput but still sequential within the task -- the code after "
+"`.await` does not run until the operation completes:"
 msgstr ""
 
 #: ../../../async-programming/concurrent-execution.md:190
@@ -451,8 +451,8 @@ msgstr ""
 
 #: ../../../async-programming/concurrent-execution.md:306
 msgid ""
-"The three arms correspond to: success, a CUDA driver or scheduling error (e."
-"g., out-of-memory, invalid launch config), and a Tokio task panic."
+"The three arms correspond to: success, a CUDA driver or scheduling error "
+"(e.g., out-of-memory, invalid launch config), and a Tokio task panic."
 msgstr ""
 
 #: ../../../async-programming/concurrent-execution.md:309
@@ -474,10 +474,10 @@ msgstr ""
 msgid ""
 "This sets the default device to GPU 0 and prepares the thread-local map for "
 "two devices. Each device's CUDA context, scheduling policy, and stream pool "
-"are created lazily on first use. All policy-driven operations (`.sync()`, `."
-"await`) use the default device unless you explicitly target a different one. "
-"The `ExecutionContext` carries the device ID, so operations on GPU 0 never "
-"interfere with streams on GPU 1."
+"are created lazily on first use. All policy-driven operations (`.sync()`, "
+"`.await`) use the default device unless you explicitly target a different "
+"one. The `ExecutionContext` carries the device ID, so operations on GPU 0 "
+"never interfere with streams on GPU 1."
 msgstr ""
 
 #: ../../../async-programming/concurrent-execution.md:326
@@ -503,63 +503,63 @@ msgid ""
 "on your situation:"
 msgstr ""
 
-#: ../../../async-programming/concurrent-execution.md:325
+#: ../../../async-programming/concurrent-execution.md:340
 msgid "Workload"
 msgstr ""
 
-#: ../../../async-programming/concurrent-execution.md:325
+#: ../../../async-programming/concurrent-execution.md:340
 msgid "Suggested pool size"
 msgstr ""
 
-#: ../../../async-programming/concurrent-execution.md:325
+#: ../../../async-programming/concurrent-execution.md:340
 msgid "Why"
 msgstr ""
 
-#: ../../../async-programming/concurrent-execution.md:325
+#: ../../../async-programming/concurrent-execution.md:340
 msgid "One large kernel per launch"
 msgstr ""
 
-#: ../../../async-programming/concurrent-execution.md:325
+#: ../../../async-programming/concurrent-execution.md:340
 msgid "1--2"
 msgstr ""
 
-#: ../../../async-programming/concurrent-execution.md:325
+#: ../../../async-programming/concurrent-execution.md:340
 msgid "The kernel already saturates the GPU"
 msgstr ""
 
-#: ../../../async-programming/concurrent-execution.md:325
+#: ../../../async-programming/concurrent-execution.md:340
 msgid "Many small kernels"
 msgstr ""
 
-#: ../../../async-programming/concurrent-execution.md:325
+#: ../../../async-programming/concurrent-execution.md:340
 msgid "4--8"
 msgstr ""
 
-#: ../../../async-programming/concurrent-execution.md:325
+#: ../../../async-programming/concurrent-execution.md:340
 msgid "Overlap launch overhead between streams"
 msgstr ""
 
-#: ../../../async-programming/concurrent-execution.md:325
+#: ../../../async-programming/concurrent-execution.md:340
 msgid "Mixed kernel + memcpy"
 msgstr ""
 
-#: ../../../async-programming/concurrent-execution.md:325
+#: ../../../async-programming/concurrent-execution.md:340
 msgid "2--4"
 msgstr ""
 
-#: ../../../async-programming/concurrent-execution.md:325
+#: ../../../async-programming/concurrent-execution.md:340
 msgid "Overlap compute with data transfer"
 msgstr ""
 
-#: ../../../async-programming/concurrent-execution.md:325
+#: ../../../async-programming/concurrent-execution.md:340
 msgid "Latency-sensitive serving"
 msgstr ""
 
-#: ../../../async-programming/concurrent-execution.md:325
+#: ../../../async-programming/concurrent-execution.md:340
 msgid "1 per request"
 msgstr ""
 
-#: ../../../async-programming/concurrent-execution.md:325
+#: ../../../async-programming/concurrent-execution.md:340
 msgid "Avoid head-of-line blocking"
 msgstr ""
 
@@ -588,63 +588,63 @@ msgstr ""
 msgid "Common pitfalls"
 msgstr ""
 
-#: ../../../async-programming/concurrent-execution.md:325
+#: ../../../async-programming/concurrent-execution.md:362
 msgid "Pitfall"
 msgstr ""
 
-#: ../../../async-programming/concurrent-execution.md:325
+#: ../../../async-programming/concurrent-execution.md:362
 msgid "What you see"
 msgstr ""
 
-#: ../../../async-programming/concurrent-execution.md:325
+#: ../../../async-programming/concurrent-execution.md:362
 msgid "Fix"
 msgstr ""
 
-#: ../../../async-programming/concurrent-execution.md:325
+#: ../../../async-programming/concurrent-execution.md:362
 msgid "`.sync()` inside an async context"
 msgstr ""
 
-#: ../../../async-programming/concurrent-execution.md:325
+#: ../../../async-programming/concurrent-execution.md:364
 msgid "Blocks the Tokio thread, stalling all tasks on it"
 msgstr ""
 
-#: ../../../async-programming/concurrent-execution.md:325
+#: ../../../async-programming/concurrent-execution.md:364
 msgid "Use `.await` instead"
 msgstr ""
 
-#: ../../../async-programming/concurrent-execution.md:325
+#: ../../../async-programming/concurrent-execution.md:364
 msgid "`DeviceBox` dropped before stream sync"
 msgstr ""
 
-#: ../../../async-programming/concurrent-execution.md:325
+#: ../../../async-programming/concurrent-execution.md:365
 msgid "Use-after-free crash or corrupted results"
 msgstr ""
 
-#: ../../../async-programming/concurrent-execution.md:325
+#: ../../../async-programming/concurrent-execution.md:365
 msgid "Keep ownership in `and_then` closures"
 msgstr ""
 
-#: ../../../async-programming/concurrent-execution.md:325
+#: ../../../async-programming/concurrent-execution.md:365
 msgid "Too many streams"
 msgstr ""
 
-#: ../../../async-programming/concurrent-execution.md:325
+#: ../../../async-programming/concurrent-execution.md:365
 msgid "Scheduling overhead exceeds overlap benefit"
 msgstr ""
 
-#: ../../../async-programming/concurrent-execution.md:325
+#: ../../../async-programming/concurrent-execution.md:365
 msgid "Profile, reduce pool size"
 msgstr ""
 
-#: ../../../async-programming/concurrent-execution.md:325
+#: ../../../async-programming/concurrent-execution.md:365
 msgid "Missing `init_device_contexts`"
 msgstr ""
 
-#: ../../../async-programming/concurrent-execution.md:325
+#: ../../../async-programming/concurrent-execution.md:367
 msgid "`DeviceError::Context` on first operation"
 msgstr ""
 
-#: ../../../async-programming/concurrent-execution.md:325
+#: ../../../async-programming/concurrent-execution.md:367
 msgid "Call once at program start"
 msgstr ""
 
