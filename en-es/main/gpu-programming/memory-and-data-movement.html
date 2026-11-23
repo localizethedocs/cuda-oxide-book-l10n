@@ -1,0 +1,1244 @@
+
+<!DOCTYPE html>
+
+
+<html lang="es-ES" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Memory and Data Movement &#8212; cuda-oxide</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/nvidia-sphinx-theme.css?v=5d97cc0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=196aea71" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/lightbox.css?v=31fdf494" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+
+    <script src="../_static/documentation_options.js?v=4730b09f"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'gpu-programming/memory-and-data-movement';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="../_static/js/lightbox.js?v=8cf6bc2b"></script>
+    <script src="../_static/js/spa-nav.js?v=9a4d0bbe"></script>
+    <link rel="canonical" href="https://projects.localizethedocs.org/cuda-oxide-book-l10n/gpu-programming/memory-and-data-movement.html" />
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="next" title="Launching Kernels" href="launching-kernels.html" />
+    <link rel="prev" title="Kernels and Device Functions" href="kernels-and-device-functions.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="es-ES"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+<script type="text/javascript" src="../ltd-provenance.js"></script>
+<script type="text/javascript" src="../ltd-current.js"></script>
+<script type="text/javascript" src="../../../ltd-config.js"></script>
+<script type="text/javascript" src="../../../ltd-flyout.js"></script>
+
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Saltar al contenido principal</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Volver arriba</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Advertencia de versión"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Navegación del sitio">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">cuda-oxide</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Búsqueda" aria-label="Búsqueda" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Tema">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Tema" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Claro"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Oscuro"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="Sistema"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>Sistema</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Claro</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Oscuro</button></li>
+  </ul>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="En esta página">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/NVlabs/cuda-oxide" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i><span class="visually-hidden">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Búsqueda" aria-label="Búsqueda" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Tema">
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Tema" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Claro"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Oscuro"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="Sistema"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>Sistema</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Claro</button></li>
+    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Oscuro</button></li>
+  </ul>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><div class="sidebar-tree">
+    <p class="sidebar-tree-title">
+        Table of Contents
+    </p>
+    <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/hello-gpu.html">Writing Your First Kernel</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Writing GPU Programs</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="execution-model.html">The CUDA Execution Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kernels-and-device-functions.html">Kernels and Device Functions</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Memory and Data Movement</a></li>
+<li class="toctree-l1"><a class="reference internal" href="launching-kernels.html">Launching Kernels</a></li>
+<li class="toctree-l1"><a class="reference internal" href="closures-and-generics.html">Closures and Generics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="error-handling-and-debugging.html">Error Handling and Debugging</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Safety on the GPU</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../gpu-safety/the-safety-model.html">The Safety Model</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Async GPU Programming</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/the-device-operation-model.html">The DeviceOperation Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/combinators-and-composition.html">Combinators and Composition</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/scheduling-and-streams.html">Scheduling and Streams</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../async-programming/concurrent-execution.html">Concurrent Execution</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Building a Real Application</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../projects/async-mlp-pipeline.html">Project: Async MLP Pipeline</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Advanced GPU Features</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/shared-memory-and-synchronization.html">Shared Memory and Synchronization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/warp-level-programming.html">Warp-Level Programming</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/tensor-memory-accelerator.html">Tensor Memory Accelerator (TMA)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/matrix-multiply-accelerators.html">Matrix Multiply Accelerators</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../advanced/cluster-programming.html">Cluster Programming</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Inside the Compiler</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/architecture-overview.html">Architecture Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/pliron.html">Pliron – Pliron IR (MLIR-like)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/rustc-public.html">rustc_public – Stable MIR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/rustc-codegen-cuda.html">The Code Generator: rustc-codegen-cuda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/mir-importer.html">The MIR Importer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/compiler-optimizations.html">Compiler Optimizations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/mlir-dialects.html">Pliron Dialects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/lowering-pipeline.html">The Lowering Pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/adding-new-intrinsics.html">Adding New Intrinsics</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler/fuzzing-and-differential-testing.html">Fuzzing and Differential Testing</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Appendix</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/building-from-source.html">Building from Source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/api-quick-reference.html">API Quick Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/supported-features.html">Supported Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/cuda-cpp-comparison.html">cuda-oxide vs CUDA C++</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/ecosystem.html">The Rust + GPU Ecosystem</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/glossary.html">Glossary</a></li>
+</ul>
+
+</div></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Miga de pan" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Inicio">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Memory and Data Movement</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="memory-and-data-movement">
+<h1>Memory and Data Movement<a class="headerlink" href="#memory-and-data-movement" title="Link to this heading">#</a></h1>
+<p>GPUs have their own memory, separate from the host. Getting data to and from the
+device – and choosing the right kind of memory once it’s there – is
+fundamental to every CUDA program. This chapter covers cuda-oxide’s memory
+abstractions, from host/device transfers to shared memory and the kernel ABI.</p>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p><a class="reference external" href="https://docs.nvidia.com/cuda/cuda-programming-guide/#device-memory-accesses">CUDA Programming Guide – Device Memory</a>
+for the authoritative reference on the CUDA memory hierarchy and access patterns.</p>
+</div>
+<section id="the-cuda-memory-hierarchy">
+<h2>The CUDA memory hierarchy<a class="headerlink" href="#the-cuda-memory-hierarchy" title="Link to this heading">#</a></h2>
+<p>NVIDIA GPUs expose several tiers of memory, each with different capacity,
+latency, and scope:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Memory</p></th>
+<th class="head text-left"><p>Scope</p></th>
+<th class="head text-left"><p>Typical size</p></th>
+<th class="head text-left"><p>Latency</p></th>
+<th class="head text-left"><p>cuda-oxide API</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><strong>Registers</strong></p></td>
+<td class="text-left"><p>Per thread</p></td>
+<td class="text-left"><p>~255 × 32-bit</p></td>
+<td class="text-left"><p>0 cycles</p></td>
+<td class="text-left"><p>Local variables</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><strong>Shared memory</strong></p></td>
+<td class="text-left"><p>Per block</p></td>
+<td class="text-left"><p>48–228 KB (arch-dependent)</p></td>
+<td class="text-left"><p>~5 cycles</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">SharedArray</span></code>, <code class="docutils literal notranslate"><span class="pre">DynamicSharedArray</span></code></p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><strong>L1 cache</strong></p></td>
+<td class="text-left"><p>Per SM</p></td>
+<td class="text-left"><p>Combined with shared</p></td>
+<td class="text-left"><p>Hardware-managed</p></td>
+<td class="text-left"><p>Automatic</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><strong>L2 cache</strong></p></td>
+<td class="text-left"><p>Chip-wide</p></td>
+<td class="text-left"><p>Up to 50 MB (Hopper)</p></td>
+<td class="text-left"><p>~30 cycles</p></td>
+<td class="text-left"><p>Automatic</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><strong>Global memory (DRAM)</strong></p></td>
+<td class="text-left"><p>All threads</p></td>
+<td class="text-left"><p>16–80 GB (HBM)</p></td>
+<td class="text-left"><p>~400 cycles</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">DeviceBuffer</span></code>, <code class="docutils literal notranslate"><span class="pre">DeviceBox</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The guiding principle: move frequently accessed data into faster, closer memory.
+Registers are fastest but per-thread; shared memory is fast and visible to the
+whole block; global memory is large but slow.</p>
+<figure class="align-center" id="id1">
+<a class="reference internal image-reference" href="../_images/memory-hierarchy.svg"><img alt="../_images/memory-hierarchy.svg" src="../_images/memory-hierarchy.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">The CUDA memory hierarchy from fastest (registers, per-thread) to largest
+(global DRAM, all threads). Each tier trades capacity for latency. The right
+panel shows scope and the cuda-oxide API for each level.</span><a class="headerlink" href="#id1" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="contexts-and-streams">
+<h2>Contexts and streams<a class="headerlink" href="#contexts-and-streams" title="Link to this heading">#</a></h2>
+<p>Before diving into memory APIs, two host-side concepts that appear in every
+code example need introduction: <strong>contexts</strong> and <strong>streams</strong>.</p>
+<p>A <strong>CUDA context</strong> (<code class="docutils literal notranslate"><span class="pre">CudaContext</span></code>) binds the host thread to a specific GPU. It
+owns all resources on that device – modules, streams, allocations. You
+typically create one at the start of your program:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_core</span><span class="p">::</span><span class="n">CudaContext</span><span class="p">;</span>
+
+<span class="kd">let</span><span class="w"> </span><span class="n">ctx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CudaContext</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="mi">0</span><span class="p">).</span><span class="n">unwrap</span><span class="p">();</span><span class="w">   </span><span class="c1">// bind to GPU 0</span>
+</pre></div>
+</div>
+<p>A <strong>CUDA stream</strong> (<code class="docutils literal notranslate"><span class="pre">CudaStream</span></code>) is an ordered queue of GPU operations.
+Operations enqueued on the <strong>same</strong> stream execute in FIFO order – each one
+sees all side effects of the preceding operations. Operations on <strong>different</strong>
+streams may overlap and run concurrently with no ordering guarantees between
+them.</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="n">stream</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ctx</span><span class="p">.</span><span class="n">default_stream</span><span class="p">();</span><span class="w">     </span><span class="c1">// the implicit, always-available stream</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">work_stream</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stream</span><span class="p">.</span><span class="n">fork</span><span class="p">()</span><span class="o">?</span><span class="p">;</span><span class="w">      </span><span class="c1">// a new stream, joined to the parent&#39;s current position</span>
+</pre></div>
+</div>
+<p>Every memory transfer and kernel launch requires a stream. For single-stream
+programs (which covers most examples in this book), the <strong>default stream</strong> is
+all you need – everything is sequential and correct by construction.
+Multi-stream pipelines unlock overlap between compute and data movement, but
+require explicit synchronization via events or <code class="docutils literal notranslate"><span class="pre">join</span></code>:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Same stream:       [kernel_A] → [memcpy_B] → [kernel_C]     (automatic ordering)
+Different streams: [kernel_A on stream 1] | [memcpy_B on stream 2]  (concurrent, needs events)
+</pre></div>
+</div>
+<figure class="align-center" id="id2">
+<a class="reference internal image-reference" href="../_images/cuda-streams.svg"><img alt="../_images/cuda-streams.svg" src="../_images/cuda-streams.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">Top: single-stream execution where operations are automatically ordered in FIFO.
+Bottom: multi-stream execution where streams A and B run concurrently, with an
+event establishing the data dependency between kernel_write and kernel_read.</span><a class="headerlink" href="#id2" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p>The <a class="reference internal" href="launching-kernels.html"><span class="std std-doc">Launching Kernels</span></a> chapter covers stream usage in
+launch macros, and the <a class="reference internal" href="../async-programming/the-device-operation-model.html"><span class="std std-doc">Async GPU Programming</span></a>
+section covers <code class="docutils literal notranslate"><span class="pre">DeviceOperation</span></code> which manages streams automatically.</p>
+</div>
+</section>
+<section id="devicebuffer-host-device-transfers">
+<h2><code class="docutils literal notranslate"><span class="pre">DeviceBuffer</span></code> – host/device transfers<a class="headerlink" href="#devicebuffer-host-device-transfers" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">DeviceBuffer&lt;T&gt;</span></code> in <code class="docutils literal notranslate"><span class="pre">cuda_core</span></code> is the primary way to allocate device memory
+and move data between host and GPU:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_core</span><span class="p">::{</span><span class="n">CudaContext</span><span class="p">,</span><span class="w"> </span><span class="n">DeviceBuffer</span><span class="p">};</span>
+
+<span class="kd">let</span><span class="w"> </span><span class="n">ctx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CudaContext</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="mi">0</span><span class="p">).</span><span class="n">unwrap</span><span class="p">();</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">stream</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ctx</span><span class="p">.</span><span class="n">default_stream</span><span class="p">();</span>
+
+<span class="c1">// Host → device: copy a host slice to GPU memory</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">a_dev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DeviceBuffer</span><span class="p">::</span><span class="n">from_host</span><span class="p">(</span><span class="o">&amp;</span><span class="n">stream</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">host_data</span><span class="p">).</span><span class="n">unwrap</span><span class="p">();</span>
+
+<span class="c1">// Allocate zeroed device memory</span>
+<span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">c_dev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DeviceBuffer</span><span class="p">::</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">::</span><span class="n">zeroed</span><span class="p">(</span><span class="o">&amp;</span><span class="n">stream</span><span class="p">,</span><span class="w"> </span><span class="mi">1024</span><span class="p">).</span><span class="n">unwrap</span><span class="p">();</span>
+
+<span class="c1">// Device → host: read results back</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">results</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c_dev</span><span class="p">.</span><span class="n">to_host_vec</span><span class="p">(</span><span class="o">&amp;</span><span class="n">stream</span><span class="p">).</span><span class="n">unwrap</span><span class="p">();</span>
+</pre></div>
+</div>
+<section id="key-methods">
+<h3>Key methods<a class="headerlink" href="#key-methods" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Method</p></th>
+<th class="head text-left"><p>Direction</p></th>
+<th class="head text-left"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">from_host(&amp;stream,</span> <span class="pre">&amp;[T])</span></code></p></td>
+<td class="text-left"><p>Host → Device</p></td>
+<td class="text-left"><p>Allocate + blocking copy</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">zeroed(&amp;stream,</span> <span class="pre">len)</span></code></p></td>
+<td class="text-left"><p>–</p></td>
+<td class="text-left"><p>Allocate + zero-fill</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">to_host_vec(&amp;stream)</span></code></p></td>
+<td class="text-left"><p>Device → Host</p></td>
+<td class="text-left"><p>Async copy + return <code class="docutils literal notranslate"><span class="pre">Vec&lt;T&gt;</span></code></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">copy_to_host(&amp;stream,</span> <span class="pre">&amp;mut</span> <span class="pre">[T])</span></code></p></td>
+<td class="text-left"><p>Device → Host</p></td>
+<td class="text-left"><p>Copy into existing slice</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cu_deviceptr()</span></code></p></td>
+<td class="text-left"><p>–</p></td>
+<td class="text-left"><p>Raw <code class="docutils literal notranslate"><span class="pre">CUdeviceptr</span></code> for FFI</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="ownership-and-drop">
+<h3>Ownership and drop<a class="headerlink" href="#ownership-and-drop" title="Link to this heading">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">DeviceBuffer</span></code> frees its allocation <strong>synchronously</strong> on drop via <code class="docutils literal notranslate"><span class="pre">cuMemFree</span></code>.
+This is a blocking driver call – it internally synchronizes the entire device
+to ensure no in-flight kernel is still touching the memory. In practice, this
+means:</p>
+<ul class="simple">
+<li><p><strong>Dropping while a kernel is running</strong> will stall the host thread until the
+GPU is completely idle, then free the memory.</p></li>
+<li><p><strong>Dropping after synchronization</strong> (e.g., after <code class="docutils literal notranslate"><span class="pre">to_host_vec</span></code> or
+<code class="docutils literal notranslate"><span class="pre">stream.synchronize()</span></code>) has no additional cost because the device is already
+idle.</p></li>
+</ul>
+<p>For single-stream workloads this is fine – everything executes in FIFO order,
+so by the time you read results back, all kernels are done and the free is
+instant. The cost becomes visible in multi-stream scenarios where you want to
+overlap compute with memory operations; a synchronous free on one stream can
+stall work on all other streams.</p>
+</section>
+</section>
+<section id="devicebox-async-friendly-device-memory">
+<h2><code class="docutils literal notranslate"><span class="pre">DeviceBox</span></code> – async-friendly device memory<a class="headerlink" href="#devicebox-async-friendly-device-memory" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">DeviceBox&lt;T&gt;</span></code> in <code class="docutils literal notranslate"><span class="pre">cuda_async</span></code> solves the synchronous-free problem. On drop, it
+frees memory via <code class="docutils literal notranslate"><span class="pre">cuMemFreeAsync</span></code> on a <strong>dedicated deallocator stream</strong>. This
+is a stream-ordered operation – the free is enqueued on the deallocator stream
+and executes only after all preceding work on that stream completes. Critically,
+it does <strong>not</strong> synchronize the device:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_async</span><span class="p">::</span><span class="n">device_box</span><span class="p">::</span><span class="n">DeviceBox</span><span class="p">;</span>
+<span class="k">use</span><span class="w"> </span><span class="n">cuda_async</span><span class="p">::</span><span class="n">device_context</span><span class="p">::</span><span class="n">init_device_contexts</span><span class="p">;</span>
+
+<span class="n">init_device_contexts</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="o">?</span><span class="p">;</span><span class="w">  </span><span class="c1">// Initialize device context map (default device 0)</span>
+
+<span class="c1">// DeviceBox wraps a device pointer; freed asynchronously on drop</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">dev_ptr</span><span class="p">:</span><span class="w"> </span><span class="nc">DeviceBox</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="cm">/* allocated by DeviceOperation chain */</span><span class="p">;</span>
+<span class="c1">// When dev_ptr is dropped, cuMemFreeAsync is called on the deallocator stream.</span>
+<span class="c1">// Other streams continue running without stalling.</span>
+</pre></div>
+</div>
+<section id="choosing-between-them">
+<h3>Choosing between them<a class="headerlink" href="#choosing-between-them" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p></p></th>
+<th class="head text-left"><p><code class="docutils literal notranslate"><span class="pre">DeviceBuffer</span></code></p></th>
+<th class="head text-left"><p><code class="docutils literal notranslate"><span class="pre">DeviceBox</span></code></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><strong>Crate</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cuda_core</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cuda_async</span></code></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><strong>Free on drop</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cuMemFree</span></code> (sync – stalls device)</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cuMemFreeAsync</span></code> (async – no stall)</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><strong>Use with</strong></p></td>
+<td class="text-left"><p>typed sync launches</p></td>
+<td class="text-left"><p>typed async launches</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><strong>Host readback</strong></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">to_host_vec()</span></code></p></td>
+<td class="text-left"><p>Via explicit memcpy operation</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><strong>Best for</strong></p></td>
+<td class="text-left"><p>Single-stream, blocking workloads</p></td>
+<td class="text-left"><p>Multi-stream, pipelined workloads</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Truco</p>
+<p>For latency-sensitive teardown in multi-stream pipelines, prefer <code class="docutils literal notranslate"><span class="pre">DeviceBox</span></code>.
+For straightforward single-stream examples, <code class="docutils literal notranslate"><span class="pre">DeviceBuffer</span></code> is simpler and
+the synchronous free is effectively zero-cost.</p>
+</div>
+</section>
+</section>
+<section id="argument-scalarization">
+<span id="memory-argument-scalarization"></span><h2>Argument scalarization<a class="headerlink" href="#argument-scalarization" title="Link to this heading">#</a></h2>
+<p>When you write a kernel that takes <code class="docutils literal notranslate"><span class="pre">&amp;[f32]</span></code>, the host and device don’t agree on
+how to represent a Rust slice in memory – the struct layout can differ between
+the host’s x86 ABI and the NVPTX ABI. cuda-oxide solves this by
+<strong>scalarizing</strong> aggregate types at the kernel boundary: decomposing them into
+primitive values that both sides interpret identically.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Kernel parameter type</p></th>
+<th class="head text-left"><p>What the host actually passes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">&amp;[T]</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">ptr:</span> <span class="pre">*const</span> <span class="pre">T</span></code> + <code class="docutils literal notranslate"><span class="pre">len:</span> <span class="pre">u64</span></code></p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">DisjointSlice&lt;T&gt;</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">ptr:</span> <span class="pre">*mut</span> <span class="pre">T</span></code> + <code class="docutils literal notranslate"><span class="pre">len:</span> <span class="pre">u64</span></code></p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">T</span></code> (scalar)</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">T</span></code> directly</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Struct <code class="docutils literal notranslate"><span class="pre">{</span> <span class="pre">a:</span> <span class="pre">u32,</span> <span class="pre">b:</span> <span class="pre">f32</span> <span class="pre">}</span></code></p></td>
+<td class="text-left"><p>One byval value (whole struct)</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Closure (with N captures)</p></td>
+<td class="text-left"><p>One byval value (whole struct)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Zero-sized types</p></td>
+<td class="text-left"><p>Stripped entirely</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>This is why typed <code class="docutils literal notranslate"><span class="pre">#[cuda_module]</span></code> methods accept <code class="docutils literal notranslate"><span class="pre">&amp;DeviceBuffer&lt;T&gt;</span></code> for <code class="docutils literal notranslate"><span class="pre">&amp;[T]</span></code>
+and <code class="docutils literal notranslate"><span class="pre">&amp;mut</span> <span class="pre">DeviceBuffer&lt;T&gt;</span></code> for writable slice-like parameters. The generated
+method extracts the pointer and length for you. Inside the kernel, the compiler
+reconstitutes the slice struct from the scalar parameters, so your kernel code
+sees normal <code class="docutils literal notranslate"><span class="pre">&amp;[T]</span></code> types.</p>
+<figure class="align-center" id="id3">
+<a class="reference internal image-reference" href="../_images/scalarization-abi.svg"><img alt="../_images/scalarization-abi.svg" src="../_images/scalarization-abi.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">Argument scalarization: the host passes Rust slices as (ptr, len) pairs through
+the ABI boundary. The device kernel receives flat scalar parameters and the
+compiler reconstitutes the original Rust types inside the kernel.</span><a class="headerlink" href="#id3" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<div class="admonition tip">
+<p class="admonition-title">Truco</p>
+<p>Scalarization is completely invisible in normal kernel code. You write <code class="docutils literal notranslate"><span class="pre">&amp;[f32]</span></code>
+in the signature and use it as a regular slice. The generated launch method and
+the compiler handle everything else.</p>
+</div>
+</section>
+<section id="disjointslice-safe-parallel-writes">
+<h2><code class="docutils literal notranslate"><span class="pre">DisjointSlice</span></code> – safe parallel writes<a class="headerlink" href="#disjointslice-safe-parallel-writes" title="Link to this heading">#</a></h2>
+<p>In CUDA C++, the standard pattern for parallel output is a raw <code class="docutils literal notranslate"><span class="pre">__global__</span></code>
+pointer that every thread indexes into. This is inherently unsafe – nothing
+prevents two threads from writing to the same location.</p>
+<p>cuda-oxide provides <code class="docutils literal notranslate"><span class="pre">DisjointSlice&lt;T,</span> <span class="pre">IndexSpace&gt;</span></code> as a safe alternative. It
+wraps a mutable slice and only allows writes through a <code class="docutils literal notranslate"><span class="pre">ThreadIndex</span></code> whose
+<code class="docutils literal notranslate"><span class="pre">IndexSpace</span></code> matches its own. Combined with matching prepared launch geometry,
+this ensures each thread accesses a unique element:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::{</span><span class="n">kernel</span><span class="p">,</span><span class="w"> </span><span class="n">DisjointSlice</span><span class="p">};</span>
+
+<span class="cp">#[kernel]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">double</span><span class="p">(</span><span class="n">input</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">out</span><span class="p">:</span><span class="w"> </span><span class="nc">DisjointSlice</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nb">Some</span><span class="p">((</span><span class="n">out_elem</span><span class="p">,</span><span class="w"> </span><span class="n">idx</span><span class="p">))</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">out</span><span class="p">.</span><span class="n">get_mut_indexed</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="o">*</span><span class="n">out_elem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">input</span><span class="p">[</span><span class="n">idx</span><span class="p">.</span><span class="n">get</span><span class="p">()]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">2.0</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">get_mut_indexed()</span></code> is the one-call form: it mints the per-thread witness
+and resolves it to a <code class="docutils literal notranslate"><span class="pre">&amp;mut</span> <span class="pre">T</span></code> in a single shot. <code class="docutils literal notranslate"><span class="pre">None</span></code> covers both
+out-of-grid threads (e.g. <code class="docutils literal notranslate"><span class="pre">col</span> <span class="pre">&gt;=</span> <span class="pre">ROW_STRIDE</span></code> for 2D) and out-of-slice
+indices.</p></li>
+<li><p>The explicit two-step form <code class="docutils literal notranslate"><span class="pre">let</span> <span class="pre">idx</span> <span class="pre">=</span> <span class="pre">thread::index_1d();</span> <span class="pre">out.get_mut(idx)</span></code>
+is also available when you need the index for parallel arithmetic across
+multiple slices.</p></li>
+<li><p>For patterns like reductions where multiple threads intentionally write
+to the same location, <code class="docutils literal notranslate"><span class="pre">get_unchecked_mut</span></code> (unsafe) provides an escape
+hatch.</p></li>
+</ul>
+<section id="why-threadindex-makes-this-safe">
+<h3>Why <code class="docutils literal notranslate"><span class="pre">ThreadIndex</span></code> makes this safe<a class="headerlink" href="#why-threadindex-makes-this-safe" title="Link to this heading">#</a></h3>
+<p>The key to <code class="docutils literal notranslate"><span class="pre">DisjointSlice</span></code>’s safety is <code class="docutils literal notranslate"><span class="pre">ThreadIndex&lt;'kernel,</span> <span class="pre">IndexSpace&gt;</span></code> –
+an opaque witness with no public constructor. The only way to obtain one
+is through trusted index functions that derive the value from hardware
+built-in variables (<code class="docutils literal notranslate"><span class="pre">threadIdx</span></code>, <code class="docutils literal notranslate"><span class="pre">blockIdx</span></code>, <code class="docutils literal notranslate"><span class="pre">blockDim</span></code>):</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="n">idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">thread</span><span class="p">::</span><span class="n">index_1d</span><span class="p">();</span><span class="w">          </span><span class="c1">// ThreadIndex&lt;&#39;_, Index1D&gt; -- ok</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">bad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ThreadIndex</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="mi">42</span><span class="p">);</span><span class="w">        </span><span class="c1">// does not exist -- private constructor</span>
+</pre></div>
+</div>
+<p>This works because CUDA’s thread indices are <strong>uniform values provided by the
+hardware</strong>: every thread in a block receives a unique <code class="docutils literal notranslate"><span class="pre">threadIdx</span></code> from the GPU’s
+warp scheduler. For 1D grid launches (where only the x dimension is used), the
+global index derived from <code class="docutils literal notranslate"><span class="pre">blockIdx.x</span> <span class="pre">*</span> <span class="pre">blockDim.x</span> <span class="pre">+</span> <span class="pre">threadIdx.x</span></code> is unique
+across the entire grid.</p>
+<p>That last statement is conditional: <code class="docutils literal notranslate"><span class="pre">index_1d()</span></code> ignores Y and Z. A 2D grid
+would repeat the same X-derived index for every Y coordinate.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>PreparedLaunch(domain=1) -&gt; Y/Z inactive -&gt; safe DisjointSlice writes
+raw LaunchConfig         -&gt; caller proves Y/Z inactive -&gt; unsafe launch
+</pre></div>
+</div>
+<p>The witness proves the device-side index space; the prepared launch proves the
+host-side geometry. Both are needed for a fully safe launch.</p>
+<p>The witness is also <code class="docutils literal notranslate"><span class="pre">!Send</span> <span class="pre">+</span> <span class="pre">!Sync</span> <span class="pre">+</span> <span class="pre">!Copy</span> <span class="pre">+</span> <span class="pre">!Clone</span></code>, and its <code class="docutils literal notranslate"><span class="pre">'kernel</span></code>
+lifetime is borrowed from a stack-local scope the macros inject – so a
+thread can’t park its <code class="docutils literal notranslate"><span class="pre">ThreadIndex</span></code> in shared memory for a neighbour to
+pick up later, and the witness can’t outlive the kernel body. Combine
+that with the <code class="docutils literal notranslate"><span class="pre">IndexSpace</span></code> parameter (<code class="docutils literal notranslate"><span class="pre">Index1D</span></code>, <code class="docutils literal notranslate"><span class="pre">Index2D&lt;S&gt;</span></code>,
+<code class="docutils literal notranslate"><span class="pre">Runtime2DIndex</span></code>) and the type system rejects mismatched 2D strides at
+compile time too – a data-race hazard becomes a type error.</p>
+</section>
+</section>
+<section id="shared-memory">
+<h2>Shared memory<a class="headerlink" href="#shared-memory" title="Link to this heading">#</a></h2>
+<p><strong>Shared memory</strong> is fast on-chip memory visible to all threads within a block.
+It is the primary tool for inter-thread communication and data reuse within a
+block, sitting between registers (per-thread) and global memory (all threads)
+in both speed and scope.</p>
+<section id="static-shared-memory-sharedarray">
+<h3>Static shared memory – <code class="docutils literal notranslate"><span class="pre">SharedArray</span></code><a class="headerlink" href="#static-shared-memory-sharedarray" title="Link to this heading">#</a></h3>
+<p>When the size is known at compile time, use <code class="docutils literal notranslate"><span class="pre">SharedArray&lt;T,</span> <span class="pre">N&gt;</span></code>:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::{</span><span class="n">kernel</span><span class="p">,</span><span class="w"> </span><span class="n">thread</span><span class="p">,</span><span class="w"> </span><span class="n">SharedArray</span><span class="p">,</span><span class="w"> </span><span class="n">DisjointSlice</span><span class="p">};</span>
+
+<span class="k">static</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">TILE</span><span class="p">:</span><span class="w"> </span><span class="nc">SharedArray</span><span class="o">&lt;</span><span class="kt">f32</span><span class="p">,</span><span class="w"> </span><span class="mi">256</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SharedArray</span><span class="p">::</span><span class="n">UNINIT</span><span class="p">;</span>
+
+<span class="cp">#[kernel]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">smem_example</span><span class="p">(</span><span class="n">input</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">out</span><span class="p">:</span><span class="w"> </span><span class="nc">DisjointSlice</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">thread</span><span class="p">::</span><span class="n">index_1d</span><span class="p">();</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">tid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">thread</span><span class="p">::</span><span class="n">threadIdx_x</span><span class="p">()</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">usize</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// Load from global to shared</span>
+<span class="w">    </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">TILE</span><span class="p">[</span><span class="n">tid</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">input</span><span class="p">[</span><span class="n">idx</span><span class="p">.</span><span class="n">get</span><span class="p">()];</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="n">thread</span><span class="p">::</span><span class="n">sync_threads</span><span class="p">();</span>
+
+<span class="w">    </span><span class="c1">// Read neighbor from shared (much faster than global)</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">neighbor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">tid</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">TILE</span><span class="p">[</span><span class="n">tid</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="mf">0.0</span>
+<span class="w">    </span><span class="p">};</span>
+<span class="w">    </span><span class="n">thread</span><span class="p">::</span><span class="n">sync_threads</span><span class="p">();</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nb">Some</span><span class="p">(</span><span class="n">out_elem</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">out</span><span class="p">.</span><span class="n">get_mut</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="o">*</span><span class="n">out_elem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">TILE</span><span class="p">[</span><span class="n">tid</span><span class="p">]</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">neighbor</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Each <code class="docutils literal notranslate"><span class="pre">static</span> <span class="pre">mut</span> <span class="pre">SharedArray</span></code> maps to a separate <code class="docutils literal notranslate"><span class="pre">.shared</span></code> allocation in PTX.
+The <code class="docutils literal notranslate"><span class="pre">sync_threads()</span></code> barrier ensures all threads have finished writing before
+any thread reads.</p>
+</section>
+<section id="dynamic-shared-memory-dynamicsharedarray">
+<h3>Dynamic shared memory – <code class="docutils literal notranslate"><span class="pre">DynamicSharedArray</span></code><a class="headerlink" href="#dynamic-shared-memory-dynamicsharedarray" title="Link to this heading">#</a></h3>
+<p>When the size depends on runtime parameters, use <code class="docutils literal notranslate"><span class="pre">DynamicSharedArray&lt;T&gt;</span></code> and
+specify the allocation size via <code class="docutils literal notranslate"><span class="pre">LaunchConfig::shared_mem_bytes</span></code>:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="k">use</span><span class="w"> </span><span class="n">cuda_device</span><span class="p">::{</span><span class="n">kernel</span><span class="p">,</span><span class="w"> </span><span class="n">thread</span><span class="p">,</span><span class="w"> </span><span class="n">DynamicSharedArray</span><span class="p">,</span><span class="w"> </span><span class="n">DisjointSlice</span><span class="p">};</span>
+
+<span class="cp">#[kernel]</span>
+<span class="k">pub</span><span class="w"> </span><span class="k">fn</span><span class="w"> </span><span class="nf">dynamic_smem_example</span><span class="p">(</span><span class="n">input</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="kt">f32</span><span class="p">],</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">out</span><span class="p">:</span><span class="w"> </span><span class="nc">DisjointSlice</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">smem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DynamicSharedArray</span><span class="p">::</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">::</span><span class="n">get</span><span class="p">();</span>
+<span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">tid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">thread</span><span class="p">::</span><span class="n">threadIdx_x</span><span class="p">()</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">usize</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">*</span><span class="n">smem</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">tid</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">input</span><span class="p">[</span><span class="n">thread</span><span class="p">::</span><span class="n">index_1d</span><span class="p">().</span><span class="n">get</span><span class="p">()];</span><span class="w"> </span><span class="p">}</span>
+<span class="w">    </span><span class="n">thread</span><span class="p">::</span><span class="n">sync_threads</span><span class="p">();</span>
+<span class="w">    </span><span class="c1">// ... use smem ...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>On the host, set the size at launch:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="n">config</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LaunchConfig</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">grid_dim</span><span class="p">:</span><span class="w"> </span><span class="p">(</span><span class="n">num_blocks</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span>
+<span class="w">    </span><span class="n">block_dim</span><span class="p">:</span><span class="w"> </span><span class="p">(</span><span class="mi">256</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span>
+<span class="w">    </span><span class="n">shared_mem_bytes</span><span class="p">:</span><span class="w"> </span><span class="mi">256</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">std</span><span class="p">::</span><span class="n">mem</span><span class="p">::</span><span class="n">size_of</span><span class="p">::</span><span class="o">&lt;</span><span class="kt">f32</span><span class="o">&gt;</span><span class="p">()</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">u32</span><span class="p">,</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>Multiple dynamic arrays can share the same allocation by using
+<code class="docutils literal notranslate"><span class="pre">DynamicSharedArray::offset(byte_offset)</span></code> to partition it.</p>
+</section>
+<section id="alignment">
+<h3>Alignment<a class="headerlink" href="#alignment" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Type</p></th>
+<th class="head text-left"><p>Default alignment</p></th>
+<th class="head text-left"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">SharedArray&lt;T,</span> <span class="pre">N&gt;</span></code></p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">align_of::&lt;T&gt;()</span></code></p></td>
+<td class="text-left"><p>Standard alignment</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">SharedArray&lt;T,</span> <span class="pre">N,</span> <span class="pre">128&gt;</span></code></p></td>
+<td class="text-left"><p>128 bytes</p></td>
+<td class="text-left"><p>Required for TMA operations</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">DynamicSharedArray&lt;T&gt;</span></code></p></td>
+<td class="text-left"><p>16 bytes</p></td>
+<td class="text-left"><p>nvcc-compatible default</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">DynamicSharedArray&lt;T,</span> <span class="pre">128&gt;</span></code></p></td>
+<td class="text-left"><p>128 bytes</p></td>
+<td class="text-left"><p>Required for TMA</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="common-pitfalls">
+<h3>Common pitfalls<a class="headerlink" href="#common-pitfalls" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>Missing <code class="docutils literal notranslate"><span class="pre">sync_threads()</span></code>:</strong> Without a barrier between shared memory writes
+and reads, threads may read stale or uninitialized data.</p></li>
+<li><p><strong>Exceeding SM limits:</strong> Requesting too much shared memory causes
+<code class="docutils literal notranslate"><span class="pre">CUDA_ERROR_LAUNCH_OUT_OF_RESOURCES</span></code>. Check your architecture’s limit.</p></li>
+</ul>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p><a class="reference external" href="https://docs.nvidia.com/cuda/cuda-programming-guide/#shared-memory">CUDA Programming Guide – Shared Memory</a>
+for details on bank conflicts, broadcasting, and optimal access patterns.</p>
+</div>
+</section>
+</section>
+<section id="unified-memory-and-hmm">
+<h2>Unified memory and HMM<a class="headerlink" href="#unified-memory-and-hmm" title="Link to this heading">#</a></h2>
+<p>By default, GPUs operate in a <strong>separate address space</strong> from the CPU. A GPU
+cannot dereference an ordinary host pointer – the address simply doesn’t map to
+anything in the GPU’s page tables. The traditional CUDA workflow therefore
+requires explicit allocation in device memory followed by explicit copies:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>┌──────────────────┐              ┌──────────────────┐
+│   CPU Memory     │    PCIe /    │   GPU Memory     │
+│   (host DRAM)    │◄────────────►│   (device HBM)   │
+│                  │   NVLink     │                  │
+└──────────────────┘    copy      └──────────────────┘
+   Separate address spaces -- GPU cannot dereference host pointers
+</pre></div>
+</div>
+<p>CUDA provides mechanisms that relax this restriction by letting the GPU access
+host memory transparently, at the cost of page-fault latency on first access.</p>
+<section id="memory-access-modes-at-a-glance">
+<h3>Memory access modes at a glance<a class="headerlink" href="#memory-access-modes-at-a-glance" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Mode</p></th>
+<th class="head text-left"><p>What GPU can access</p></th>
+<th class="head text-left"><p>Allocation required</p></th>
+<th class="head text-left"><p>First-access cost</p></th>
+<th class="head text-left"><p>Hardware requirement</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p><strong>Explicit copy</strong></p></td>
+<td class="text-left"><p>Device memory only</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">DeviceBuffer</span></code></p></td>
+<td class="text-left"><p>None (data copied upfront)</p></td>
+<td class="text-left"><p>Any CUDA GPU</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><strong>Pinned (mapped)</strong></p></td>
+<td class="text-left"><p>Specific host buffers</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cudaHostAlloc</span></code></p></td>
+<td class="text-left"><p>High (~10–20 µs per access)</p></td>
+<td class="text-left"><p>Any CUDA GPU</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p><strong>Unified Memory</strong></p></td>
+<td class="text-left"><p>Managed allocations</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">cudaMallocManaged</span></code></p></td>
+<td class="text-left"><p>Medium (page migration)</p></td>
+<td class="text-left"><p>Kepler+ (sm_30+)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p><strong>HMM</strong></p></td>
+<td class="text-left"><p><em>Any</em> host memory</p></td>
+<td class="text-left"><p>None</p></td>
+<td class="text-left"><p>Medium (page fault + fetch)</p></td>
+<td class="text-left"><p>Turing+ on Linux</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>cuda-oxide primarily uses <strong>explicit copies</strong> (<code class="docutils literal notranslate"><span class="pre">DeviceBuffer</span></code>, <code class="docutils literal notranslate"><span class="pre">DeviceBox</span></code>) for
+bulk data and <strong>HMM</strong> for non-move closure captures and small configuration
+data.</p>
+</section>
+<section id="unified-memory">
+<h3>Unified Memory<a class="headerlink" href="#unified-memory" title="Link to this heading">#</a></h3>
+<p>Unified Memory is CUDA’s managed-memory allocator (<code class="docutils literal notranslate"><span class="pre">cudaMallocManaged</span></code>). The
+resulting pointer is valid on both the CPU and GPU – the CUDA runtime tracks
+which processor «owns» each page and migrates it on demand. When the GPU
+accesses a page that currently resides in host DRAM, the runtime transparently
+copies it to device memory before the kernel reads the data. This migration is
+invisible to your code but not free: the first access from the «wrong» side
+incurs a page fault and a DMA transfer over the interconnect. Subsequent
+accesses to the same page hit the GPU’s local cache.</p>
+<p>cuda-oxide does not currently wrap <code class="docutils literal notranslate"><span class="pre">cudaMallocManaged</span></code> directly. For managed-
+memory workflows you would use the CUDA driver API through raw bindings.
+In practice, <code class="docutils literal notranslate"><span class="pre">DeviceBuffer::from_host</span></code> (explicit copy) covers most use cases
+and gives predictable performance.</p>
+</section>
+<section id="hmm-heterogeneous-memory-management">
+<h3>HMM (Heterogeneous Memory Management)<a class="headerlink" href="#hmm-heterogeneous-memory-management" title="Link to this heading">#</a></h3>
+<p>HMM is a Linux kernel feature that extends Unified Memory’s demand-paging model
+to <strong>all system memory</strong> – heap allocations, <code class="docutils literal notranslate"><span class="pre">mmap</span></code> regions, and even stack
+variables. With HMM enabled, the GPU can dereference any valid host pointer
+without a special CUDA allocator:</p>
+<div class="highlight-rust notranslate"><div class="highlight"><pre><span></span><span class="kd">let</span><span class="w"> </span><span class="n">factor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="k">i32</span><span class="p">;</span><span class="w">                           </span><span class="c1">// ordinary stack variable</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">scale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">|</span><span class="n">x</span><span class="p">:</span><span class="w"> </span><span class="kt">i32</span><span class="o">|</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">factor</span><span class="p">;</span><span class="w">            </span><span class="c1">// captures &amp;factor (non-move)</span>
+<span class="c1">// SAFETY: args match the kernel&#39;s signature; &amp;factor stays alive via HMM.</span>
+<span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">cuda_launch</span><span class="o">!</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">kernel</span><span class="p">:</span><span class="w"> </span><span class="nc">scale</span><span class="p">,</span><span class="w"> </span><span class="n">args</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="o">..</span><span class="p">.]</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span><span class="w">  </span><span class="c1">// GPU reads &amp;factor via HMM</span>
+</pre></div>
+</div>
+<p>Unlike Unified Memory, HMM requires no special allocation API – the pointer is
+a plain host address. When ATS (Address Translation Services) is available on
+hardware-coherent platforms like Grace Hopper, it supersedes HMM and provides
+hardware coherence at cache-line granularity; HMM is automatically disabled.</p>
+</section>
+<section id="what-happens-on-a-page-fault">
+<h3>What happens on a page fault<a class="headerlink" href="#what-happens-on-a-page-fault" title="Link to this heading">#</a></h3>
+<p>When a kernel loads from an address whose page is not resident in device memory,
+the hardware and driver cooperate to fetch it:</p>
+<ol class="arabic simple">
+<li><p>The SM executes a global load (<code class="docutils literal notranslate"><span class="pre">ld.global</span></code>) for a virtual address.</p></li>
+<li><p>The <strong>GPU MMU</strong> looks up the address in the TLB. On a miss, it walks the
+device page table.</p></li>
+<li><p>If the page table has no mapping, the GPU raises a <strong>page fault</strong>. The
+faulting warp stalls; other warps on the same SM can continue.</p></li>
+<li><p>The <strong>CUDA driver fault handler</strong> determines the source of the page:</p>
+<ul class="simple">
+<li><p><em>Unified Memory</em> – the CUDA runtime identifies the managed allocation and
+initiates migration.</p></li>
+<li><p><em>HMM</em> – the Linux kernel’s HMM layer resolves the host virtual address,
+pins the host page, and either migrates it or creates a remote mapping.</p></li>
+</ul>
+</li>
+<li><p>A <strong>DMA transfer</strong> over PCIe or NVLink copies the page from host DRAM to
+device HBM. The GPU memory controller writes the data; the host memory
+controller services the read.</p></li>
+<li><p>The GPU page table is updated, the TLB is refilled, and the <strong>warp
+resumes</strong>. The page is now local and cached in L2; subsequent accesses cost
+only hundreds of cycles.</p></li>
+</ol>
+<p>The latency of step 5 depends on the interconnect:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Interconnect</p></th>
+<th class="head text-left"><p>Bandwidth</p></th>
+<th class="head text-left"><p>Fault latency</p></th>
+<th class="head text-left"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>PCIe 4.0 x16</p></td>
+<td class="text-left"><p>~25 GB/s</p></td>
+<td class="text-left"><p>~10–20 µs</p></td>
+<td class="text-left"><p>Most desktop / workstation GPUs</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>PCIe 5.0 x16</p></td>
+<td class="text-left"><p>~50 GB/s</p></td>
+<td class="text-left"><p>~5–15 µs</p></td>
+<td class="text-left"><p>Ada Lovelace + newer platforms</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>NVLink 4.0</p></td>
+<td class="text-left"><p>~900 GB/s</p></td>
+<td class="text-left"><p>~1–5 µs</p></td>
+<td class="text-left"><p>Data-center GPUs (H100, B100)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Grace Hopper C2C</p></td>
+<td class="text-left"><p>~900 GB/s</p></td>
+<td class="text-left"><p>&lt;1 µs</p></td>
+<td class="text-left"><p>Hardware coherent – uses ATS, not HMM</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Because faults operate at page granularity (4 KB or 2 MB), a single fault can
+satisfy many threads. Warp-level coalescing also helps: 32 threads reading
+consecutive 4-byte elements touch at most one or two pages, not 32. On PCIe
+systems, a single fault costs roughly the same as a small <code class="docutils literal notranslate"><span class="pre">cudaMemcpy</span></code> – the
+advantage of demand paging is that you only pay for the pages you actually
+touch.</p>
+</section>
+<section id="how-cuda-oxide-uses-hmm">
+<h3>How cuda-oxide uses HMM<a class="headerlink" href="#how-cuda-oxide-uses-hmm" title="Link to this heading">#</a></h3>
+<p>cuda-oxide leverages HMM in two ways:</p>
+<ol class="arabic simple">
+<li><p><strong>Non-move closure captures.</strong> When a non-<code class="docutils literal notranslate"><span class="pre">move</span></code> closure is passed to a
+kernel, captured variables remain on the host stack and the GPU accesses
+them through HMM pointers. This avoids copying data that the kernel only
+reads once or infrequently.</p></li>
+<li><p><strong>Struct ABI with dynamic layout.</strong> cuda-oxide matches Rust’s actual struct
+layout (including <code class="docutils literal notranslate"><span class="pre">#[repr(Rust)]</span></code> field reordering) on the device side, so
+HMM-accessed host structs are read correctly without <code class="docutils literal notranslate"><span class="pre">#[repr(C)]</span></code> or manual
+layout specification. The compiler queries <code class="docutils literal notranslate"><span class="pre">rustc</span></code> for field offsets and
+builds matching LLVM struct types with explicit padding.</p></li>
+</ol>
+</section>
+<section id="hmm-system-requirements">
+<h3>HMM system requirements<a class="headerlink" href="#hmm-system-requirements" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Requirement</p></th>
+<th class="head text-left"><p>Minimum</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>GPU architecture</p></td>
+<td class="text-left"><p>Turing (compute capability 7.5+)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Linux kernel</p></td>
+<td class="text-left"><p>6.1.24+, 6.2.11+, or 6.3+</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>CUDA driver</p></td>
+<td class="text-left"><p>535+ with Open Kernel Modules</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Check whether HMM is active on your system:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nvidia-smi<span class="w"> </span>-q<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>Addressing
+<span class="c1"># Addressing Mode : HMM  ← HMM is enabled</span>
+</pre></div>
+</div>
+</section>
+<section id="when-to-use-hmm-vs-explicit-copies">
+<h3>When to use HMM vs explicit copies<a class="headerlink" href="#when-to-use-hmm-vs-explicit-copies" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>Scenario</p></th>
+<th class="head text-left"><p>Recommended approach</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>Large arrays processed by many threads</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">DeviceBuffer::from_host</span></code> (explicit copy)</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Small read-only configuration data</p></td>
+<td class="text-left"><p>HMM (pass pointer, let GPU page-fault)</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Data shared between CPU and GPU iteratively</p></td>
+<td class="text-left"><p>Explicit copies with double-buffering</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>Prototyping / quick experiments</p></td>
+<td class="text-left"><p>HMM (simplest – no copies needed)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Truco</p>
+<p>HMM is a convenience, not a performance strategy. For bandwidth-sensitive
+kernels, explicit copies to device memory will always be faster because they
+avoid page-fault overhead and use the full memory bus width.</p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">Ver también</p>
+<p><a class="reference external" href="https://docs.nvidia.com/cuda/cuda-programming-guide/04-special-topics/unified-memory.html">CUDA Programming Guide – Unified Memory</a>
+and <a class="reference external" href="https://developer.nvidia.com/blog/simplifying-gpu-application-development-with-heterogeneous-memory-management/">NVIDIA Blog – Simplifying GPU Development with HMM</a>
+for the full details on page migration, prefetching, and system requirements.</p>
+</div>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="kernels-and-device-functions.html"
+       title="página anterior">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">anterior</p>
+        <p class="prev-next-title">Kernels and Device Functions</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="launching-kernels.html"
+       title="siguiente página">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">siguiente</p>
+        <p class="prev-next-title">Launching Kernels</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> En esta página
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-cuda-memory-hierarchy">The CUDA memory hierarchy</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#contexts-and-streams">Contexts and streams</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#devicebuffer-host-device-transfers"><code class="docutils literal notranslate"><span class="pre">DeviceBuffer</span></code> – host/device transfers</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#key-methods">Key methods</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ownership-and-drop">Ownership and drop</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#devicebox-async-friendly-device-memory"><code class="docutils literal notranslate"><span class="pre">DeviceBox</span></code> – async-friendly device memory</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-between-them">Choosing between them</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#argument-scalarization">Argument scalarization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#disjointslice-safe-parallel-writes"><code class="docutils literal notranslate"><span class="pre">DisjointSlice</span></code> – safe parallel writes</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#why-threadindex-makes-this-safe">Why <code class="docutils literal notranslate"><span class="pre">ThreadIndex</span></code> makes this safe</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#shared-memory">Shared memory</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#static-shared-memory-sharedarray">Static shared memory – <code class="docutils literal notranslate"><span class="pre">SharedArray</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#dynamic-shared-memory-dynamicsharedarray">Dynamic shared memory – <code class="docutils literal notranslate"><span class="pre">DynamicSharedArray</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#alignment">Alignment</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#common-pitfalls">Common pitfalls</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#unified-memory-and-hmm">Unified memory and HMM</a><ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#memory-access-modes-at-a-glance">Memory access modes at a glance</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#unified-memory">Unified Memory</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hmm-heterogeneous-memory-management">HMM (Heterogeneous Memory Management)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-happens-on-a-page-fault">What happens on a page fault</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-cuda-oxide-uses-hmm">How cuda-oxide uses HMM</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hmm-system-requirements">HMM system requirements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#when-to-use-hmm-vs-explicit-copies">When to use HMM vs explicit copies</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+  
+    <div class="footer-items__center">
+      
+        <div class="footer-item"><footer class="bd-footer-content">
+  <div class="footer-container" style="padding: 1rem 0 2rem 0; border-top: 1px solid var(--pst-color-border); text-align: left;">
+    
+    <!-- NVIDIA Logo -->
+    <div style="margin-bottom: 1rem;">
+      <img src="../_static/nvidia-logo-horiz-rgb-blk-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem; filter: brightness(0);"
+           class="only-light">
+      <img src="../_static/nvidia-logo-horiz-rgb-wht-for-screen.svg" 
+           alt="NVIDIA" 
+           style="height: 3.5rem;"
+           class="only-dark pst-js-only">
+    </div>
+    
+    <!-- Footer Links - single line, left aligned -->
+    <div style="font-size: 0.8125rem; margin-bottom: 0.5rem; color: var(--pst-color-text-muted);">
+      <a href="https://www.nvidia.com/en-us/about-nvidia/privacy-policy/" target="_blank" style="color: inherit; text-decoration: none;">Privacy Policy</a> | 
+      <a href="https://www.nvidia.com/en-us/preferences/email-preferences/" target="_blank" style="color: inherit; text-decoration: none;">Your Privacy Choices</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/terms-of-service/" target="_blank" style="color: inherit; text-decoration: none;">Terms of Service</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/accessibility/" target="_blank" style="color: inherit; text-decoration: none;">Accessibility</a> | 
+      <a href="https://www.nvidia.com/en-us/about-nvidia/company-policies/" target="_blank" style="color: inherit; text-decoration: none;">Corporate Policies</a> | 
+      <a href="https://www.nvidia.com/en-us/product-security/" target="_blank" style="color: inherit; text-decoration: none;">Product Security</a> | 
+      <a href="https://www.nvidia.com/en-us/contact/" target="_blank" style="color: inherit; text-decoration: none;">Contact</a>
+    </div>
+    
+    <!-- Copyright -->
+    <div style="font-size: 0.8125rem; color: var(--pst-color-text-muted);">
+      Copyright &copy; 2025-2026, NVIDIA.
+    </div>
+    
+  </div>
+</footer></div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>
